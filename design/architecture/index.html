@@ -1,0 +1,1049 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://wwww.ebi.ac.uk/metabolights/resources/mtbls-ws3/design/architecture/">
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../aspects/dependency_inversion/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
+    
+    
+      
+        <title>Overview - MetaboLights ws3</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MetaboLights ws3" class="md-header__button md-logo" aria-label="MetaboLights ws3" data-md-component="logo">
+      
+  <img src="../../assets/metabolights.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MetaboLights ws3
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MetaboLights ws3" class="md-nav__button md-logo" aria-label="MetaboLights ws3" data-md-component="logo">
+      
+  <img src="../../assets/metabolights.png" alt="logo">
+
+    </a>
+    MetaboLights ws3
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metabolights-ws3-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      MetaboLights Ws3 Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MetaboLights Ws3 Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      General design principles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layers-and-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layers and design principles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layers and design principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Domain layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Application layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#presentation-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presentation layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Infrastructure layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run layer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Aspects
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Aspects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aspects/dependency_inversion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dependency Inversion
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aspects/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aspects/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aspects/auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Auth
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aspects/async_tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metabolights-ws3-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      MetaboLights Ws3 Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MetaboLights Ws3 Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      General design principles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layers-and-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layers and design principles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layers and design principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Domain layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Application layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#presentation-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presentation layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Infrastructure layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run layer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
+<p>MetaboLights WS3 is designed to address the latest goals and requirements of MetaboLights.</p>
+<ul>
+<li><code>Separation of Concerns</code>: Different concerns (presentation , business logic and data access) should be isolated each other. Especially, business logic does not need to know how  data is stored or managed.</li>
+<li><code>Maintainability</code>: Architecture should enable more maintainable code. To achieve this, Well defined layers should be maintained based on separation of concerns instead of external framework dependent spaghetti code. Layers and layer dependencies should be checked automatically.</li>
+<li><code>Framework Independence</code>: Business logic should not depend on external frameworks to make it easy to upgrade them or use different frameworks without affecting remaining code. MetaboLights uses different frameworks and external services and over the years, any dependencies cause major issues for applications upgrades or infrastructure changes.</li>
+<li><code>Testability</code>: Architecture should enable to change application configuration and run unit, integration, functional and non-functional tests.</li>
+<li><code>Extensible</code>: Architecture should enable to add new components or new frameworks.</li>
+<li><code>Flexible</code>: Architecture can enable to define and run different applications (multiple REST API servers, CLI applications) on same repository.</li>
+<li><code>Scalable</code>: Each application should run as stateless  and can be deployed in a container.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Inspiration</p>
+<p>MetaboLights WS3 is inspired from the following software principals, architectures and approaches:</p>
+<ul>
+<li>SOLID (Single-responsibility, Open-closed Principle, Liskov substitution, Interface segregation, Dependency inversion) Object Oriented Design Principles</li>
+<li>Domain Driven Design (DDD)</li>
+<li>Command Query Responsibility Segregation (CQRS)</li>
+<li>Clean Architecture</li>
+<li>Onion Architecture</li>
+<li>Hexagonal / Port &amp; Adaptor Architecture</li>
+</ul>
+</div>
+<h2 id="metabolights-ws3-architecture">MetaboLights Ws3 Architecture<a class="headerlink" href="#metabolights-ws3-architecture" title="Permanent link">&para;</a></h2>
+<p>MetaboLights Ws3 architecture has  <code>domain</code>, <code>application</code>, <code>presentation</code> and <code>infrastructure</code> core layers, and an additional layer named <code>run</code> to customize endpoints and executables. You can find its layers and their dependency hierarchy below:</p>
+<p><img alt="MetaboLights Ws3 layers and dependency hierarchy" src="../../assets/img/layers_dependencies.png" style="display: block; margin: 0 auto" /></p>
+<h3 id="general-design-principles">General design principles<a class="headerlink" href="#general-design-principles" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Each layer can use the lower layer(s) but not higher layers. For example, <code>infrastructure</code> layer can import both <code>application</code> and <code>domain</code> layer modules but <code>application</code> layer can only import modules from <code>domain</code> layer.</li>
+<li><code>infrastructure</code> and <code>presentation</code> layers are on the same level and they are isolated. They do not import any modules from each other.</li>
+<li>All external services (e.g., external web services) and python package dependencies (postgresql, redis, elasticsearch, etc.) are isolated from <code>application</code> layer modules. Application modules only use interfaces. Interfaces are implemented in <code>infrastructure</code> layer.</li>
+<li><code>application</code> layer modules do not know how domain entities are stored and managed (on NFS, SQL or NoSQL DB, Object Storage, etc.). They use only repository interfaces to process them.</li>
+<li>Only <code>presentation</code> layer modules will check authentication or authorization (Role based authentication and authorization). There will be no logic to check authentication or authorization in <code>application</code> or <code>infrastructure</code> layer modules (They may access authentication and authorization information in read-only mode).</li>
+<li>All application logic should be implemented in <code>application</code> layer not in <code>presentation</code> or <code>infrastructure</code> layer.</li>
+<li><code>presentation</code> layer modules should implement only RestAPI or CLI inputs and outputs (authentication and authorization). Any business logic should be moved to application and domain layer.</li>
+<li>Implementation layer modules should implement only application interfaces.</li>
+<li>Any external python package used in <code>presentation</code> or <code>infrastructure</code> layer is defined as an optional dependency (group).</li>
+<li>An <code>extra</code> dependency name is defined for each executable defined in <code>run</code> layer
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="k">[tool.poetry.extras]</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="n">ws3_worker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;uvloop&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;celery&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;httpx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;sqlalchemy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;asyncpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;metabolights-utils&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;redis&quot;</span><span class="p">]</span>
+</span></code></pre></div></li>
+<li><code>dependency_injector</code> containers will be defined for each executable in <code>run</code> layer.</li>
+<li>Prefer to implement and use async coroutines for time consuming operations (external service calls, time consuming tasks etc.)</li>
+</ul>
+<h3 id="layers-and-design-principles">Layers and design principles<a class="headerlink" href="#layers-and-design-principles" title="Permanent link">&para;</a></h3>
+<h4 id="domain-layer">Domain layer<a class="headerlink" href="#domain-layer" title="Permanent link">&para;</a></h4>
+<p>Domain layer contains only MetaboLights specific domain classes, enumerations, decorators, exceptions and basic utility methods.</p>
+<ul>
+<li><code>Domain</code> layer imports only <code>core Python packages</code> and the following libraries:<ul>
+<li><code>pydantic</code></li>
+<li><code>metabolights-utils</code></li>
+<li>Core utility libraries: <code>pyyaml</code>, <code>python-dateutil</code>, <code>pytz</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="application-layer">Application layer<a class="headerlink" href="#application-layer" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p><code>Application</code> layer imports <em>only <code>domain</code> layer</em> packages. The only exception is async tasks in <code>application</code> layer. They use <code>dependency_injector</code> package for injection of services.</p>
+</li>
+<li>
+<p>All methods and classes in <code>application</code> layer use interfaces to access infrastructure components and services.</p>
+</li>
+<li>
+<p><code>Application</code> layer modules do not import any external python libraries (e.g., celery, redis, etc.) in. Instead of importing any external library, a new service or component may be defined in <code>infrastructure</code> layer. To implement a new service or component:</p>
+<ul>
+<li>Define interfaces in <code>application</code> layer.</li>
+<li>Create any required domain objects in <code>domain</code> layer.</li>
+<li>Implement interfaces in <code>infrastructure</code> layer.</li>
+<li>Update <code>dependency_injector</code> container in <code>run</code> layer to use it.</li>
+</ul>
+</li>
+<li>Initial interfaces in <code>application</code> layers are listed below:<ul>
+<li><code>AsyncTaskService</code></li>
+<li><code>AuthenticationService</code>, <code>AuthorizationService</code> and <code>IdentityService</code></li>
+<li><code>CacheService</code></li>
+<li><code>PolicyService</code></li>
+<li><code>StudyMetadataService</code></li>
+</ul>
+</li>
+<li>Repositories are also defined as interfaces. e.g. <code>Study</code>, <code>User</code>, <code>ValidationReport</code>, <code>ValidationOverride</code>, <code>StudyObject</code>, etc. entity repositories.</li>
+<li>Application related logic is implemented in <code>use_cases</code> package. any module in <code>use_cases</code> package can import any other packages in <code>application</code> layer.</li>
+<li>All async tasks are implemented in <code>remote_tasks</code> package and they do not import <code>use_cases</code> modules.</li>
+</ul>
+<p>You can find <code>application</code> layer packages and their dependency hierarchy below:</p>
+<p><img alt="application layer dependency hierarchy" src="../../assets/img/application_layers.png" style="display: block; margin: 0 auto" /></p>
+<h4 id="presentation-layer">Presentation layer<a class="headerlink" href="#presentation-layer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>Presentation</code> layer can imports <code>application</code> and <code>domain</code> layer packages. It may also import <code>dependency_injector</code> and presentation related libraries (e.g., FastAPI, click).</li>
+<li><code>Presentation</code> layer do not import any <code>infrastructure</code> layer packages in <code>presentation</code> layer.</li>
+<li>Rest API, CLI or other executable can be defined as a presentation.</li>
+<li>Rest API endpoints are defined within API groups and each API group has managed versions. Initial Rest API groups are <code>submission</code>,<code>auth</code>, <code>curation</code>,  <code>submission</code>, and <code>public</code> .<ul>
+<li><code>Submission Rest API group</code>: It provides endpoints to create and update MetaboLights submissions. Authentication is required to use endpoints.</li>
+<li><code>Curation Rest API group</code>: It provides endpoints to curators to run curation tasks on submitted studies and make them public. Authentication is required to use endpoints.</li>
+<li><code>Public Rest API group</code>: It provides endpoints to access MetaboLights studies.</li>
+<li><code>Auth Rest API group</code>: It provides to endpoints to create and revoke JWT tokens.</li>
+</ul>
+</li>
+<li>Each user or service that wants to access any authorized endpoints should have a valid JWT token. Only JWT token is used to authorize requests.</li>
+<li>Rest API authentication will be managed within authorization middleware.</li>
+</ul>
+<h4 id="infrastructure-layer">Infrastructure layer<a class="headerlink" href="#infrastructure-layer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>Infrastructure</code> layer modules can import <code>dependency_injector</code> and any external libraries (e.g., redis, elasticsearch, celery, etc.) as well as <code>application</code> and <code>domain</code> layer.</li>
+<li><code>Infrastructure</code> layer modules do not import any <code>presentation</code> layer modules.</li>
+<li>Multiple implementations can be defined for an interface defined in <code>application</code> layer. For example, there are proxy and standalone implementations for auth services. Each implementation is isolated from each others.</li>
+<li>Initial Service and repository implementations:<ul>
+<li>AsyncTaskService: <code>Celery</code> and <code>thread</code> (for development) implementations</li>
+<li>AuthenticationService, AuthorizationService and IdentityService: <code>mtbls_ws2 proxy</code> and <code>standalone</code> implementations.</li>
+<li>CacheService: <code>Redis</code>, <code>Redis sentinel</code> and <code>in-memory</code> (for development) implementations</li>
+<li>PolicyService: Open policy agency (<code>OPA</code>) implementation</li>
+<li>StudyMetadataService: <code>NFS</code> and <code>mongodb</code> (in progress) implementations</li>
+<li>ValidationOverrideService, ValidationReportService: <code>NFS</code> and <code>mongodb</code> (in progress) implementations</li>
+<li>Repositories:<ul>
+<li><code>Study</code>, <code>Submitter</code>: <code>postgresql</code> and <code>sqlite</code> (for development) implementations</li>
+<li><code>ValidationReport</code>, <code>ValidationOverride</code>: <code>NFS</code> and <code>mongodb</code> (in progress)</li>
+<li><code>InvestigationFileObject</code>, <code>IsaTableObject</code> (<code>SampleFile</code>, <code>AssayFile</code> <code>AssignmentFile</code>): <code>NFS</code> and <code>mongodb</code> (in progress)</li>
+<li><code>FileObject</code>:  to store data folder content. <code>mongodb</code> (in progress)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="run-layer">Run layer<a class="headerlink" href="#run-layer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>Run</code> layer defines <code>dependency_injector</code> container and runs executable in <code>presentation</code> layer (submission API, public API, worker, etc.).</li>
+<li>Initial executables are:<ul>
+<li><code>Submission Rest API</code>: It uses celery async application, NFS and PostgreSQL based repositories, redis cache service and proxy authentication service.</li>
+<li><code>Submission Rest API Worker</code>: Celery worker to run submission remote tasks</li>
+<li><code>Submission Rest API Worker Monitor</code>: Flower executable to monitor celery tasks</li>
+</ul>
+</li>
+<li>Log filters and application configuration files are customized depends on selected presentation layer application and service implementations.</li>
+<li>Unit tests overrides async task, auth, and cache services. Postgresql database is also overriden by Sqlite database to run unit tests.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Overview
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../aspects/dependency_inversion/" class="md-footer__link md-footer__link--next" aria-label="Next: Dependency Inversion">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Dependency Inversion
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://x.com/MetaboLights" target="_blank" rel="noopener" title="x.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8l164.9-188.5L26.8 48h145.6l100.5 132.9zm-24.8 373.8h39.1L151.1 88h-42z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bsky.app/profile/metabolights.bsky.social" target="_blank" rel="noopener" title="bsky.app" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M111.8 62.2C170.2 105.9 233 194.7 256 242.4c23-47.6 85.8-136.4 144.2-180.2 42.1-31.6 110.3-56 110.3 21.8 0 15.5-8.9 130.5-14.1 149.2-18.2 64.8-84.4 81.4-143.3 71.3C456 322 482.2 380 425.6 438c-107.4 110.2-154.3-27.6-166.3-62.9-1.7-4.9-2.6-7.8-3.3-7.8s-1.6 3-3.3 7.8c-12 35.3-59 173.1-166.3 62.9-56.5-58-30.4-116 72.5-133.5C100 314.6 33.8 298 15.7 233.1 10.4 214.4 1.5 99.4 1.5 83.9c0-77.8 68.2-53.4 110.3-21.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.code.copy", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      
+    
+  </body>
+</html>
