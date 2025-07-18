@@ -1,0 +1,544 @@
+{
+    "mappings": {
+        "properties": {
+            "annotations": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "assayTechniques": {
+                "properties": {
+                    "main": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "name": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "sub": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "technique": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "measurementType": {
+                "type": "alias",
+                "path": "assays.measurementType.term"
+            },
+            "assayTechnique_main": {
+                "type": "alias",
+                "path": "assayTechniques.main"
+            },
+            "assayTechnique": {
+                "type": "alias",
+                "path": "assayTechniques.technique"
+            },
+            "assayTechnique_name": {
+                "type": "alias",
+                "path": "assayTechniques.name"
+            },
+            "assayTechnique_sub": {
+                "type": "alias",
+                "path": "assayTechniques.sub"
+            },
+            "designDescriptor": {
+                "type": "alias",
+                "path": "designDescriptors.term"
+            },
+            "factor": {
+                "type": "alias",
+                "path": "factors.term"
+            },
+            "funder": {
+                "type": "alias",
+                "path": "fundings.funder"
+            },
+            "organismPart": {
+                "type": "alias",
+                "path": "organismParts.term"
+            },
+            "organism": {
+                "type": "alias",
+                "path": "organisms.term"
+            },
+            "sampleType": {
+                "type": "alias",
+                "path": "sampleTypes.term"
+            },
+            "variant": {
+                "type": "alias",
+                "path": "variants.term"
+            },
+            "technologyType": {
+                "type": "alias",
+                "path": "technologyTypes.term"
+            },
+            "protocol_description": {
+                "type": "alias",
+                "path": "protocols.description"
+            },
+            "assays": {
+                "properties": {
+                    "assignmentFiles": {
+                        "type": "keyword",
+                        "index": false
+                    },
+                    "filePath": {
+                        "type": "keyword",
+                        "index": false
+                    },
+                    "measurementType": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "technique": {
+                        "properties": {
+                            "main": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "name": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "sub": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "technique": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "technologyPlatform": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "technologyType": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            },
+            "contacts": {
+                "properties": {
+                    "address": {
+                        "type": "text"
+                    },
+                    "affiliation": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "email": {
+                        "type": "keyword",
+                        "index": false
+                    },
+                    "firstName": {
+                        "type": "text"
+                    },
+                    "lastName": {
+                        "type": "text"
+                    },
+                    "midInitials": {
+                        "type": "text"
+                    },
+                    "orcid": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "roles": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            },
+            "description": {
+                "type": "text"
+            },
+            "designDescriptors": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "factors": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "fundings": {
+                "properties": {
+                    "fundRefId": {
+                        "type": "keyword"
+                    },
+                    "funder": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "grantIdentifier": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            },
+            "investigationFilePath": {
+                "type": "keyword",
+                "index": false
+            },
+            "modifiedTime": {
+                "type": "date"
+            },
+            "organismParts": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "organisms": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "protocols": {
+                "properties": {
+                    "description": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "parameters": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "protocolType": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "uri": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "version": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "publicReleaseDate": {
+                "type": "date"
+            },
+            "publications": {
+                "properties": {
+                    "authorList": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "doi": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "pubMedId": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "status": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            },
+                            "termSourceRef": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "title": {
+                        "type": "text"
+                    }
+                }
+            },
+            "sampleFilePath": {
+                "type": "keyword",
+                "index": false
+            },
+            "sampleTypes": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "sizeInBytes": {
+                "type": "long"
+            },
+            "sizeInText": {
+                "type": "keyword",
+                "ignore_above": 256
+            },
+            "studyId": {
+                "type": "keyword",
+                "ignore_above": 256
+            },
+            "submissionDate": {
+                "type": "date"
+            },
+            "technologyTypes": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "title": {
+                "type": "text"
+            },
+            "variants": {
+                "properties": {
+                    "term": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "termAccessionNumber": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    },
+                    "termSourceRef": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            }
+        }
+    }
+}

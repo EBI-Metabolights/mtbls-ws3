@@ -1,0 +1,182 @@
+from dependency_injector import containers, providers
+
+from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (
+    FileObjectWriteRepository,
+)
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+    StudyReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.study.study_write_repository import (
+    StudyWriteRepository,
+)
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+    UserReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.user.user_write_repository import (
+    UserWriteRepository,
+)
+from mtbls.domain.shared.repository.study_bucket import StudyBucket
+from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
+from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
+from mtbls.infrastructure.persistence.db.model.alias_generator import (
+    DbTableAliasGeneratorImpl,
+)
+from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
+
+# from mtbls.infrastructure.persistence.db.mongodb.config import (
+#     MongoDbConnection,
+# )
+from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
+    DatabaseClientImpl,
+)
+from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
+from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (
+    FileSystemObjectWriteRepository,
+)
+from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (
+    StudyFolderManager,
+)
+from mtbls.infrastructure.repositories.study.db.study_read_repository import (
+    SqlDbStudyReadRepository,
+)
+from mtbls.infrastructure.repositories.study.db.study_write_repository import (
+    SqlDbStudyWriteRepository,
+)
+from mtbls.infrastructure.repositories.user.db.user_read_repository import (
+    SqlDbUserReadRepository,
+)
+from mtbls.infrastructure.repositories.user.db.user_write_repository import (
+    SqlDbUserWriteRepository,
+)
+
+
+class GatewaysContainer(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    runtime_config = providers.Configuration()
+    database_client: DatabaseClient = providers.Singleton(
+        DatabaseClientImpl,
+        db_connection=config.database.postgresql.connection,
+        db_pool_size=runtime_config.db_pool_size,
+    )
+
+    # mongodb_connection: MongoDbConnection = providers.Resource(
+    #     create_config_from_dict,
+    #     MongoDbConnection,
+    #     config.database.mongodb.connection,
+    # )
+
+    pub_sub_broker: PubSubConnection = providers.Singleton(
+        RedisConnectionProvider,
+        config=config.cache.redis.connection,
+    )
+
+    pub_sub_backend: PubSubConnection = pub_sub_broker
+
+
+class RepositoriesContainer(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    entity_mapper: EntityMapper = providers.Singleton(EntityMapper)
+
+    alias_generator: AliasGenerator = providers.Singleton(
+        DbTableAliasGeneratorImpl, entity_mapper
+    )
+
+    gateways = providers.DependenciesContainer()
+    services = providers.DependenciesContainer()
+    study_read_repository: StudyReadRepository = providers.Singleton(
+        SqlDbStudyReadRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
+    study_write_repository: StudyWriteRepository = providers.Singleton(
+        SqlDbStudyWriteRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
+    user_write_repository: UserWriteRepository = providers.Singleton(
+        SqlDbUserWriteRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
+
+    user_read_repository: UserReadRepository = providers.Singleton(
+        SqlDbUserReadRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
+    # study_file_repository: StudyFileRepository = providers.Singleton(
+    #     MongoDbStudyFileRepository,
+    #     connection=gateways.mongodb_connection,
+    #     study_objects_collection_name="study_files",
+    # )
+
+    # study_file_repository: StudyFileRepository = providers.Singleton(
+    #     SqlDbStudyFileRepository,
+    #     entity_mapper=entity_mapper,
+    #     alias_generator=alias_generator,
+    #     database_client=gateways.database_client,
+    # )
+
+    folder_manager = providers.Singleton(
+        StudyFolderManager, config=config.repositories.study_folders
+    )
+
+    internal_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.INTERNAL_FILES,
+        observer=None,
+    )
+    audit_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.AUDIT_FILES,
+        observer=None,
+    )
+    metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+        observer=None,
+    )
+    # investigation_object_repository: InvestigationObjectRepository = (
+    #     providers.Singleton(
+    #         MongoDbInvestigationObjectRepository,
+    #         connection=gateways.mongodb_connection,
+    #         collection_name="investigation_files",
+    #         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+    #         observer=study_file_repository,
+    #     )
+    # )
+    # isa_table_object_repository: IsaTableObjectRepository = providers.Singleton(
+    #     MongoDbIsaTableObjectRepository,
+    #     connection=gateways.mongodb_connection,
+    #     collection_name="isa_table_files",
+    #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+    #     observer=study_file_repository,
+    # )
+    # isa_table_row_object_repository: IsaTableRowObjectRepository = providers.Singleton(
+    #     MongoDbIsaTableRowObjectRepository,
+    #     connection=gateways.mongodb_connection,
+    #     collection_name="isa_table_rows",
+    #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+    # )
+    # validation_override_repository: ValidationOverrideRepository = providers.Singleton(
+    #     MongoDbValidationOverrideRepository,
+    #     connection=gateways.mongodb_connection,
+    #     collection_name="validation_overrides",
+    #     observer=study_file_repository,
+    # )
+    # validation_report_repository: ValidationReportRepository = providers.Singleton(
+    #     MongoDbValidationReportRepository,  # noqa: F821
+    #     connection=gateways.mongodb_connection,
+    #     study_bucket=StudyBucket.INTERNAL_FILES,
+    #     collection_name="validation_reports",
+    #     validation_history_object_key="validation-history",
+    #     observer=study_file_repository,
+    # )

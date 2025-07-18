@@ -1,0 +1,52 @@
+default_language_version:
+  python: python3.13
+repos:
+- repo: https://github.com/abravalheri/validate-pyproject
+  rev: v0.24.1
+  hooks:
+  - id: validate-pyproject
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-added-large-files
+    args: [ "--maxkb=2000" ]
+  - id: check-toml
+  - id: check-json
+  - id: pretty-format-json
+    args:
+    - "--autofix"
+    - "--indent=4"
+    - "--no-sort-keys"
+  - id: check-yaml
+    args:
+    - --unsafe
+  - id: end-of-file-fixer
+    exclude: resources/.+\.(js|css)$
+  - id: trailing-whitespace
+    exclude: (tests/data/.+|resources/.+\.(js|css))$
+- repo: https://github.com/astral-sh/uv-pre-commit
+  rev: 0.7.19
+  hooks:
+  - id: uv-lock
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.12.2
+  hooks:
+  - id: ruff-check
+    args:
+    - --fix
+    - --extend-select
+    - I
+  - id: ruff-format
+- repo: https://github.com/seddonym/import-linter.git
+  rev: "v2.3"
+  hooks:
+  - id: import-linter
+    name: architecture and package structure check (lint-importer)
+    additional_dependencies: [ dependency_injector ]
+    args: [ "--no-cache" ]
+- repo: https://github.com/commitizen-tools/commitizen
+  rev: v4.8.3
+  hooks:
+  - id: commitizen
+    stages: [ commit-msg ]

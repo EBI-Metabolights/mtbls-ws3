@@ -1,0 +1,145 @@
+run:
+  submission:
+    system_health_check:
+      upload_health_check_host: http://45.88.81.49:8081
+    default_datase_license:
+      name: "CC0 1.0 Universal"
+      version: "1.0"
+    module_config:
+      loaded_sub_package_names:
+      - mtbls.presentation.rest_api.core
+      - mtbls.presentation.rest_api.groups.auth.v1
+      - mtbls.presentation.rest_api.groups.submission.v1.routers
+      - mtbls.presentation.rest_api.groups.curation.v1
+      - mtbls.presentation.rest_api.groups.system.v1
+      - mtbls.presentation.utils
+    authorized_endpoints:
+    - prefix: "/submissions/"
+      scopes:
+      - curator
+      - submitter
+    - prefix: "/curation/"
+      scopes:
+      - curator
+    api_server_config:
+      port: 7000
+      api_groups:
+      - config_name: "submission"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/submission/v1/routers
+      - config_name: "curation"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/curation/v1
+      - config_name: "auth"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/auth/v1
+      - config_name: "auth"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/system/v1
+      cors:
+        origins:
+        - http(s*)://.*\.ebi\.ac\.uk(:\d{1,5})?
+        - http(s*)://localhost(:.\d{1,5})?
+        - http(s*)://.*\.docker\.internal(:.+)?
+        - http(s*)://127\.0\.0\.1(:\d{1,5})?
+      server_info:
+        root_path: ""
+        title: "EMBL-EBI MetaboLights Submission API"
+        version: "3.0.1"
+        description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
+        summary: Open MetaboLights Submission REST API
+        terms_of_service: https://www.ebi.ac.uk/about/terms-of-use
+        license_info:
+          name: Apache 2.0
+          identifier: Apache 2.0
+        contact:
+          name: MetaboLights
+          url: https://www.ebi.ac.uk/metabolights
+          email: metabolights-help@ebi.ac.uk
+        openapi_tags:
+        # - name: "Public Study Search"
+        #   description: "Search MetaboLights study repository"
+        # - name: "Public Study Search Reference Terms"
+        #   description: "List ontologies and control vocabularies defined in MetaboLights study metadata files"
+        - name: "About API"
+          description: "Get information about API"
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": %(resource_id)s, "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: DEBUG
+          formatter: "text_formatter"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter, correlation_id ]
+      root:
+        level: DEBUG
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: DEBUG
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+      filters:
+        correlation_id:
+          (): "asgi_correlation_id.CorrelationIdFilter"
+          default_value: "-"
+        default_filter:
+          (): "mtbls.run.rest_api.submission.log_filter.DefaultLogFilter"
+services:
+  authentication:
+    standalone:
+      application_secret_key: test_123
+  policy_service:
+    opa:
+      version_url: http://localhost:8181/v1/data/metabolights/validation/v2/configuration/version
+      validation_url: http://localhost:8181/v1/data/metabolights/validation/v2/report/complete_report?pretty=true
+      templates_url: http://localhost:8181/v1/data/metabolights/validation/v2/templates
+      control_lists_url: http://localhost:8181/v1/data/metabolights/validation/v2/controlLists
+      rule_definitions_url: http://localhost:8181/v1/data/metabolights/validation/v2/configuration/rules
+gateways:
+  database:
+    sqlite:
+      connection:
+        file_path: .test-temp/sqlite_test.db
+        url_scheme: sqlite+aiosqlite
+    # mongodb:
+    #   connection:
+    #     url_scheme: mongodb
+    #     host: hh-rke-wp-webadmin-33-worker-4.caas.ebi.ac.uk
+    #     port: 32068
+    #     user: root
+    #     password: example
+    #     database: test
+repositories:
+  study_folders:
+    mounted_paths:
+      private_metadata_files_root_path: tests/data/storages/rw/studies/metadata-files
+      audit_files_root_path: tests/data/storages/rw/studies/audit-files
+      internal_files_root_path: tests/data/storages/rw/studies/internal-files
+      deleted_private_metadata_files_root_path: tests/data/storages/rw/studies/deleted-files
+      deleted_private_data_files_root_path: tests/data/storages/services/studies/deleted-files
+      private_data_files_root_path: tests/data/storages/services/studies/data-files
+      public_metadata_files_root_path: ""
+      public_data_files_root_path: ""
+      uploaded_files_root_path: ""
+      deleted_uploaded_files_root_path: ""

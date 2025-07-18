@@ -1,0 +1,1726 @@
+{
+    "result": [
+        {
+            "description": "There is no input.",
+            "rule_id": "rule___100_100_001_01",
+            "section": "input",
+            "title": "There is no input data.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Input data should have valid schema.",
+            "rule_id": "rule___100_100_001_02",
+            "section": "input",
+            "title": "Input data format is not valid.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update i_Investigation.txt file considering error messages.",
+            "rule_id": "rule___100_100_100_01",
+            "section": "investigation",
+            "title": "There is a critical file parse error for i_Investigation.txt.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update i_Investigation.txt file considering error messages.",
+            "rule_id": "rule___100_100_100_02",
+            "section": "investigation",
+            "title": "There is a file parse error for i_Investigation.txt.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update i_Investigation.txt file considering warning messages.",
+            "rule_id": "rule___100_100_100_03",
+            "section": "investigation",
+            "title": "There is a file parse warning for i_Investigation.txt.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Update investigation name as i_Investigation.txt",
+            "rule_id": "rule___100_100_100_04",
+            "section": "investigation",
+            "title": "Investigation file name is not i_Investigation.txt",
+            "type": "ERROR"
+        },
+        {
+            "description": "Define i_Investigation.txt in parserMessages.",
+            "rule_id": "rule___100_100_100_05",
+            "section": "investigation",
+            "title": "There is no parser information for i_Investigation.txt.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Delete multiple investigation file within study folder.",
+            "rule_id": "rule___100_100_100_06",
+            "section": "investigation",
+            "title": "Unreferenced investigation files.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a critical file parse error in the sample file.",
+            "rule_id": "rule___100_200_001_01",
+            "section": "samples",
+            "title": "There is a critical file parse error for the sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse error for the sample file.",
+            "rule_id": "rule___100_200_001_02",
+            "section": "samples",
+            "title": "There is a file parse error for the sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse warning for the sample file.",
+            "rule_id": "rule___100_200_001_03",
+            "section": "samples",
+            "title": "There is a file parse warning for the sample file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Define sample file in parserMessages.",
+            "rule_id": "rule___100_200_001_04",
+            "section": "samples",
+            "title": "There is no parser information for sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Define a sample file for the study.",
+            "rule_id": "rule___100_200_001_05",
+            "section": "samples",
+            "title": "There is no sample file for the study.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Define only one sample file for the study.",
+            "rule_id": "rule___100_200_001_06",
+            "section": "samples",
+            "title": "There are multiple sample files.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Sample file name must start with 's_', contain study identifier and have extension '.txt'.",
+            "rule_id": "rule___100_200_001_08",
+            "section": "samples",
+            "title": "Sample file name pattern is not correct.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update i_Investigation.txt  file to reference the sample file or delete it.",
+            "rule_id": "rule___100_200_001_09",
+            "section": "samples",
+            "title": "Sample file is not referenced in i_Investigation.txt file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a critical file parse error in the assay file.",
+            "rule_id": "rule___100_300_001_01",
+            "section": "assays",
+            "title": "There is a critical file parse error for the assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse error for the assay file.",
+            "rule_id": "rule___100_300_001_02",
+            "section": "assays",
+            "title": "There is a file parse error for the assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse warning for the assay file.",
+            "rule_id": "rule___100_300_001_03",
+            "section": "assays",
+            "title": "There is a file parse warning for the assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Define assay file in parserMessages.",
+            "rule_id": "rule___100_300_001_04",
+            "section": "assays",
+            "title": "There is no parser information for assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Define an assay file for the study.",
+            "rule_id": "rule___100_300_001_05",
+            "section": "assays",
+            "title": "There is no assay file for the study.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file technology type should be defined to execute validation rules.",
+            "rule_id": "rule___100_300_001_06",
+            "section": "assays",
+            "title": "Technology type not defined for assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file technology type is not supported.",
+            "rule_id": "rule___100_300_001_07",
+            "section": "assays",
+            "title": "Technology type not supported for assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file name must start with 'a_' and have extension '.txt'.",
+            "rule_id": "rule___100_300_001_08",
+            "section": "assays",
+            "title": "Assay file name not correct pattern.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update i_Investigation.txt  file to reference the assay file or delete it.",
+            "rule_id": "rule___100_300_001_09",
+            "section": "assays",
+            "title": "Assay file is not referenced in i_Investigation.txt file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Use only .-_A-Za-z0-9 characters for an assay file name. e.g. a_REQ2025010211233_LC-MS_negative_reverse-phase_metabolite_profiling.txt",
+            "rule_id": "rule___100_300_001_10",
+            "section": "assays",
+            "title": "Assay file name contains invalid characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a critical file parse error in the metabolite assignment file.",
+            "rule_id": "rule___100_400_001_01",
+            "section": "metabolites",
+            "title": "There is a critical file parse error for the metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse error for the metabolite assignment file.",
+            "rule_id": "rule___100_400_001_02",
+            "section": "metabolites",
+            "title": "There is a file parse error for the metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is a file parse warning for the metabolite assignment file.",
+            "rule_id": "rule___100_400_001_03",
+            "section": "metabolites",
+            "title": "There is a file parse warning for the metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Define metabolite assignment file in parserMessages.",
+            "rule_id": "rule___100_400_001_04",
+            "section": "metabolites",
+            "title": "There is no parser information for metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assignment file technology type should be defined to execute file type validation rules.",
+            "rule_id": "rule___100_400_001_05",
+            "section": "metabolites",
+            "title": "Technology type not defined for metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Update assay files to reference the metabolite assignment or delete it.",
+            "rule_id": "rule___100_400_001_06",
+            "section": "metabolites",
+            "title": "Metabolite assignment file is not referenced in assay file(s).",
+            "type": "ERROR"
+        },
+        {
+            "description": "Metabolite assignment file name must start with 'm_' and have extension '.tsv'.",
+            "rule_id": "rule___100_400_001_07",
+            "section": "metabolites",
+            "title": "Metabolite assignment file name not correct pattern.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Use only .-_A-Za-z0-9 characters for an metabolite assignment file name. e.g. m_REQ2025010211233_LC-MS_negative_reverse-phase_metabolite_profiling_v2_maf.tsv",
+            "rule_id": "rule___100_400_001_08",
+            "section": "metabolites",
+            "title": "Metabolite assignment file name contains invalid characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is an invalid multi-column structure in assay file. Check column order.",
+            "rule_id": "rule_a_100_100_001_01",
+            "section": "assays",
+            "title": "Invalid multi-column structure in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is an unordered or unlinked column in assay file. Check column order.",
+            "rule_id": "rule_a_100_100_001_02",
+            "section": "assays",
+            "title": "Unordered or unlinked column structure in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Default columns must exist in assay file.",
+            "rule_id": "rule_a_100_100_001_03",
+            "section": "assays",
+            "title": "Default columns not in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Rename or remove unexpected columns in assay file.",
+            "rule_id": "rule_a_100_100_001_04",
+            "section": "assays",
+            "title": "Unexpected column in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Unexpected 'Protocol REF' column in assay file. Only one 'Protocol REF' header is allowed in assay file.",
+            "rule_id": "rule_a_100_100_001_05",
+            "section": "assays",
+            "title": "Unexpected 'Protocol REF' column in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Add missing Protocol REF column or related protocol section.",
+            "rule_id": "rule_a_100_100_001_06",
+            "section": "assays",
+            "title": "Missing 'Protocol REF' column in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Empty columns must not exist in assay file. All column headers should be defined.",
+            "rule_id": "rule_a_100_100_001_07",
+            "section": "assays",
+            "title": "Empty columns in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Order of default column header is not correct in assay file.",
+            "rule_id": "rule_a_100_100_001_08",
+            "section": "assays",
+            "title": "Order of default column header is not correct in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Parameter Value column headers should be unique in assay file.",
+            "rule_id": "rule_a_100_100_001_09",
+            "section": "assays",
+            "title": "Multiple Parameter Value columns with same header are not allowed in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Default column header name (except Data File columns) should be unique in assay file.",
+            "rule_id": "rule_a_100_100_001_10",
+            "section": "assays",
+            "title": "Column header name defined in template is not unique in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Assay Parameter Value names must be referenced in i_Investigation.txt.",
+            "rule_id": "rule_a_100_100_001_11",
+            "section": "assays",
+            "title": "Assay Parameter Values names not in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file must be referenced in i_Investigation.txt.",
+            "rule_id": "rule_a_100_100_002_01",
+            "section": "assays",
+            "title": "Assay file not referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "No row is defined in assay file. Add more than one row (run). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_a_100_100_005_01",
+            "section": "assays",
+            "title": "There is no row in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Only one row is defined in assay file. Add more than one row (run). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_a_100_100_005_02",
+            "section": "assays",
+            "title": "There is only one row in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Values in assay file should not start or end with space characters.",
+            "rule_id": "rule_a_200_090_001_01",
+            "section": "assays",
+            "title": "Values with trailing or leading spaces in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Prioritised ontology Term Source REFs should be used for ontology terms in this column if possible.",
+            "rule_id": "rule_a_200_090_002_01",
+            "section": "assays",
+            "title": "Ontology Term Source REF of ontology terms not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Prioritised default ontology Term Source REFs should be used for ontology terms in this column if possible.",
+            "rule_id": "rule_a_200_090_002_02",
+            "section": "assays",
+            "title": "Ontology Term Source REF of ontology terms not in prioritised default control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All ontology Term Source REFs should be referenced in ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_a_200_090_002_03",
+            "section": "assays",
+            "title": "Ontology Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select ontology terms and/or change ontology Term Source REF.",
+            "rule_id": "rule_a_200_090_002_04",
+            "section": "assays",
+            "title": "Ontology Term Source REF defined for empty ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "We highly recommend to use the prioritised ontology Term Source REFs for an unit ontology term.",
+            "rule_id": "rule_a_200_090_002_05",
+            "section": "assays",
+            "title": "Ontology Term Source REF for a unit is defined however Term Source REF is not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select unit ontology terms and/or change ontology Term Source REF.",
+            "rule_id": "rule_a_200_090_002_06",
+            "section": "assays",
+            "title": "Ontology Term Source REF defined for empty unit ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Source REF of ontology terms should be defined. A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_a_200_090_002_07",
+            "section": "assays",
+            "title": "Term Source REF of ontology terms is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Source REF of unit ontology terms should be defined. A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_a_200_090_002_08",
+            "section": "assays",
+            "title": "Term Source REF of unit ontology terms is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_a_200_090_002_09",
+            "section": "assays",
+            "title": "Term not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Use same Term Accession Number for the term in control list.",
+            "rule_id": "rule_a_200_090_002_10",
+            "section": "assays",
+            "title": "Term Accession Number of the given term is different than accession number in control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Fill term value for the given accession number in control list.",
+            "rule_id": "rule_a_200_090_002_11",
+            "section": "assays",
+            "title": "Empty term with an accession number in control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Use correct ontology Term Source REF for the accession number.",
+            "rule_id": "rule_a_200_090_002_12",
+            "section": "assays",
+            "title": "Term Source REF for the given accession is different.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Accession Number of ontology terms should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_a_200_090_003_01",
+            "section": "assays",
+            "title": "Term Accession Number length of ontology terms less than 3 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Accession Number of unit ontology terms should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_a_200_090_003_02",
+            "section": "assays",
+            "title": "Term Accession number length of unit ontology terms less than 3 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select ontology terms and/or change ontology Term Accession Number.",
+            "rule_id": "rule_a_200_090_003_03",
+            "section": "assays",
+            "title": "Term Accession Number defined for empty ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select unit ontology terms and/or change ontology Term Accession Number.",
+            "rule_id": "rule_a_200_090_003_04",
+            "section": "assays",
+            "title": "Term Accession Number defined for empty unit ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All required column values should be defined in assay file.",
+            "rule_id": "rule_a_200_090_004_01",
+            "section": "assays",
+            "title": "Required columns have empty values in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or greater than the minimum length.",
+            "rule_id": "rule_a_200_090_004_02",
+            "section": "assays",
+            "title": "Values do not meet minimum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or less than the maximum length.",
+            "rule_id": "rule_a_200_090_004_03",
+            "section": "assays",
+            "title": "Values do not meet maximum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All rows should be filled with the same value (case sensitive).",
+            "rule_id": "rule_a_200_090_005_01",
+            "section": "assays",
+            "title": "Values for Protocol REF column not valid in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All Sample Name column values should be defined in sample file.",
+            "rule_id": "rule_a_200_100_001_01",
+            "section": "assays",
+            "title": "Values for Sample Name column not in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Often Sample Name column values will be unique.",
+            "rule_id": "rule_a_200_100_001_02",
+            "section": "assays",
+            "title": "Values for Sample Name column not unique in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Metabolite assignment file name must start with 'm_' and have extension '.tsv'.",
+            "rule_id": "rule_a_200_200_001_01",
+            "section": "assays",
+            "title": "Metabolite assignment file name not correct pattern in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Use only .-_A-Za-z0-9 characters for an metabolite assignment file name in assay file.",
+            "rule_id": "rule_a_200_200_001_02",
+            "section": "assays",
+            "title": "Metabolite assignment file name contains invalid characters in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Raw data files or Derived data files must be defined in assay file.",
+            "rule_id": "rule_a_200_300_001_01",
+            "section": "assays",
+            "title": "Both 'Raw Spectral Data File' and 'Derived Spectral Data File' not in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Derived Spectral Data File is defined without Raw Spectral Data File. We recommend to upload raw file and reference it.",
+            "rule_id": "rule_a_200_300_001_02",
+            "section": "assays",
+            "title": "Derived Spectral Data File' is defined but 'Raw Spectral Data File' is empty in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All Raw Spectral Data File column values should have extension found in control list.",
+            "rule_id": "rule_a_200_300_001_03",
+            "section": "assays",
+            "title": "Values for Raw Spectral Data File column not correct extension in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All MS Assay Name column values should be unique.",
+            "rule_id": "rule_a_200_300_002_01",
+            "section": "assays",
+            "title": "Values for MS Assay Name column not unique in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one file should be defined in Derived Spectral Data Files, Free Induction Decay Data File or Acquisition Parameter Data File columns.",
+            "rule_id": "rule_a_200_400_001_01",
+            "section": "assays",
+            "title": "Derived Spectral Data Files, Acquisition Parameter Data File and Free Induction Decay Data File values are empty in NMR assays.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All NMR Assay Name column values should be unique.",
+            "rule_id": "rule_a_200_400_002_01",
+            "section": "assays",
+            "title": "Values for NMR Assay Name column not unique in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All Derived Spectral Data File column values should have extension found in control list.",
+            "rule_id": "rule_a_200_500_001_01",
+            "section": "assays",
+            "title": "Values for Derived Spectral Data File column not correct extension in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "if all values in Column Type are in a control list, technique name defined in control list should be in assay file name.",
+            "rule_id": "rule_a_200_600_001_01",
+            "section": "assays",
+            "title": "Column Type column values are not same as assay file name",
+            "type": "WARNING"
+        },
+        {
+            "description": "Values for Scan Polarity column not same as assay file name",
+            "rule_id": "rule_a_200_600_002_01",
+            "section": "assays",
+            "title": "Scan Polarity column values are not same as assay file name",
+            "type": "WARNING"
+        },
+        {
+            "description": "Referenced data files must exist within study FILES folder. Reference data files with format FILES/<<sub folder if exists>>/<<file name>> in assay file.",
+            "rule_id": "rule_f_400_090_001_01",
+            "section": "files",
+            "title": "Referenced data files not within study FILES folder.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Reference data files with format FILES/<<sub folder if exists>>/<<file name>> in assay file.",
+            "rule_id": "rule_f_400_090_001_02",
+            "section": "files",
+            "title": "Referenced data files do not start with FILES/ prefix.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Use only .- _A-Za-z0-9 characters as a referenced data file name.",
+            "rule_id": "rule_f_400_090_001_03",
+            "section": "files",
+            "title": "Referenced data files contain invalid characters. There are invalid characters in a referenced file name.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Check referenced data files and re-upload.",
+            "rule_id": "rule_f_400_090_001_04",
+            "section": "files",
+            "title": "Referenced data files contain zero byte data.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Folder reference in data file column is not allowed. If data file type is a folder, compress it with zip utility tool and reference compressed data file.",
+            "rule_id": "rule_f_400_090_001_07",
+            "section": "files",
+            "title": "Folders are referenced in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Only .zip files are allowed in this column. If data file or its parent is a raw data folder, compress it with zip utility tool and reference only compressed data file (e.g. 0011/fid -> 0001.zip, 0001/acqu -> 0001.zip).",
+            "rule_id": "rule_f_400_090_001_08",
+            "section": "files",
+            "title": "A file in NMR raw data folder is referenced in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Use only .-_A-Za-z0-9 characters for data file name.",
+            "rule_id": "rule_f_400_090_001_09",
+            "section": "files",
+            "title": "Uploaded data file names contain invalid characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Referenced raw data files should be located within FILES/RAW_FILES/<<sub folder if exists>>/<<file name>> and upload your data to appropriate folder.",
+            "rule_id": "rule_f_400_090_002_01",
+            "section": "files",
+            "title": "Referenced raw data files not within RAW_FILES folder.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Reference your derived file DERIVED_FILES/<<sub folder if exists>>/<<file name>> and upload your data to appropriate folder.",
+            "rule_id": "rule_f_400_090_003_01",
+            "section": "files",
+            "title": "Referenced derived data files not within DERIVED_FILES folder.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Metadata files must not exist within study FILES folder. Review and delete/move metadata files.",
+            "rule_id": "rule_f_400_100_001_01",
+            "section": "files",
+            "title": "Metadata files within study FILES folder.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Review referenced file names and make referenced file names unique.",
+            "rule_id": "rule_f_400_100_001_02",
+            "section": "files",
+            "title": "Multiple referenced data files with the same name within different folders.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Derived data files should be referenced in assay file.",
+            "rule_id": "rule_f_400_100_001_03",
+            "section": "files",
+            "title": "Derived data files not referenced in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Raw data files should be referenced in assay file.",
+            "rule_id": "rule_f_400_100_001_04",
+            "section": "files",
+            "title": "Raw data files not referenced in assay file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Data files with .aspx extensions must not exist within study FILES folder. Check Aspera upload completed successfully.",
+            "rule_id": "rule_f_400_100_001_05",
+            "section": "files",
+            "title": "Data files with .aspx extensions within study FILES folder.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Data files with .wiff.scan extensions often accompany data files with .wiff extensions within study FILES folder. Check referenced data files and re-upload.",
+            "rule_id": "rule_f_400_100_001_06",
+            "section": "files",
+            "title": "Data files with .wiff extensions but no data files with .wiff.scan extensions within study FILES folder.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Term Source Name should be defined with length equal or greater than 2 characters in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_100_001_01",
+            "section": "investigation",
+            "title": "Term Source Name length less than 2 characters in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Source File should be defined with length equal or greater than 2 characters in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_100_002_01",
+            "section": "investigation",
+            "title": "Term Source File length less than 2 characters in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Investigation Title should be defined with length equal or greater than 10 characters. Please use same title as first publication.",
+            "rule_id": "rule_i_100_200_001_01",
+            "section": "investigation",
+            "title": "Investigation Title length less than 10 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Investigation Identifier should be valid format (e.g., MTBLS<positive_number> or REQ{datetime}<positive_number>).",
+            "rule_id": "rule_i_100_200_002_01",
+            "section": "investigation",
+            "title": "Investigation Identifier not valid.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Investigation Submission Date should be valid date and ISO8601 format (e.g., 2023-01-01).",
+            "rule_id": "rule_i_100_200_003_01",
+            "section": "investigation",
+            "title": "Investigation Submission Date not valid.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Investigation Public Release Date should be valid date and ISO8601 format (e.g., 2023-01-01).",
+            "rule_id": "rule_i_100_200_004_01",
+            "section": "investigation",
+            "title": "Investigation Public Release Date not valid.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Only one study should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_300_001_01",
+            "section": "investigation",
+            "title": "No study referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Only one study should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_300_001_02",
+            "section": "investigation",
+            "title": "More than one study referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Identifier should be valid format (e.g., MTBLS<positive_number> or REQ{datetime}).",
+            "rule_id": "rule_i_100_300_002_01",
+            "section": "investigation",
+            "title": "Study Identifier not valid.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Title should be defined with length equal or greater than 25 characters. Please use same title as first publication.",
+            "rule_id": "rule_i_100_300_003_01",
+            "section": "investigation",
+            "title": "Study Title length less than 25 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study title should contain only printable characters.",
+            "rule_id": "rule_i_100_300_003_02",
+            "section": "investigation",
+            "title": "Non-printable characters in Study Title.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study title should be updated. Do not use template message 'Please update the study title'.",
+            "rule_id": "rule_i_100_300_003_03",
+            "section": "investigation",
+            "title": "Study Title contains only template message.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Description should be defined with length equal or greater than 60 characters. Please use abstract of first publication.",
+            "rule_id": "rule_i_100_300_004_01",
+            "section": "investigation",
+            "title": "Study Description length less than 60 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study abstract/description should be updated. Do not use template message 'Please update the study abstract/description'.",
+            "rule_id": "rule_i_100_300_004_02",
+            "section": "investigation",
+            "title": "Study abstract/description contains only template message.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Submission Date should be valid date and ISO8601 format (e.g., 2023-01-01).",
+            "rule_id": "rule_i_100_300_005_01",
+            "section": "investigation",
+            "title": "Study Submission Date not valid.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Public Release Date should be valid date and ISO8601 format (e.g., 2023-01-01).",
+            "rule_id": "rule_i_100_300_006_01",
+            "section": "investigation",
+            "title": "Study Public Release Date not valid.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least 3 study design descriptors should be defined.",
+            "rule_id": "rule_i_100_310_001_01",
+            "section": "investigation",
+            "title": "There are less than 3 Study Design Descriptors in the Study Design Descriptors section of investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Design Type should be defined.",
+            "rule_id": "rule_i_100_310_002_01",
+            "section": "investigation",
+            "title": "Study Design Type is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Design Type Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_310_003_01",
+            "section": "investigation",
+            "title": "Study Design Type Term Accession Number is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Design Type Term Source REF should be defined.",
+            "rule_id": "rule_i_100_310_004_01",
+            "section": "investigation",
+            "title": "Study Design Type Term Source REF is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Design Type Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_310_004_02",
+            "section": "investigation",
+            "title": "Study Design Type Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_310_004_03",
+            "section": "investigation",
+            "title": "Study Design Type Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one study publications should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_320_001_01",
+            "section": "investigation",
+            "title": "No study publications referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "A published publication should have a valid DOI or PubMed ID.",
+            "rule_id": "rule_i_100_320_002_01",
+            "section": "investigation",
+            "title": "DOI or PubMed ID is not defined for a published study publication.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A publication in published status should have a valid DOI.",
+            "rule_id": "rule_i_100_320_003_01",
+            "section": "investigation",
+            "title": "DOI is invalid for a published study publication.",
+            "type": "WARNING"
+        },
+        {
+            "description": "If DOI is defined, its format should be a valid.",
+            "rule_id": "rule_i_100_320_003_02",
+            "section": "investigation",
+            "title": "DOI format is invalid for a study publication.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A published publication should have a valid PubMed ID. Valid PubMed ID contains only digits.",
+            "rule_id": "rule_i_100_320_004_01",
+            "section": "investigation",
+            "title": "PubMed ID is invalid for a published study publication.",
+            "type": "WARNING"
+        },
+        {
+            "description": "If PubMed ID is defined, its format should be valid PubMed ID. Valid PubMed ID contains only digits.",
+            "rule_id": "rule_i_100_320_004_02",
+            "section": "investigation",
+            "title": "PubMed ID format is invalid for a study publication.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Publication Title should be defined with length equal or greater than 25 characters.",
+            "rule_id": "rule_i_100_320_005_01",
+            "section": "investigation",
+            "title": "Study Publication Title length less than 25 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Publication Author List should be defined.",
+            "rule_id": "rule_i_100_320_006_01",
+            "section": "investigation",
+            "title": "Study Publication Author List is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Publication Status should be defined.",
+            "rule_id": "rule_i_100_320_007_01",
+            "section": "investigation",
+            "title": "Study Publication Status is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_320_007_02",
+            "section": "investigation",
+            "title": "Study Publication Status not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Publication Status Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_320_008_01",
+            "section": "investigation",
+            "title": "Study Publication Status Term Accession Number is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Publication Status Term Source REF should be defined.",
+            "rule_id": "rule_i_100_320_009_01",
+            "section": "investigation",
+            "title": "Study Publication Status Term Source REF is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Publication Status Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_320_009_02",
+            "section": "investigation",
+            "title": "Study Publication Status Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_320_009_03",
+            "section": "investigation",
+            "title": "Study Publication Status Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one study factors should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_330_001_01",
+            "section": "investigation",
+            "title": "No study factors referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Factor Name should be defined.",
+            "rule_id": "rule_i_100_330_002_01",
+            "section": "investigation",
+            "title": "Study Factor Name is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Factor Type should be defined with length equal or greater than 2 characters.",
+            "rule_id": "rule_i_100_330_003_01",
+            "section": "investigation",
+            "title": "Study Factor Type length less than 2 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Factor Type Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_330_004_01",
+            "section": "investigation",
+            "title": "Study Factor Type Term Accession Number is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Factor Type Term Source REF should be defined.",
+            "rule_id": "rule_i_100_330_005_01",
+            "section": "investigation",
+            "title": "Study Factor Type Term Source REF is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Factor Type Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_330_005_02",
+            "section": "investigation",
+            "title": "Study Factor Type Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_330_005_03",
+            "section": "investigation",
+            "title": "Study Factor Type Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one study assays should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_340_001_01",
+            "section": "investigation",
+            "title": "No study assays referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file name should be set for each study in i_Investigation.txt.",
+            "rule_id": "rule_i_100_340_002_01",
+            "section": "investigation",
+            "title": "Study Assay File Name is empty in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Assay file name must start with 'a_' and have extension '.txt'.",
+            "rule_id": "rule_i_100_340_002_02",
+            "section": "investigation",
+            "title": "Study Assay File Name not correct pattern.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Use only .-_A-Za-z0-9 characters for an assay file name.",
+            "rule_id": "rule_i_100_340_002_03",
+            "section": "investigation",
+            "title": "There are invalid characters in assay file name.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Assay Measurement Type should be defined.",
+            "rule_id": "rule_i_100_340_003_01",
+            "section": "investigation",
+            "title": "Study Assay Measurement Type is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Measurement Type Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_340_004_01",
+            "section": "investigation",
+            "title": "Study Assay Measurement Type Term Accession Number is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Measurement Type Term Source REF should be defined.",
+            "rule_id": "rule_i_100_340_005_01",
+            "section": "investigation",
+            "title": "Study Assay Measurement Type Term Source REF is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Measurement Type Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_340_005_02",
+            "section": "investigation",
+            "title": "Study Assay Measurement Type Term Source REF not referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_340_005_03",
+            "section": "investigation",
+            "title": "Study Assay Measurement Type Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Assay Technology Type should be defined.",
+            "rule_id": "rule_i_100_340_006_01",
+            "section": "investigation",
+            "title": "Study Assay Technology Type is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Technology Type Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_340_007_01",
+            "section": "investigation",
+            "title": "Study Assay Technology Type Term Accession Number is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Technology Type Term Source REF should be defined.",
+            "rule_id": "rule_i_100_340_008_01",
+            "section": "investigation",
+            "title": "Study Assay Technology Type Term Source REF is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Assay Technology Type Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_340_008_02",
+            "section": "investigation",
+            "title": "Study Assay Technology Type Term Source REF not referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_340_008_03",
+            "section": "investigation",
+            "title": "Study Assay Technology Type Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Assay Technology Platform should be defined.",
+            "rule_id": "rule_i_100_340_009_01",
+            "section": "investigation",
+            "title": "Study Assay Technology Platform is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "At least one study protocols should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_350_001_01",
+            "section": "investigation",
+            "title": "No study protocols referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All study protocols should be defined considering assay technologies used in study.",
+            "rule_id": "rule_i_100_350_001_02",
+            "section": "investigation",
+            "title": "A study protocol is missing in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Protocol Name should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_i_100_350_002_01",
+            "section": "investigation",
+            "title": "Study Protocol Name length less than 3 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Protocol Description should be defined with length equal or greater than 40 characters.",
+            "rule_id": "rule_i_100_350_003_01",
+            "section": "investigation",
+            "title": "Study Protocol Description length less than 40 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Protocol Description should contain only printable characters.",
+            "rule_id": "rule_i_100_350_003_02",
+            "section": "investigation",
+            "title": "Non-printable characters in Study Protocol Description.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Protocol Description should be updated. Do not use template message.",
+            "rule_id": "rule_i_100_350_003_03",
+            "section": "investigation",
+            "title": "Study Protocol Description contains only template message.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Protocol Type should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_i_100_350_004_01",
+            "section": "investigation",
+            "title": "Study Protocol Type length less than 3 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All default study protocol parameters should be defined for study protocol.",
+            "rule_id": "rule_i_100_350_007_01",
+            "section": "investigation",
+            "title": "Study protocol parameter is missing for a study protocol.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study protocol parameters name should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_i_100_350_008_01",
+            "section": "investigation",
+            "title": "Study Protocol Parameters Name length less than 3 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "At least one study contacts should be defined in i_Investigation.txt.",
+            "rule_id": "rule_i_100_360_001_01",
+            "section": "investigation",
+            "title": "No study contacts referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Person First Name should be defined with length equal or greater than 2 characters.",
+            "rule_id": "rule_i_100_360_002_01",
+            "section": "investigation",
+            "title": "Study Person First Name length less than 2 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Person Last Name should be defined with length equal or greater than 2 characters.",
+            "rule_id": "rule_i_100_360_003_01",
+            "section": "investigation",
+            "title": "Study Person Last Name length less than 2 characters.",
+            "type": "ERROR"
+        },
+        {
+            "description": "At least one study contact must have an email address.",
+            "rule_id": "rule_i_100_360_004_01",
+            "section": "investigation",
+            "title": "Study contacts have no email address.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Study Person Email must be valid format.",
+            "rule_id": "rule_i_100_360_004_02",
+            "section": "investigation",
+            "title": "Study Person Email not valid.",
+            "type": "ERROR"
+        },
+        {
+            "description": "First Study Person Affiliation should be valid.",
+            "rule_id": "rule_i_100_360_006_01",
+            "section": "investigation",
+            "title": "First Study Person Affiliation not valid.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one role should be defined for a study contact.",
+            "rule_id": "rule_i_100_360_007_01",
+            "section": "investigation",
+            "title": "Study Person Roles is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Person Roles should be defined with length equal or greater than 2 characters.",
+            "rule_id": "rule_i_100_360_008_01",
+            "section": "investigation",
+            "title": "Study Person Roles length less than 2 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Person Roles Term Accession Number should be defined.",
+            "rule_id": "rule_i_100_360_009_01",
+            "section": "investigation",
+            "title": "Study Person Roles Term Accession Number is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Person Roles Term Source REFs should be referenced in the ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_i_100_360_010_01",
+            "section": "investigation",
+            "title": "Study Person Roles Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_i_100_360_010_02",
+            "section": "investigation",
+            "title": "Study Person Roles Term Source REF not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Study Person Roles Term Source REF should be defined.",
+            "rule_id": "rule_i_100_360_010_03",
+            "section": "investigation",
+            "title": "Study Person Roles Term Source REF is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one study contact must have Principal Investigator role.",
+            "rule_id": "rule_i_100_360_011_01",
+            "section": "investigation",
+            "title": "There is no study contact with Principal Investigator role.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Principal Investigator first name, last name and email must be defined.",
+            "rule_id": "rule_i_100_360_011_02",
+            "section": "investigation",
+            "title": "Principal Investigator contact details not defined.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Default columns must exist in metabolite assignment file.",
+            "rule_id": "rule_m_100_100_001_01",
+            "section": "metabolites",
+            "title": "Default columns not in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Unordered columns in metabolite assignment file.",
+            "rule_id": "rule_m_100_100_001_02",
+            "section": "metabolites",
+            "title": "Unordered columns in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Empty columns must not exist in metabolite assignment file. All column headers should be defined.",
+            "rule_id": "rule_m_100_100_001_03",
+            "section": "metabolites",
+            "title": "Empty columns in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Default column header name should be unique in the metabolite assignment file.",
+            "rule_id": "rule_m_100_100_001_04",
+            "section": "metabolites",
+            "title": "Default column header name is not unique in the metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Sample Name columns must exist in metabolite assignment file.",
+            "rule_id": "rule_m_100_100_002_01",
+            "section": "metabolites",
+            "title": "Sample Name columns not in metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "If Sample Name columns do not exist, MS Assay Name or NMR Assay Name columns should be defined in metabolite assignment file.",
+            "rule_id": "rule_m_100_100_002_02",
+            "section": "metabolites",
+            "title": "MS Assay Name or NMR Assay Name columns not in metabolite assignment file",
+            "type": "WARNING"
+        },
+        {
+            "description": "Metabolite assignment file must be referenced in assay file.",
+            "rule_id": "rule_m_100_100_004_01",
+            "section": "metabolites",
+            "title": "Metabolite assignment file not referenced in assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Metabolite assignment file name must start with 'm_' and have extension '.tsv'.",
+            "rule_id": "rule_m_100_100_005_01",
+            "section": "metabolites",
+            "title": "Metabolite assignment file name not correct pattern.",
+            "type": "ERROR"
+        },
+        {
+            "description": "No row is defined in metabolite assignment file. Add more than one row (assignment). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_m_100_100_006_01",
+            "section": "metabolites",
+            "title": "There is no row in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Only one row is defined in metabolite assignment file. Add more than one row (assignment). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_m_100_100_006_02",
+            "section": "metabolites",
+            "title": "There is only one row in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Values in metabolite assignment file should not start or end with space characters.",
+            "rule_id": "rule_m_300_090_001_01",
+            "section": "metabolites",
+            "title": "Values with trailing or leading spaces in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All required column values should be defined in metabolite assignment file.",
+            "rule_id": "rule_m_300_090_005_01",
+            "section": "metabolites",
+            "title": "Values for required columns not in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or greater than the minimum length.",
+            "rule_id": "rule_m_300_090_005_02",
+            "section": "metabolites",
+            "title": "Values do not meet minimum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or less than the maximum length.",
+            "rule_id": "rule_m_300_090_005_03",
+            "section": "metabolites",
+            "title": "Values do not meet maximum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All 'mass_to_charge' column values should be defined in metabolite assignment file.",
+            "rule_id": "rule_m_300_100_001_01",
+            "section": "metabolites",
+            "title": "mass_to_charge column has empty values in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All 'retention_time' column values should be defined in metabolite assignment file for LC-MS / GC-MS.",
+            "rule_id": "rule_m_300_100_001_02",
+            "section": "metabolites",
+            "title": "retention_time column has empty values in metabolite assignment file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All 'retention_time' column values should be numeric.",
+            "rule_id": "rule_m_300_100_001_03",
+            "section": "metabolites",
+            "title": "Some retention_time column values are not numeric in metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All 'chemical_shift' column values should be defined in metabolite assignment file.",
+            "rule_id": "rule_m_300_200_001_01",
+            "section": "metabolites",
+            "title": "Values for chemical_shift column not in metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All 'chemical_shift' column values should be numeric.",
+            "rule_id": "rule_m_300_200_001_02",
+            "section": "metabolites",
+            "title": "Values for chemical_shift column not numeric in metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All 'multiplicity' column values should be defined in metabolite assignment file.",
+            "rule_id": "rule_m_300_200_001_03",
+            "section": "metabolites",
+            "title": "Values for multiplicity column not in metabolite assignment file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "There is an invalid multi-column structure in sample file. Check column order.",
+            "rule_id": "rule_s_100_100_001_01",
+            "section": "samples",
+            "title": "Invalid multi-column structure in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There is an unordered or unlinked column in sample file. Check column order.",
+            "rule_id": "rule_s_100_100_001_02",
+            "section": "samples",
+            "title": "Unordered or unlinked column structure in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All default columns should exist in sample file.",
+            "rule_id": "rule_s_100_100_001_03",
+            "section": "samples",
+            "title": "Some default columns are missing in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Unexpected column in sample file. Only factor and characteristics columns can be defined in sample file.",
+            "rule_id": "rule_s_100_100_001_04",
+            "section": "samples",
+            "title": "Unexpected column in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Unexpected 'Protocol REF' column in sample file. Only one 'Protocol REF' header is allowed in sample file.",
+            "rule_id": "rule_s_100_100_001_05",
+            "section": "samples",
+            "title": "Unexpected 'Protocol REF' column in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There should be at least one factor column in sample file.",
+            "rule_id": "rule_s_100_100_001_06",
+            "section": "samples",
+            "title": "There is no factor column in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Empty columns must not exist in sample file. All column headers should be defined.",
+            "rule_id": "rule_s_100_100_001_07",
+            "section": "samples",
+            "title": "Empty columns in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Order of default column header is not correct in sample file.",
+            "rule_id": "rule_s_100_100_001_08",
+            "section": "samples",
+            "title": "Order of default column header is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Order of characteristics column header is not correct in sample file. All characteristics columns should be defined before Sample collection Protocol REF column.",
+            "rule_id": "rule_s_100_100_001_09",
+            "section": "samples",
+            "title": "Order of characteristics column header is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Order of factor column header is not correct in sample file. All factor columns should be defined after Sample Name column.",
+            "rule_id": "rule_s_100_100_001_10",
+            "section": "samples",
+            "title": "Order of factor column header is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Column header structure is not correct in sample file. Any ontology and unit column should have the leading columns, Term Source REF and Term Accession Number. Single columns must not have leading columns.",
+            "rule_id": "rule_s_100_100_001_11",
+            "section": "samples",
+            "title": "Column header structure is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Factor value column structure should be ontology (with Term Source REF and Term Accession Number) or a value with unit (and Term Source REF and Term Accession Number) in sample file.",
+            "rule_id": "rule_s_100_100_001_12",
+            "section": "samples",
+            "title": "Factor value column structure is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Additional characteristics column structure should be ontology in sample file.",
+            "rule_id": "rule_s_100_100_001_13",
+            "section": "samples",
+            "title": "Additional characteristics column structure is not correct in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Characteristics and Factor Value column headers should be unique in sample file.",
+            "rule_id": "rule_s_100_100_001_14",
+            "section": "samples",
+            "title": "Multiple Characteristics / Factor Value columns with same header are not allowed in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There should be a Factor Value column in sample file for each study factor.",
+            "rule_id": "rule_s_100_100_001_15",
+            "section": "samples",
+            "title": "Missing Factor Value columns in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "There should be a study factor for each Factor Value column in sample file.",
+            "rule_id": "rule_s_100_100_001_16",
+            "section": "samples",
+            "title": "Unexpected Factor Value columns in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "No row is defined in sample file. Add more than one row (sample). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_s_100_100_002_01",
+            "section": "samples",
+            "title": "There is no row in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Only one row is defined in sample file. Add more than one row (sample). Please ensure all xxx, including controls, QCs, standards, etc, are referenced.",
+            "rule_id": "rule_s_100_100_002_02",
+            "section": "samples",
+            "title": "There is only one row in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Only one sample file is allowed and its name should be 's_<accession number>.txt'.",
+            "rule_id": "rule_s_100_100_003_01",
+            "section": "samples",
+            "title": "Sample file not referenced in investigation file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Values in sample file should not start or end with space characters.",
+            "rule_id": "rule_s_200_090_001_01",
+            "section": "samples",
+            "title": "Values with trailing or leading spaces in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Prioritised ontology Term Source REFs should be used for ontology terms in this column if possible.",
+            "rule_id": "rule_s_200_090_002_01",
+            "section": "samples",
+            "title": "Ontology Term Source REF of ontology terms not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Prioritised default ontology Term Source REFs should be used for ontology terms in this column if possible.",
+            "rule_id": "rule_s_200_090_002_02",
+            "section": "samples",
+            "title": "Ontology Term Source REF of ontology terms not in prioritised default control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All ontology Term Source REFs should be referenced in ONTOLOGY SOURCE REFERENCE section in i_Investigation.txt.",
+            "rule_id": "rule_s_200_090_002_03",
+            "section": "samples",
+            "title": "Ontology Term Source REF not referenced in investigation file.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select ontology terms and/or change ontology Term Source REF.",
+            "rule_id": "rule_s_200_090_002_04",
+            "section": "samples",
+            "title": "Ontology Term Source REF defined for empty ontology terms.",
+            "type": "ERROR"
+        },
+        {
+            "description": "We highly recommend to use the prioritised ontology Term Source REFs for an unit ontology terms.",
+            "rule_id": "rule_s_200_090_002_05",
+            "section": "samples",
+            "title": "Ontology Term Source REF for a unit not in prioritised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select unit ontology terms and/or change ontology Term Source REF.",
+            "rule_id": "rule_s_200_090_002_06",
+            "section": "samples",
+            "title": "Ontology Term Source REF defined for empty unit ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Source REF of ontology terms should be defined. A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_s_200_090_002_07",
+            "section": "samples",
+            "title": "Term Source REF of ontology terms is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Source REF of unit ontology terms should be defined. A prioritised control list is defined. Review and select from the prioritised control list if possible.",
+            "rule_id": "rule_s_200_090_002_08",
+            "section": "samples",
+            "title": "Term Source REF of unit ontology terms is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Accession Number of ontology terms should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_s_200_090_003_01",
+            "section": "samples",
+            "title": "Term Accession Number length of ontology terms less than 3 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Term Accession Number of unit ontology terms should be defined with length equal or greater than 3 characters.",
+            "rule_id": "rule_s_200_090_003_02",
+            "section": "samples",
+            "title": "Term Accession Number length of unit ontology terms less than 3 characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select ontology terms and/or change ontology Term Accession Number.",
+            "rule_id": "rule_s_200_090_003_03",
+            "section": "samples",
+            "title": "Term Accession Number defined for empty ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Select unit ontology terms and/or change ontology Term Accession Number.",
+            "rule_id": "rule_s_200_090_003_04",
+            "section": "samples",
+            "title": "Term Accession Number defined for empty unit ontology terms.",
+            "type": "WARNING"
+        },
+        {
+            "description": "Complete all values in required columns.",
+            "rule_id": "rule_s_200_090_004_01",
+            "section": "samples",
+            "title": "Empty value is found in a required column.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or greater than the minimum length.",
+            "rule_id": "rule_s_200_090_004_02",
+            "section": "samples",
+            "title": "Values do not meet minimum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each row should have a value equal or less than the maximum length.",
+            "rule_id": "rule_s_200_090_004_03",
+            "section": "samples",
+            "title": "Values do not meet maximum length requirement.",
+            "type": "ERROR"
+        },
+        {
+            "description": "All rows should be filled with the same value (case sensitive).",
+            "rule_id": "rule_s_200_090_005_01",
+            "section": "samples",
+            "title": "Values for Protocol REF column not valid in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Organism name in column Characteristics[Organism] should be defined as ontology terms. Choose the 'Homo sapiens' taxonomy term instead of 'human' or 'man'.",
+            "rule_id": "rule_s_200_100_001_01",
+            "section": "samples",
+            "title": "Organism name not an ontology term.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Organism name in column Characteristics[Organism] should be defined as ontology terms.",
+            "rule_id": "rule_s_200_100_001_02",
+            "section": "samples",
+            "title": "Organism name not an ontology term.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Organism should not contain the actual ontology/taxonomy name, please include just the appropriate taxonomy term.",
+            "rule_id": "rule_s_200_100_001_03",
+            "section": "samples",
+            "title": "Organism name should not contain colon (:) characters.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one value should be defined in Characteristics column.",
+            "rule_id": "rule_s_200_100_002_01",
+            "section": "samples",
+            "title": "User defined Characteristics column is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "We highly recommend to use the prioritised ontology Source Refs for the characteristics ontology term.",
+            "rule_id": "rule_s_200_100_002_02",
+            "section": "samples",
+            "title": "Term Source REF of the user defined characteristics ontology term is not in the priotirised control list.",
+            "type": "WARNING"
+        },
+        {
+            "description": "We highly recommend to use the prioritised Ontology Source Refs for the characteristics ontology term.",
+            "rule_id": "rule_s_200_100_002_03",
+            "section": "samples",
+            "title": "Term Source REF of the user defined characteristics ontology terms is empty",
+            "type": "WARNING"
+        },
+        {
+            "description": "We highly recommend to define accession number of the selected term.",
+            "rule_id": "rule_s_200_100_002_04",
+            "section": "samples",
+            "title": "Term Accession Number of the user defined characteristics ontology terms is empty.",
+            "type": "WARNING"
+        },
+        {
+            "description": "All sample names should be unique in sample file.",
+            "rule_id": "rule_s_200_200_001_01",
+            "section": "samples",
+            "title": "Sample name values are not unique in sample file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Each sample name should be referenced at least one time in assay files.",
+            "rule_id": "rule_s_200_200_001_02",
+            "section": "samples",
+            "title": "Values for Sample Name column not in any assay file.",
+            "type": "ERROR"
+        },
+        {
+            "description": "Factor values should be set for each row.",
+            "rule_id": "rule_s_200_200_002_01",
+            "section": "samples",
+            "title": "There are empty values in factor column.",
+            "type": "WARNING"
+        },
+        {
+            "description": "At least one data should be defined in Factor Value column.",
+            "rule_id": "rule_s_200_200_002_02",
+            "section": "samples",
+            "title": "Factor value column is empty.",
+            "type": "ERROR"
+        },
+        {
+            "description": "We highly recommend to use the prioritised Ontology Source Refs for the factor ontology term.",
+            "rule_id": "rule_s_200_200_003_01",
+            "section": "samples",
+            "title": "Term Source REFs of the factor ontology term is not in the prioritised control list.",
+            "type": "WARNING"
+        }
+    ]
+}

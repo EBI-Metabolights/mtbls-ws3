@@ -1,0 +1,1 @@
+- Python `pathlib.Path` package is used instead of `os.path`

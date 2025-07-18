@@ -1,0 +1,12 @@
+.git*
+.idea
+.vscode*/
+.venv*/
+.DS_Store
+tests
+.*
+Dockerfile
+mkdocs*
+*-config*.yaml
+conftest.py
+CHANGELOG.md
