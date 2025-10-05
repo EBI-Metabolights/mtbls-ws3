@@ -36,7 +36,8 @@ repos:
     args:
     - --fix
     - --extend-select
-    - I
+    - I,E4,E5,E7,E9,F,G,SLF,Q,T
+    - --exit-non-zero-on-fix
   - id: ruff-format
 - repo: https://github.com/seddonym/import-linter.git
   rev: "v2.3"

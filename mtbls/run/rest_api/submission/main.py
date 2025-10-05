@@ -1,4 +1,5 @@
 import logging
+import pathlib
 import uuid
 from contextlib import asynccontextmanager
 from typing import Union
@@ -23,7 +24,11 @@ from mtbls.presentation.rest_api.shared.router_utils import add_routers
 from mtbls.run.config_renderer import render_config_secrets
 from mtbls.run.module_utils import load_modules
 from mtbls.run.rest_api.submission import initialization
-from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
+from mtbls.run.rest_api.submission.containers import (
+    CONFIG_FILE,
+    CONFIG_SECRETS_FILE,
+    Ws3ApplicationContainer,
+)
 from mtbls.run.subscribe import find_async_task_modules, find_injectable_modules
 
 logger: None | logging.Logger = None
@@ -169,6 +174,14 @@ def get_app(
 
 
 if __name__ == "__main__":
+    for config_file in (CONFIG_FILE, CONFIG_SECRETS_FILE):
+        success = True
+        if not config_file or not pathlib.Path(config_file).exists():
+            logger = logging.getLogger(__name__)
+            logger.error("%s file does not exist", config_file)
+            success = False
+        if not success:
+            exit(1)
     init_container: Ws3ApplicationContainer = Ws3ApplicationContainer()
     fast_app = get_app(initial_container=init_container)
     server_configuration: ApiServerConfiguration = init_container.api_server_config()
