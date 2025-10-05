@@ -288,7 +288,8 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if name not in study_factors:
                     self.modifier_update(
                         source=self.model.investigation_file_path,
-                        action=f"Factor Value in the sample file is added as a new study factor: {name}",
+                        action=f"Factor Value in the sample file "
+                        f"is added as a new study factor: {name}",
                         old_value="",
                         new_value=name,
                     )
@@ -303,6 +304,8 @@ class InvestigationFileModifier(BaseIsaModifier):
         for file in self.model.assays:
             assay_file: AssayFile = self.model.assays[file]
             protocols = self.get_protocol_parameters_in_assay(assay_file)
+            if not protocols:
+                return
             for column_name in protocols:
                 _, name, params = protocols[column_name]
 
@@ -329,10 +332,14 @@ class InvestigationFileModifier(BaseIsaModifier):
             for item in removed_params:
                 protocol.parameters.remove(item)
             if removed_params:
-                msg = f"Invalid and duplicate parameters are removed from protocol '{name}'"
+                msg = (
+                    f"Invalid and duplicate parameters are "
+                    f"removed from protocol '{name}'"
+                )
                 self.modifier_update(
                     source=self.model.investigation_file_path,
-                    action=f"{msg} {name}: {', '.join([x.term for x in removed_params])}",
+                    action=f"{msg} {name}: "
+                    f"{', '.join([x.term for x in removed_params])}",
                     old_value=", ".join(
                         [
                             f"{idx + 1}: '{x.term}'"
@@ -376,7 +383,10 @@ class InvestigationFileModifier(BaseIsaModifier):
                     study_protocols[name].parameters.append(OntologyItem(term=item))
 
                 if missing_set:
-                    msg = "Default protocol paremters and additional protocol parameters referenced in assay file are added to protocol"
+                    msg = (
+                        "Default protocol paremters and additional protocol parameters"
+                        " referenced in assay file are added to protocol"
+                    )
                     self.modifier_update(
                         source=self.model.investigation_file_path,
                         action=msg,
@@ -583,7 +593,8 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if len(investigation.studies) > 1:
             self.modifier_update(
-                action="First study will be used in i_Investigation.txt file. Other studies are deleted.",
+                action="First study will be used in i_Investigation.txt file."
+                " Other studies are deleted.",
                 old_value="Multiple study",
                 new_value="One study",
                 source=self.model.investigation_file_path,
@@ -778,11 +789,6 @@ class InvestigationFileModifier(BaseIsaModifier):
                 techniques
             )
             if not protocol_params:
-                logger.warning(
-                    "%s, protocol paratemeters are not fetched for %s. Skipping...",
-                    study.identifier,
-                    ", ".join(techniques),
-                )
                 return
             protocols = investigation.studies[0].study_protocols.protocols
             for protocol in protocols:
@@ -793,7 +799,8 @@ class InvestigationFileModifier(BaseIsaModifier):
                     }
                     if missing_params:
                         self.modifier_update(
-                            action=f"Missing '{protocol.name}' protocol parameters are added: {', '.join(missing_params)}.",
+                            action=f"Missing '{protocol.name}' protocol "
+                            "parameters are added: {', '.join(missing_params)}.",
                             old_value="",
                             new_value=", ".join(missing_params),
                             source=self.model.investigation_file_path,
@@ -871,7 +878,8 @@ class InvestigationFileModifier(BaseIsaModifier):
             remove_list.sort(key=lambda x: x[0], reverse=True)
             for idx, contact in remove_list:
                 self.modifier_update(
-                    action=f"Study Contacts [{idx + 1}] without first name and last name is removed.",
+                    action=f"Study Contacts [{idx + 1}] "
+                    "without first name and last name is removed.",
                     old_value="Empty contact",
                     new_value="",
                     source=self.model.investigation_file_path,
@@ -889,7 +897,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                             and (not contact.email or not contact.email.strip())
                         ):
                             self.modifier_update(
-                                action=f"Study Contacts {idx + 1} ({contact.first_name} {contact.last_name}): Email is updated",
+                                action=f"Study Contacts {idx + 1} "
+                                f"({contact.first_name} {contact.last_name}): "
+                                "Email is updated",
                                 old_value=contact.email,
                                 new_value=submitter.user_name,
                                 source=self.model.investigation_file_path,
@@ -899,7 +909,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if len(contact.first_name) == 1 and contact.first_name.isupper():
                     new_val = f"{contact.first_name}."
                     self.modifier_update(
-                        action=f"Study Contacts [{idx + 1}] ({contact.first_name} {contact.last_name}) First Name is updated.",
+                        action=f"Study Contacts [{idx + 1}] "
+                        f"({contact.first_name} {contact.last_name}) "
+                        "First Name is updated.",
                         old_value=contact.first_name,
                         new_value=new_val,
                         source=self.model.investigation_file_path,
@@ -909,7 +921,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if len(contact.last_name) == 1 and contact.last_name.isupper():
                     new_val = f"{contact.last_name}."
                     self.modifier_update(
-                        action=f"Study Contacts [{idx + 1}] ({contact.first_name} {contact.last_name}) Last Name is updated.",
+                        action=f"Study Contacts [{idx + 1}] "
+                        f"({contact.first_name} {contact.last_name}) "
+                        "Last Name is updated.",
                         old_value=contact.last_name,
                         new_value=new_val,
                         source=self.model.investigation_file_path,
@@ -922,7 +936,8 @@ class InvestigationFileModifier(BaseIsaModifier):
                     self.override_ontology_term(
                         source=default_role,
                         target=contact.roles[0],
-                        source_label=f"Study Contacts [{idx + 1}] ({contact.first_name} {contact.last_name}) Role [1]",
+                        source_label=f"Study Contacts [{idx + 1}] "
+                        f"({contact.first_name} {contact.last_name}) Role [1]",
                     )
 
     def update_assay_defaults(self):

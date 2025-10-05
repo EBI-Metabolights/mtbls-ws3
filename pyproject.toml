@@ -173,16 +173,16 @@ modules = [
    "mtbls.infrastructure.persistence.db.postgresql",
    "mtbls.infrastructure.persistence.db.sqlite",
    "mtbls.infrastructure.caching.in_memory",
-   "mtbls.infrastructure.cache.redis",
-   "mtbls.infrastructure.cache.redis_sentinel",
+   "mtbls.infrastructure.caching.redis",
+   "mtbls.infrastructure.caching.redis_sentinel",
    "mtbls.infrastructure.pub_sub.celery",
    "mtbls.infrastructure.pub_sub.threading",
 ]
 
 ignore_imports = [
-  "mtbls.infrastructure.pub_sub.connection.redis -> mtbls.infrastructure.cache.redis.redis_config",
-  "mtbls.infrastructure.pub_sub.connection.redis_sentinel -> mtbls.infrastructure.cache.redis_sentinel.redis_sentinel_config",
-  "mtbls.infrastructure.cache.redis_sentinel.redis_sentinel_config -> mtbls.infrastructure.cache.redis.redis_config"
+  "mtbls.infrastructure.pub_sub.connection.redis -> mtbls.infrastructure.caching.redis.redis_config",
+  "mtbls.infrastructure.pub_sub.connection.redis_sentinel -> mtbls.infrastructure.caching.redis_sentinel.redis_sentinel_config",
+  "mtbls.infrastructure.caching.redis_sentinel.redis_sentinel_config -> mtbls.infrastructure.caching.redis.redis_config"
 ]
 
 [[tool.importlinter.contracts]]

@@ -21,7 +21,7 @@ from mtbls.application.services.interfaces.study_metadata_service import (
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
-from mtbls.domain.shared.modifier import StudyMetadataModifierResult
+from mtbls.domain.shared.modifier import StudyMetadataModifierResult, UpdateLog
 from mtbls.domain.shared.validator.policy import PolicyResult, PolicyResultList
 from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPhase
 
@@ -174,7 +174,11 @@ async def validate_by_policy_service(
     if modifier_result and modifier_result.resource_id:
         policy_result.resource_id = resource_id
         policy_result.metadata_modifier_enabled = True
-        if modifier_result.logs:
+        if modifier_result.error_message:
+            policy_result.metadata_updates = [
+                UpdateLog(action="Modifier failed. " + modifier_result.error_message)
+            ]
+        elif modifier_result.logs:
             policy_result.metadata_updates = modifier_result.logs
     start_time = time.time()
 

@@ -1,19 +1,22 @@
 from dependency_injector import containers, providers
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
-from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.statistic.statistic_read_repository import (  # noqa: E501
+    StatisticReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study.study_write_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.user.user_write_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
@@ -31,12 +34,15 @@ from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
     DatabaseClientImpl,
 )
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
-from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (
+from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
-from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (
+from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (  # noqa: E501
     StudyFolderManager,
 )
+from mtbls.infrastructure.repositories.statistic.sql_db.statistic_read_repository import (  # noqa: E501
+    SqlDbStatisticReadRepository,
+)  # noqa: E501
 from mtbls.infrastructure.repositories.study.db.study_read_repository import (
     SqlDbStudyReadRepository,
 )
@@ -109,6 +115,14 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         alias_generator=alias_generator,
         database_client=gateways.database_client,
     )
+
+    statistic_read_repository: StatisticReadRepository = providers.Singleton(
+        SqlDbStatisticReadRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
+
     # study_file_repository: StudyFileRepository = providers.Singleton(
     #     MongoDbStudyFileRepository,
     #     connection=gateways.mongodb_connection,
@@ -144,7 +158,8 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
         observer=None,
     )
-    # investigation_object_repository: InvestigationObjectRepository = (
+
+    # investigation_object_repository: InvestigationObjectRepository = ( # noqa: E501
     #     providers.Singleton(
     #         MongoDbInvestigationObjectRepository,
     #         connection=gateways.mongodb_connection,
@@ -153,27 +168,27 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     #         observer=study_file_repository,
     #     )
     # )
-    # isa_table_object_repository: IsaTableObjectRepository = providers.Singleton(
+    # isa_table_object_repository: IsaTableObjectRepository = providers.Singleton( # noqa: E501
     #     MongoDbIsaTableObjectRepository,
     #     connection=gateways.mongodb_connection,
     #     collection_name="isa_table_files",
     #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
     #     observer=study_file_repository,
     # )
-    # isa_table_row_object_repository: IsaTableRowObjectRepository = providers.Singleton(
+    # isa_table_row_object_repository: IsaTableRowObjectRepository = providers.Singleton( # noqa: E501
     #     MongoDbIsaTableRowObjectRepository,
     #     connection=gateways.mongodb_connection,
     #     collection_name="isa_table_rows",
     #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
     # )
-    # validation_override_repository: ValidationOverrideRepository = providers.Singleton(
+    # validation_override_repository: ValidationOverrideRepository = providers.Singleton( # noqa: E501
     #     MongoDbValidationOverrideRepository,
     #     connection=gateways.mongodb_connection,
     #     collection_name="validation_overrides",
     #     observer=study_file_repository,
     # )
-    # validation_report_repository: ValidationReportRepository = providers.Singleton(
-    #     MongoDbValidationReportRepository,  # noqa: F821
+    # validation_report_repository: ValidationReportRepository = providers.Singleton( # noqa: E501
+    #     MongoDbValidationReportRepository,
     #     connection=gateways.mongodb_connection,
     #     study_bucket=StudyBucket.INTERNAL_FILES,
     #     collection_name="validation_reports",

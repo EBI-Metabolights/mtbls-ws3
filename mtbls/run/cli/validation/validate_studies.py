@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import traceback
 import uuid
 from pathlib import Path
 from typing import Union
@@ -17,10 +16,10 @@ from mtbls.application.remote_tasks.common.run_validation import (
     validate_by_policy_service,
 )
 from mtbls.application.services.interfaces.policy_service import PolicyService
-from mtbls.application.services.interfaces.repositories.file_object.file_object_read_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_read_repository import (  # noqa: E501
     FileObjectReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
 from mtbls.application.services.interfaces.study_metadata_service import (
@@ -81,15 +80,6 @@ def run_validation_cli(
     config_file: Union[None, str] = None,
     secrets_file: Union[None, str] = None,
 ):
-    """_summary_
-
-    Args:
-        studies_root_path (str): _description_
-        config_file (Union[None, str], optional): _description_. Defaults to None.
-        secrets_file (Union[None, str], optional): _description_. Defaults to None.
-        validation_reports_root_path (Union[None, str], optional): _description_. Defaults to None.
-        summary_file (Union[None, str], optional): _description_. Defaults to None.
-    """
     container: MtblsCliApplicationContainer = MtblsCliApplicationContainer()
     render_config_secrets(container.config(), container.secrets())
     container.init_resources()
@@ -160,7 +150,7 @@ async def run_validation_and_save_report(
 
     # selected_resource_ids = [x for x in resource_ids.data if x[0] in selection]
     # selected_resource_ids.sort(
-    #     key=lambda x: int(x[0].removeprefix("MTBLS").removeprefix("REQ")), reverse=True
+    #   key=lambda x: int(x[0].removeprefix("MTBLS").removeprefix("REQ")), reverse=True
     # )
     with summary_file.open("w") as fw:
         for resource_id, release_date, status in resource_ids:
@@ -194,7 +184,7 @@ async def run_validation_and_save_report(
                         resource_id,
                         modifier_result.error_message,
                     )
-                    raise ValueError(modifier_result.error_message)
+                    # raise ValueError(modifier_result.error_message)
 
                 audit_folder_name = ""
                 if modifier_result.logs:
@@ -275,7 +265,7 @@ async def run_validation_and_save_report(
                 )
                 fw.flush()
             except Exception as ex:
-                print(traceback.format_exc())
+                # print(traceback.format_exc())
                 logger.exception(ex)
                 exception_message = f"{type(ex)} {str(ex)}"
                 logger.error(

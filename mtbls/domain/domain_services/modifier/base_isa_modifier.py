@@ -79,7 +79,8 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
         source_str = [None, None]
         for idx, x in enumerate([source, target]):
             source_str[idx] = (
-                f"Name: {x.source_name}, File: {x.source_file}, Version: {x.source_version}, Description: {x.source_description}"
+                f"Name: {x.source_name}, File: {x.source_file}, "
+                f"Version: {x.source_version}, Description: {x.source_description}"
             )
 
         if target.source_name != source.source_name:
@@ -171,7 +172,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
 
         ordered_protocol_params: dict[str, list[str]] = {}
         self.protocol_parameters[key] = ordered_protocol_params
-        for technique_name in techniques:
+        for technique_name in techniques_list:
             result = self.get_protocol_template(technique_name)
             if result:
                 for protocol in result:
@@ -198,14 +199,11 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
         ):
             return []
         templates = {
-            x.upper(): self.templates["studyProtocolTemplates"][x]
+            x: self.templates["studyProtocolTemplates"][x]
             for x in self.templates["studyProtocolTemplates"]
         }
-        if (
-            technique_name.upper() in templates
-            and "protocols" in templates[technique_name.upper()]
-        ):
-            return templates[technique_name.upper()]["protocols"]
+        if technique_name in templates and "protocols" in templates[technique_name]:
+            return templates[technique_name]["protocols"]
         return []
 
     def get_ordered_protocol_names(self, technique_name: str) -> list[str]:

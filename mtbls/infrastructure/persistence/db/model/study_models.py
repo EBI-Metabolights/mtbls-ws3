@@ -210,6 +210,12 @@ class Study(Base):
     dataset_license_agreeing_user = Column(String(255))
     revision_number = Column(BigInteger, nullable=False, default=0)
     revision_datetime = Column(DateTime, nullable=True)
+    sample_type = Column(String, default="minimum")
+    data_policy_agreement = Column(BigInteger, nullable=False, default=0)
+    study_category = Column(BigInteger, nullable=False, default=0)
+    template_version = Column(String(50), nullable=False, default="1.0")
+    mhd_accession = Column(String(50))
+    mhd_model_version = Column(String(50))
 
     users: Mapped[list[User]] = relationship(
         "User", secondary="study_user", back_populates="studies"
@@ -217,6 +223,28 @@ class Study(Base):
 
     @classmethod
     def get_field_alias_exceptions(self):
+        return self.__field_alias_exceptions__
+
+
+class Statistic(Base):
+    __tablename__ = "ml_stats"
+    __table_args__ = {"sqlite_autoincrement": True}
+
+    __field_alias_exceptions__: dict[str, str] = {
+        "id_": "id",
+        "section": "page_section",
+        "name": "str_name",
+        "value": "str_value",
+    }
+
+    id = Column(Integer, primary_key=True)
+    page_section = Column(String(20), nullable=False)
+    str_name = Column(String(200), nullable=False)
+    str_value = Column(String(200), nullable=False)
+    sort_order = Column(BigInteger)
+
+    @classmethod
+    def get_field_alias_exceptions(self) -> dict[str, str]:
         return self.__field_alias_exceptions__
 
 

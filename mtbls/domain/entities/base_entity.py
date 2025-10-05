@@ -40,6 +40,14 @@ class BaseUser(BaseOutputEntity):
     __entity_type__: Entity = Entity.User
 
 
+class BaseStatisticInput(BaseInputEntity):
+    __entity_type__: Entity = Entity.Statistic
+
+
+class BaseStatistic(BaseOutputEntity):
+    __entity_type__: Entity = Entity.Statistic
+
+
 class BaseStudyFileInput(BaseInputEntity):
     __entity_type__: Entity = Entity.StudyFile
 

@@ -1,6 +1,7 @@
 from mtbls.domain.enums.entity import Entity
 from mtbls.infrastructure.persistence.db.model.study_models import (
     Base,
+    Statistic,
     Study,
     StudyFile,
     User,
@@ -11,6 +12,7 @@ class EntityMapper:
     entity_table_map: dict[Entity, Base] = {
         Entity.User: User,
         Entity.Study: Study,
+        Entity.Statistic: Statistic,
         Entity.StudyFile: StudyFile,
     }
 
