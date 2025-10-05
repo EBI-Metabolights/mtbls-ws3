@@ -172,7 +172,7 @@ modules = [
    "mtbls.infrastructure.auth.standalone",
    "mtbls.infrastructure.persistence.db.postgresql",
    "mtbls.infrastructure.persistence.db.sqlite",
-   "mtbls.infrastructure.cache.in_memory",
+   "mtbls.infrastructure.caching.in_memory",
    "mtbls.infrastructure.cache.redis",
    "mtbls.infrastructure.cache.redis_sentinel",
    "mtbls.infrastructure.pub_sub.celery",

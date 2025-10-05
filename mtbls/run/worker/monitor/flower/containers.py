@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
-from mtbls.infrastructure.cache.redis.redis_config import RedisConnection
+from mtbls.infrastructure.caching.redis.redis_config import RedisConnection
 
 
 class Ws3MonitorApplicationContainer(containers.DeclarativeContainer):

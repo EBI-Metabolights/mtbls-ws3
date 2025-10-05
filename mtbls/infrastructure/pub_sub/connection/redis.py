@@ -1,7 +1,7 @@
 from typing import Any, Union
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
-from mtbls.infrastructure.cache.redis.redis_config import RedisConnection
+from mtbls.infrastructure.caching.redis.redis_config import RedisConnection
 
 
 class RedisConnectionProvider(PubSubConnection):

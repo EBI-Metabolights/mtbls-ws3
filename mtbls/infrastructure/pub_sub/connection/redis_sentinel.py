@@ -1,7 +1,7 @@
 from typing import Any, Union
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
-from mtbls.infrastructure.cache.redis_sentinel.redis_sentinel_config import (
+from mtbls.infrastructure.caching.redis_sentinel.redis_sentinel_config import (
     RedisSentinelConnection,
 )
 

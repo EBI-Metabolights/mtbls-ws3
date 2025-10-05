@@ -17,7 +17,7 @@ from mtbls.infrastructure.auth.standalone.standalone_authentication_config impor
 from mtbls.infrastructure.auth.standalone.standalone_authentication_service import (
     AuthenticationServiceImpl,
 )
-from mtbls.infrastructure.cache.in_memory.in_memory_cache import InMemoryCacheImpl
+from mtbls.infrastructure.caching.in_memory.in_memory_cache import InMemoryCacheImpl
 from mtbls.infrastructure.persistence.db.sqlite.config import SQLiteDatabaseConnection
 from mtbls.infrastructure.persistence.db.sqlite.db_client_impl import (
     SQLiteDatabaseClientImpl,

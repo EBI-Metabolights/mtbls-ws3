@@ -37,7 +37,7 @@ from mtbls.infrastructure.auth.standalone.standalone_authentication_service impo
 from mtbls.infrastructure.auth.standalone.standalone_authorization_service import (
     AuthorizationServiceImpl,
 )
-from mtbls.infrastructure.cache.redis.redis_impl import RedisCacheImpl
+from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (
