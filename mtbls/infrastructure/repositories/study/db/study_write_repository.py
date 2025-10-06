@@ -1,4 +1,4 @@
-from mtbls.application.services.interfaces.repositories.study.study_write_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
 from mtbls.domain.entities.study import StudyInput, StudyOutput

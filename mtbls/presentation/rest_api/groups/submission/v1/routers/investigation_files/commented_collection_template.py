@@ -22,13 +22,13 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.collection_with_fields_template import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.collection_with_fields_template import (  # noqa: E501
     StudyItemCollectionWithFields,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (  # noqa: E501
     RestApiEndpointConfiguration,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (  # noqa: E501
     StudyJsonListResponse,
 )
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
@@ -80,7 +80,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
             path=self.item_route_path + "/comments",
             method=self._get_comments,
             http_method="GET",
-            summary=f"Get comments of the selected {self.item_name.lower().replace('_', ' ')}",
+            summary=f"Get comments of the selected {self.item_name.lower().replace('_', ' ')}",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[CommentItem]],
         )
 
@@ -89,7 +89,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
             path=self.item_route_path + "/comments",
             method=self._set_comment,
             http_method="PUT",
-            summary=f"Update or create a comment for the selected {self.item_name.lower().replace('_', ' ')}",
+            summary=f"Update or create a comment for the selected {self.item_name.lower().replace('_', ' ')}",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[CommentItem]],
         )
 
@@ -98,7 +98,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
             path=self.item_route_path + "/comments",
             method=self._delete_comment,
             http_method="DELETE",
-            summary=f"Delete a comment from the selected {self.item_name.lower().replace('_', ' ')}",
+            summary=f"Delete a comment from the selected {self.item_name.lower().replace('_', ' ')}",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[CommentItem]],
         )
 
@@ -130,7 +130,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
             filter: Annotated[
                 Union[None, str],
                 Query(
-                    description="Comment name and value filter. e.g. name=x or name=x,value=y"
+                    description="Comment name and value filter. e.g. name=x or name=x,value=y"  # noqa: E501
                 ),
             ] = None,
         ):
@@ -220,7 +220,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                         )
                     )
                 return APIErrorResponse(
-                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
             return APIErrorResponse(
@@ -277,7 +277,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                         )
                     )
                 return APIErrorResponse(
-                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
             return APIErrorResponse(

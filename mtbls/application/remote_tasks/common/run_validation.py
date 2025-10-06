@@ -118,6 +118,12 @@ async def run_validation_task(  # noqa: PLR0913
     result_list: PolicyResultList = PolicyResultList()
     if modifier_result and isinstance(modifier_result, dict):
         modifier_result = StudyMetadataModifierResult.model_validate(modifier_result)
+        if modifier_result.has_error:
+            logger.error(
+                "Modifier failed for %s: %s.",
+                resource_id,
+                modifier_result.error_message or "",
+            )
     if isinstance(phases, ValidationPhase):
         phases = [phases]
     elif isinstance(phases, list):

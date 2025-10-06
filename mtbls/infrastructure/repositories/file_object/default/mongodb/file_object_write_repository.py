@@ -9,10 +9,10 @@ from urllib.parse import quote
 import httpx
 from pymongo.results import DeleteResult
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

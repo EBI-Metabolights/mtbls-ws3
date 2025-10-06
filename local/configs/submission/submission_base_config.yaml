@@ -7,6 +7,7 @@ run:
       loaded_sub_package_names:
       - mtbls.presentation.rest_api.core
       - mtbls.presentation.rest_api.groups.auth.v1
+      - mtbls.presentation.rest_api.groups.public.v1.routers
       - mtbls.presentation.rest_api.groups.submission.v1.routers
       - mtbls.presentation.rest_api.groups.curation.v1
       - mtbls.presentation.rest_api.groups.system.v1
@@ -22,6 +23,10 @@ run:
     api_server_config:
       port: 7000
       api_groups:
+      - config_name: "public"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/public/v1/routers
       - config_name: "submission"
         enabled: true
         router_paths:
@@ -34,7 +39,7 @@ run:
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/auth/v1
-      - config_name: "auth"
+      - config_name: "system"
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/system/v1
@@ -128,7 +133,7 @@ gateways:
     # mongodb:
     #   connection:
     #     url_scheme: mongodb
-    #     host: hh-rke-wp-webadmin-33-worker-4.caas.ebi.ac.uk
+    #     host: <host>
     #     port: 32068
     #     user: root
     #     password: example

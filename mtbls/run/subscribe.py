@@ -134,8 +134,9 @@ def find_decorator_in_package(
 
     Returns:
 
-        dict: Dictionary where keys are file paths and values are lists of function names using the decorator.
-    """
+        dict: Dictionary where keys are file paths and
+           values are lists of function names using the decorator.
+    """  # noqa: E501
     result = {}
 
     for root, _, files in os.walk(package_path):

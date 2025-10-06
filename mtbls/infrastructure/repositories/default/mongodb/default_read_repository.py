@@ -3,7 +3,7 @@ from typing import Any, Generic, Union
 
 import pymongo
 
-from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (  # noqa: E501
     AbstractReadRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

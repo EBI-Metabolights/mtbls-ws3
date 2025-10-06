@@ -6,10 +6,10 @@ from typing import Any, Union
 from bson import ObjectId
 from pymongo.results import DeleteResult, UpdateResult
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     DefaultFileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (
+from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
     StudyFileRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

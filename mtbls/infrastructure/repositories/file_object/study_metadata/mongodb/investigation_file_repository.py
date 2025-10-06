@@ -1,9 +1,9 @@
 import logging
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.file_object.study_metadata.metadata_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.study_metadata.metadata_repository import (  # noqa: E501
     InvestigationObjectRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

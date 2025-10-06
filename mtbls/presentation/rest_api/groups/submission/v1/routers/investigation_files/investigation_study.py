@@ -24,7 +24,7 @@ from mtbls.presentation.rest_api.core.responses import APIErrorResponse, APIResp
 from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.extended_collection_template import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.extended_collection_template import (  # noqa: E501
     ExtendedStudyItemCollection,
 )
 from mtbls.presentation.rest_api.shared.dependencies import get_resource_id

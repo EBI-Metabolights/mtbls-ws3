@@ -1,7 +1,7 @@
 import abc
 from typing import Union
 
-from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (  # noqa: E501
     AbstractReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput

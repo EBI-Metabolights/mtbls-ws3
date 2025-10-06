@@ -9,6 +9,7 @@ run:
       loaded_sub_package_names:
       - mtbls.presentation.rest_api.core
       - mtbls.presentation.rest_api.groups.auth.v1
+      - mtbls.presentation.rest_api.groups.public.v1
       - mtbls.presentation.rest_api.groups.submission.v1.routers
       - mtbls.presentation.rest_api.groups.curation.v1
       - mtbls.presentation.rest_api.groups.system.v1
@@ -24,6 +25,10 @@ run:
     api_server_config:
       port: 7000
       api_groups:
+      - config_name: "public"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/public/v1/routers
       - config_name: "submission"
         enabled: true
         router_paths:
@@ -36,7 +41,7 @@ run:
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/auth/v1
-      - config_name: "auth"
+      - config_name: "system"
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/system/v1
@@ -49,7 +54,6 @@ run:
       server_info:
         root_path: ""
         title: "EMBL-EBI MetaboLights Submission API"
-        version: "3.0.1"
         description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
         summary: Open MetaboLights Submission REST API
         terms_of_service: https://www.ebi.ac.uk/about/terms-of-use
@@ -61,18 +65,20 @@ run:
           url: https://www.ebi.ac.uk/metabolights
           email: metabolights-help@ebi.ac.uk
         openapi_tags:
-        # - name: "Public Study Search"
-        #   description: "Search MetaboLights study repository"
-        # - name: "Public Study Search Reference Terms"
-        #   description: "List ontologies and control vocabularies defined in MetaboLights study metadata files"
         - name: "About API"
           description: "Get information about API"
+        - name: "Study Validation"
+          description: "Validate a study and get validation results"
+        - name: "Study Validation Overrides"
+          description: "Override validation rules (curators only)"
+        - name: "MetaboLights Statistiscs"
+          description: "Public MetaboLights statistics"
     logging:
       version: 1
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": %(resource_id)s, "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
           format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
       handlers:

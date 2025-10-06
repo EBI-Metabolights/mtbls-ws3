@@ -8,7 +8,7 @@ from sqlalchemy import select
 from typing_extensions import OrderedDict
 
 from mtbls.application.decorators.validate import validate_inputs_outputs
-from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (  # noqa: E501
     AbstractReadRepository,
 )
 from mtbls.domain.enums.entity import Entity

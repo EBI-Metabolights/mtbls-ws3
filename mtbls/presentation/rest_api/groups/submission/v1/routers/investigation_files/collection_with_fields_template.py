@@ -20,13 +20,13 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.collection_template import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.collection_template import (  # noqa: E501
     StudyItemCollection,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (  # noqa: E501
     RestApiEndpointConfiguration,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (  # noqa: E501
     FieldData,
     StudyJsonListResponse,
 )
@@ -87,7 +87,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
             path=self.item_route_path + "/" + field_name,
             method=self._get_item_field(field_name, field_type),
             http_method="GET",
-            summary=f"Get {field_name.replace('_', ' ')} of the selected {self.item_name.lower().replace('_', ' ')}",
+            summary=f"Get {field_name.replace('_', ' ')} of the selected {self.item_name.lower().replace('_', ' ')}",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[FieldData[field_type]]],
         )
 
@@ -98,7 +98,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
             path=self.item_route_path + "/" + field_name,
             method=self._update_item_field(field_name, field_type),
             http_method="PUT",
-            summary=f"Update {field_name.replace('_', ' ')} of the selected {self.item_name.lower().replace('_', ' ')}",
+            summary=f"Update {field_name.replace('_', ' ')} of the selected {self.item_name.lower().replace('_', ' ')}",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[FieldData[field_type]]],
         )
 
@@ -132,7 +132,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
                 )
                 if not json_response:
                     return APIErrorResponse(
-                        error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                        error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                     )
 
                 return APIResponse(content=json_response)
@@ -176,7 +176,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
                 )
                 if not json_response:
                     return APIErrorResponse(
-                        error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                        error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                     )
 
                 return APIResponse(content=json_response)

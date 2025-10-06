@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from pathlib import Path
 
 from sqlalchemy import text
@@ -9,17 +10,25 @@ from mtbls.infrastructure.persistence.db.sqlite.db_client_impl import (
     SQLiteDatabaseClientImpl,
 )
 
+logger = logging.getLogger(__name__)
+
 
 async def init_db(sqlite_client: SQLiteDatabaseClientImpl, init_script_path: Path):
     async with sqlite_client.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        with init_script_path.open() as file:
-            lines = file.readlines()
-            for line in lines:
-                line = line.strip()
-                if line and not line.startswith("--"):
-                    query = text(line.strip())
-                    await conn.execute(query, execution_options={"no_parameters": True})
+        try:
+            with init_script_path.open() as file:
+                lines = file.readlines()
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.startswith("--"):
+                        query = text(line.strip())
+                        await conn.execute(
+                            query, execution_options={"no_parameters": True}
+                        )
+        except Exception as ex:
+            logger.exception(ex)
+            raise ex
 
 
 async def create_test_sqlite_db(

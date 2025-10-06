@@ -26,13 +26,13 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.commented_collection_template import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.commented_collection_template import (  # noqa: E501
     CommentedStudyItemCollection,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (  # noqa: E501
     RestApiEndpointConfiguration,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (  # noqa: E501
     StudyJsonListResponse,
 )
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
@@ -130,7 +130,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
     #             subitem=subitem, subitem_model_class=subitem_model_class
     #         ),
     #         http_method="GET",
-    #         summary=f"Get {subitem.replace("_", " ")} from the selected {self.item_name.lower().replace("_", " ")}",
+    #         summary=f"Get {subitem.replace("_", " ")} from the selected {self.item_name.lower().replace("_", " ")}",  # noqa: E501
     #         response_model=APIResponse[StudyJsonResponse[subitem_model_class]],
     #     )
 
@@ -148,7 +148,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                 target_subitem_model_class=target_subitem_model_class,
             ),
             http_method="POST",
-            summary=f"Add new item to the selected {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",
+            summary=f"Add new item to the selected {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
         )
 
@@ -161,7 +161,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                 subitem=subitem, subitem_model_class=subitem_model_class
             ),
             http_method="PUT",
-            summary=f"Update an item of {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",
+            summary=f"Update an item of {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
         )
 
@@ -174,7 +174,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                 subitem=subitem, subitem_model_class=subitem_model_class
             ),
             http_method="GET",
-            summary=f"Add an item to selected {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",
+            summary=f"Add an item to selected {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
         )
 
@@ -185,7 +185,9 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
             path=self.item_route_path + "/" + subitem + "/" + "{sub_index}",
             method=self._delete_subitem(subitem, subitem_model_class),
             http_method="DELETE",
-            summary=f"Delete one item from the {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",
+            summary="Delete one item from the "
+            f"{self.item_name.lower().replace('_', ' ')} "
+            f"{subitem.replace('_', ' ')} list.",
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
         )
 
@@ -373,7 +375,8 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
     #             )
     #             if not json_response:
     #                 return APIErrorResponse(
-    #                     error_message=f"Invalid input {self.item_name.lower()} index {index} {subitem} {sub_index} for the study {resource_id}"
+    #                     error_message=f"Invalid input {self.item_name.lower()} index "
+    #                     f"{index} {subitem} {sub_index} for the study {resource_id}"
     #                 )
 
     #             return APIResponse(content=json_response)
@@ -433,7 +436,8 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                             )
                         )
                     return APIErrorResponse(
-                        error_message=f"Invalid input {self.item_name.lower()} index {index} or sub index {sub_index} for the study {resource_id}"
+                        error_message=f"Invalid input {self.item_name.lower()} index "
+                        f"{index} or sub index {sub_index} for the study {resource_id}"
                     )
 
                 return APIErrorResponse(
@@ -490,7 +494,8 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                             )
                         )
                 return APIErrorResponse(
-                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                    error_message=f"Invalid input {self.item_name.lower()} "
+                    f"index {index} or filter for the study {resource_id}"
                 )
 
             return _delete_subitem

@@ -14,7 +14,7 @@ from mtbls.domain.exceptions.repository import (
     UnexpectedStudyObjectTypeError,
 )
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
-from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_config import (
+from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_config import (  # noqa: E501
     StudyFolderConfiguration,
 )
 
@@ -32,12 +32,12 @@ class StudyFolderManager:
         self.root_path_bucket_str_map: dict[StudyBucket, str] = {
             StudyBucket.AUDIT_FILES: paths.audit_files_root_path,
             StudyBucket.PRIVATE_METADATA_FILES: paths.private_metadata_files_root_path,
-            StudyBucket.DELETED_PRIVATE_METADATA_FILES: paths.deleted_private_metadata_files_root_path,
+            StudyBucket.DELETED_PRIVATE_METADATA_FILES: paths.deleted_private_metadata_files_root_path,  # noqa: E501
             StudyBucket.INTERNAL_FILES: paths.internal_files_root_path,
             StudyBucket.AUDIT_FILES: paths.audit_files_root_path,
             StudyBucket.PRIVATE_DATA_FILES: paths.private_data_files_root_path,
             StudyBucket.PUBLIC_DATA_FILES: paths.public_data_files_root_path,
-            StudyBucket.DELETED_PRIVATE_DATA_FILES: paths.deleted_private_data_files_root_path,
+            StudyBucket.DELETED_PRIVATE_DATA_FILES: paths.deleted_private_data_files_root_path,  # noqa: E501
             StudyBucket.UPLOADED_FILES: paths.uploaded_files_root_path,
             StudyBucket.DELETED_UPLOADED_FILES: paths.deleted_uploaded_files_root_path,
         }
@@ -51,8 +51,8 @@ class StudyFolderManager:
 
     @staticmethod
     def _convert_to_real_paths(paths: BaseModel):
-        for field_name in paths.model_fields:
-            value = paths.model_fields[field_name]
+        for field_name in paths.__class__.model_fields:
+            value = paths.__class__.model_fields[field_name]
             if field_name.endswith("_path"):
                 value = getattr(paths, field_name)
                 if str(value):

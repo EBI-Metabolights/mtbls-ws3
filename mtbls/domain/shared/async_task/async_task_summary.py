@@ -16,7 +16,7 @@ class AsyncTaskStatus(CamelCaseModel):
     task_status: Annotated[
         str,
         Field(
-            description="This field contains status of the task. Values: INITIATED, STARTED, SUCCESS, FAILURE, REVOKED, PENDING, etc.",
+            description="This field contains status of the task. Values: INITIATED, STARTED, SUCCESS, FAILURE, REVOKED, PENDING, etc.",  # noqa: E501
         ),
     ] = ""
     ready: Annotated[
@@ -28,7 +28,7 @@ class AsyncTaskStatus(CamelCaseModel):
     is_successful: Annotated[
         Union[None, bool],
         Field(
-            description="This field contains whether the task completed successfully or not.",
+            description="This field contains whether the task completed successfully or not.",  # noqa: E501
         ),
     ] = None
     message: Annotated[
@@ -47,6 +47,6 @@ class AsyncTaskSummary(CamelCaseModel, Generic[T]):
     task_result: Annotated[
         Union[None, str, T],
         Field(
-            description="This field contains result of the task (failure message or success result).",
+            description="This field contains result of the task (failure message or success result).",  # noqa: E501
         ),
     ] = None

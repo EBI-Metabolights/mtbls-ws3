@@ -1,10 +1,10 @@
 import abc
 from typing import Union
 
-from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (  # noqa: E501
     AbstractWriteRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_read_repository import (
+from mtbls.application.services.interfaces.repositories.study_file.study_file_read_repository import (  # noqa: E501
     StudyFileReadRepository,
 )
 from mtbls.domain.entities.study_file import StudyFileInput, StudyFileOutput

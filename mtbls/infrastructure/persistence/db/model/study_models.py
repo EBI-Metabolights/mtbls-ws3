@@ -13,6 +13,7 @@ from sqlalchemy import (
     Text,
     TypeDecorator,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -168,6 +169,7 @@ class Study(Base):
         IntEnum(StudyStatus),
         nullable=False,
         default=StudyStatus.DORMANT,
+        server_default=text(str(StudyStatus.DORMANT.value)),
     )
     studysize: Mapped[Decimal] = mapped_column(nullable=True)
     updatedate: Mapped[datetime.datetime] = mapped_column(nullable=False)
@@ -195,6 +197,7 @@ class Study(Base):
         IntEnum(CurationType),
         nullable=False,
         default=CurationType.NO_CURATION,
+        server_default=text(str(CurationType.NO_CURATION.value)),
     )
     reserved_accession: Mapped[str] = mapped_column(
         String(50), unique=False, nullable=True
@@ -205,17 +208,29 @@ class Study(Base):
     first_public_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
     first_private_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
 
-    dataset_license = Column(String(255))
-    dataset_license_version = Column(String(255))
-    dataset_license_agreeing_user = Column(String(255))
-    revision_number = Column(BigInteger, nullable=False, default=0)
-    revision_datetime = Column(DateTime, nullable=True)
-    sample_type = Column(String, default="minimum")
-    data_policy_agreement = Column(BigInteger, nullable=False, default=0)
-    study_category = Column(BigInteger, nullable=False, default=0)
-    template_version = Column(String(50), nullable=False, default="1.0")
-    mhd_accession = Column(String(50))
-    mhd_model_version = Column(String(50))
+    dataset_license: Mapped[str] = mapped_column(String(255), nullable=True)
+    dataset_license_version: Mapped[str] = mapped_column(String(255), nullable=True)
+    dataset_license_agreeing_user: Mapped[str] = mapped_column(
+        String(255), nullable=True
+    )
+    revision_number: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0"), default=0
+    )
+    revision_datetime: Mapped[datetime.datetime] = mapped_column(nullable=True)
+    sample_type: Mapped[str] = mapped_column(
+        String(255), nullable=False, server_default=text("minimum"), default="minimum"
+    )
+    data_policy_agreement: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0"), default=0
+    )
+    study_category: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0"), default=0
+    )
+    template_version: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default=text("1.0"), default="1.0"
+    )
+    mhd_accession: Mapped[str] = mapped_column(String(50), nullable=True)
+    mhd_model_version: Mapped[str] = mapped_column(String(50), nullable=True)
 
     users: Mapped[list[User]] = relationship(
         "User", secondary="study_user", back_populates="studies"

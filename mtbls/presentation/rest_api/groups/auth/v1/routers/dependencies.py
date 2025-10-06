@@ -73,7 +73,7 @@ async def check_update_permission(
             raise AuthorizationError(
                 context.user.id_,
                 resource_id,
-                f"User {context.user.id_} is not granted to update resource {resource_id}",
+                f"User {context.user.id_} is not granted to update resource {resource_id}",  # noqa: E501
             )
         logger.debug(
             "User %s is granted to update resource %s",

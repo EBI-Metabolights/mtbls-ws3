@@ -33,7 +33,7 @@ from mtbls.presentation.rest_api.core.responses import (
     APIResponse,
     Status,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (  # noqa: E501
     GetValidationResponse,
 )
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer

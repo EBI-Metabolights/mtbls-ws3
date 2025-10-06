@@ -1,8 +1,8 @@
 from mtbls.application.services.interfaces.auth.identity_service import IdentityService
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.user.user_write_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
 from mtbls.domain.entities.user import IdentityOutput, UserInput, UserOutput

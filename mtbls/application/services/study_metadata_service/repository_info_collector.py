@@ -7,7 +7,7 @@ from metabolights_utils.models.metabolights.model import (
 )
 from metabolights_utils.provider.study_provider import AbstractFolderMetadataCollector
 
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (
+from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
     StudyFileRepository,
 )
 from mtbls.domain.entities.study_file import StudyFileOutput

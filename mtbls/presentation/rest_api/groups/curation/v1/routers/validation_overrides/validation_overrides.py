@@ -37,7 +37,7 @@ router = APIRouter(
 @router.get(
     "/{resource_id}",
     summary="Check and Get Study Validation Result",
-    description="Checks Validation Task and return MetaboLights validations (if completed)",
+    description="Checks Validation Task and return MetaboLights validations (if completed)",  # noqa: E501
     response_model=APIResponse[ValidationOverrideList],
 )
 @inject
@@ -61,7 +61,7 @@ async def get_validation_overrides_endpoint(
 @router.patch(
     "/{resource_id}",
     summary="Patch validation overrides for the study",
-    description="Adds new override if it is not in validation overrides list or update multiple matched items.",
+    description="Adds new override if it is not in validation overrides list or update multiple matched items.",  # noqa: E501
     response_model=APIResponse[ValidationOverrideList],
 )
 @inject

@@ -1,6 +1,6 @@
 import logging
 
-from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (  # noqa: E501
     ValidationOverrideRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

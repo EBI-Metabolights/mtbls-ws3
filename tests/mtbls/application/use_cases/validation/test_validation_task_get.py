@@ -206,7 +206,8 @@ class TestGetStudyValidationResult:
     ):
         """_summary_
         Case:
-            Task id is not defined. There is a running task. It is completed successfully.
+            Task id is not defined. There is a running task.
+            It is completed successfully.
         Expected result:
             Fetch task status, content has validation result
         """
@@ -261,7 +262,8 @@ class TestGetStudyValidationResult:
     ):
         """_summary_
         Case:
-            Task id is not defined. There is a running task. It is completed with failure.
+            Task id is not defined.
+            There is a running task. It is completed with failure.
         Expected result:
             return AsyncTaskRemoteFailure
         """
@@ -311,7 +313,8 @@ class TestGetStudyValidationResult:
     ):
         """_summary_
         Case:
-            Task id is not defined. There is a running task. It is completed with failure but not throws exception.
+            Task id is not defined. There is a running task.
+            It is completed with failure but not throws exception.
         Expected result:
             return AsyncTaskRemoteFailure
         """

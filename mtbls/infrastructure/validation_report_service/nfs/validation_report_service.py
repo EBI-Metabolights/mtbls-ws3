@@ -13,7 +13,7 @@ from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.data_types import ZeroOrPositiveInt
 from mtbls.domain.shared.validation_result_file import ValidationResultFile
 from mtbls.domain.shared.validator.policy import PolicySummaryResult
-from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (
+from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
 
@@ -120,7 +120,7 @@ class FileSystemValidationReportService(ValidationReportService):
         tmp_file_path = self.temp_directory / temp_filename
         source_uri = f"file://{str(tmp_file_path)}"
         time_str = validation_result.start_time.strftime("%Y-%m-%d_%H-%M-%S")
-        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"
+        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"  # noqa: E501
         try:
             with tmp_file_path.open("w") as f:
                 f.write(validation_result.model_dump_json(indent=4, by_alias=True))
@@ -192,7 +192,7 @@ class FileSystemValidationReportService(ValidationReportService):
     ) -> PolicySummaryResult:
         task_id = selected_object.task_id
         time_str = selected_object.validation_time
-        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"
+        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"  # noqa: E501
         temp_filename = pathlib.Path(f"{str(uuid.uuid4())}.json")
         tmp_file_path = self.temp_directory / temp_filename
 

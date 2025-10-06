@@ -1,9 +1,9 @@
 import logging
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (  # noqa: E501
     ValidationOverrideRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

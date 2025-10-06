@@ -11,7 +11,7 @@ from mtbls.application.services.interfaces.async_task.async_task_service import 
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.application.services.interfaces.policy_service import PolicyService
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.domain.shared.repository.query_options import QueryOptions

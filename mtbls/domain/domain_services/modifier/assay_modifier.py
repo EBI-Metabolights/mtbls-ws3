@@ -79,7 +79,7 @@ class AssayFileModifier(IsaTableModifier):
                     old_values_str = self.get_list_string(list(old_values), limit)
                     self.modifier_update(
                         source=file_name,
-                        action=f"Protocol REF [column index: {protocol_ref_columns[protocol_ref][0] + 1}] values are updated.",
+                        action=f"Protocol REF [column index: {protocol_ref_columns[protocol_ref][0] + 1}] values are updated.",  # noqa: E501
                         old_value=old_values_str,
                         new_value=new_val,
                     )
@@ -192,7 +192,7 @@ class AssayFileModifier(IsaTableModifier):
 
                 self.modifier_update(
                     source=file_name,
-                    action=f"Update assay file reference on column {header.column_header} (case sensitive)",
+                    action=f"Update assay file reference on column {header.column_header} (case sensitive)",  # noqa: E501
                     old_value=old_values,
                     new_value=new_values,
                 )
@@ -289,7 +289,7 @@ class AssayFileModifier(IsaTableModifier):
                             assay_file.table.data[column_name] = new_values
                             self.modifier_update(
                                 source=assay_file.file_path,
-                                action=f"{column_name} column values are filled from Sample Name column values.",
+                                action=f"{column_name} column values are filled from Sample Name column values.",  # noqa: E501
                                 old_value="",
                                 new_value=sample_name_str,
                             )

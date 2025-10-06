@@ -4,10 +4,10 @@ from typing import Annotated
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Response, status
 
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study.study_write_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
 from mtbls.domain.entities.study import StudyOutput
@@ -18,7 +18,7 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license.schemas import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license.schemas import (  # noqa: E501
     LICENSE_URLS,
     DatasetLicense,
     DatasetLicenseInfoConfiguration,
@@ -33,7 +33,7 @@ router = APIRouter(tags=["Dataset License"], prefix="/submissions/v2/dataset-lic
 @router.put(
     "/{resource_id}",
     summary="Add dataset license agreement for a study.",
-    description="Update a study to indicate that the user has agreed to the dataset license and data policy. This is mandatory but is handled as a separate request.",
+    description="Update a study to indicate that the user has agreed to the dataset license and data policy. This is mandatory but is handled as a separate request.",  # noqa: E501
     response_model=APIResponse[DatasetLicenseResponse],
 )
 @inject
@@ -124,7 +124,7 @@ async def create_license_agreement(
 @router.get(
     "/{resource_id}",
     summary="Add dataset license agreement for a study.",
-    description="Update a study to indicate that the user has agreed to the dataset license and data policy. This is mandatory but is handled as a separate request.",
+    description="Update a study to indicate that the user has agreed to the dataset license and data policy. This is mandatory but is handled as a separate request.",  # noqa: E501
     response_model=APIResponse[DatasetLicenseResponse],
 )
 @inject

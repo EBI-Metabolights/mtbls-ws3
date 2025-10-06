@@ -107,7 +107,7 @@ class SampleFileModifier(IsaTableModifier):
                 )
                 self.modifier_update(
                     source=study.file_name,
-                    action=f"A new Factor Value for factor {name}: Factor Value[{name}]",
+                    action=f"A new Factor Value for factor {name}: Factor Value[{name}]",  # noqa: E501
                     old_value="",
                     new_value=f"Factor Value[{name}]",
                 )

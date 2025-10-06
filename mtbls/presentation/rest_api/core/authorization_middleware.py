@@ -62,7 +62,10 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             self.set_request_track(user, client_host, route_path, resource_id)
 
             if user.is_authenticated:
-                access_request_message = f"User {user.user_detail.id_} requests {method} {route_path} from host/IP {client_host}."
+                access_request_message = (
+                    f"User {user.user_detail.id_} requests "
+                    f"{method} {route_path} from host/IP {client_host}."
+                )
                 if resource_id:
                     permission_context: StudyPermissionContext = (
                         await self.authorization_service.get_user_resource_permission(
@@ -94,7 +97,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
                         self.check_initial_authorization(
                             route_path, user, client_host, auth
                         )
-                access_request_message = f"Unauthenticated user requests {method} {route_path} from host/IP {client_host}."
+                access_request_message = f"Unauthenticated user requests {method} {route_path} from host/IP {client_host}."  # noqa: E501
             if resource_id:
                 access_request_message += f" Target resource id: {resource_id}"
             logger.debug(access_request_message)
@@ -177,7 +180,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
                 logger.error(error_log_message)
                 raise AuthorizationError(error_log_message)
             logger.error(
-                "Unauthenticated user requested the authorized %s resource from host %s",
+                "Unauthenticated user requested the authorized %s resource from host %s",  # noqa: E501
                 route_path,
                 client_host,
             )

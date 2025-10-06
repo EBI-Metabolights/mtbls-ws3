@@ -476,10 +476,10 @@ class InvestigationFileModifier(BaseIsaModifier):
             label_parts.append(prefix)
             label_name = " ".join([x for x in label_parts if x and x.strip()])
             section_name = " ".join([x for x in name_parts if x and x.strip()])
-            for field in item.model_fields:
+            for field in item.__class__.model_fields:
                 val = getattr(item, field)
 
-                extra = item.model_fields[field].json_schema_extra
+                extra = item.__class__.model_fields[field].json_schema_extra
                 suffix = (
                     extra["header_name"] if extra and "header_name" in extra else ""
                 )
@@ -515,7 +515,7 @@ class InvestigationFileModifier(BaseIsaModifier):
     ):
         for idx, obj in enumerate(item_list):
             if isinstance(obj, BaseModel):
-                for k in obj.model_fields:
+                for k in obj.__class__.model_fields:
                     new_label_items = [label, f"{idx if list_items else ''}", f" {k}"]
                     new_label_items = [x.strip() for x in new_label_items if x]
                     new_label = " ".join(new_label_items).upper()
@@ -1074,7 +1074,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if item.term and item.term_source_ref:
                     ontology_sources.add(item.term_source_ref.strip())
             elif isinstance(obj, IsaAbstractModel):
-                for k in obj.model_fields:
+                for k in obj.__class__.model_fields:
                     v = getattr(obj, k)
                     if isinstance(v, IsaAbstractModel):
                         self.update_ontology_source_set([v], ontology_sources)

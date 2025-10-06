@@ -37,13 +37,13 @@ from mtbls.infrastructure.auth.standalone.standalone_authorization_service impor
 from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
-from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (
+from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
 )
-from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (
+from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (  # noqa: E501
     FileSystemValidationOverrideService,
 )
-from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (
+from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (  # noqa: E501
     FileSystemValidationReportService,
 )
 from mtbls.presentation.rest_api.groups.auth.v1.routers.oauth2_scheme import (
@@ -138,8 +138,6 @@ CONFIG_SECRETS_FILE = os.environ.get(
     "CONFIG_SECRETS_FILE",
     ".submission-config-secrets/.secrets.yaml",
 )
-
-print("Worker config file path", CONFIG_FILE)
 
 
 class Ws3WorkerApplicationContainer(containers.DeclarativeContainer):

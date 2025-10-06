@@ -39,7 +39,7 @@ class DatasetLicenseResponse(BaseModel):
         Optional[DatasetLicense],
         Field(
             default=None,
-            description="The name and version of the dataset license, and the agreeing user.",
+            description="The name and version of the dataset license, and the agreeing user.",  # noqa: E501
         ),
     ]
     message: Annotated[

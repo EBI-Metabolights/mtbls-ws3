@@ -1,7 +1,7 @@
 import abc
 from typing import Generic
 
-from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (  # noqa: E501
     AbstractReadRepository,
 )
 from mtbls.domain.shared.data_types import ID_TYPE, INPUT_TYPE, OUTPUT_TYPE

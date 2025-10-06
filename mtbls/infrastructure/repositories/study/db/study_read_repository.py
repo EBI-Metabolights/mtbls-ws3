@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from typing_extensions import OrderedDict
 
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput

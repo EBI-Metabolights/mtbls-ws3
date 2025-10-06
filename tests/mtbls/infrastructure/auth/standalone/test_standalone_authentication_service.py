@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from mtbls.application.services.interfaces.cache_service import CacheService
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.infrastructure.auth.standalone.standalone_authentication_config import (

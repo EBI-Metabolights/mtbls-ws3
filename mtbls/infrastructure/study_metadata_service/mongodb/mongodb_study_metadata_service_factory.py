@@ -1,6 +1,6 @@
 from typing import Union
 
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
 from mtbls.application.services.interfaces.study_metadata_service import (
@@ -9,19 +9,19 @@ from mtbls.application.services.interfaces.study_metadata_service import (
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
-from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.investigation_file_repository import (
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.investigation_file_repository import (  # noqa: E501
     MongoDbInvestigationObjectRepository,
 )
-from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_repository import (
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_repository import (  # noqa: E501
     MongoDbIsaTableObjectRepository,
 )
-from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_row_repository import (
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_row_repository import (  # noqa: E501
     MongoDbIsaTableRowObjectRepository,
 )
 from mtbls.infrastructure.repositories.study_file.mongodb.study_file_repository import (
     MongoDbStudyFileRepository,
 )
-from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_service import (
+from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_service import (  # noqa: E501
     MongoDbStudyMetadataService,
 )
 

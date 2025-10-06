@@ -12,7 +12,7 @@ from mtbls.domain.shared.health_check.transfer_status import (
     ProtocolServerStatus,
     TransferStatus,
 )
-from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_config import (
+from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_config import (  # noqa: E501
     StandaloneSystemHealthCheckConfiguration,
 )
 

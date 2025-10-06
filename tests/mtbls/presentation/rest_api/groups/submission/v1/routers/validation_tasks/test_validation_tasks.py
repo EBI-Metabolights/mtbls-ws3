@@ -43,7 +43,7 @@ from mtbls.presentation.rest_api.core.responses import (
     APIResponse,
     Status,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (  # noqa: E501
     GetValidationResponse,
     StartValidationResponse,
 )
@@ -429,7 +429,7 @@ class TestGetValidationsV1:
         expected: task status and content
         """
         task_id = "123456-987650-54321-success-01"
-        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"
+        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"  # noqa: E501
         self.remove_task_results(task_id, target)
         try:
             resource_id = "MTBLS800001"
@@ -525,7 +525,7 @@ class TestGetValidationsV1:
         key = f"validation_task:current:{resource_id}"
 
         task_id = "83599aa5-7130-48ad-95e9-36e4ac51405c-234"
-        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"
+        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"  # noqa: E501
         services = mock_submission_api_client.container.services
         cache_service: CacheService = services.cache_service()
         await cache_service.set_value(key, value=task_id, expiration_time_in_seconds=60)
@@ -578,7 +578,7 @@ class TestGetValidationsV1:
         key = f"validation_task:current:{resource_id}"
 
         task_id = "83599aa5-7130-48ad-95e9-36e4ac51405c-234"
-        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"
+        target = "tests/data/storages/rw/studies/internal-files/MTBLS800001/validation-history"  # noqa: E501
         services = mock_submission_api_client.container.services
         cache_service: CacheService = services.cache_service()
         await cache_service.set_value(key, value=task_id, expiration_time_in_seconds=60)

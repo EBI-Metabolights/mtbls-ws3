@@ -14,7 +14,7 @@ from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.domain.shared.validation_result_file import ValidationResultFile
 from mtbls.domain.shared.validator.policy import PolicySummaryResult
-from mtbls.infrastructure.repositories.file_object.validation.reports.mongodb.validation_override_repository import (
+from mtbls.infrastructure.repositories.file_object.validation.reports.mongodb.validation_override_repository import (  # noqa: E501
     MongoDbValidationReportRepository,
 )
 
@@ -104,7 +104,7 @@ class MongoDbValidationReportService(ValidationReportService):
         self, resource_id: str, task_id: str, validation_result: PolicySummaryResult
     ) -> bool:
         time_str = validation_result.start_time.strftime("%Y-%m-%d_%H-%M-%S")
-        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"
+        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"  # noqa: E501
         filters = {"resourceId": resource_id, "data.taskId": task_id}
         result = await self.find_with_filter(filters=filters)
         file = self.collection.find_one(filters, {"data": 0, "_id": 1})

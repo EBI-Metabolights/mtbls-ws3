@@ -1,6 +1,6 @@
 import logging
 
-from mtbls.application.services.interfaces.repositories.file_object.study_metadata.metadata_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.study_metadata.metadata_repository import (  # noqa: E501
     IsaTableRowObjectRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

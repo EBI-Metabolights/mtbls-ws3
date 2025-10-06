@@ -14,3 +14,7 @@ insert into users (id, address, affiliation, affiliationurl, apitoken, email, fi
 insert into study_user (studyid, userid) values(200000, 3);
 insert into study_user (studyid, userid) values(200001, 4);
 insert into study_user (studyid, userid) values(200002, 5);
+
+insert into ml_stats (id, page_section, str_name, str_value, sort_order) values (1, 'title', 'Data', 'Data in MetaboLights', 0)
+insert into ml_stats (id, page_section, str_name, str_value, sort_order) values (2, 'Data', 'Total number of studies', '8699', 0)
+insert into ml_stats (id, page_section, str_name, str_value, sort_order) values (3, 'Data', ' - Public', '1358', 1)

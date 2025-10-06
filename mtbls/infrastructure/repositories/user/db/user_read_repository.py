@@ -5,7 +5,7 @@ from pydantic import ConfigDict, validate_call
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput

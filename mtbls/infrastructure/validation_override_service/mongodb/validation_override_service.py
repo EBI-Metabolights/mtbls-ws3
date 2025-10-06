@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Union
 
 from mtbls.application.services.interfaces.policy_service import PolicyService
-from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (  # noqa: E501
     ValidationOverrideRepository,
 )
 from mtbls.application.services.interfaces.validation_override_service import (
@@ -30,7 +30,7 @@ class MongoDbValidationOverrideService(ValidationOverrideService):
         self,
         validation_override_repository: ValidationOverrideRepository,
         policy_service: PolicyService,
-        validation_overrides_object_key: str = "validation-overrides/validation-overrides.json",
+        validation_overrides_object_key: str = "validation-overrides/validation-overrides.json",  # noqa: E501
     ):
         self.validation_override_repository = validation_override_repository
         self.policy_service = policy_service

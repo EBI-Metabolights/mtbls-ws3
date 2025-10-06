@@ -21,10 +21,10 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_read_permission,
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.endpoint_config import (  # noqa: E501
     RestApiEndpointConfiguration,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files.models import (  # noqa: E501
     StudyJsonListResponse,
 )
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
@@ -176,7 +176,7 @@ class StudyItemCollection:
         index_description = (
             f"{self.item_name.lower()} item index, e.g. 0 or 1 (First item index is 0)."
         )
-        filter_description = f"{self.item_name.lower()} item filter, e.g. name=Extraction,description=data"
+        filter_description = f"{self.item_name.lower()} item filter, e.g. name=Extraction,description=data"  # noqa: E501
 
         @inject
         async def get_items_wrapper(
@@ -307,7 +307,7 @@ class StudyItemCollection:
                         )
                     )
                 return APIErrorResponse(
-                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                    error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
             return APIErrorResponse(
@@ -354,7 +354,7 @@ class StudyItemCollection:
                         )
                     )
             return APIErrorResponse(
-                error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"
+                error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
             )
 
         return delete_item_wrapper

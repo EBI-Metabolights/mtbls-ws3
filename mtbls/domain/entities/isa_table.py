@@ -21,7 +21,7 @@ class ColumnDefinition(CamelCaseModel):
     column_name: Annotated[
         Union[str, None],
         Field(
-            description="Index as string of a column in ISA Table. First column index is '0'."
+            description="Index as string of a column in ISA Table. First column index is '0'."  # noqa: E501
         ),
     ] = None
 
@@ -37,7 +37,7 @@ class ColumnInfo(CamelCaseModel):
     column_name: Annotated[
         Union[str, None],
         Field(
-            description="Index as string of a column in ISA Table. First column index is '0'."
+            description="Index as string of a column in ISA Table. First column index is '0'."  # noqa: E501
         ),
     ] = None
 
@@ -46,13 +46,13 @@ class ColumnInfo(CamelCaseModel):
     unique_column_name: Annotated[
         str,
         Field(
-            description="Unique header name of column. It is same if column header is unique in ISA table."
+            description="Unique header name of column. It is same if column header is unique in ISA table."  # noqa: E501
         ),
     ] = ""
     additional_columns: Annotated[
         list[str],
         Field(
-            description="Linked column names. If column is ontology or a column with unit ontology column, it lists the following column headers."
+            description="Linked column names. If column is ontology or a column with unit ontology column, it lists the following column headers."  # noqa: E501
         ),
     ] = []
 

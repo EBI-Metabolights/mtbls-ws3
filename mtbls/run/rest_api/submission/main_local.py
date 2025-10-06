@@ -59,9 +59,9 @@ if __name__ == "__main__":
     #     MongoDbStudyMetadataServiceFactory(
     #         study_read_repository=container.repositories.study_read_repository(),
     #         file_registry=container.repositories.file_registry(),
-    #         investigation_object_repository=container.repositories.investigation_object_repository(),
-    #         isa_table_object_repository=container.repositories.isa_table_object_repository(),
-    #         isa_table_row_object_repository=container.repositories.isa_table_row_object_repository(),
+    #         investigation_object_repository=container.repositories.investigation_object_repository(),  # noqa: E501
+    #         isa_table_object_repository=container.repositories.isa_table_object_repository(),  # noqa: E501
+    #         isa_table_row_object_repository=container.repositories.isa_table_row_object_repository(),  # noqa: E501
     #     )
     # )
 

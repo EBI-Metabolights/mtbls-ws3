@@ -5,7 +5,7 @@ from metabolights_utils.models.isa.investigation_file import OntologyAnnotation
 
 class OntologyItem(OntologyAnnotation):
     def __str__(self) -> str:
-        return f"{self.term_source_ref or ''}:{self.term or ''}:{self.term_accession_number or ''}"
+        return f"{self.term_source_ref or ''}:{self.term or ''}:{self.term_accession_number or ''}"  # noqa: E501
 
     def __hash__(self) -> int:
         return hash(self.__str__())

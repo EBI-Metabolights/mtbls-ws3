@@ -13,7 +13,7 @@ class InMemoryCacheImpl(CacheService):
         self.expiration_times = {}
 
     async def _is_expired(self, key: str) -> bool:
-        # Check if the key has expired based on the current time and the stored expiration timestamp
+        # Check if the key has expired based on the current time and the stored expiration timestamp  # noqa: E501
         if key in self.expiration_times:
             if self.expiration_times[key] <= int(time.time()):
                 # Key has expired, remove it

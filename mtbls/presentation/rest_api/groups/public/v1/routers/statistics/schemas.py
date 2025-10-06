@@ -3,12 +3,22 @@ from typing import Annotated, List
 
 from pydantic import BaseModel, Field
 
+SECTION_DB_VALUE_MAP = {
+    "info": "Info",
+    "submitters": "Submitters",
+    "data": "Data",
+    "top-submitters": "Topsubmitters",
+}
+
 
 class StatisticCategory(enum.StrEnum):
-    SUBMITTERS = "Submitters"
-    DATA = "Data"
-    TOP_SUBMITTERS = "Topsubmitters"
-    INFO = "Info"
+    SUBMITTERS = "submitters"
+    DATA = "data"
+    TOP_SUBMITTERS = "top-submitters"
+    INFO = "info"
+
+    def get_db_value(self):
+        return SECTION_DB_VALUE_MAP.get(self.value)
 
 
 class MetricData(BaseModel):

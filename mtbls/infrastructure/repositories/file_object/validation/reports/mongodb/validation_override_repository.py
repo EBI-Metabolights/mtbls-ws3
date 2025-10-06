@@ -3,10 +3,10 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.file_object.validation.validation_report_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_report_repository import (  # noqa: E501
     ValidationReportRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity
@@ -111,7 +111,7 @@ class MongoDbValidationReportRepository(
         filters = {"resourceId": resource_id, "taskId": task_id}
         result = self.find_with_filter(filters=filters)
 
-        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"
+        object_key = f"{self.validation_history_object_key}/validation-history__{time_str}__{task_id}.json"  # noqa: E501
 
         created = False
         if result:

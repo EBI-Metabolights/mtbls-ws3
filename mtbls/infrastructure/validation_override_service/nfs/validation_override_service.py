@@ -5,7 +5,7 @@ import uuid
 from typing import Union
 
 from mtbls.application.services.interfaces.policy_service import PolicyService
-from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
 from mtbls.application.services.interfaces.validation_override_service import (
@@ -25,7 +25,7 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
         self,
         policy_service: PolicyService,
         file_object_repository: FileObjectWriteRepository,
-        validation_overrides_object_key: str = "validation-overrides/validation-overrides.json",
+        validation_overrides_object_key: str = "validation-overrides/validation-overrides.json",  # noqa: E501
         temp_directory: str = "/tmp/validation-overrides-tmp",
     ):
         super().__init__()

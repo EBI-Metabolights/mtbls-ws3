@@ -105,7 +105,7 @@ async def patch_validation_overrides(
             if new_item.update.comment:
                 updated_values["comment"] = new_item.update.comment
             logger.info(
-                "Validation rules are updated for %s. Updated override ids: %s. Updated value: %s",
+                "Validation rules are updated for %s. Updated override ids: %s. Updated value: %s",  # noqa: E501
                 resource_id,
                 updated_rules,
                 updated_values,

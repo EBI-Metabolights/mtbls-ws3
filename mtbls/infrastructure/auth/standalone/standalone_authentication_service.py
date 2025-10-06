@@ -13,7 +13,7 @@ from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.domain.enums.jwt_token_content import JwtTokenContent, JwtTokenInput

@@ -29,7 +29,7 @@ class ServerInfo(BaseModel):
     root_path: Annotated[
         str,
         Field(
-            description="context path if web service is behind proxy service. e.i. /metabolights/ws3",
+            description="context path if web service is behind proxy service. e.i. /metabolights/ws3",  # noqa: E501
         ),
     ] = ""
     title: Annotated[

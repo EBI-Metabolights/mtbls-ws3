@@ -40,16 +40,16 @@ from mtbls.infrastructure.auth.standalone.standalone_authorization_service impor
 from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
-from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (
+from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
 )
-from mtbls.infrastructure.system_health_check_service.remote.remote_system_health_check_service import (
+from mtbls.infrastructure.system_health_check_service.remote.remote_system_health_check_service import (  # noqa: E501
     RemoteSystemHealthCheckService,
 )
-from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (
+from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (  # noqa: E501
     FileSystemValidationOverrideService,
 )
-from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (
+from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (  # noqa: E501
     FileSystemValidationReportService,
 )
 from mtbls.presentation.rest_api.core.core_router import set_oauth2_redirect_endpoint
@@ -58,7 +58,7 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.oauth2_scheme import (
     OAuth2ClientCredentials,
     get_oauth2_scheme,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license.schemas import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license.schemas import (  # noqa: E501
     DatasetLicenseInfoConfiguration,
 )
 from mtbls.run.config import ModuleConfiguration
@@ -161,7 +161,7 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     #     MongoDbValidationOverrideService,
     #     validation_override_repository=repositories.validation_override_repository,
     #     policy_service=policy_service,
-    #     validation_overrides_object_key="validation-overrides/validation-overrides.json",
+    #     validation_overrides_object_key="validation-overrides/validation-overrides.json",  # noqa: E501
     # )
     # validation_report_service: ValidationReportService = providers.Singleton(
     #     MongoDbValidationReportService,
@@ -175,10 +175,6 @@ CONFIG_SECRETS_FILE = os.environ.get(
     "CONFIG_SECRETS_FILE",
     ".submission-config-secrets/.secrets.yaml",
 )
-print("Config file path:", CONFIG_FILE)
-print("Config file secrets path:", CONFIG_SECRETS_FILE)
-
-print("Submission server config file path", CONFIG_FILE)
 
 
 class Ws3ApplicationContainer(containers.DeclarativeContainer):

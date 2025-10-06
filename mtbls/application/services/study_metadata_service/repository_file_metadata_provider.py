@@ -4,7 +4,7 @@ from typing import Union
 
 from metabolights_utils.provider.study_provider import AbstractMetadataFileProvider
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
 from mtbls.domain.shared.repository.study_bucket import StudyBucket

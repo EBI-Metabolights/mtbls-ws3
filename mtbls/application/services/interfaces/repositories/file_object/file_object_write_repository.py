@@ -1,6 +1,6 @@
 import abc
 
-from mtbls.application.services.interfaces.repositories.file_object.file_object_read_repository import (
+from mtbls.application.services.interfaces.repositories.file_object.file_object_read_repository import (  # noqa: E501
     FileObjectReadRepository,
 )
 

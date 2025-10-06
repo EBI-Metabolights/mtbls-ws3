@@ -52,8 +52,10 @@ class APIBaseResponse(APIBaseModel):
     success_message: Annotated[
         Union[None, str],
         Field(
-            description="If status is `success`, response may contain success message."
-            "It may contain a message for partial success even if response status is `error`."
+            description="If status is `success`, "
+            "response may contain success message."
+            "It may contain a message for partial "
+            "success even if response status is `error`."
         ),
     ] = None
 
@@ -65,7 +67,8 @@ class APIBaseResponse(APIBaseModel):
     errors: Annotated[
         Union[List[str], List[APIValidationError]],
         Field(
-            description="If status is `error`, response may contain a list of error details."
+            description="If status is `error`, "
+            "response may contain a list of error details."
         ),
     ] = []
 
@@ -149,7 +152,8 @@ class APISuccessResponse(APIResponse):
 
 class APIListResponse(APIBaseResponse, Generic[L]):
     """
-    API response model for non-paginated results. List item can be primitive or any object.
+    API response model for non-paginated results.
+    List item can be primitive or any object.
     """
 
     content: Annotated[
@@ -172,7 +176,8 @@ class APIPaginatedResponse(APIBaseResponse, Generic[T]):
 class APIErrorResponse(APIBaseResponse):
     """
     API response model for error response.
-    `APIErrorResponse` model can be converted to `APIPaginatedResponse`, `APIListResponse` and `APIResponse`.
+    `APIErrorResponse` model can be converted to
+    `APIPaginatedResponse`, `APIListResponse` and `APIResponse`.
     """
 
     status: Annotated[
@@ -188,7 +193,7 @@ class APIErrorResponse(APIBaseResponse):
 PUBLIC_ENDPOINT_ERROR_RESPONSES: Dict[int, APIErrorResponse] = {
     status.HTTP_400_BAD_REQUEST: {"model": APIErrorResponse},
     status.HTTP_404_NOT_FOUND: {"model": APIErrorResponse},
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": APIErrorResponse},
+    status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse},
     status.HTTP_429_TOO_MANY_REQUESTS: {"model": APIErrorResponse},
     status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": APIErrorResponse},
     status.HTTP_501_NOT_IMPLEMENTED: {"model": APIErrorResponse},
@@ -201,7 +206,7 @@ ALL_ERROR_RESPONSES: Dict[int, APIErrorResponse] = {
     status.HTTP_403_FORBIDDEN: {"model": APIErrorResponse},
     status.HTTP_404_NOT_FOUND: {"model": APIErrorResponse},
     status.HTTP_405_METHOD_NOT_ALLOWED: {"model": APIErrorResponse},
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": APIErrorResponse},
+    status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse},
     status.HTTP_429_TOO_MANY_REQUESTS: {"model": APIErrorResponse},
     status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": APIErrorResponse},
     status.HTTP_501_NOT_IMPLEMENTED: {"model": APIErrorResponse},

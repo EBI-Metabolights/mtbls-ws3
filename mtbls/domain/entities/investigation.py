@@ -70,8 +70,8 @@ class OntologySourceReferenceItem(CamelCaseModel):
     name: Annotated[
         str,
         Field(
-            description="The name of the source of a term; i.e. the source controlled vocabulary or ontology."
-            " These names will be used in all corresponding Term Source REF fields that occur elsewhere."
+            description="The name of the source of a term; i.e. the source controlled vocabulary or ontology."  # noqa: E501
+            " These names will be used in all corresponding Term Source REF fields that occur elsewhere."  # noqa: E501
         ),
     ] = ""
 
@@ -82,7 +82,7 @@ class OntologySourceReferenceItem(CamelCaseModel):
     version: Annotated[
         Union[str, int],
         Field(
-            description="The version number of the Term Source to support terms tracking."
+            description="The version number of the Term Source to support terms tracking."  # noqa: E501
         ),
     ] = ""
     description: Annotated[
@@ -108,14 +108,14 @@ class OntologyItem(CamelCaseModel):
     term_accession_number: Annotated[
         str,
         Field(
-            description="The accession number from the Term Source associated with the term.",
+            description="The accession number from the Term Source associated with the term.",  # noqa: E501
         ),
     ] = ""
     term_source_ref: Annotated[
         str,
         Field(
             description="Source reference name of ontology term. e.g., EFO, OBO, NCIT. "
-            "Ontology source reference names should be defined in ontology source references section in i_Investigation.txt file",
+            "Ontology source reference names should be defined in ontology source references section in i_Investigation.txt file",  # noqa: E501
         ),
     ] = ""
 
@@ -138,14 +138,14 @@ class ValueTypeItem(CamelCaseModel):
     term_accession_number: Annotated[
         str,
         Field(
-            description="The accession number from the Term Source associated with the term.",
+            description="The accession number from the Term Source associated with the term.",  # noqa: E501
         ),
     ] = ""
     term_source_ref: Annotated[
         str,
         Field(
             description="Source reference name of ontology term. e.g., EFO, OBO, NCIT. "
-            "Ontology source reference names should be defined in ontology source references section in i_Investigation.txt file",
+            "Ontology source reference names should be defined in ontology source references section in i_Investigation.txt file",  # noqa: E501
         ),
     ] = ""
 
@@ -155,14 +155,14 @@ class FactorItem(CamelCaseModel):
         str,
         Field(
             description="The name of one factor used in the study files. "
-            "A factor corresponds to an independent variable manipulated by the experimentalist "
-            "with the intention to affect biological systems in a way that can be measured by an assay.",
+            "A factor corresponds to an independent variable manipulated by the experimentalist "  # noqa: E501
+            "with the intention to affect biological systems in a way that can be measured by an assay.",  # noqa: E501
         ),
     ] = ""
     type: Annotated[
         OntologyItem,
         Field(
-            description="A term allowing the classification of the factor into categories. "
+            description="A term allowing the classification of the factor into categories. "  # noqa: E501
             "The term is a controlled vocabulary or an ontology",
         ),
     ] = OntologyItem()
@@ -181,13 +181,13 @@ class AssayItem(CamelCaseModel):
     measurement_type: Annotated[
         OntologyItem,
         Field(
-            description="A term to qualify what is being measured (e.g. metabolite identification).",
+            description="A term to qualify what is being measured (e.g. metabolite identification).",  # noqa: E501
         ),
     ] = OntologyItem()
     technology_type: Annotated[
         OntologyItem,
         Field(
-            description="Term to identify the technology used to perform the measurement, "
+            description="Term to identify the technology used to perform the measurement, "  # noqa: E501
             "e.g. NMR spectrometry assay, mass spectrometry assay",
         ),
     ] = OntologyItem()
@@ -195,7 +195,7 @@ class AssayItem(CamelCaseModel):
         str,
         Field(
             description="Platform information "
-            "such as assay technique name, polarity, column model, manufacturer, platform name.",
+            "such as assay technique name, polarity, column model, manufacturer, platform name.",  # noqa: E501
         ),
     ] = ""
 
@@ -207,37 +207,37 @@ class PersonItem(CamelCaseModel):
     last_name: Annotated[
         str,
         Field(
-            description="Last name of a person associated with the investigation or study."
+            description="Last name of a person associated with the investigation or study."  # noqa: E501
         ),
     ] = ""
     first_name: Annotated[
         str,
         Field(
-            description="First name of person associated with the investigation or study.",
+            description="First name of person associated with the investigation or study.",  # noqa: E501
         ),
     ] = ""
     mid_initials: Annotated[
         str,
         Field(
-            description="Middle name initials (if exists) of person associated with the investigation or study",
+            description="Middle name initials (if exists) of person associated with the investigation or study",  # noqa: E501
         ),
     ] = ""
     email: Annotated[
         str,
         Field(
-            description="Email address of person associated with the investigation or study",
+            description="Email address of person associated with the investigation or study",  # noqa: E501
         ),
     ] = ""
     phone: Annotated[
         str,
         Field(
-            description="Phone number of person associated with the investigation or study",
+            description="Phone number of person associated with the investigation or study",  # noqa: E501
         ),
     ] = ""
     fax: Annotated[
         str,
         Field(
-            description="Fax number of person associated with the investigation or study",
+            description="Fax number of person associated with the investigation or study",  # noqa: E501
         ),
     ] = ""
     address: Annotated[
@@ -249,14 +249,14 @@ class PersonItem(CamelCaseModel):
     affiliation: Annotated[
         str,
         Field(
-            description="Affiliation of person associated with the investigation or study",
+            description="Affiliation of person associated with the investigation or study",  # noqa: E501
         ),
     ] = ""
     roles: Annotated[
         list[OntologyItem],
         Field(
             description="Roles of person associated with the investigation or study. "
-            "Multiple role can be defined for each person. Role is defined as an ontology term. "
+            "Multiple role can be defined for each person. Role is defined as an ontology term. "  # noqa: E501
             "e.g., NCIT:Investigator, NCIT:Author",
         ),
     ] = []
@@ -352,20 +352,20 @@ class StudyItem(CamelCaseModel):
     file_name: Annotated[
         str,
         Field(
-            description="Name of the Sample Table file corresponding the definition of that Study.",
+            description="Name of the Sample Table file corresponding the definition of that Study.",  # noqa: E501
         ),
     ] = ""
 
     title: Annotated[
         str,
         Field(
-            description="A concise phrase used to encapsulate the purpose and goal of the study.",
+            description="A concise phrase used to encapsulate the purpose and goal of the study.",  # noqa: E501
         ),
     ] = ""
     description: Annotated[
         str,
         Field(
-            description="A textual description of the study, with components such as objective or goals.",
+            description="A textual description of the study, with components such as objective or goals.",  # noqa: E501
         ),
     ] = ""
     submission_date: Annotated[
@@ -433,7 +433,7 @@ class InvestigationItem(CommentedItem):
     submission_date: Annotated[
         str,
         Field(
-            description="The date on which the investigation was reported to the MetaboLights repository. "
+            description="The date on which the investigation was reported to the MetaboLights repository. "  # noqa: E501
             "String formatted as ISO8601 date YYYY-MM-DD"
         ),
     ] = ""
@@ -453,7 +453,7 @@ class InvestigationItem(CommentedItem):
     publications: Annotated[
         list[PublicationItem],
         Field(
-            description="All publications prepared to report results of the investigation."
+            description="All publications prepared to report results of the investigation."  # noqa: E501
         ),
     ] = []
 

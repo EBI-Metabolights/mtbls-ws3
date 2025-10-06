@@ -4,7 +4,7 @@ from typing import Generic
 from bson.objectid import ObjectId
 from pymongo.results import DeleteResult, InsertManyResult, UpdateResult
 
-from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (  # noqa: E501
     AbstractWriteRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

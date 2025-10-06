@@ -72,7 +72,7 @@ async def start_study_validation_task(  # noqa: PLR0913
 
     Returns:
         AsyncTaskStatus: Status of the started task.
-    """
+    """  # noqa: E501
     key = f"validation_task:current:{resource_id}"
     task_id = await cache_service.get_value(key)
     if task_id:
@@ -93,14 +93,14 @@ async def start_study_validation_task(  # noqa: PLR0913
                     task_id,
                     f"Previous validation task: {task_id}",
                     "Validation result of the previous validation task exists. "
-                    "Read the previous task result or delete it to start a new validation task.",
+                    "Read the previous task result or delete it to start a new validation task.",  # noqa: E501
                 )
             ttl = await cache_service.get_ttl_in_seconds(key)
             if ttl > (cache_expiration_in_seconds - 10):
                 raise AsyncTaskAlreadyStartedError(
                     resource_id,
                     task_id,
-                    f"A validation task has been started for {resource_id}. Wait for its result.",
+                    f"A validation task has been started for {resource_id}. Wait for its result.",  # noqa: E501
                 )
             logger.debug(
                 "Validation task for %s is overriding the previous task result %s",
@@ -188,7 +188,7 @@ async def get_study_validation_result(  # noqa: PLR0913
 
     Returns:
         AsyncTaskSummary: Task status and validation result (if task is completed).
-    """
+    """  # noqa: E501
 
     task_status: Union[AsyncTaskStatus, None] = None
     task: Union[AsyncTaskResult, None] = None
@@ -501,7 +501,7 @@ async def delete_validation_task(
 
     Returns:
         bool: Return if task id is deleted from cache and sent signal to terminate current running task.
-    """
+    """  # noqa: E501
     result: Union[AsyncTaskResult, None] = None
     key = f"validation_task:current:{resource_id}"
     value = await cache_service.get_value(key)
@@ -517,7 +517,7 @@ async def delete_validation_task(
     except Exception as ex:
         if isinstance(ex, AsyncTaskNotFoundError):
             return False
-        message = f"Validation task id {task_id} is not found for resource_id: {resource_id}: {ex}"
+        message = f"Validation task id {task_id} is not found for resource_id: {resource_id}: {ex}"  # noqa: E501
         logger.error(message)
 
     try:
@@ -530,7 +530,7 @@ async def delete_validation_task(
                 task_id,
             )
     except Exception as ex:
-        message = f"Revoke failed: validation task id {task_id} for resource_id: {resource_id}: {ex}"
+        message = f"Revoke failed: validation task id {task_id} for resource_id: {resource_id}: {ex}"  # noqa: E501
         logger.error(message)
 
     return task_id_in_cache

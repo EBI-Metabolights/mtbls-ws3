@@ -1,4 +1,4 @@
-from mtbls.application.services.interfaces.repositories.user.user_write_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
 from mtbls.domain.entities.user import UserInput, UserOutput

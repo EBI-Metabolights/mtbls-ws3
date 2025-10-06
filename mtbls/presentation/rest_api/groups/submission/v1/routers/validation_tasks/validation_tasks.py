@@ -48,7 +48,7 @@ from mtbls.presentation.rest_api.core.responses import (
 from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_update_permission,
 )
-from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (
+from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (  # noqa: E501
     GetValidationResponse,
     StartValidationResponse,
 )
@@ -61,7 +61,8 @@ router = APIRouter(tags=["Study Validation"], prefix="/submissions/v2/validation
 
 @router.get(
     "/{resource_id}",
-    summary="Get Study Validation Results History ordered by validation time descending",
+    summary="Get Study Validation Results History "
+    "ordered by validation time descending",
     description="Get Validation Results",
     response_model=APIResponse[PaginatedOutput[ValidationResultFile]],
 )
@@ -118,7 +119,8 @@ async def create_validation_task(
         bool,
         Field(
             title="Run metadata modifier",
-            description="Updates metadata files and fixes common errors in metadata files.",
+            description="Updates metadata files and "
+            "fixes common errors in metadata files.",
         ),
     ] = True,
     override_previous_task_results: Annotated[
@@ -166,7 +168,8 @@ async def create_validation_task(
 @router.get(
     "/{resource_id}/{task_id}",
     summary="Check and Get Study Validation Result",
-    description="Checks Validation Task and return MetaboLights validations (if task completed). "
+    description="Checks Validation Task and "
+    "return MetaboLights validations (if task completed). "
     "If task_id is not defined, returns the last task result (if exists)",
     response_model=APIResponse[GetValidationResponse],
 )
@@ -236,7 +239,7 @@ async def get_validation_task_result(  # noqa: PLR0913
 @router.get(
     "/{resource_id}/{task_id}/report",
     summary="Get Study Validation Report",
-    description="Checks Validation Task and return MetaboLights validation report (if task completed). "
+    description="Checks Validation Task and return MetaboLights validation report (if task completed). "  # noqa: E501
     "If task_id is not defined, returns the last task result (if exists)",
 )
 @inject

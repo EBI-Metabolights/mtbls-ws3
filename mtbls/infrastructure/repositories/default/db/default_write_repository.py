@@ -6,7 +6,7 @@ from sqlalchemy import select
 from typing_extensions import OrderedDict
 
 from mtbls.application.decorators.validate import validate_inputs_outputs
-from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (
+from mtbls.application.services.interfaces.repositories.default.abstract_write_repository import (  # noqa: E501
     AbstractWriteRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity

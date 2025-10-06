@@ -4,10 +4,10 @@ from typing import Union
 from mtbls.application.services.interfaces.auth.authorization_service import (
     AuthorizationService,
 )
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.domain.entities.user import UserOutput

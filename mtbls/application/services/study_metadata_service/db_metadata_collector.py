@@ -6,7 +6,7 @@ from metabolights_utils.provider.async_provider.study_provider import (
     AbstractDbMetadataCollector,
 )
 
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
 from mtbls.domain.entities.user import UserOutput

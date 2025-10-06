@@ -25,10 +25,10 @@ from mtbls.infrastructure.persistence.db.sqlite.db_client_impl import (
 from mtbls.infrastructure.pub_sub.threading.thread_manager_impl import (
     ThreadingAsyncTaskService,
 )
-from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_config import (
+from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_config import (  # noqa E501
     StandaloneSystemHealthCheckConfiguration,
 )
-from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_service import (
+from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_service import (  # noqa E501
     StandaloneSystemHealthCheckService,
 )
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
@@ -105,6 +105,26 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
 
 @pytest.fixture(scope="module")
 def submission_api_client(submission_api_container):
+    app, _ = create_app(container=submission_api_container, db_connection_pool_size=3)
+    # Override async task service
+    async_task_registry = submission_api_container.core.async_task_registry()
+    submission_api_container.services.async_task_service.override(
+        ThreadingAsyncTaskService(
+            app_name="default",
+            queue_names=["common", "validation", "datamover", "compute"],
+            async_task_registry=async_task_registry,
+        )
+    )
+
+    return TestClient(
+        app=app,
+        base_url="http://wwwdev.ebi.ac.uk",
+        raise_server_exceptions=False,
+    )
+
+
+@pytest.fixture(scope="module")
+def public_api_client(submission_api_container):
     app, _ = create_app(container=submission_api_container, db_connection_pool_size=3)
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()

@@ -11,7 +11,7 @@ from starlette.authentication import (
 from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
 )
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
 from mtbls.domain.entities.auth_user import AuthenticatedUser, UnauthenticatedUser

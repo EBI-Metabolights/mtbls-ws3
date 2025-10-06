@@ -76,7 +76,7 @@ class ThreadingAsyncTaskResult(AsyncTaskResult):
             if res == 0:
                 raise AsyncTaskRemoteFailure("Invalid thread ID")
             if res > 1:
-                # If it returns more than 1, it means we accidentally affected more threads
+                # If it returns more than 1, it means we accidentally affected more threads  # noqa: E501
                 ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), 0)
                 raise AsyncTaskRemoteFailure("PyThreadState_SetAsyncExc failed")
 
