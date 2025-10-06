@@ -205,6 +205,10 @@ class FileSystemValidationReportService(ValidationReportService):
 
             with tmp_file_path.open() as f:
                 validations_obj = json.load(f)
-            return PolicySummaryResult.model_validate(validations_obj)
+            result = PolicySummaryResult.model_validate(validations_obj)
+            return result
+        except Exception as ex:
+            logger.exception(ex)
+            raise ex
         finally:
             tmp_file_path.unlink(missing_ok=True)

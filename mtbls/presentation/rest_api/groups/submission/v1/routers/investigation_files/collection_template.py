@@ -30,7 +30,7 @@ from mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_file
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
 from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 
 class StudyItemCollection:

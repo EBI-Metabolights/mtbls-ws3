@@ -54,7 +54,7 @@ from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.m
 )
 from mtbls.presentation.rest_api.shared.dependencies import get_resource_id, get_task_id
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 router = APIRouter(tags=["Study Validation"], prefix="/submissions/v2/validations")
 

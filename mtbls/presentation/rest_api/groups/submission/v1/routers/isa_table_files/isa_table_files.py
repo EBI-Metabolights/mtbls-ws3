@@ -28,7 +28,7 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
 )
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 router = APIRouter(prefix="/submissions/v1")
 

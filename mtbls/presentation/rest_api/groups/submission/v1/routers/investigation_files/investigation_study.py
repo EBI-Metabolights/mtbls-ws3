@@ -32,7 +32,7 @@ from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
 endpoint_prefix = "/submissions/v2/investigation-files"
 
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 router = APIRouter(prefix=endpoint_prefix)
 

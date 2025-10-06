@@ -71,8 +71,8 @@ run:
           description: "Validate a study and get validation results"
         - name: "Study Validation Overrides"
           description: "Override validation rules (curators only)"
-        - name: "MetaboLights Statistiscs"
-          description: "Public MetaboLights statistics"
+        - name: "MetaboLights Statistics"
+          description: "Public MetaboLights Statistics"
     logging:
       version: 1
       disable_existing_loggers: true
