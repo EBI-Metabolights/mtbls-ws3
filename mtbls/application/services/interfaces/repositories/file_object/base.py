@@ -23,6 +23,7 @@ class BaseFileObjectRepository(
         observers: Union[None, Sequence[FileObjectObserver]] = None,
     ):
         super().__init__(study_bucket)
+        self._observers = set()
         if observers:
             self._observers: set[FileObjectObserver] = set(x for x in observers if x)
 

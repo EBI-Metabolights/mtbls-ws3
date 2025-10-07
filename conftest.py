@@ -79,7 +79,9 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
         standalone_heath_check_config_str
     )
     container.services.system_health_check_service.override(
-        StandaloneSystemHealthCheckService(config=health_check_config)
+        StandaloneSystemHealthCheckService(
+            config=health_check_config, http_client=container.services.http_client
+        )
     )
     # Override Cache
     container.services.cache_service.override(InMemoryCacheImpl())

@@ -16,9 +16,7 @@ from mtbls.presentation.rest_api.groups.public.v1.routers.statistics.schemas imp
 
 logger = getLogger(__name__)
 
-router = APIRouter(
-    tags=["MetaboLights Statistics"], prefix="/public/v2/mtbls-statistics"
-)
+router = APIRouter(tags=["Public"], prefix="/public/v2/mtbls-statistics")
 
 
 @router.get(

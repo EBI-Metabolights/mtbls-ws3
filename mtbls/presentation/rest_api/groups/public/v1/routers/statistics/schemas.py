@@ -12,8 +12,8 @@ SECTION_DB_VALUE_MAP = {
 
 
 class StatisticCategory(enum.StrEnum):
-    SUBMITTERS = "submitters"
     DATA = "data"
+    SUBMITTERS = "submitters"
     TOP_SUBMITTERS = "top-submitters"
     INFO = "info"
 

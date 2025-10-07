@@ -29,7 +29,7 @@ class MongoDbIsaTableObjectRepository(
         collection_name: str = "isa_table_files",
         output_entity_class: type[BaseEntity] = IsaTableFileObject,
         study_bucket: StudyBucket = StudyBucket.PRIVATE_METADATA_FILES,
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(MongoDbDefaultWriteRepository, self).__init__(
             connection=connection,

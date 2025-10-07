@@ -13,7 +13,7 @@ from mtbls.domain.entities.user import UserOutput
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
 from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
-from mtbls.infrastructure.persistence.db.model.study_models import Study, User
+from mtbls.infrastructure.persistence.db.model.study_models import Study
 from mtbls.infrastructure.repositories.default.db.default_read_repository import (
     SqlDbDefaultReadRepository,
 )
@@ -49,24 +49,24 @@ class SqlDbUserReadRepository(
     async def get_user_by_api_token(self, api_token: str) -> Union[None, UserOutput]:
         return await self._get_first_by_field_name("api_token", api_token)
 
-    async def _get_studies_by_filter(self, filter_: Callable) -> list[StudyOutput]:
+    async def _get_study_submitters_by_filter(
+        self, filter_: Callable
+    ) -> list[UserOutput]:
         async with self.database_client.session() as session:
-            stmt = select(User).where(filter_()).options(selectinload(Study.users))
+            stmt = select(Study).where(filter_()).options(selectinload(Study.users))
 
             result = await session.execute(stmt)
-            result: Study = result.scalars().all()
-            if result:
-                return [
-                    UserOutput.model_validate(x)
-                    for x in await result[0].awaitable_attrs.users
-                ]
+            study: None | Study = result.scalars().one_or_none()
+            if study:
+                return await self.convert_to_output_type_list(study.users)
             return []
 
-    async def get_studies_by_username(self, username: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.username == username)
+    async def get_study_submitters_by_accession(
+        self, accession_number: str
+    ) -> list[UserOutput]:
+        return await self._get_study_submitters_by_filter(
+            lambda: Study.acc == accession_number
+        )
 
-    async def get_studies_by_email(self, email: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.email == email)
-
-    async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.orcid == orcid)
+    async def get_study_submitters_by_id(self, id_: int) -> list[UserOutput]:
+        return await self._get_study_submitters_by_filter(lambda: Study.id == id_)

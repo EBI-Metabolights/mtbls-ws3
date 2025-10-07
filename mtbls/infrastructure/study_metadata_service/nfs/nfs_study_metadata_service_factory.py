@@ -9,6 +9,9 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
     StudyFileRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.application.services.interfaces.study_metadata_service import (
     StudyMetadataService,
 )
@@ -28,8 +31,10 @@ class FileObjectStudyMetadataServiceFactory(StudyMetadataServiceFactory):
         audit_files_object_repository: FileObjectWriteRepository,
         internal_files_object_repository: FileObjectWriteRepository,
         study_read_repository: StudyReadRepository,
+        user_read_repository: UserReadRepository,
         temp_path: Union[None, str] = None,
     ):
+        self.user_read_repository = user_read_repository
         self.internal_files_object_repository = internal_files_object_repository
         self.study_file_repository = study_file_repository
         self.metadata_files_object_repository = metadata_files_object_repository
@@ -48,5 +53,6 @@ class FileObjectStudyMetadataServiceFactory(StudyMetadataServiceFactory):
             audit_files_object_repository=self.audit_files_object_repository,
             internal_files_object_repository=self.internal_files_object_repository,
             study_read_repository=self.study_read_repository,
+            user_read_repository=self.user_read_repository,
             temp_path=self.temp_path,
         )

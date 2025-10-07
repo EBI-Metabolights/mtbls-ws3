@@ -78,7 +78,9 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
 
     policy_service: PolicyService = providers.Singleton(
         OpaPolicyService,
-        config.policy_service.opa,
+        http_client=gateways.http_client,
+        config=config.policy_service.opa,
+        max_polling_in_seconds=60,
     )
 
     async_task_service: AsyncTaskService = providers.Singleton(
@@ -101,6 +103,7 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         config=config.authentication.mtbls_ws2,
         cache_service=cache_service,
         user_read_repository=repositories.user_read_repository,
+        http_client=gateways.http_client,
     )
     request_tracker: RequestTracker = providers.Singleton(RequestTracker)
     authorization_service: AuthorizationService = providers.Singleton(
@@ -129,6 +132,7 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         audit_files_object_repository=repositories.audit_files_object_repository,
         internal_files_object_repository=repositories.internal_files_object_repository,
         study_read_repository=repositories.study_read_repository,
+        user_read_repository=repositories.user_read_repository,
         temp_path="/tmp/study-metadata-service",
     )
 
@@ -159,7 +163,6 @@ class Ws3WorkerApplicationContainer(containers.DeclarativeContainer):
         config=config,
         gateways=gateways,
     )
-
     services = providers.Container(
         Ws3WorkerServicesContainer,
         config=config.services,

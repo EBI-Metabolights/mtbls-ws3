@@ -24,11 +24,11 @@ Any dependency container will be created for
 
 
 /// example | Dependency container
-You can find an example container definition below. It defines repositories and their implementations. It also assigns the implementations' initiation parameters as well.
+You can find an example container definition below. It defines repositories and their implementations, and assigns the initiation parameters as well.
 
 ///
 
-```Python  hl_lines="11-12 18-19 25-26 32-33 43-44 49-50 55-56"
+```Python  hl_lines="21-22 27-28 33-34 39-40 46-57"
 --8<-- "examples/api/dependency_injection/repository_container.py:44:130"
 ```
 

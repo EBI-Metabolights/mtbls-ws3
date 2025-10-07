@@ -88,12 +88,15 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
 
     policy_service: PolicyService = providers.Singleton(
         OpaPolicyService,
-        config.policy_service.opa,
+        http_client=gateways.http_client,
+        config=config.policy_service.opa,
+        max_polling_in_seconds=60,
     )
 
     system_health_check_service: SystemHealthCheckService = providers.Singleton(
         RemoteSystemHealthCheckService,
         config.system_health_check.remote,
+        http_client=gateways.http_client,
     )
 
     async_task_service: AsyncTaskService = providers.Singleton(
@@ -144,6 +147,7 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     #     isa_table_object_repository=repositories.isa_table_object_repository,
     #     isa_table_row_object_repository=repositories.isa_table_row_object_repository,
     #     study_read_repository=repositories.study_read_repository,
+    #     user_read_repository=repositories.user_read_repository
     #     temp_path="/tmp/study-metadata-service",
     # )
 
@@ -154,6 +158,7 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         audit_files_object_repository=repositories.audit_files_object_repository,
         internal_files_object_repository=repositories.internal_files_object_repository,
         study_read_repository=repositories.study_read_repository,
+        user_read_repository=repositories.user_read_repository,
         temp_path="/tmp/study-metadata-service",
     )
 

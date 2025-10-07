@@ -33,7 +33,7 @@ class MongoDbInvestigationObjectRepository(
         collection_name: str = "investigation_files",
         output_entity_class: type[BaseEntity] = InvestigationFileObject,
         study_bucket: StudyBucket = StudyBucket.PRIVATE_METADATA_FILES,
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(MongoDbDefaultWriteRepository, self).__init__(
             connection=connection,

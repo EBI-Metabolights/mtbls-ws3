@@ -6,9 +6,9 @@ import re
 from typing import Any, Union
 from urllib.parse import quote
 
-import httpx
 from pymongo.results import DeleteResult
 
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
@@ -17,7 +17,9 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 )
 from mtbls.domain.entities.base_entity import BaseEntity
 from mtbls.domain.entities.base_file_object import BaseFileObject
+from mtbls.domain.entities.http_response import HttpResponse
 from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.exceptions.repository import (
     StudyObjectAlreadyExistsError,
     StudyObjectNotFoundError,
@@ -43,8 +45,9 @@ class MongoDbFileObjectWriteRepository(
         collection_name: str,
         output_entity_class: type[BaseEntity],
         study_bucket: StudyBucket,
+        http_client: HttpClient,
         resource_category: ResourceCategory = ResourceCategory.UNKNOWN_RESOURCE,
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(MongoDbDefaultWriteRepository, self).__init__(
             connection=connection,
@@ -54,6 +57,7 @@ class MongoDbFileObjectWriteRepository(
         super(FileObjectWriteRepository, self).__init__(
             study_bucket=study_bucket, observers=[observer]
         )
+        self.http_client = http_client
         self.study_bucket = study_bucket
         self.resource_category = resource_category
 
@@ -275,10 +279,10 @@ class MongoDbFileObjectWriteRepository(
     ) -> bool:
         if not source_uri or not re.match(r"^https?://", source_uri):
             raise UnsupportedUriError(source_uri)
-        response = httpx.get(source_uri)
-        response.raise_for_status()
-        data = json.loads(response.text)
-        return self.update_data(resource_id, object_key, data)
+        response: HttpResponse = await self.http_client.send_request(
+            HttpRequestType.GET, source_uri
+        )
+        return self.update_data(resource_id, object_key, response.json_data)
 
     async def delete_object(
         self,

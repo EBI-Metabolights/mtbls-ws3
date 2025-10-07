@@ -3,11 +3,14 @@ from dependency_injector import containers, providers
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
+from mtbls.application.services.interfaces.repositories.statistic.statistic_read_repository import (  # noqa: E501
+    StatisticReadRepository,
+)
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
+    StudyWriteRepository,
 )
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
@@ -21,17 +24,24 @@ from mtbls.infrastructure.persistence.db.model.alias_generator import (
     DbTableAliasGeneratorImpl,
 )
 from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
+
+# from mtbls.infrastructure.persistence.db.mongodb.config import (
+#     MongoDbConnection,
+# )
 from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
 from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (  # noqa: E501
     StudyFolderManager,
 )
+from mtbls.infrastructure.repositories.statistic.sql_db.statistic_read_repository import (  # noqa: E501
+    SqlDbStatisticReadRepository,
+)  # noqa: E501
 from mtbls.infrastructure.repositories.study.db.study_read_repository import (
     SqlDbStudyReadRepository,
 )
-from mtbls.infrastructure.repositories.study_file.sql_db.study_file_repository import (
-    SqlDbStudyFileRepository,
+from mtbls.infrastructure.repositories.study.db.study_write_repository import (
+    SqlDbStudyWriteRepository,
 )
 from mtbls.infrastructure.repositories.user.db.user_read_repository import (
     SqlDbUserReadRepository,
@@ -57,7 +67,12 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         alias_generator=alias_generator,
         database_client=gateways.database_client,
     )
-
+    study_write_repository: StudyWriteRepository = providers.Singleton(
+        SqlDbStudyWriteRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
     user_write_repository: UserWriteRepository = providers.Singleton(
         SqlDbUserWriteRepository,
         entity_mapper=entity_mapper,
@@ -72,8 +87,8 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         database_client=gateways.database_client,
     )
 
-    study_file_repository: StudyFileRepository = providers.Singleton(
-        SqlDbStudyFileRepository,
+    statistic_read_repository: StatisticReadRepository = providers.Singleton(
+        SqlDbStatisticReadRepository,
         entity_mapper=entity_mapper,
         alias_generator=alias_generator,
         database_client=gateways.database_client,
@@ -87,17 +102,20 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.INTERNAL_FILES,
-        observer=study_file_repository,
+        http_client=services.http_client,
+        observer=None,
     )
     audit_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.AUDIT_FILES,
-        observer=study_file_repository,
+        http_client=services.http_client,
+        observer=None,
     )
     metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
-        observer=study_file_repository,
+        http_client=services.http_client,
+        observer=None,
     )

@@ -2,11 +2,10 @@ import socket
 from logging import getLogger
 from typing import Any, Union
 
-import httpx
-
 from mtbls.application.services.interfaces.health_check_service import (
     SystemHealthCheckService,
 )
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.domain.exceptions.health_check import HealthCheckError
 from mtbls.domain.shared.health_check.transfer_status import (
     ProtocolServerStatus,
@@ -23,8 +22,10 @@ class StandaloneSystemHealthCheckService(SystemHealthCheckService):
     def __init__(
         self,
         config: Union[StandaloneSystemHealthCheckConfiguration, dict[str, Any]],
+        http_client: HttpClient,
     ):
         super().__init__()
+        self.http_client = http_client
         self.config = config
         if isinstance(self.config, dict):
             self.config = StandaloneSystemHealthCheckConfiguration.model_validate(
@@ -65,7 +66,7 @@ class StandaloneSystemHealthCheckService(SystemHealthCheckService):
             )
             return transfer_status
 
-        except (httpx.RequestError, httpx.HTTPStatusError, httpx.ConnectError) as exc:
+        except Exception as exc:
             err_msg = str(exc)
             raise HealthCheckError("Could not fetch remote health status", err_msg)
 

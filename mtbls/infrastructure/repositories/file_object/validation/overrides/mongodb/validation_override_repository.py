@@ -33,7 +33,7 @@ class MongoDbValidationOverrideRepository(
         collection_name: str = "validation_overrides",
         output_entity_class: type[BaseEntity] = ValidationOverrideFileObject,
         study_bucket: StudyBucket = StudyBucket.INTERNAL_FILES,
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(ValidationOverrideRepository, self).__init__(
             study_bucket=study_bucket, observers=[observer]

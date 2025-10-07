@@ -20,6 +20,7 @@ router = APIRouter(tags=["System"], prefix="/system/v2/configuration")
     summary="Get current system configuration",
     description="Get current system configuration",
     response_model=APIResponse[dict[str, Any]],
+    include_in_schema=False,
 )
 @inject
 async def get_status(

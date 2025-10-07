@@ -1,9 +1,9 @@
-import json
 from logging import getLogger
 
-import httpx
-
+from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.domain.entities.http_response import HttpResponse
 from mtbls.domain.entities.study import StudyOutput
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.presentation.rest_api.groups.public.v1.routers.studies.schemas import (
     StudyTitle,
 )
@@ -12,46 +12,51 @@ logger = getLogger(__name__)
 
 
 async def find_studies_on_europmc_by_orcid(
-    orcid_id: str, submitter_studies: list[StudyOutput]
+    http_client: HttpClient, orcid_id: str, submitter_studies: list[StudyOutput]
 ) -> list[StudyTitle]:
     mtbls_accession_list = [x.accession_number for x in submitter_studies]
-    article_id_list = search_europe_pmc(orcid=orcid_id)
+    article_id_list = await search_europe_pmc(http_client, orcid=orcid_id)
     if article_id_list:
         for article_id in article_id_list:
-            get_xref(article_id, mtbls_accession_list)
+            await get_xref(http_client, article_id, mtbls_accession_list)
 
     mtbls_basic_list: list[StudyTitle] = [
-        StudyTitle(accession=x, title=get_mtbls_title(acc=x))
+        StudyTitle(accession=x, title=await get_mtbls_title(http_client, acc=x))
         for x in mtbls_accession_list
     ]
     return mtbls_basic_list
 
 
-def search_europe_pmc(orcid: str):
+async def search_europe_pmc(http_client: HttpClient, orcid: str):
     europe_pmc_url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
     article_id_list: list[str] = []
     try:
-        response = httpx.get(
+        response: HttpResponse = await http_client.send_request(
+            HttpRequestType.GET,
             europe_pmc_url,
-            headers={"query": orcid, "format": "json"},
+            params={"query": orcid, "format": "json"},
             timeout=10,
         )
-        response_obj = json.loads(response.text)
-        if response_obj and response_obj["hitCount"] > 0:
-            result_list = response_obj["resultList"]["result"]
+        response_obj = response.json_data
+        if response_obj and response_obj.get("hitCount", 0) > 0:
+            result_list = response_obj.get("resultList", {}).get("result", [])
             for result in result_list:
-                article_id_list.append(result["id"])
+                result_id = result.get("id", None)
+                if result_id:
+                    article_id_list.append(result["id"])
     except Exception as ex:
         logger.warning("search_europe_pmc error: %s", str(ex))
     return article_id_list
 
 
-def get_xref(arc_id: str, mtbls_acc_list: list[str]):
+async def get_xref(http_client: HttpClient, arc_id: str, mtbls_acc_list: list[str]):
     europmc_url_prefix = "https://www.ebi.ac.uk/ebisearch/ws/rest/europepmc"
     xref_url = f"{europmc_url_prefix}/entry/{arc_id}/xref/metabolights"
     try:
-        response = httpx.get(xref_url, headers={"format": "json"}, timeout=10)
-        response_obj = json.loads(response.text)
+        response: HttpResponse = await http_client.send_request(
+            HttpRequestType.GET, xref_url, params={"format": "json"}, timeout=10
+        )
+        response_obj = response.json_data
 
         if response_obj and response_obj.get("entries", []):
             entries = response_obj.get("entries", [])
@@ -65,16 +70,17 @@ def get_xref(arc_id: str, mtbls_acc_list: list[str]):
     return mtbls_acc_list
 
 
-def get_mtbls_title(acc: str):
+async def get_mtbls_title(http_client: HttpClient, acc: str):
     ebi_search_url = "https://www.ebi.ac.uk/ebisearch/ws/rest/metabolights"
     title = ""
     try:
-        response = httpx.get(
+        response: HttpResponse = await http_client.send_request(
+            HttpRequestType.GET,
             ebi_search_url,
-            headers={"query": f"id:{acc}", "fields": "id,name", "format": "json"},
+            params={"query": f"id:{acc}", "fields": "id,name", "format": "json"},
             timeout=10,
         )
-        response_obj = json.loads(response.text)
+        response_obj = response.json_data
         if response_obj and response_obj["hitCount"] > 0:
             if response_obj["entries"]:
                 entries = response_obj["entries"]

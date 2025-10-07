@@ -27,13 +27,18 @@ from mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license.sc
 
 logger = getLogger(__name__)
 
-router = APIRouter(tags=["Dataset License"], prefix="/submissions/v2/dataset-licenses")
+router = APIRouter(
+    tags=["MetaboLights Submission"],
+    prefix="/submissions/v2/dataset-licenses",
+)
 
 
 @router.put(
     "/{resource_id}",
     summary="Add dataset license agreement for a study.",
-    description="Update a study to indicate that the user has agreed to the dataset license and data policy. This is mandatory but is handled as a separate request.",  # noqa: E501
+    description="Update a study to indicate that the user has agreed "
+    "to the dataset license and data policy. "
+    "This is mandatory but is handled as a separate request.",
     response_model=APIResponse[DatasetLicenseResponse],
 )
 @inject

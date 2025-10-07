@@ -72,27 +72,22 @@ class SqlDbStudyReadRepository(
             return []
         return [await self.convert_to_user(x) for x in db_objects]
 
-    async def _get_study_submitters_by_filter(
-        self, filter_: Callable
-    ) -> list[UserOutput]:
+    async def _get_studies_by_filter(self, filter_: Callable) -> list[StudyOutput]:
         async with self.database_client.session() as session:
-            stmt = select(Study).where(filter_()).options(selectinload(Study.users))
+            stmt = select(User).where(filter_()).options(selectinload(User.studies))
 
             result = await session.execute(stmt)
-            result: Study = result.scalars().all()
-            if result:
-                return await self.convert_to_users(
-                    await result[0].awaitable_attrs.users
-                )
+            result: None | Study = result.scalars().one_or_none()
 
+            if result:
+                return await self.convert_to_output_type_list(result.studies)
             return []
 
-    async def get_study_submitters_by_accession(
-        self, accession_number: str
-    ) -> list[UserOutput]:
-        return await self._get_study_submitters_by_filter(
-            lambda: Study.acc == accession_number
-        )
+    async def get_studies_by_username(self, username: str) -> list[StudyOutput]:
+        return await self._get_studies_by_filter(lambda: User.username == username)
 
-    async def get_study_submitters_by_id(self, id_: int) -> list[UserOutput]:
-        return await self._get_study_submitters_by_filter(lambda: Study.id == id_)
+    async def get_studies_by_email(self, email: str) -> list[StudyOutput]:
+        return await self._get_studies_by_filter(lambda: User.email == email)
+
+    async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]:
+        return await self._get_studies_by_filter(lambda: User.orcid == orcid)

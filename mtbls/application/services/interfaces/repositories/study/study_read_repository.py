@@ -5,7 +5,6 @@ from mtbls.application.services.interfaces.repositories.default.abstract_read_re
     AbstractReadRepository,
 )  # noqa: E501
 from mtbls.domain.entities.study import StudyOutput
-from mtbls.domain.entities.user import UserOutput
 
 
 class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
@@ -20,7 +19,10 @@ class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
     ) -> Union[None, StudyOutput]: ...
 
     @abc.abstractmethod
-    async def get_study_submitters_by_id(self, id_: int) -> list[UserOutput]: ...
+    async def get_studies_by_username(self, username: str) -> list[StudyOutput]: ...
 
     @abc.abstractmethod
-    async def get_study_submitters_by_accession(self, id_: int) -> list[UserOutput]: ...
+    async def get_studies_by_email(self, email: str) -> list[StudyOutput]: ...
+
+    @abc.abstractmethod
+    async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]: ...

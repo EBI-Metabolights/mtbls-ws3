@@ -39,7 +39,7 @@ class MongoDbValidationReportRepository(
         study_bucket: StudyBucket = StudyBucket.INTERNAL_FILES,
         collection_name: str = "validation_reports",
         validation_history_object_key: str = "validation-history",
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(MongoDbDefaultWriteRepository, self).__init__(
             connection=connection,

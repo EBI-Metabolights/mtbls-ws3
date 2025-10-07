@@ -3,6 +3,9 @@ from typing import Union
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.application.services.interfaces.study_metadata_service import (
     StudyMetadataService,
 )
@@ -34,10 +37,12 @@ class MongoDbStudyMetadataServiceFactory(StudyMetadataServiceFactory):
         investigation_object_repository: MongoDbInvestigationObjectRepository,
         isa_table_object_repository: MongoDbIsaTableObjectRepository,
         isa_table_row_object_repository: MongoDbIsaTableRowObjectRepository,
+        user_read_repository: UserReadRepository,
         temp_path: Union[None, str] = None,
     ):
         self.study_read_repository = study_read_repository
         self.study_file_repository = study_file_repository
+        self.user_read_repository = user_read_repository
         self.investigation_object_repository = investigation_object_repository
         self.isa_table_object_repository = isa_table_object_repository
         self.isa_table_row_object_repository = isa_table_row_object_repository
@@ -54,5 +59,6 @@ class MongoDbStudyMetadataServiceFactory(StudyMetadataServiceFactory):
             investigation_object_repository=self.investigation_object_repository,
             isa_table_object_repository=self.isa_table_object_repository,
             isa_table_row_object_repository=self.isa_table_row_object_repository,
+            user_read_repository=self.user_read_repository,
             temp_path=self.temp_path,
         )

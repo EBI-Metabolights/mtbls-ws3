@@ -1,15 +1,15 @@
 import datetime
-import json
 import logging
 from typing import Any, Union
 
-import httpx
 import jsonschema
 from metabolights_utils.models.metabolights import get_study_model_schema
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.policy_service import PolicyService
-from mtbls.application.utils.http_utils import get_http_response
+from mtbls.domain.entities.http_response import HttpResponse
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.shared.validator.policy import PolicyInput, ValidationResult
 from mtbls.domain.shared.validator.validation import Validation, VersionedValidationsMap
 from mtbls.infrastructure.policy_service.opa.opa_configuration import OpaConfiguration
@@ -20,10 +20,12 @@ logger = logging.getLogger(__name__)
 class OpaPolicyService(PolicyService):
     def __init__(
         self,
+        http_client: HttpClient,
         config: Union[OpaConfiguration, dict[str, Any]],
         max_polling_in_seconds: int = 60,
     ):
         super().__init__()
+        self.http_client = http_client
         self.config = config
         if isinstance(self.config, dict):
             self.config = OpaConfiguration.model_validate(config)
@@ -41,7 +43,7 @@ class OpaPolicyService(PolicyService):
     async def get_templates(self) -> dict[str, Any]:
         now = datetime.datetime.now(datetime.timezone.utc).timestamp()
         if now - self.templates_last_update_time > self.max_polling_in_seconds:
-            self.templates = await get_http_response(
+            self.templates = await self.get_http_response(
                 self.config.templates_url, "result"
             )
             self.templates_last_update_time = now
@@ -50,7 +52,9 @@ class OpaPolicyService(PolicyService):
     async def get_rule_definitions(self) -> dict[str, Any]:
         now = datetime.datetime.now(datetime.timezone.utc).timestamp()
         if now - self.rule_definitions_update_time > self.max_polling_in_seconds:
-            rules = await get_http_response(self.config.rule_definitions_url, "result")
+            rules = await self.get_http_response(
+                self.config.rule_definitions_url, "result"
+            )
             self.rule_definitions_update_time = now
             validations_map = VersionedValidationsMap(
                 validation_version=rules["validation_version"],
@@ -66,7 +70,7 @@ class OpaPolicyService(PolicyService):
     async def get_control_lists(self) -> dict[str, Any]:
         now = datetime.datetime.now(datetime.timezone.utc).timestamp()
         if now - self.control_lists_last_update_time > self.max_polling_in_seconds:
-            self.control_lists = await get_http_response(
+            self.control_lists = await self.get_http_response(
                 self.config.control_lists_url, "result"
             )
             self.control_lists_last_update_time = now
@@ -75,7 +79,9 @@ class OpaPolicyService(PolicyService):
     async def get_supported_validation_versions(self) -> list[str]:
         now = datetime.datetime.now(datetime.timezone.utc).timestamp()
         if now - self.version_update_time > self.max_polling_in_seconds:
-            versions_result = await get_http_response(self.config.version_url, "result")
+            versions_result = await self.get_http_response(
+                self.config.version_url, "result"
+            )
             self.versions = [versions_result]
             self.version_update_time = now
         return self.versions
@@ -110,11 +116,42 @@ class OpaPolicyService(PolicyService):
             resource_id,
             self.config.validation_url,
         )
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                self.config.validation_url, json=dict_value, timeout=timeout_in_seconds
-            )
-            result = json.loads(response.text)
-        messages = ValidationResult.model_validate(result["result"])
+
+        response: HttpResponse = await self.http_client.send_request(
+            HttpRequestType.POST,
+            url=self.config.validation_url,
+            json=dict_value,
+            timeout=timeout_in_seconds,
+        )
+        messages = ValidationResult.model_validate(response.json_data.get("result", {}))
         logger.debug("Validation report is received for %s", resource_id)
         return messages
+
+    async def get_http_response(
+        self, url: str, root_dict_key: Union[None, str] = None
+    ) -> Union[Any, dict[str, Any]]:
+        if not url:
+            raise ValueError("url is required")
+
+        url = url.rstrip("/")
+        if not url:
+            return {}
+
+        try:
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.GET, url, timeout=10
+            )
+
+            if not root_dict_key:
+                return response.json_data or {}
+
+            if response.json_data and response.json_data.get(root_dict_key):
+                return response.json_data.get(root_dict_key)
+
+            if response.json_data and not response.json_data.get(root_dict_key):
+                logger.warning("There is no '%s' in response", root_dict_key)
+
+        except Exception as ex:
+            logger.error("Error call %s: %s", url, str(ex))
+
+        return {}

@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
@@ -20,6 +21,7 @@ from mtbls.application.services.interfaces.repositories.user.user_write_reposito
     UserWriteRepository,
 )
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
+from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
 from mtbls.infrastructure.persistence.db.model.alias_generator import (
@@ -78,6 +80,10 @@ class GatewaysContainer(containers.DeclarativeContainer):
     )
 
     pub_sub_backend: PubSubConnection = pub_sub_broker
+
+    http_client: HttpClient = providers.Singleton(
+        HttpxClient, max_timeount_in_seconds=60
+    )
 
 
 class RepositoriesContainer(containers.DeclarativeContainer):
@@ -144,18 +150,21 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.INTERNAL_FILES,
+        http_client=gateways.http_client,
         observer=None,
     )
     audit_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.AUDIT_FILES,
+        http_client=gateways.http_client,
         observer=None,
     )
     metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+        http_client=gateways.http_client,
         observer=None,
     )
 

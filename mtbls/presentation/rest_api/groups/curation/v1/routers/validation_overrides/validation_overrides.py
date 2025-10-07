@@ -30,7 +30,7 @@ from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
 logger = getLogger(__name__)
 
 router = APIRouter(
-    tags=["Study Validation Overrides"], prefix="/curation/v2/validation-overrides"
+    tags=["MetaboLights Curation"], prefix="/curation/v2/validation-overrides"
 )
 
 

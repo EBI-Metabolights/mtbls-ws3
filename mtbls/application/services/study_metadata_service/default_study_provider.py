@@ -28,6 +28,9 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.application.services.study_metadata_service.db_metadata_collector import (
     DefaultAsyncDbMetadataCollector,
 )
@@ -183,12 +186,14 @@ class DataFileIndexMetabolightsStudyProvider(AsyncMetabolightsStudyProvider):
         self,
         resource_id: str,
         study_read_repository: StudyReadRepository,
+        user_read_repository: UserReadRepository,
         internal_files_object_repository: FileObjectReadRepository,
         data_file_index_file_key: str,
     ) -> None:
         super().__init__(
             db_metadata_collector=DefaultAsyncDbMetadataCollector(
-                study_read_repository=study_read_repository
+                study_read_repository=study_read_repository,
+                user_read_repository=user_read_repository,
             ),
             folder_metadata_collector=DataFileIndexMetadataCollector(
                 resource_id, internal_files_object_repository, data_file_index_file_key

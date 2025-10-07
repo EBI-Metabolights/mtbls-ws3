@@ -43,7 +43,7 @@ class MongoDbFileObjectReadRepository(
         output_entity_class: type[BaseEntity],
         study_bucket: StudyBucket,
         resource_category: ResourceCategory = ResourceCategory.UNKNOWN_RESOURCE,
-        observer: FileObjectObserver = None,
+        observer: None | FileObjectObserver = None,
     ):
         super(MongoDbDefaultReadRepository, self).__init__(
             connection=connection,

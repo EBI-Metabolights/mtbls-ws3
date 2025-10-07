@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Union
 
-import httpx
 import jwt
 
 from mtbls.application.decorators.validate import validate_inputs_outputs
@@ -9,9 +8,12 @@ from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
+from mtbls.domain.entities.http_response import HttpResponse
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.enums.token_type import TokenType
 from mtbls.domain.shared.data_types import TokenStr
 from mtbls.infrastructure.auth.mtbls_ws2.mtbls_ws2_authentication_config import (
@@ -27,8 +29,10 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
         config: Union[dict[str, Any], MtblsWs2AuthenticationConfiguration],
         cache_service: CacheService,
         user_read_repository: UserReadRepository,
+        http_client: HttpClient,
     ) -> None:
         self.cache_service = cache_service
+        self.http_client = http_client
         if isinstance(config, MtblsWs2AuthenticationConfiguration):
             self.config = config
         else:
@@ -46,15 +50,15 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
             raise NotImplementedError()
         url = f"{self.backend_ws_base_url}/auth/login-with-token"
         try:
-            response = httpx.post(
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.POST,
                 url,
                 headers={"Content-Type": "application/json"},
                 json={"token": token},
                 timeout=5,
             )
-            response.raise_for_status()
-            if response and "Jwt" in response.headers and response.headers["Jwt"]:
-                return response.headers["Jwt"]
+            if response and response.headers and response.headers.get("Jwt"):
+                return response.headers.get("Jwt")
             raise Exception("Invalid response from backend")
         except Exception as ex:
             logger.warning("error: %s", str(ex))
@@ -64,14 +68,14 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
         url = f"{self.backend_ws_base_url}/auth/login"
         try:
             logger.info("Login request from: %s", username)
-            response = httpx.post(
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.POST,
                 url,
                 headers={"Content-Type": "application/json"},
                 json={"email": username, "secret": password},
                 timeout=5,
             )
-            response.raise_for_status()
-            if response and "Jwt" in response.headers and response.headers["Jwt"]:
+            if response and response.headers and response.headers.get("Jwt"):
                 return response.headers["Jwt"]
 
             raise Exception("Invalid response from backend")
@@ -107,15 +111,15 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
 
         url = f"{self.backend_ws_base_url}/auth/validate-token"
         try:
-            response = httpx.post(
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.POST,
                 url,
                 headers={"Content-Type": "application/json"},
                 json={"Jwt": token, "User": email},
                 timeout=5,
             )
-            response.raise_for_status()
-            if response and "User" in response.headers and response.headers["User"]:
-                return response.headers["User"]
+            if response and response.headers and response.headers.get("User"):
+                return response.headers.get("User")
 
             raise Exception("Invalid response from backend")
         except Exception as ex:

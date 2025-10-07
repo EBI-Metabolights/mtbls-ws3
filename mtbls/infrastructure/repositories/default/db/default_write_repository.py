@@ -117,8 +117,8 @@ class SqlDbDefaultWriteRepository(
             try:
                 stmt = select(table).where(table.id == entity.id_)
                 result = await session.execute(stmt)
-                table_row = result.scalars().one_or_none()
-                table_row = await self.update_table_row(table_row, entity)
+                table_row_result = result.scalars().one_or_none()
+                table_row = await self.update_table_row(table_row_result, entity)
                 session.add(table_row)
                 await session.commit()
                 return await self.convert_to_output_type(table_row)

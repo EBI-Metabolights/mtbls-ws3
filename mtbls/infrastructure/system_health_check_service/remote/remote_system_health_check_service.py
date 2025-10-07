@@ -1,11 +1,12 @@
 from logging import getLogger
 from typing import Any, Union
 
-import httpx
-
 from mtbls.application.services.interfaces.health_check_service import (
     SystemHealthCheckService,
 )
+from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.domain.entities.http_response import HttpResponse
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.exceptions.health_check import HealthCheckError
 from mtbls.domain.shared.health_check.transfer_status import (
     ProtocolServerStatus,
@@ -22,8 +23,10 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
     def __init__(
         self,
         config: Union[SystemHealthCheckConfiguration, dict[str, Any]],
+        http_client: HttpClient,
     ):
         super().__init__()
+        self.http_client = http_client
         self.config = config
         if isinstance(self.config, dict):
             self.config = SystemHealthCheckConfiguration.model_validate(config)
@@ -34,14 +37,13 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
             raise HealthCheckError("Remote service is not defined.")
 
         try:
-            async with httpx.AsyncClient() as client:
-                resp = await client.get(
-                    config.health_check_url, timeout=config.timeout_in_seconds
-                )
-                resp.raise_for_status()
-                data = resp.json()
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.GET,
+                url=config.health_check_url,
+                timeout=config.timeout_in_seconds,
+            )
 
-            content = data.get("content", {})
+            content = response.json_data.get("content", {})
             ts = content.get("transfer_status", {})
 
             if not ts:
@@ -60,7 +62,7 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
             )
             return transfer_status
 
-        except (httpx.RequestError, httpx.HTTPStatusError, httpx.ConnectError) as exc:
+        except Exception as exc:
             # If we can’t reach the service or it returned a bad status
             err_msg = str(exc)
             raise HealthCheckError("Could not fetch remote health status", err_msg)

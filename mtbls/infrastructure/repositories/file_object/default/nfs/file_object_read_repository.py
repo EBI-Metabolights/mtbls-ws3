@@ -34,9 +34,11 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         self,
         folder_manager: StudyFolderManager,
         study_bucket: StudyBucket,
-        observer: FileObjectObserver,
+        observer: None | FileObjectObserver = None,
     ):
-        super().__init__(study_bucket=study_bucket, observers=[observer])
+        super().__init__(
+            study_bucket=study_bucket, observers=[observer] if observer else None
+        )
         self.folder_manager = folder_manager
         self.study_bucket = study_bucket
 

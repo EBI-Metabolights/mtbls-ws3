@@ -3,8 +3,7 @@ import pathlib
 import re
 import shutil
 
-import httpx
-
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
@@ -15,6 +14,7 @@ from mtbls.domain.entities.study_file import (
     ResourceCategory,
     StudyFileOutput,
 )
+from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.exceptions.repository import (
     StudyBucketNotFoundError,
     StudyObjectAlreadyExistsError,
@@ -40,11 +40,13 @@ class FileSystemObjectWriteRepository(
         self,
         folder_manager: StudyFolderManager,
         study_bucket: StudyBucket,
-        observer: FileObjectObserver,
+        http_client: HttpClient,
+        observer: None | FileObjectObserver = None,
     ):
         super().__init__(
             folder_manager=folder_manager, study_bucket=study_bucket, observer=observer
         )
+        self.http_client = http_client
 
     async def put_object(
         self,
@@ -184,12 +186,11 @@ class FileSystemObjectWriteRepository(
         if not source_uri or not re.match(r"^https?://", source_uri):
             raise UnsupportedUriError(source_uri)
 
-        with httpx.stream("GET", source_uri) as response:
-            response.raise_for_status()
+        with dest_path.open("wb") as fs:
+            await self.http_client.stream(
+                fs, HttpRequestType.GET, source_uri, timeout=120
+            )
 
-            with dest_path.open("wb") as f:
-                for chunk in response.iter_bytes():
-                    f.write(chunk)
         return True
 
     async def delete_object(

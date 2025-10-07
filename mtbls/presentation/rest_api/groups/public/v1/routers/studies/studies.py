@@ -4,11 +4,9 @@ from typing import Annotated
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Path, Response, status
 
-from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
+from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa E501
     StudyReadRepository,
-)
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
-    UserReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput
 from mtbls.presentation.rest_api.core.responses import (
@@ -24,7 +22,7 @@ from mtbls.presentation.rest_api.groups.public.v1.routers.studies.service import
 
 logger = getLogger(__name__)
 
-router = APIRouter(tags=["MetaboLights Study Search"], prefix="/public/v2")
+router = APIRouter(tags=["Public"], prefix="/public/v2")
 
 
 @router.get(
@@ -38,11 +36,11 @@ router = APIRouter(tags=["MetaboLights Study Search"], prefix="/public/v2")
 async def get_studies_by_orcid(
     response: Response,
     orcid: Annotated[str, Path(title="ORCID Id")],
-    user_read_repository: UserReadRepository = Depends(  # noqa: FAST002
-        Provide["repositories.user_read_repository"]
-    ),
     study_read_repository: StudyReadRepository = Depends(  # noqa: FAST002
         Provide["repositories.study_read_repository"]
+    ),
+    http_client: HttpClient = Depends(  # noqa: FAST002
+        Provide["gateways.http_client"]
     ),
 ):
     if not orcid:
@@ -50,7 +48,7 @@ async def get_studies_by_orcid(
         response_message = APIErrorResponse(error="ORCID is not valid.")
         return response_message
 
-    studies: list[StudyOutput] = await user_read_repository.get_studies_by_orcid(
+    studies: list[StudyOutput] = await study_read_repository.get_studies_by_orcid(
         orcid=orcid
     )
     if not studies:
@@ -59,7 +57,7 @@ async def get_studies_by_orcid(
         return response_message
 
     study_titles = await find_studies_on_europmc_by_orcid(
-        orcid_id=orcid, submitter_studies=studies
+        http_client=http_client, orcid_id=orcid, submitter_studies=studies
     )
     response: APIListResponse[StudyTitle] = APIListResponse[StudyTitle]()
     response.content = study_titles

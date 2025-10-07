@@ -9,6 +9,9 @@ from metabolights_utils.provider.async_provider.study_provider import (
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.domain.entities.user import UserOutput
 from mtbls.domain.enums.curation_type import CurationType
 from mtbls.domain.enums.study_status import StudyStatus
@@ -47,8 +50,13 @@ USER_ROLE_MAP = {
 
 
 class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
-    def __init__(self, study_read_repository: StudyReadRepository):
+    def __init__(
+        self,
+        study_read_repository: StudyReadRepository,
+        user_read_repository: UserReadRepository,
+    ):
         self.study_read_repository = study_read_repository
+        self.user_read_repository = user_read_repository
 
     async def get_study_metadata_from_db(
         self, resource_id: str, connection
@@ -74,7 +82,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
             )
             submitters: list[
                 UserOutput
-            ] = await self.study_read_repository.get_study_submitters_by_accession(
+            ] = await self.user_read_repository.get_study_submitters_by_accession(
                 resource_id
             )
 

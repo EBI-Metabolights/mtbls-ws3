@@ -62,6 +62,8 @@ if __name__ == "__main__":
     #         investigation_object_repository=container.repositories.investigation_object_repository(),  # noqa: E501
     #         isa_table_object_repository=container.repositories.isa_table_object_repository(),  # noqa: E501
     #         isa_table_row_object_repository=container.repositories.isa_table_row_object_repository(),  # noqa: E501
+    #     user_read_repository=container.repositories.user_read_repository
+
     #     )
     # )
 

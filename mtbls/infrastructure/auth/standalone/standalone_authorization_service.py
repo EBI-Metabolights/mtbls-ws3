@@ -85,7 +85,7 @@ class AuthorizationServiceImpl(AuthorizationService):
             permission_context.permissions.read = True
         if permission_context.user and permission_context.user.username:
             study_users = (
-                await self.study_read_repository.get_study_submitters_by_accession(
+                await self.user_read_repository.get_study_submitters_by_accession(
                     permission_context.study.accession_number
                 )
             )

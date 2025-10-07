@@ -22,6 +22,9 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.application.services.interfaces.study_metadata_service import (
     StudyMetadataService,
 )
@@ -127,6 +130,7 @@ async def run_validation_and_save_report(
     summary_file: Path,
     policy_service: PolicyService,
     study_read_repository: StudyReadRepository,
+    user_read_repository: UserReadRepository,
     internal_files_object_repository: FileObjectReadRepository,
 ) -> PolicySummaryResult:
     logger = logging.getLogger(__name__)
@@ -146,6 +150,7 @@ async def run_validation_and_save_report(
         data_file_index_file_key="DATA_FILES/data_file_index.json",
         internal_files_object_repository=internal_files_object_repository,
         study_read_repository=study_read_repository,
+        user_read_repository=user_read_repository,
     )
 
     # selected_resource_ids = [x for x in resource_ids.data if x[0] in selection]

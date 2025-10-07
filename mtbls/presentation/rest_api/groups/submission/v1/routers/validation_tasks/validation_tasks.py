@@ -56,7 +56,9 @@ from mtbls.presentation.rest_api.shared.dependencies import get_resource_id, get
 
 logger = getLogger(__name__)
 
-router = APIRouter(tags=["Study Validation"], prefix="/submissions/v2/validations")
+router = APIRouter(
+    tags=["MetaboLights Submission"], prefix="/submissions/v2/validations"
+)
 
 
 @router.get(

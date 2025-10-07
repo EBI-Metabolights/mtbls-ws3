@@ -19,12 +19,14 @@ logger = logging.getLogger(__name__)
 
 async def check_read_permission(
     resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-    jwt_token: Union[None, str] = Security(oauth2_scheme.optional_oauth2_scheme),
+    jwt_token: Union[None, str] = Security(oauth2_scheme.oauth2_scheme),
     request: Request = None,
 ) -> StudyPermissionContext:
     get_request_tracker().resource_id_var.set(resource_id if resource_id else "-")
 
     if isinstance(request.user, AuthenticatedUser):
+        if not jwt_token:
+            raise AuthenticationError("Invalid jwt token.")
         context = request.user.permission_context
         if not context or not context.study or not context.permissions.read:
             logger.warning(
@@ -54,7 +56,7 @@ async def check_read_permission(
         "Unauthenticated user %s is not granted to view resource  %s",
         resource_id,
     )
-    raise AuthenticationError("User has not authenticated.")
+    raise AuthorizationError(f"User has no authorization to read {resource_id}.")
 
 
 async def check_update_permission(
@@ -62,6 +64,8 @@ async def check_update_permission(
     jwt_token: Union[None, str] = Security(oauth2_scheme.oauth2_scheme),
     request: Request = None,
 ) -> StudyPermissionContext:
+    if not jwt_token:
+        raise AuthenticationError("Invalid jwt token.")
     get_request_tracker().resource_id_var.set(resource_id if resource_id else "-")
     if isinstance(request.user, AuthenticatedUser):
         context = request.user.permission_context
@@ -88,6 +92,9 @@ async def check_curator_role(
     jwt_token: Union[None, str] = Security(oauth2_scheme.oauth2_scheme),
     request: Request = None,
 ) -> UserOutput:
+    if not jwt_token:
+        raise AuthenticationError("Invalid jwt token.")
+
     if isinstance(request.user, AuthenticatedUser):
         user = request.user.user_detail
         if not user or user.role not in [UserRole.CURATOR, UserRole.SYSTEM_ADMIN]:

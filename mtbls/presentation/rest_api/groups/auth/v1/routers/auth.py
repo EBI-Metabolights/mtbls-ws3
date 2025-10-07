@@ -9,6 +9,7 @@ from mtbls.application.services.interfaces.auth.authentication_service import (
 )
 from mtbls.domain.enums.jwt_token_content import JwtToken
 from mtbls.domain.enums.token_type import TokenType
+from mtbls.domain.exceptions.auth import AuthenticationError
 from mtbls.presentation.rest_api.core.responses import APIResponse, Status
 from mtbls.presentation.rest_api.groups.auth.v1.routers import oauth2_scheme
 from mtbls.presentation.rest_api.groups.auth.v1.routers.types import (
@@ -92,5 +93,7 @@ async def revoke_oauth2_token(
         Provide["services.authentication_service"]
     ),
 ):
+    if not jwt_token:
+        raise AuthenticationError("Invalid jwt token.")
     await authentication_service.revoke_jwt_token(jwt_token)
     return APIResponse(status=Status.SUCCESS, message="token revoked")
