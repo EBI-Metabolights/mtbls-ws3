@@ -102,20 +102,20 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.INTERNAL_FILES,
-        http_client=services.http_client,
+        http_client=gateways.http_client,
         observer=None,
     )
     audit_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.AUDIT_FILES,
-        http_client=services.http_client,
+        http_client=gateways.http_client,
         observer=None,
     )
     metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
         folder_manager=folder_manager,
         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
-        http_client=services.http_client,
+        http_client=gateways.http_client,
         observer=None,
     )

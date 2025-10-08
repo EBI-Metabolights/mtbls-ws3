@@ -3,14 +3,15 @@ import copy
 import json
 from pathlib import Path
 from typing import Any, Generator
+from unittest.mock import Mock
 
 import pytest
 import yaml
 from fastapi.testclient import TestClient
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
-from local.policy_service.mock_policy_service import MockPolicyService
 from local.sqlite.init_db import create_test_sqlite_db
+from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.infrastructure.auth.standalone.standalone_authentication_config import (
     StandaloneAuthenticationConfiguration,
 )
@@ -33,6 +34,7 @@ from mtbls.infrastructure.system_health_check_service.standalone.standalone_syst
 )
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 from mtbls.run.rest_api.submission.main import create_app
+from tests.mtbls.mocks.policy_service.mock_policy_service import MockPolicyService
 
 
 @pytest.fixture(scope="session")
@@ -78,9 +80,11 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
     health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(
         standalone_heath_check_config_str
     )
+    container.gateways.http_client.override(Mock(spec=HttpClient))
+
     container.services.system_health_check_service.override(
         StandaloneSystemHealthCheckService(
-            config=health_check_config, http_client=container.services.http_client
+            config=health_check_config, http_client=container.gateways.http_client
         )
     )
     # Override Cache

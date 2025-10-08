@@ -7,7 +7,7 @@ run:
       loaded_sub_package_names:
       - mtbls.presentation.rest_api.core
       - mtbls.presentation.rest_api.groups.auth.v1
-      - mtbls.presentation.rest_api.groups.public.v1.routers
+      - mtbls.presentation.rest_api.groups.public.v1
       - mtbls.presentation.rest_api.groups.submission.v1.routers
       - mtbls.presentation.rest_api.groups.curation.v1
       - mtbls.presentation.rest_api.groups.system.v1
