@@ -5,38 +5,64 @@ repos:
   rev: v0.24.1
   hooks:
   - id: validate-pyproject
+    name: 🔍 Validate pyproject.toml
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.28.0
+  hooks:
+    - id: gitleaks
+      name: "🔒 Security · Detect hardcoded secrets"
+- repo: https://github.com/hukkin/mdformat
+  rev: 0.7.22
+  hooks:
+    - id: mdformat
+      name: "🟢  Markdown · Format markdown"
+      additional_dependencies:
+        - mdformat-gfm          # GitHub-Flavored Markdown support
+        - mdformat-ruff         # Python code formatting
+        - mdformat-frontmatter  # YAML frontmatter support
+        - ruff                  # Required for mdformat-ruff
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
+    name: 🟢  Check large files
     args: [ "--maxkb=2000" ]
   - id: check-toml
+    name: 🟢  Check toml files
   - id: check-json
+    name: 🟢  Check json files
   - id: pretty-format-json
+    name: 🟢  Format json files
     args:
     - "--autofix"
     - "--indent=4"
     - "--no-sort-keys"
   - id: check-yaml
+    name: 🟢  Check yaml files
     args:
     - --unsafe
   - id: end-of-file-fixer
+    name: 🟢 Check end of file character
     exclude: resources/.+\.(js|css)$
   - id: trailing-whitespace
+    name: 🟢  Check training whitespaces
     exclude: (tests/data/.+|resources/.+\.(js|css))$
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.7.19
+  rev: 0.9.1
   hooks:
   - id: uv-lock
+    name: ✅ Check training whitespaces
 - repo: https://github.com/lk16/detect-missing-init
   rev: v0.1.6
   hooks:
   - id: detect-missing-init
+    name: 🔍 Detect missing __init__.py files
     args: [ "--create", "--track", "--python-folders", "mtbls" ]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.12.2
+  rev: v0.14.0
   hooks:
   - id: ruff-check
+    name: 🔍 Check Format with Ruff
     args:
     - --fix
     - --extend-select
@@ -44,15 +70,18 @@ repos:
     - --exit-non-zero-on-fix
     - --no-cache
   - id: ruff-format
+    name: 🐍 python · Format with Ruff
 - repo: https://github.com/seddonym/import-linter.git
-  rev: "v2.3"
+  rev: "v2.5.2"
   hooks:
   - id: import-linter
-    name: architecture and package structure check (lint-importer)
+    name: 🪵 architecture and package structure check (lint-imports)
+    language: python
     additional_dependencies: [ dependency_injector ]
     args: [ "--no-cache" ]
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.8.3
+  rev: v4.9.1
   hooks:
   - id: commitizen
+    name: "🗒️ git · Validate commit message"
     stages: [ commit-msg ]

@@ -1,14 +1,18 @@
 import datetime
 from typing import Annotated, Union
 
-from pydantic import Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from mtbls.domain.entities.base_entity import BaseUser
+from mtbls.domain.enums.entity import Entity
 from mtbls.domain.enums.user_role import UserRole
 from mtbls.domain.enums.user_status import UserStatus
 
 
 class UserInput(BaseUser):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
     username: Union[None, str] = None
     email: Union[None, str] = None
     role: Union[None, UserRole, int] = UserRole.ANONYMOUS
@@ -47,10 +51,16 @@ class UserInput(BaseUser):
 
 
 class UserOutput(UserInput):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
     id_: int
 
 
 class IdentityOutput(BaseUser):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
     id_: int
     first_name: Union[None, str] = None
     last_name: Union[None, str] = None

@@ -33,7 +33,7 @@ class SqlDbStatisticReadRepository(
 
         self.user_type_alias_dict = OrderedDict()
         for field in Statistic.model_fields:
-            entity_type: Entity = Statistic.__entity_type__
+            entity_type: Entity = Statistic.model_config.get("entity_type")
             value = alias_generator.get_alias(entity_type, field)
             self.user_type_alias_dict[field] = value
 

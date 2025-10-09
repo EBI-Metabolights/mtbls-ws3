@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Union
+from typing import Any, Type, Union
 
 from pydantic import BaseModel
 from pydantic.alias_generators import to_snake
@@ -27,7 +27,7 @@ from mtbls.infrastructure.persistence.db.model.study_models import Base
 logger = logging.getLogger(__name__)
 
 
-class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
+class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TYPE]):
     def __init__(
         self,
         entity_mapper: EntityMapper,
@@ -40,37 +40,14 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
 
         generics = self.__orig_bases__[0].__args__
 
-        self.output_type: BaseModel = generics[0]
+        self.output_type: Type[BaseModel] = generics[0]
         self.output_type_alias_dict = OrderedDict()
+        entity_type: Entity = self.output_type.model_config.get("entity_type")
         for field in self.output_type.model_fields:
-            entity_type: Entity = self.output_type.__entity_type__
             value = alias_generator.get_alias(entity_type, field)
             self.output_type_alias_dict[field] = value
         self.id_type = generics[1]
-        self.managed_table = self.entity_mapper.get_table_model(
-            self.output_type.__entity_type__
-        )
-
-    async def convert_to_output_type(self, db_object: Base) -> OUTPUT_TYPE:
-        if not db_object:
-            return None
-        object_dict = db_object.__dict__
-
-        value = {
-            x: object_dict[self.output_type_alias_dict[x]]
-            for x in self.output_type_alias_dict
-        }
-        return self.output_type.model_validate(value)
-
-    async def convert_to_output_type_list(
-        self, db_objects: list[Base]
-    ) -> list[OUTPUT_TYPE]:
-        if not db_objects:
-            return []
-        result = []
-        for db_object in db_objects:
-            result.append(await self.convert_to_output_type(db_object))
-        return result
+        self.managed_table = self.entity_mapper.get_table_model(entity_type)
 
     @validate_inputs_outputs
     async def get_by_id(self, id_: ID_TYPE) -> Union[None, OUTPUT_TYPE]:
@@ -79,7 +56,9 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
             stmt = select(table).where(table.id == id_)
             result = await session.execute(stmt)
             db_object = result.scalars().one_or_none()
-            return await self.convert_to_output_type(db_object)
+            return await self.entity_mapper.convert_to_output_type(
+                db_object, self.output_type
+            )
 
     @validate_inputs_outputs
     async def get_ids(
@@ -144,7 +123,9 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
             if not query_field_options.selected_fields:
                 db_objects = result.scalars().all()
                 if db_objects:
-                    output.data = await self.convert_to_output_type_list(db_objects)
+                    output.data = await self.entity_mapper.convert_to_output_type_list(
+                        db_objects, self.output_type
+                    )
             else:
                 all_data = result.all()
                 if all_data:
@@ -244,8 +225,19 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
         scheme_class: type[BaseModel],
         filter_conditions: Union[None, list[EntityFilter]],
     ) -> Any:
+        filters = self.build_filters(model_class, filter_conditions)
+        for filt in filters:
+            query = query.filter(filt)
+        return query
+
+    def build_filters(
+        self,
+        model_class: type[Base],
+        filter_conditions: Union[None, list[EntityFilter]],
+    ) -> list:
+        filters = []
         if not filter_conditions:
-            return query
+            return filters
         for filter in filter_conditions:
             try:
                 filter_key, op, value = (
@@ -278,5 +270,5 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE]):
                 if value == "null":
                     value = None
                 filt = attr(value)
-            query = query.filter(filt)
-        return query
+            filters.append(filt)
+        return filters

@@ -49,7 +49,7 @@ class SqlDbStudyFileRepository(
         self.registered_repositories = set()
         self.user_type_alias_dict = OrderedDict()
         for field in SqlDbStudyFileOutput.model_fields:
-            entity_type: Entity = SqlDbStudyFileOutput.__entity_type__
+            entity_type: Entity = SqlDbStudyFileOutput.model_config.get("entity_type")
             value = alias_generator.get_alias(entity_type, field)
             self.user_type_alias_dict[field] = value
 

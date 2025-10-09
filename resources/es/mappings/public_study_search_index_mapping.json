@@ -197,6 +197,80 @@
                     }
                 }
             },
+            "contacts": {
+                "properties": {
+                    "firstName": {
+                        "type": "text"
+                    },
+                    "lastName": {
+                        "type": "text"
+                    },
+                    "midInitials": {
+                        "type": "text"
+                    },
+                    "email": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "orcid": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "affiliation": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "address": {
+                        "type": "text"
+                    },
+                    "roles": {
+                        "properties": {
+                            "term": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termSourceRef": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "termAccessionNumber": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "country": {
                 "type": "text",
                 "fields": {

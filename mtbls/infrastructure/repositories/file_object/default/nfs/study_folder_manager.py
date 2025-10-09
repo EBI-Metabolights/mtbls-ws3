@@ -40,6 +40,8 @@ class StudyFolderManager:
             StudyBucket.DELETED_PRIVATE_DATA_FILES: paths.deleted_private_data_files_root_path,  # noqa: E501
             StudyBucket.UPLOADED_FILES: paths.uploaded_files_root_path,
             StudyBucket.DELETED_UPLOADED_FILES: paths.deleted_uploaded_files_root_path,
+            StudyBucket.DELETED_UPLOADED_FILES: paths.deleted_uploaded_files_root_path,
+            StudyBucket.INDEX_CACHE_FILES: paths.indices_cache_path,
         }
         self.root_path_bucket_map: dict[str, str] = {
             x: pathlib.Path(self.root_path_bucket_str_map[x])

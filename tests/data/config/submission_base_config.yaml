@@ -149,3 +149,4 @@ repositories:
       public_data_files_root_path: ""
       uploaded_files_root_path: ""
       deleted_uploaded_files_root_path: ""
+      indices_cache_path: /nfs/public/rw/metabolomics/test/data/es-data

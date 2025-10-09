@@ -1,8 +1,8 @@
 import logging
-from typing import Callable, Union
+from typing import Union
 
 from pydantic import ConfigDict, validate_call
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 from typing_extensions import OrderedDict
 
@@ -10,8 +10,10 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
     StudyReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput
+from mtbls.domain.entities.study_revision import StudyRevisionOutput
 from mtbls.domain.entities.user import UserOutput
 from mtbls.domain.enums.entity import Entity
+from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
@@ -38,56 +40,159 @@ class SqlDbStudyReadRepository(
 
         self.user_type_alias_dict = OrderedDict()
         for field in UserOutput.model_fields:
-            entity_type: Entity = UserOutput.__entity_type__
+            entity_type: Entity = UserOutput.model_config.get("entity_type")
             value = alias_generator.get_alias(entity_type, field)
             self.user_type_alias_dict[field] = value
 
     @validate_call(validate_return=True, config=ConfigDict(strict=True))
-    async def get_study_by_accession(self, accession: str) -> Union[None, StudyOutput]:
-        return await self._get_first_by_field_name("accession_number", accession)
+    async def get_study_by_id(
+        self,
+        id_: str,
+        include_revisions: bool = False,
+        include_submitters: bool = False,
+    ) -> Union[None, StudyOutput]:
+        return await self.get_study_by_filter(
+            lambda: Study.id == id, include_revisions, include_submitters
+        )
+
+    @validate_call(validate_return=True, config=ConfigDict(strict=True))
+    async def get_study_by_accession(
+        self,
+        accession: str,
+        include_revisions: bool = False,
+        include_submitters: bool = False,
+    ) -> Union[None, StudyOutput]:
+        return await self.get_study_by_filter(
+            lambda: Study.acc == accession, include_revisions, include_submitters
+        )
+
+    async def get_study_by_filter(
+        self, filter_, include_revisions, include_submitters
+    ) -> None | StudyOutput:
+        async with self.database_client.session() as session:
+            stmt = select(Study).where(filter_())
+            if include_submitters:
+                stmt = stmt.options(selectinload(Study.submitters))
+            if include_revisions:
+                stmt = stmt.options(selectinload(Study.revisions))
+            result = await session.execute(stmt)
+            study: None | Study = result.scalars().one_or_none()
+            if study:
+                study_entity: StudyOutput = (
+                    await self.entity_mapper.convert_to_output_type(study, StudyOutput)
+                )
+                if include_revisions and study.revisions:
+                    study_entity.revisions = (
+                        await self.entity_mapper.convert_to_output_type_list(
+                            study.revisions, StudyRevisionOutput
+                        )
+                    )
+                if include_submitters and study.submitters:
+                    study_entity.submitters = (
+                        await self.entity_mapper.convert_to_output_type_list(
+                            study.submitters, UserOutput
+                        )
+                    )
+
+        return study_entity
 
     @validate_call(validate_return=True, config=ConfigDict(strict=True))
     async def get_study_by_obfuscation_code(
-        self, obfuscation_code: str
+        self,
+        obfuscation_code: str,
+        include_revisions: bool = False,
+        include_submitters: bool = False,
     ) -> Union[None, StudyOutput]:
-        return await self._get_first_by_field_name("obfuscation_code", obfuscation_code)
+        return await self.get_study_by_filter(
+            lambda: Study.obfuscationcode == obfuscation_code,
+            include_revisions,
+            include_submitters,
+        )
+
+    async def get_studies(
+        self,
+        filters: Union[None, list[EntityFilter]],
+        include_revisions: bool = False,
+        include_submitters: bool = False,
+    ) -> list[str]:
+        query_filters = self.build_filters(Study, filters)
+
+        if not query_filters:
+            return []
+        elif len(query_filters) > 1:
+            filters = and_(*query_filters)
+        else:
+            filters = query_filters[0]
+
+        return await self._get_studies_by_filter(
+            filter_=lambda: filters,
+            include_revisions=include_revisions,
+            include_submitters=include_submitters,
+        )
 
     async def get_study_accessions(
-        self, query_options: Union[None, QueryOptions] = None
-    ) -> list[str]: ...
+        self,
+        filters: Union[None, list[EntityFilter]],
+    ) -> list[str]:
+        return await self.select_field(
+            "accession_number", QueryOptions(filters=filters)
+        )
 
-    async def convert_to_user(self, db_object: User) -> UserOutput:
-        if not db_object:
-            return None
-        object_dict = db_object.__dict__
+    async def _get_studies_by_filter(
+        self, filter_, include_revisions, include_submitters
+    ) -> None | StudyOutput:
+        async with self.database_client.session() as session:
+            stmt = select(Study).where(filter_())
+            if include_submitters:
+                stmt = stmt.options(selectinload(Study.submitters))
+            if include_revisions:
+                stmt = stmt.options(selectinload(Study.revisions))
+            result = await session.execute(stmt)
+            studies: None | Study = result.scalars().all()
+            study_entities = []
+            if studies:
+                for study in studies:
+                    study_entity: StudyOutput = (
+                        await self.entity_mapper.convert_to_output_type(
+                            study, StudyOutput
+                        )
+                    )
+                    if include_revisions and study.revisions:
+                        study_entity.revisions = (
+                            await self.entity_mapper.convert_to_output_type_list(
+                                study.revisions, StudyRevisionOutput
+                            )
+                        )
+                    if include_submitters and study.submitters:
+                        study_entity.submitters = (
+                            await self.entity_mapper.convert_to_output_type_list(
+                                study.submitters, UserOutput
+                            )
+                        )
+                    study_entities.append(study_entity)
 
-        value = {
-            x: object_dict[self.user_type_alias_dict[x]]
-            for x in self.user_type_alias_dict
-        }
-        return UserOutput.model_validate(value)
+        return study_entities
 
-    async def convert_to_users(self, db_objects: User) -> list[UserOutput]:
-        if not db_objects:
-            return []
-        return [await self.convert_to_user(x) for x in db_objects]
-
-    async def _get_studies_by_filter(self, filter_: Callable) -> list[StudyOutput]:
+    async def _get_submitter_studies(self, filter_) -> None | StudyOutput:
         async with self.database_client.session() as session:
             stmt = select(User).where(filter_()).options(selectinload(User.studies))
 
             result = await session.execute(stmt)
-            result: None | Study = result.scalars().one_or_none()
-
-            if result:
-                return await self.convert_to_output_type_list(result.studies)
-            return []
+            user: None | User = result.scalars().one_or_none()
+            if user:
+                return await self.entity_mapper.convert_to_output_type_list(
+                    user.studies, StudyOutput
+                )
+        return []
 
     async def get_studies_by_username(self, username: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.username == username)
+        return await self._get_submitter_studies(lambda: User.username == username)
 
     async def get_studies_by_email(self, email: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.email == email)
+        return await self._get_submitter_studies(lambda: User.email == email)
 
     async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]:
-        return await self._get_studies_by_filter(lambda: User.orcid == orcid)
+        return await self._get_submitter_studies(lambda: User.orcid == orcid)
+
+    async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]:
+        return await self._get_submitter_studies(lambda: User.id == id_)

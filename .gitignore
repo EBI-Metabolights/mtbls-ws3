@@ -1,7 +1,6 @@
 .mypy*
 es_study_index
 .pytest*
-indices*/
 .old
 .*secrets*
 ./config.yaml

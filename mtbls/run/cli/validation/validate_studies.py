@@ -50,7 +50,7 @@ from mtbls.run.cli.validation.container import MtblsCliApplicationContainer
 from mtbls.run.config_renderer import render_config_secrets
 
 
-@click.command(no_args_is_help=True, name="validate-studies")
+@click.command(no_args_is_help=True, name="validation")
 @click.option(
     "--config-file",
     "-c",

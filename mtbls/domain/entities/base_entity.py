@@ -6,8 +6,6 @@ from mtbls.domain.enums.entity import Entity
 
 
 class BaseEntity(BaseModel):
-    __entity_type__: Union[None, Entity] = None
-
     model_config = ConfigDict(from_attributes=True, strict=True)
 
 
@@ -25,32 +23,60 @@ class BaseOutputEntity(BaseEntity):
 
 
 class BaseStudyInput(BaseInputEntity):
-    __entity_type__: Entity = Entity.Study
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Study
+    )
 
 
 class BaseStudy(BaseOutputEntity):
-    __entity_type__: Entity = Entity.Study
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Study
+    )
 
 
 class BaseUserInput(BaseInputEntity):
-    __entity_type__: Entity = Entity.User
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
 
 
 class BaseUser(BaseOutputEntity):
-    __entity_type__: Entity = Entity.User
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
 
 
 class BaseStatisticInput(BaseInputEntity):
-    __entity_type__: Entity = Entity.Statistic
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Statistic
+    )
 
 
 class BaseStatistic(BaseOutputEntity):
-    __entity_type__: Entity = Entity.Statistic
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Statistic
+    )
 
 
 class BaseStudyFileInput(BaseInputEntity):
-    __entity_type__: Entity = Entity.StudyFile
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.StudyFile
+    )
 
 
 class BaseStudyFile(BaseOutputEntity):
-    __entity_type__: Entity = Entity.StudyFile
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.StudyFile
+    )
+
+
+class BaseStudyRevisionInput(BaseInputEntity):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
+    )
+
+
+class BaseStudyRevision(BaseOutputEntity):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
+    )

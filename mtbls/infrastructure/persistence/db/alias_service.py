@@ -53,15 +53,10 @@ class AliasService:
             self.find_classes_in_module(BaseEntity, module, loaded_entity_classes)
         logger.debug("Setting alias generators for the entities")
         for name, loaded_entity_class in loaded_entity_classes.items():
-            if hasattr(loaded_entity_class, "__entity_type__"):
-                entity_type = loaded_entity_class.__entity_type__
-                if isinstance(entity_type, Entity):
-                    alias_generator = partial(
-                        self.alias_generator.get_alias, entity_type
-                    )
-                    self.set_model_validation_alias(
-                        loaded_entity_class, alias_generator
-                    )
+            entity_type = loaded_entity_class.model_config.get("entity_type")
+            if isinstance(entity_type, Entity):
+                alias_generator = partial(self.alias_generator.get_alias, entity_type)
+                self.set_model_validation_alias(loaded_entity_class, alias_generator)
 
     @staticmethod
     def get_full_class_name(obj):

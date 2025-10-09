@@ -16,6 +16,8 @@ class MountedPaths(BaseModel):
     uploaded_files_root_path: str = ""
     deleted_uploaded_files_root_path: str = ""
 
+    indices_cache_path: str = ""
+
 
 class StudyFolderConfiguration(BaseModel):
     mounted_paths: MountedPaths = MountedPaths()

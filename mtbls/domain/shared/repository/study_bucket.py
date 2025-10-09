@@ -17,5 +17,7 @@ class StudyBucket(enum.StrEnum):
 
     UPLOADED_FILES = "uploaded_files"
 
+    INDEX_CACHE_FILES = "index_cache_files"
+
 
 STUDY_BUCKET_MAP = {x.value: x for x in StudyBucket}
