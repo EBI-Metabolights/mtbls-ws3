@@ -21,7 +21,7 @@ from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
 )
 from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 router = APIRouter(tags=["Study Validation Overrides"], prefix="/curation/v1")
 
