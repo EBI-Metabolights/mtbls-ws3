@@ -110,6 +110,7 @@ testpaths = [
     "tests"
 ]
 asyncio_default_fixture_loop_scope = "function"
+cache_dir = ".pytest-cache"
 
 [tool.ruff]
 target-version = "py313"
@@ -167,7 +168,8 @@ ignore_imports = [
   "mtbls.run.**.initialization -> dependency_injector",
   "mtbls.run.subscribe -> dependency_injector",
   "mtbls.run.rest_api.submission.base_container -> dependency_injector",
-  "mtbls.run.cli.validation.container -> dependency_injector"
+  "mtbls.run.cli.validation.container -> dependency_injector",
+  "mtbls.run.config_utils -> dependency_injector"
 ]
 
 [[tool.importlinter.contracts]]

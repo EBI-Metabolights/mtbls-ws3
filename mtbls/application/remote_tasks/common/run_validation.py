@@ -118,7 +118,7 @@ async def run_validation_task(  # noqa: PLR0913
     result_list: PolicyResultList = PolicyResultList()
     if modifier_result and isinstance(modifier_result, dict):
         modifier_result = StudyMetadataModifierResult.model_validate(modifier_result)
-    if modifier_result.has_error:
+    if modifier_result and modifier_result.has_error:
         logger.error(
             "Modifier failed for %s: %s.",
             resource_id,

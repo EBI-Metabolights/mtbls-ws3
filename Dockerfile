@@ -1,6 +1,10 @@
-FROM python:3.13-trixie AS builder
+ARG CONTAINER_REGISTRY_PREFIX=docker.io/library/
+ARG UV_CONTAINER_IMAGE=ghcr.io/astral-sh/uv:0.9.1-python3.13-bookworm
+
+FROM ${CONTAINER_REGISTRY_PREFIX}python:3.13-trixie AS builder
 
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
+
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 

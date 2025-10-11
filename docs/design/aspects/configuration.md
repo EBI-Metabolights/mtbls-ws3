@@ -1,7 +1,9 @@
 # Configuration
+
 Application configurations will be defined in yaml file(s) and managed by dependency injection mechanism.
 
 ### General design and coding principles
+
 - The content and structure of a configuration file depend on the application's dependency container and selected service/repository implementations.
 - Application dependency container loads configuration file and uses its content to initiate container elements (resource, service, repository, etc.).
 - Any configuration related to business logic can be defined in config file. They can be injected by dependency injection mechanism.
@@ -94,6 +96,7 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
 ```
 
 ### Secrets
+
 Secrets are stored in a different yaml file named `config-secrets.yaml`. They are referenced in config file as a template (e.g.`{{ postgresql.password }}` ) and rendered with `Jinja2` template framework.
 
 Each application should render config file after creating dependency container.
@@ -110,8 +113,12 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
 ...
 # initiate container and render secrets
 container = Ws3ApplicationContainer()
+set_application_configuration(
+        container,
+        config_file_path="tests/data/config/mtbls-base-config.yaml",
+        secrets_file_path="tests/data/config/mtbls-base-config-secrets.yaml",
+    )
 container.init_resources()
-render_config_secrets(container.config(), container.secrets())
 ...
 ```
 

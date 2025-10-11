@@ -30,18 +30,16 @@ class StudyFolderManager:
         self._convert_to_real_paths(paths)
 
         self.root_path_bucket_str_map: dict[StudyBucket, str] = {
-            StudyBucket.AUDIT_FILES: paths.audit_files_root_path,
             StudyBucket.PRIVATE_METADATA_FILES: paths.private_metadata_files_root_path,
             StudyBucket.DELETED_PRIVATE_METADATA_FILES: paths.deleted_private_metadata_files_root_path,  # noqa: E501
+            StudyBucket.PRIVATE_DATA_FILES: paths.private_data_files_root_path,
+            StudyBucket.DELETED_PRIVATE_DATA_FILES: paths.deleted_private_data_files_root_path,  # noqa: E501
             StudyBucket.INTERNAL_FILES: paths.internal_files_root_path,
             StudyBucket.AUDIT_FILES: paths.audit_files_root_path,
-            StudyBucket.PRIVATE_DATA_FILES: paths.private_data_files_root_path,
-            StudyBucket.PUBLIC_DATA_FILES: paths.public_data_files_root_path,
-            StudyBucket.DELETED_PRIVATE_DATA_FILES: paths.deleted_private_data_files_root_path,  # noqa: E501
-            StudyBucket.UPLOADED_FILES: paths.uploaded_files_root_path,
-            StudyBucket.DELETED_UPLOADED_FILES: paths.deleted_uploaded_files_root_path,
-            StudyBucket.DELETED_UPLOADED_FILES: paths.deleted_uploaded_files_root_path,
-            StudyBucket.INDEX_CACHE_FILES: paths.indices_cache_path,
+            StudyBucket.INDICES_CACHE_FILES: paths.indices_cache_root_path,
+            StudyBucket.PUBLIC_DATA_FILES: paths.public_studies_root_path,
+            StudyBucket.DELETED_PUBLIC_DATA_FILES: paths.deleted_public_data_files_root_path,  # noqa: E501
+            StudyBucket.REPORT_FILES: paths.report_files_path,
         }
         self.root_path_bucket_map: dict[str, str] = {
             x: pathlib.Path(self.root_path_bucket_str_map[x])

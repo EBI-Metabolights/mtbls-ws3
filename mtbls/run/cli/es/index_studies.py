@@ -1,11 +1,9 @@
 import asyncio
 import logging
 import uuid
-from pathlib import Path
 from typing import Union
 
 import click
-import yaml
 
 from mtbls.application.context.request_tracker import (
     RequestTrackerModel,
@@ -22,20 +20,20 @@ from mtbls.presentation.cli.indices.public_study_search.update_json_files import
     update_study_metadata_json_files,
 )
 from mtbls.run.cli.es.containers import EsCliApplicationContainer
-from mtbls.run.config_renderer import render_config_secrets
+from mtbls.run.config_utils import set_application_configuration
 
 
 @click.command(name="index")
 @click.option(
     "--config-file",
     "-c",
-    default="submission-config.yaml",
+    default="mtbls-ws-config.yaml",
     help="Local config path.",
 )
 @click.option(
     "--secrets-file",
     "-s",
-    default=".submission-config-secrets/.secrets.yaml",
+    default=".mtbls-ws-config-secrets/.secrets.yaml",
     help="config secrets file path.",
 )
 def run_es_cli(
@@ -43,14 +41,11 @@ def run_es_cli(
     secrets_file: Union[None, str] = None,
 ):
     container: EsCliApplicationContainer = EsCliApplicationContainer()
-    with Path(config_file).open() as f:
-        config_dict = yaml.safe_load(f)
-        container.config.from_dict(config_dict)
-    with Path(secrets_file).open() as f:
-        secrets_dict = yaml.safe_load(f)
-        container.secrets.from_dict(config_dict)
 
-    render_config_secrets(config_dict, secrets_dict)
+    success = set_application_configuration(container, config_file, secrets_file)
+    if not success:
+        click.echo("Configuration error")
+        exit(1)
     container.init_resources()
 
     study_read_repository: StudyReadRepository = (

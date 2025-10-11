@@ -6,16 +6,25 @@ variables:
   IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${IMAGE_TAG}"
   IMAGE_LATEST_TAG: "${CI_COMMIT_REF_NAME}-latest"
   LATEST_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-latest"
+  UV_CONTAINER_IMAGE_TAG: "0.9.1-python3.13-bookworm"
+  UV_CONTAINER_IMAGE: "ghcr.io/astral-sh/uv"
+  UV_LINK_MODE: copy
+  CONFIG_DIR: "config-files"
 workflow:
   rules:
   - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "staging"
 stages:
-- source
+- lint
 - build
-- deploy
+- deploy-ws-worker
+- deploy-ws
 
-configuration_parameters:
-  stage: source
+lint_and_test:
+  stage: lint
+  image: $CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG
+  tags:
+  - mtbls
+  - docker
   script:
   - echo "CI_BUILDS_DIR $CI_BUILDS_DIR"
   - echo "CI_REGISTRY_USER $CI_REGISTRY_USER"
@@ -23,7 +32,7 @@ configuration_parameters:
   - echo "BRANCH $CI_COMMIT_REF_NAME"
   - echo "CI_PIPELINE_ID $CI_PIPELINE_ID"
   - echo "CI_COMMIT_SHORT_SHA $CI_COMMIT_SHORT_SHA"
-  - echo "CI_REGISTRY_IMAGE CI_REGISTRY_IMAGE"
+  - echo "CI_REGISTRY_IMAGE $CI_REGISTRY_IMAGE"
   - echo "APP_VERSION $APP_VERSION"
   - echo "BUILD_NUMBER $BUILD_NUMBER"
   - echo "IMAGE_TAG $IMAGE_TAG"
@@ -36,42 +45,72 @@ configuration_parameters:
   - echo "MTBLS_NFS_USER_GROUP1_ID $MTBLS_NFS_USER_GROUP1_ID"
   - echo "MTBLS_NFS_USER_GROUP2_ID $MTBLS_NFS_USER_GROUP2_ID"
   - echo "MTBLS_NFS_USER_ID $MTBLS_NFS_USER_ID"
-
-lint_and_test:
-  stage: source
-  script:
+  - apt-get update && apt-get install git -y
+  - git status
+  - ls -al
+  - echo "install dependencies"
   - uv sync --locked --extra ws3
+  - echo "Run pre-commit tools"
   - uv run pre-commit run
+  - echo "Run unit tests"
   - uv run pytest
 
 build_docker:
   stage: build
+  image: $CI_REGISTRY_IMAGE/docker:latest
+  tags:
+  - mtbls
+  - docker
   script:
-  - docker image prune -f
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-  - echo "Build number $BUILD_NUMBER, commit name ${CI_COMMIT_REF_NAME}"
-  - echo "${BUILD_NUMBER}" > build_number
-  - echo  "$APP_VERSION" | xargs > app_version
+  - docker version
+  - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
+  - CURRENT_PATH="$(pwd)"
+  - echo "CURRENT_PATH $CURRENT_PATH"
+  - rm -rf $CONFIG_DIR
+  - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - echo "CONFIG_DIR $CONFIG_DIR"
+  - CICD_PROJECT_ROOT_PATH="$(realpath $CONFIG_DIR)"
+  - cd $CONFIG_DIR
+  - ls -al
+  - echo checkout $APPS_PROJECT_BRANCH_NAME
+  - git checkout $APPS_PROJECT_BRANCH_NAME
   - git status
-  - echo "docker build --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME ."
-  - docker build --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME .
-  - echo "docker build --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME ."
-  - docker build --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME .
-  - docker push $IMAGE_NAME
-  - docker push $LATEST_IMAGE_NAME
+  - git pull
+  - export DOCKER_CONFIG=$(realpath $CICD_PROJECT_ROOT_PATH/$DOCKER_CONFIG_FILE_PATH)
+  - cd $CURRENT_PATH
+  - echo DOCKER_CONFIG $DOCKER_CONFIG
+  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
+  - ls -al
+  - echo "docker --config $DOCKER_CONFIG build  --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME ."
+  - docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME .
+  - echo "docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME ."
+  - docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME .
+  - docker --config $DOCKER_CONFIG push $IMAGE_NAME
+  - docker --config $DOCKER_CONFIG push $LATEST_IMAGE_NAME
 
-deploy_ws3:
+deploy_ws_worker:
+  stage: deploy-ws-worker
+  image: $CI_REGISTRY_IMAGE/k8s:1.23.17
+  tags:
+  - mtbls
+  - docker
   variables:
     CHART_NAME: mtbls-ws3
   extends: .kube_deploy_script
 
-deploy_ws3_worker:
+deploy_ws:
+  stage: deploy-ws
+  image: $CI_REGISTRY_IMAGE/k8s:1.23.17
+  tags:
+  - mtbls
+  - docker
   variables:
     CHART_NAME: mtbls-ws3-worker
   extends: .kube_deploy_script
 
 .kube_deploy_script:
-  stage: deploy
   rules:
   - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development"
     when: on_success
@@ -79,24 +118,30 @@ deploy_ws3_worker:
     when: manual
     allow_failure: true
   script:
-  - BUILD_PATH=$(realpath tmp)
-  - echo "BUILD_PATH $BUILD_PATH"
-  - mkdir -p $BUILD_PATH
-  - cd $BUILD_PATH
-  - APPS_ROOT_PATH="$BUILD_PATH/apps"
-  - rm -rf $APPS_ROOT_PATH
-  - echo git clone https://$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD@${APPS_PROJECT_URL}
-  - git clone https://$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD@${APPS_PROJECT_URL}
-  - cd $APPS_ROOT_PATH
-  - git switch $APPS_PROJECT_BRANCH_NAME
+  - apk add --no-cache git
+  - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
+  - CURRENT_PATH="$(pwd)"
+  - echo "CURRENT_PATH $CURRENT_PATH"
+  - rm -rf $CONFIG_DIR
+  - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - echo "CONFIG_DIR $CONFIG_DIR"
+  - CICD_PROJECT_ROOT_PATH="$(realpath $CONFIG_DIR)"
+  - export K8S_CONFIG_FILE_PATH=$(realpath $CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH)
+  - echo $K8S_CONFIG_FILE_PATH
+  - cd $CONFIG_DIR
+  - ls -al
+  - echo checkout $APPS_PROJECT_BRANCH_NAME
+  - git checkout $APPS_PROJECT_BRANCH_NAME
   - git status
   - git pull
-  - DEPLOYMENTS_FOLDER_SCRIPTS="$APPS_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
   - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
+  - ls -al
   - cd $DEPLOYMENTS_FOLDER_SCRIPTS
   - cat initial_setup.sh
   - bash initial_setup.sh
-  - DEPLOYMENTS_CHART_PATH="$APPS_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
+  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
   - echo "DEPLOYMENTS_CHART_PATH $DEPLOYMENTS_CHART_PATH"
   - cd $DEPLOYMENTS_CHART_PATH
   - cat template.sh
@@ -105,4 +150,5 @@ deploy_ws3_worker:
   - cat install.sh
   - echo install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
-  - rm -rf $BUILD_PATH
+  - cd $CURRENT_PATH
+  - rm -rf $CONFIG_DIR

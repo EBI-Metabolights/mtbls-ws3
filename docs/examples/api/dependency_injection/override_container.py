@@ -1,8 +1,4 @@
-from pathlib import Path
-from typing import Any
-
 import pytest
-import yaml
 
 from mtbls.infrastructure.auth.standalone.standalone_authentication_config import (
     StandaloneAuthenticationConfiguration,
@@ -15,20 +11,19 @@ from mtbls.infrastructure.persistence.db.sqlite.config import SQLiteDatabaseConn
 from mtbls.infrastructure.persistence.db.sqlite.db_client_impl import (
     SQLiteDatabaseClientImpl,
 )
+from mtbls.run.config_utils import set_application_configuration
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 
 
 @pytest.fixture(scope="module")
-def submission_api_config() -> dict[str, Any]:
-    with Path("tests/data/config/submission_base_config.yaml").open("r") as f:
-        return yaml.safe_load(f)
-
-
-@pytest.fixture(scope="module")
-def submission_api_container(submission_api_config) -> Ws3ApplicationContainer:
+def submission_api_container() -> Ws3ApplicationContainer:
     container = Ws3ApplicationContainer()
     # Override config
-    container.config.override(submission_api_config)
+    set_application_configuration(
+        container,
+        config_file_path="tests/data/config/mtbls-base-config.yaml",
+        secrets_file_path="tests/data/config/mtbls-base-config-secrets.yaml",
+    )
     # Override Cache
     container.services.cache_service.override(InMemoryCacheImpl())
     # Override Database gateway

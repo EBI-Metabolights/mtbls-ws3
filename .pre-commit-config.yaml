@@ -16,11 +16,6 @@ repos:
   hooks:
     - id: mdformat
       name: "🟢  Markdown · Format markdown"
-      additional_dependencies:
-        - mdformat-gfm          # GitHub-Flavored Markdown support
-        - mdformat-ruff         # Python code formatting
-        - mdformat-frontmatter  # YAML frontmatter support
-        - ruff                  # Required for mdformat-ruff
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
   hooks:

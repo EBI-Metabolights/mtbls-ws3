@@ -14,7 +14,7 @@ def test_statistics_01(public_api_client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     json_response = response.json()
     result = APIResponse[StatisticData].model_validate(json_response)
-    # check local/sqlite/initial_data.sql for initial values
+    # check tests/data/sqlite/initial_data.sql for initial values
     assert result
     assert result.content
     assert result.content.title == "Data in MetaboLights"

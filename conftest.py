@@ -6,11 +6,9 @@ from typing import Any, Generator
 from unittest.mock import Mock
 
 import pytest
-import yaml
 from fastapi.testclient import TestClient
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
-from local.sqlite.init_db import create_test_sqlite_db
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.infrastructure.auth.standalone.standalone_authentication_config import (
     StandaloneAuthenticationConfiguration,
@@ -32,26 +30,31 @@ from mtbls.infrastructure.system_health_check_service.standalone.standalone_syst
 from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_service import (  # noqa E501
     StandaloneSystemHealthCheckService,
 )
+from mtbls.run.config_utils import set_application_configuration
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 from mtbls.run.rest_api.submission.main import create_app
+from tests.data.sqlite.init_db import create_test_sqlite_db
 from tests.mtbls.mocks.policy_service.mock_policy_service import MockPolicyService
 
 
 @pytest.fixture(scope="session")
-def submission_api_config() -> dict[str, Any]:
-    file_path = Path("local/configs/submission/submission_base_config.yaml")
-    with file_path.open("r") as f:
-        return yaml.safe_load(f)
+def local_config_file() -> Generator[Any, Any, str]:
+    return "tests/data/config/mtbls-base-config.yaml"
 
 
 @pytest.fixture(scope="session")
-def local_env_container(
-    submission_api_config,
-) -> Generator[Any, Any, Ws3ApplicationContainer]:
-    container = Ws3ApplicationContainer()
+def local_secrets_file() -> Generator[Any, Any, str]:
+    return "tests/data/config/mtbls-base-config-secrets.yaml"
 
-    # Override config
-    container.config.override(submission_api_config)
+
+@pytest.fixture(scope="session")
+def local_env_container() -> Generator[Any, Any, Ws3ApplicationContainer]:
+    container = Ws3ApplicationContainer()
+    set_application_configuration(
+        container,
+        config_file_path="tests/data/config/mtbls-base-config.yaml",
+        secrets_file_path="tests/data/config/mtbls-base-config-secrets.yaml",
+    )
     connection_json = container.config.gateways.database.sqlite.connection()
 
     db_connection = SQLiteDatabaseConnection.model_validate(connection_json)
@@ -62,7 +65,7 @@ def local_env_container(
     asyncio.run(
         create_test_sqlite_db(
             db_file_path,
-            Path("local/sqlite/initial_data.sql"),
+            Path("tests/data/sqlite/initial_data.sql"),
             scheme=scheme,
         )
     )
@@ -110,8 +113,15 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
 
 
 @pytest.fixture(scope="module")
-def submission_api_client(submission_api_container):
-    app, _ = create_app(container=submission_api_container, db_connection_pool_size=3)
+def submission_api_client(
+    submission_api_container, local_config_file, local_secrets_file
+):
+    app, _ = create_app(
+        config_file_path=local_config_file,
+        secrets_file_path=local_secrets_file,
+        container=submission_api_container,
+        db_connection_pool_size=3,
+    )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
     submission_api_container.services.async_task_service.override(
@@ -130,8 +140,13 @@ def submission_api_client(submission_api_container):
 
 
 @pytest.fixture(scope="module")
-def public_api_client(submission_api_container):
-    app, _ = create_app(container=submission_api_container, db_connection_pool_size=3)
+def public_api_client(submission_api_container, local_config_file, local_secrets_file):
+    app, _ = create_app(
+        config_file_path=local_config_file,
+        secrets_file_path=local_secrets_file,
+        container=submission_api_container,
+        db_connection_pool_size=3,
+    )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
     submission_api_container.services.async_task_service.override(

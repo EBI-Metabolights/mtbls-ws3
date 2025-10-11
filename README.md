@@ -22,7 +22,6 @@ apt update; apt install git -y
 
 # Mac command
 # brew install git
-
 # clone project from github
 git clone https://github.com/EBI-Metabolights/mtbls-ws3
 

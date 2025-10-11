@@ -48,5 +48,5 @@ async def create_test_sqlite_db(
 
 if __name__ == "__main__":
     file_path = Path("local_test.db")
-    init_script_path = Path("local/sqlite/initial_data.sql")
+    init_script_path = Path("tests/data/sqlite/initial_data.sql")
     asyncio.run(create_test_sqlite_db(file_path, init_script_path))

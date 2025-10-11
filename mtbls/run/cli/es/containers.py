@@ -77,7 +77,7 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         providers.Singleton(
             FileSystemObjectWriteRepository,
             folder_manager=folder_manager,
-            study_bucket=StudyBucket.INDEX_CACHE_FILES,
+            study_bucket=StudyBucket.INDICES_CACHE_FILES,
             http_client=gateways.http_client,
             observer=None,
         )
@@ -99,8 +99,8 @@ class ServicesContainer(containers.DeclarativeContainer):
 
 
 class EsCliApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["submission-config.yaml"])
-    secrets = providers.Configuration(yaml_files=["submission-config-secrets.yaml"])
+    config = providers.Configuration(yaml_files=["mtbls-ws-config.yaml"])
+    secrets = providers.Configuration(yaml_files=["mtbls-ws-config-secrets.yaml"])
     core = providers.Container(
         CoreContainer,
         config=config,

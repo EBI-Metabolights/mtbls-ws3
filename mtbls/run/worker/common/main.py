@@ -12,7 +12,7 @@ from mtbls.application.services.interfaces.async_task.utils import (
 )
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
-from mtbls.run.config_renderer import render_config_secrets
+from mtbls.run.config_utils import set_application_configuration
 from mtbls.run.module_utils import load_modules
 from mtbls.run.rest_api.submission import initialization
 from mtbls.run.subscribe import find_async_task_modules, find_injectable_modules
@@ -32,6 +32,8 @@ def config_loggers(
 
 
 def update_container(
+    config_file_path: str,
+    secrets_file_path: str,
     app_name="default",
     queue_names: Union[None, Sequence[str]] = None,
     initial_container: Union[None, Ws3WorkerApplicationContainer] = None,
@@ -45,9 +47,12 @@ def update_container(
     modules = find_injectable_modules()
     injectable_modules = load_modules(modules, module_config)
 
-    if not initial_container:
-        raise ValueError("Initial container is not defined")
-    render_config_secrets(initial_container.config(), initial_container.secrets())
+    success = set_application_configuration(
+        initial_container, config_file_path, secrets_file_path
+    )
+    if not success:
+        raise Exception("Configuration update task failed.")
+
     initial_container.init_resources()
     initial_container.wire(packages=[mtbls.__name__])
 
@@ -82,10 +87,14 @@ def get_worker_app(initial_container: Ws3WorkerApplicationContainer):
     return manager.app
 
 
-def get_celery_worker_app():
+def get_celery_worker_app(config_file_path: None | str, secrets_file_path: None | str):
     initial_container = Ws3WorkerApplicationContainer()
     update_container(
-        initial_container=initial_container, app_name="default", queue_names=["common"]
+        config_file_path=config_file_path,
+        secrets_file_path=secrets_file_path,
+        initial_container=initial_container,
+        app_name="default",
+        queue_names=["common"],
     )
     asyncio.run(
         initialization.init_application(

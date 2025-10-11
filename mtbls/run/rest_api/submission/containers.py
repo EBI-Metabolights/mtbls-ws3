@@ -1,4 +1,3 @@
-import os
 from logging import config as logging_config
 
 from dependency_injector import containers, providers
@@ -175,16 +174,9 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     # )
 
 
-CONFIG_FILE = os.environ.get("CONFIG_FILE", "submission-config.yaml")
-CONFIG_SECRETS_FILE = os.environ.get(
-    "CONFIG_SECRETS_FILE",
-    ".submission-config-secrets/.secrets.yaml",
-)
-
-
 class Ws3ApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=[CONFIG_FILE])
-    secrets = providers.Configuration(yaml_files=[CONFIG_SECRETS_FILE])
+    config = providers.Configuration()
+    secrets = providers.Configuration()
     core = providers.Container(
         Ws3CoreContainer,
         config=config,

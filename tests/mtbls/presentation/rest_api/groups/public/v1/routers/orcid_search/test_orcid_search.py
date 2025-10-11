@@ -75,6 +75,6 @@ def test_get_studies_by_orcid_id(
     json_data = response.json()
     assert json_data
     result = APIResponse[MetaboLightsStudyCitation].model_validate(response.json())
-    # check local/sqlite/initial_data.sql for initial values
+    # check tests/data/sqlite/initial_data.sql for initial values
     assert result
     assert result.content

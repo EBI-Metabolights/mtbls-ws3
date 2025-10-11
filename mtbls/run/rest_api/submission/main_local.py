@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import uvicorn
@@ -18,15 +19,21 @@ from mtbls.infrastructure.pub_sub.threading.thread_manager_impl import (
     ThreadingAsyncTaskService,
 )
 from mtbls.presentation.rest_api.core.models import ApiServerConfiguration
+from mtbls.run.config_utils import (
+    CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME,
+    DEFAULT_CONFIG_FILE_PATH,
+    DEFAULT_SECRETS_FILE_PATH,
+    SECRET_FILE_ENVIRONMENT_VARIABLE_NAME,
+)
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 from mtbls.run.rest_api.submission.main import get_app
 
 # TODO: FIX IT
 if __name__ == "__main__":
     container = Ws3ApplicationContainer()
-    with Path("local/configs/submission/config.yaml").open("r") as f:
+    with Path("tests/data/config/mtbls-base-config.yaml").open("r") as f:
         config = yaml.safe_load(f)
-    with Path("local/configs/submission/config-secrets.yaml").open("r") as f:
+    with Path("tests/data/config/.secrets.yaml").open("r") as f:
         config_secrets = yaml.safe_load(f)
     # Override config
     container.config.override(config)
@@ -80,7 +87,17 @@ if __name__ == "__main__":
             user_read_repository=container.repositories.user_read_repository(),
         )
     )
-    fast_app = get_app(initial_container=container)
+    config_file_path = os.environ.get(
+        CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
+    )
+    secrets_file_path = os.environ.get(
+        SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH
+    )
+    fast_app = get_app(
+        config_file_path=config_file_path,
+        secrets_file_path=secrets_file_path,
+        initial_container=container,
+    )
     container.services.async_task_service.override(
         ThreadingAsyncTaskService(
             app_name="default",

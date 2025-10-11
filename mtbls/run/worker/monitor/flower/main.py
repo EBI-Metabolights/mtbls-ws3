@@ -30,7 +30,6 @@ def initiate_container(
     container: Union[None, Ws3MonitorApplicationContainer] = None,
 ) -> Ws3MonitorApplicationContainer:
     global logger  # noqa: PLW0603
-
     if not container:
         raise ValueError("Initial container is not defined")
 

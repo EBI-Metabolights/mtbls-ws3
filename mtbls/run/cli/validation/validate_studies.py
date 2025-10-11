@@ -47,7 +47,7 @@ from mtbls.domain.shared.validator.policy import (
 )
 from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPhase
 from mtbls.run.cli.validation.container import MtblsCliApplicationContainer
-from mtbls.run.config_renderer import render_config_secrets
+from mtbls.run.config_utils import set_application_configuration
 
 
 @click.command(no_args_is_help=True, name="validation")
@@ -84,7 +84,10 @@ def run_validation_cli(
     secrets_file: Union[None, str] = None,
 ):
     container: MtblsCliApplicationContainer = MtblsCliApplicationContainer()
-    render_config_secrets(container.config(), container.secrets())
+    success = set_application_configuration(container, config_file, secrets_file)
+    if not success:
+        click.echo("Configuration error")
+        exit(1)
     container.init_resources()
     # render secrets in config file
 

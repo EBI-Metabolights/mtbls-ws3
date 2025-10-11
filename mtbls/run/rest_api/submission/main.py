@@ -1,5 +1,5 @@
 import logging
-import pathlib
+import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Union
@@ -21,14 +21,16 @@ from mtbls.presentation.rest_api.core.authorization_middleware import (
 from mtbls.presentation.rest_api.core.exception import exception_handler
 from mtbls.presentation.rest_api.core.models import ApiServerConfiguration
 from mtbls.presentation.rest_api.shared.router_utils import add_routers
-from mtbls.run.config_renderer import render_config_secrets
+from mtbls.run.config_utils import (
+    CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME,
+    DEFAULT_CONFIG_FILE_PATH,
+    DEFAULT_SECRETS_FILE_PATH,
+    SECRET_FILE_ENVIRONMENT_VARIABLE_NAME,
+    set_application_configuration,
+)
 from mtbls.run.module_utils import load_modules
 from mtbls.run.rest_api.submission import initialization
-from mtbls.run.rest_api.submission.containers import (
-    CONFIG_FILE,
-    CONFIG_SECRETS_FILE,
-    Ws3ApplicationContainer,
-)
+from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 from mtbls.run.subscribe import find_async_task_modules, find_injectable_modules
 
 logger: None | logging.Logger = None
@@ -46,6 +48,8 @@ async def lifespan(fast_api: FastAPI):
 
 
 def update_container(
+    config_file_path: str,
+    secrets_file_path: str,
     app_name: str = "default",
     queue_names: Union[None, list[str]] = None,
     initial_container: Union[None, Ws3ApplicationContainer] = None,
@@ -66,7 +70,11 @@ def update_container(
     async_module_names = {x.__name__ for x in async_task_modules}
     injectable_module_names = {x.__name__ for x in injectable_modules}
     wirable_module_name = list(async_module_names.union(injectable_module_names))
-    render_config_secrets(container.config(), container.secrets())
+    success = set_application_configuration(
+        container, config_file_path, secrets_file_path
+    )
+    if not success:
+        raise Exception("Configuration update task failed.")
     container.init_resources()
     # render secrets in config file
     logger = logging.getLogger(__name__)
@@ -91,6 +99,8 @@ def update_container(
 
 
 def create_app(
+    config_file_path: str,
+    secrets_file_path: str,
     app_name="default",
     queue_names: Union[None, list[str]] = None,
     db_connection_pool_size=3,
@@ -99,7 +109,11 @@ def create_app(
     if not queue_names:
         queue_names = ["common"]
     container = update_container(
-        app_name=app_name, queue_names=queue_names, initial_container=container
+        config_file_path=config_file_path,
+        secrets_file_path=secrets_file_path,
+        app_name=app_name,
+        queue_names=queue_names,
+        initial_container=container,
     )
     container.gateways.runtime_config.db_pool_size.override(db_connection_pool_size)
     server_config: ApiServerConfiguration = container.api_server_config()
@@ -157,6 +171,8 @@ def create_app(
 
 
 def get_app(
+    config_file_path: None | str,
+    secrets_file_path: None | str,
     initial_container: Union[None, Ws3ApplicationContainer] = None,
     app_name="default",
     queue_names: Union[None, list[str]] = None,
@@ -165,6 +181,8 @@ def get_app(
     if not initial_container:
         initial_container = Ws3ApplicationContainer()
     fast_app, _ = create_app(
+        config_file_path=config_file_path,
+        secrets_file_path=secrets_file_path,
         app_name=app_name,
         queue_names=queue_names,
         db_connection_pool_size=db_connection_pool_size,
@@ -174,16 +192,18 @@ def get_app(
 
 
 if __name__ == "__main__":
-    for config_file in (CONFIG_FILE, CONFIG_SECRETS_FILE):
-        success = True
-        if not config_file or not pathlib.Path(config_file).exists():
-            logger = logging.getLogger(__name__)
-            logger.error("%s file does not exist", config_file)
-            success = False
-        if not success:
-            exit(1)
     init_container: Ws3ApplicationContainer = Ws3ApplicationContainer()
-    fast_app = get_app(initial_container=init_container)
+    config_file_path = os.environ.get(
+        CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
+    )
+    secrets_file_path = os.environ.get(
+        SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH
+    )
+    fast_app = get_app(
+        config_file_path=config_file_path,
+        secrets_file_path=secrets_file_path,
+        initial_container=init_container,
+    )
     server_configuration: ApiServerConfiguration = init_container.api_server_config()
     config = server_configuration.server_info
     log_config = init_container.config.run.submission.logging()
