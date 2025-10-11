@@ -1,5 +1,4 @@
 import logging
-import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Union
@@ -22,10 +21,7 @@ from mtbls.presentation.rest_api.core.exception import exception_handler
 from mtbls.presentation.rest_api.core.models import ApiServerConfiguration
 from mtbls.presentation.rest_api.shared.router_utils import add_routers
 from mtbls.run.config_utils import (
-    CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME,
-    DEFAULT_CONFIG_FILE_PATH,
-    DEFAULT_SECRETS_FILE_PATH,
-    SECRET_FILE_ENVIRONMENT_VARIABLE_NAME,
+    get_application_config_files,
     set_application_configuration,
 )
 from mtbls.run.module_utils import load_modules
@@ -33,7 +29,7 @@ from mtbls.run.rest_api.submission import initialization
 from mtbls.run.rest_api.submission.containers import Ws3ApplicationContainer
 from mtbls.run.subscribe import find_async_task_modules, find_injectable_modules
 
-logger: None | logging.Logger = None
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -52,32 +48,33 @@ def update_container(
     secrets_file_path: str,
     app_name: str = "default",
     queue_names: Union[None, list[str]] = None,
-    initial_container: Union[None, Ws3ApplicationContainer] = None,
+    container: Union[None, Ws3ApplicationContainer] = None,
 ) -> Ws3ApplicationContainer:
     if not queue_names:
         queue_names = ["common"]
     global logger  # noqa: PLW0603
 
-    if not initial_container:
-        raise TypeError()
+    if not container:
+        raise TypeError("Init container is not defined")
 
-    module_config = initial_container.module_config()
-    modules = find_async_task_modules(app_name=app_name, queue_names=queue_names)
-    async_task_modules = load_modules(modules, module_config)
-    modules = find_injectable_modules()
-    injectable_modules = load_modules(modules, module_config)
-    container = initial_container
-    async_module_names = {x.__name__ for x in async_task_modules}
-    injectable_module_names = {x.__name__ for x in injectable_modules}
-    wirable_module_name = list(async_module_names.union(injectable_module_names))
     success = set_application_configuration(
         container, config_file_path, secrets_file_path
     )
     if not success:
         raise Exception("Configuration update task failed.")
     container.init_resources()
-    # render secrets in config file
-    logger = logging.getLogger(__name__)
+
+    module_config = container.module_config()
+
+    modules = find_async_task_modules(app_name=app_name, queue_names=queue_names)
+    async_task_modules = load_modules(modules, module_config)
+    modules = find_injectable_modules()
+    injectable_modules = load_modules(modules, module_config)
+
+    async_module_names = {x.__name__ for x in async_task_modules}
+    injectable_module_names = {x.__name__ for x in injectable_modules}
+    wirable_module_name = list(async_module_names.union(injectable_module_names))
+
     container.wire(packages=[mtbls.__name__])
     container.wire(
         modules=[
@@ -86,7 +83,6 @@ def update_container(
             *wirable_module_name,
         ]
     )
-
     logger.info(
         "Registered modules contain async tasks. %s",
         [x.__name__ for x in async_task_modules],
@@ -113,7 +109,7 @@ def create_app(
         secrets_file_path=secrets_file_path,
         app_name=app_name,
         queue_names=queue_names,
-        initial_container=container,
+        container=container,
     )
     container.gateways.runtime_config.db_pool_size.override(db_connection_pool_size)
     server_config: ApiServerConfiguration = container.api_server_config()
@@ -173,40 +169,35 @@ def create_app(
 def get_app(
     config_file_path: None | str,
     secrets_file_path: None | str,
-    initial_container: Union[None, Ws3ApplicationContainer] = None,
+    container: Union[None, Ws3ApplicationContainer] = None,
     app_name="default",
     queue_names: Union[None, list[str]] = None,
     db_connection_pool_size=3,
 ):
-    if not initial_container:
-        initial_container = Ws3ApplicationContainer()
+    if not container:
+        container = Ws3ApplicationContainer()
     fast_app, _ = create_app(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
         app_name=app_name,
         queue_names=queue_names,
         db_connection_pool_size=db_connection_pool_size,
-        container=initial_container,
+        container=container,
     )
     return fast_app
 
 
 if __name__ == "__main__":
-    init_container: Ws3ApplicationContainer = Ws3ApplicationContainer()
-    config_file_path = os.environ.get(
-        CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
-    )
-    secrets_file_path = os.environ.get(
-        SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH
-    )
+    app_container: Ws3ApplicationContainer = Ws3ApplicationContainer()
+    config_file_path, secrets_file_path = get_application_config_files()
     fast_app = get_app(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
-        initial_container=init_container,
+        container=app_container,
     )
-    server_configuration: ApiServerConfiguration = init_container.api_server_config()
+    server_configuration: ApiServerConfiguration = app_container.api_server_config()
     config = server_configuration.server_info
-    log_config = init_container.config.run.submission.logging()
+    log_config = app_container.config.run.submission.logging()
 
     try:
         uvicorn.run(
@@ -219,4 +210,4 @@ if __name__ == "__main__":
     except Exception as ex:
         raise ex
     finally:
-        init_container.shutdown_resources()
+        app_container.shutdown_resources()

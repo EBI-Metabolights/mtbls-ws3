@@ -99,8 +99,8 @@ class ServicesContainer(containers.DeclarativeContainer):
 
 
 class EsCliApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["mtbls-ws-config.yaml"])
-    secrets = providers.Configuration(yaml_files=["mtbls-ws-config-secrets.yaml"])
+    config = providers.Configuration()
+    secrets = providers.Configuration()
     core = providers.Container(
         CoreContainer,
         config=config,

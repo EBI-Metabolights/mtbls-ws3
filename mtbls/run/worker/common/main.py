@@ -12,13 +12,16 @@ from mtbls.application.services.interfaces.async_task.utils import (
 )
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
-from mtbls.run.config_utils import set_application_configuration
+from mtbls.run.config_utils import (
+    get_application_config_files,
+    set_application_configuration,
+)
 from mtbls.run.module_utils import load_modules
 from mtbls.run.rest_api.submission import initialization
 from mtbls.run.subscribe import find_async_task_modules, find_injectable_modules
 from mtbls.run.worker.common.containers import Ws3WorkerApplicationContainer
 
-logger = None
+logger = logging.getLogger(__name__)
 
 
 @setup_logging.connect()
@@ -36,30 +39,28 @@ def update_container(
     secrets_file_path: str,
     app_name="default",
     queue_names: Union[None, Sequence[str]] = None,
-    initial_container: Union[None, Ws3WorkerApplicationContainer] = None,
+    container: Union[None, Ws3WorkerApplicationContainer] = None,
 ) -> Ws3WorkerApplicationContainer:
     global logger  # noqa: PLW0603
     queue_names = queue_names if queue_names else ["common"]
 
-    module_config = initial_container.module_config()
+    success = set_application_configuration(
+        container, config_file_path, secrets_file_path
+    )
+    if not success:
+        raise Exception("Configuration update task failed.")
+    container.init_resources()
+
+    module_config = container.module_config()
     modules = find_async_task_modules(app_name=app_name, queue_names=queue_names)
     async_task_modules = load_modules(modules, module_config)
     modules = find_injectable_modules()
     injectable_modules = load_modules(modules, module_config)
 
-    success = set_application_configuration(
-        initial_container, config_file_path, secrets_file_path
-    )
-    if not success:
-        raise Exception("Configuration update task failed.")
+    container.wire(packages=[mtbls.__name__])
 
-    initial_container.init_resources()
-    initial_container.wire(packages=[mtbls.__name__])
-
-    initial_container.wire(modules=[initialization.__name__])
-    initial_container.wire(modules=[__name__, *async_task_modules, *injectable_modules])
-    logger = logging.getLogger(__name__)
-
+    container.wire(modules=[initialization.__name__])
+    container.wire(modules=[__name__, *async_task_modules, *injectable_modules])
     logger.info(
         "Registered modules contain async tasks. %s",
         [x.__name__ for x in async_task_modules],
@@ -68,13 +69,13 @@ def update_container(
         "Registered modules contain dependency injections. %s",
         [x.__name__ for x in injectable_modules],
     )
-    return initial_container
+    return container
 
 
-def get_worker_app(initial_container: Ws3WorkerApplicationContainer):
+def get_worker_app(container: Ws3WorkerApplicationContainer):
     async_task_registry = get_async_task_registry()
 
-    rc = initial_container.gateways.config.cache.redis.connection()
+    rc = container.gateways.config.cache.redis.connection()
     redis_connection_provider = RedisConnectionProvider(rc)
     manager = CeleryAsyncTaskService(
         broker=redis_connection_provider,
@@ -88,11 +89,11 @@ def get_worker_app(initial_container: Ws3WorkerApplicationContainer):
 
 
 def get_celery_worker_app(config_file_path: None | str, secrets_file_path: None | str):
-    initial_container = Ws3WorkerApplicationContainer()
+    container = Ws3WorkerApplicationContainer()
     update_container(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
-        initial_container=initial_container,
+        container=container,
         app_name="default",
         queue_names=["common"],
     )
@@ -101,11 +102,15 @@ def get_celery_worker_app(config_file_path: None | str, secrets_file_path: None 
             test_async_task_service=False, test_policy_service=True
         )
     )
-    return get_worker_app(initial_container)
+    return get_worker_app(container)
 
 
 def main():
-    app = get_celery_worker_app()
+    config_file_path, secrets_file_path = get_application_config_files()
+
+    app = get_celery_worker_app(
+        config_file_path=config_file_path, secrets_file_path=secrets_file_path
+    )
     app.start(
         argv=[
             "worker",

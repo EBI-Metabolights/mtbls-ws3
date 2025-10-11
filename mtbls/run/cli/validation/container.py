@@ -98,8 +98,8 @@ class MtblsCliServicesContainer(containers.DeclarativeContainer):
 
 
 class MtblsCliApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["config.yaml"])
-    secrets = providers.Configuration(yaml_files=["config-secrets.yaml"])
+    config = providers.Configuration()
+    secrets = providers.Configuration()
     core = providers.Container(
         MtblsCliCoreContainer,
         config=config,

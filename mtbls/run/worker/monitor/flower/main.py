@@ -11,6 +11,9 @@ from mtbls.application.services.interfaces.async_task.utils import (
 )
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
+from mtbls.run.config_utils import (
+    set_application_configuration,
+)
 from mtbls.run.worker.monitor.flower.containers import Ws3MonitorApplicationContainer
 
 logger: Union[None, logging.Logger] = None
@@ -33,6 +36,7 @@ def initiate_container(
     if not container:
         raise ValueError("Initial container is not defined")
 
+    set_application_configuration(container)
     container.init_resources()
 
     logger = logging.getLogger(__name__)
@@ -69,5 +73,5 @@ def main(container: Ws3MonitorApplicationContainer):
 
 
 if __name__ == "__main__":
-    init_container = Ws3MonitorApplicationContainer()
-    main(container=init_container)
+    app_container = Ws3MonitorApplicationContainer()
+    main(container=app_container)

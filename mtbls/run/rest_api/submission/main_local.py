@@ -96,7 +96,7 @@ if __name__ == "__main__":
     fast_app = get_app(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
-        initial_container=container,
+        container=container,
     )
     container.services.async_task_service.override(
         ThreadingAsyncTaskService(

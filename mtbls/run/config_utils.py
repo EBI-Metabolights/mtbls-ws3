@@ -15,6 +15,17 @@ SECRET_FILE_ENVIRONMENT_VARIABLE_NAME = "MTBLS_WS_SECRET_FILE"
 DEFAULT_SECRETS_FILE_PATH = ".mtbls-ws-config-secrets/.secrets.yaml"
 
 
+def get_application_config_files() -> tuple[str, str]:
+    config_file_path = os.environ.get(
+        CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
+    )
+    secrets_file_path = os.environ.get(
+        SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH
+    )
+
+    return config_file_path, secrets_file_path
+
+
 def render_config_secrets(
     config: dict[str, Any], secrets: dict[str, Any]
 ) -> dict[str, Any]:
@@ -50,17 +61,6 @@ def set_application_configuration(
             DEFAULT_SECRETS_FILE_PATH,
         )
     if Path(config_file_path).exists():
-        with Path(config_file_path).open() as f:
-            config_dict = yaml.safe_load(f)
-            if not config_dict:
-                logger.error("Config file %s content is empty", config_file_path)
-                return False
-            container.config.from_dict(config_dict)
-    else:
-        logger.error("Config file %s does not exist", config_file_path)
-        return False
-
-    if Path(config_file_path).exists():
         with Path(secrets_file_path).open() as f:
             secrets_dict = yaml.safe_load(f)
             if not secrets_dict:
@@ -69,5 +69,18 @@ def set_application_configuration(
             container.secrets.from_dict(secrets_dict or {})
     else:
         logger.warning("Secret file %s does not exist.", config_file_path)
-    render_config_secrets(config_dict, secrets_dict or {})
+
+    if Path(config_file_path).exists():
+        with Path(config_file_path).open() as f:
+            config_dict = yaml.safe_load(f)
+            if not config_dict:
+                logger.error("Config file %s content is empty", config_file_path)
+                return False
+            if secrets_dict:
+                config_dict = render_config_secrets(config_dict, secrets_dict)
+            container.config.from_dict(config_dict)
+    else:
+        logger.error("Config file %s does not exist", config_file_path)
+        return False
+
     return True

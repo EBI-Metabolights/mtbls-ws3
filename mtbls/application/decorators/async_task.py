@@ -1,3 +1,5 @@
+import logging
+
 from mtbls.application.context.async_task_registry import (
     ASYNC_TASK_APP_NAME,
     ASYNC_TASK_QUEUE,
@@ -5,13 +7,14 @@ from mtbls.application.context.async_task_registry import (
 )
 from mtbls.domain.shared.async_task.async_task_description import AsyncTaskDescription
 
+logger = logging.getLogger(__name__)
+
 
 def async_task(
     app_name: ASYNC_TASK_APP_NAME = "default", queue: ASYNC_TASK_QUEUE = "common"
 ):
     def inner(task_method):
         task_name = task_method.__module__ + "." + task_method.__name__
-        print(f"Task {task_name} will be registered")
 
         def wrapper(**kwargs):
             return task_method(**kwargs)
@@ -20,6 +23,9 @@ def async_task(
         if app_name not in ASYNC_TASK_REGISTRY:
             ASYNC_TASK_REGISTRY[app_name] = {}
         ASYNC_TASK_REGISTRY[app_name][task_name] = executor
+        logger.info(
+            "Task for application '%s', '%s' queue: %s", app_name, queue, task_name
+        )
         return executor
 
     return inner

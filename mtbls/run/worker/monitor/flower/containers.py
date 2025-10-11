@@ -5,7 +5,8 @@ from mtbls.infrastructure.caching.redis.redis_config import RedisConnection
 
 
 class Ws3MonitorApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["config.yaml"])
+    config = providers.Configuration()
+    secrets = providers.Configuration()
 
     celery_broker: RedisConnection = providers.Resource(
         create_config_from_dict,
