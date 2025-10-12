@@ -1,7 +1,6 @@
-from typing import Union
-
 from metabolights_utils.models.common import ErrorMessage
 from metabolights_utils.models.metabolights import model
+from metabolights_utils.models.metabolights import model as mtbls_utils_model
 from metabolights_utils.provider.async_provider.study_provider import (
     AbstractDbMetadataCollector,
 )
@@ -69,16 +68,38 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 numeric_study_id=int(
                     study.accession_number.replace("MTBLS", "").replace("REQ", "")
                 ),
-                submission_date=study.submission_date.strftime("%Y-%m-%d"),
-                release_date=study.release_date.strftime("%Y-%m-%d"),
-                update_date=study.update_date.isoformat(),
-                status_date=study.status_date.isoformat(),
+                submission_date=study.submission_date.strftime("%Y-%m-%d")
+                if study.submission_date
+                else "",
+                release_date=study.release_date.strftime("%Y-%m-%d")
+                if study.release_date
+                else "",
+                update_date=study.update_date.isoformat() if study.update_date else "",
+                status_date=study.status_date.isoformat() if study.status_date else "",
                 obfuscation_code=study.obfuscation_code,
                 study_size=study.study_size,
                 study_types=study.study_type.split(";") if study.study_type else [],
-                overrides=self.split_override_value(study.override),
                 status=STUDY_STATUS_MAP[study.status],
                 curation_request=CURATION_REQUEST_MAP[study.curation_type],
+                study_category=mtbls_utils_model.StudyCategory(
+                    study.study_category.value
+                ),
+                sample_template=study.sample_type or "",
+                template_version=study.template_version or "",
+                reserved_mhd_accession=study.mhd_accession or "",
+                mhd_model_version=study.mhd_model_version or "",
+                dataset_license=study.dataset_license or "",
+                dataset_license_version=study.dataset_license_version or "",
+                first_public_date=study.first_public_date.isoformat()
+                if study.first_public_date
+                else "",
+                first_private_date=study.first_private_date.isoformat()
+                if study.first_private_date
+                else "",
+                revision_number=study.revision_number or 0,
+                revision_date=study.revision_datetime.isoformat()
+                if study.revision_datetime
+                else "",
             )
             submitters: list[
                 UserOutput
@@ -107,15 +128,3 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
             return model.StudyDBMetadata(), [
                 ErrorMessage(short="Error while loading db metadata", detail=str(ex))
             ]
-
-    def split_override_value(self, override_value: Union[None, str]) -> dict[str, str]:
-        if not override_value:
-            return {}
-        override_list = override_value.strip().split("|")
-        overrides = {}
-        for item in override_list:
-            if item:
-                key_value = item.split(":")
-                if len(key_value) > 1:
-                    overrides[key_value[0]] = key_value[1] or ""
-        return overrides

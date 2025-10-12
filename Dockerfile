@@ -1,4 +1,4 @@
-ARG CONTAINER_REGISTRY_PREFIX=docker.io/library/
+ARG CONTAINER_REGISTRY_PREFIX=docker.io/
 ARG UV_CONTAINER_IMAGE=ghcr.io/astral-sh/uv:0.9.1-python3.13-bookworm
 
 FROM ${CONTAINER_REGISTRY_PREFIX}python:3.13-trixie AS builder
