@@ -26,12 +26,15 @@ theme:
   - search.share
   - search.suggest
   - toc.follow
+  - toc.integrate
 extra:
   social:
   - icon: fontawesome/brands/x-twitter
     link: https://x.com/MetaboLights
   - icon: fontawesome/brands/bluesky
     link: https://bsky.app/profile/metabolights.bsky.social
+extra_css:
+  - stylesheets/extra.css
 nav:
 - Overview: index.md
 - Design:

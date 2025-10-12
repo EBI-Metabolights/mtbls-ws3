@@ -60,6 +60,7 @@ def set_application_configuration(
             SECRET_FILE_ENVIRONMENT_VARIABLE_NAME,
             DEFAULT_SECRETS_FILE_PATH,
         )
+    secrets_dict = {}
     if Path(config_file_path).exists():
         with Path(secrets_file_path).open() as f:
             secrets_dict = yaml.safe_load(f)

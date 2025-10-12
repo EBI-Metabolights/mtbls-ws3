@@ -7,11 +7,14 @@ Logging mechanism is based on Python logging module. It is extended to implement
 - Each async task will log with the task id.
 - Logs will not contain personal credentials or PII (Personally Identifiable Information)
 
-
 ### General design and coding principles
-- Each module uses its own logger  (logger with `__name__` ) to log its state and progress.
+
+- Each module uses its own logger (logger with `__name__` ) to log its state and progress.
 - Use logging module instead of `print` lines.
+- Do not log any secret (password, token, etc.)
 - Prefer logging statement deferred string formatting instead of f-string or string format.
+- Create a log filter for each executable and update it to filter unexpected or more frequent logs (version, health check, etc.).
+- Resource id (MTBLS, REQ, etc.), IP, user, path, etc. will be injected in logs. Do not add these values in log messages.
 
 ```Python hl_lines="3 8"
 import logging
@@ -29,6 +32,7 @@ logger.error(f"Error at {index}: {value}")
 logger.error("Error at {}: {}".format(index, value))
 
 ```
+
 /// hint
 
 These design principles will be checked with linter automatically.
@@ -36,15 +40,16 @@ These design principles will be checked with linter automatically.
 ///
 
 ## Logging configuration
+
 Each application can have custom logging configuration and logging filter classes.
 
 Logging configurations have both `json` and `text` formatters. Each formatter can also print some additional information for each log:
 
-- `resource_id` to track requested study (MTBLS or REQ id)
-- `user_id` to track authenticated user. It is unique user id in database
-- `route path` to track target endpoint.
+- `resource_id` to track requested resource (MTBLS or REQ id)
+- `user_id` to track authenticated user. Its value is unique user id (not email or user id) in user database table.
+- `route path` to track target REST API endpoint or method.
 - `request_id` to track all logs triggered by the same request.
-- `task_id` to track all task logs triggered by the same task
+- `task_id` to track all async task logs triggered by the same task
 - `client` to track IP address or host of the requester
 
 An example logging configuration is below:
@@ -81,18 +86,16 @@ logging:
       (): "mtbls.run.rest_api.submission.log_filter.DefaultLogFilter"
 ```
 
-
 Example JSON log
 
 ```json
 { "level_name": "DEBUG", "time": "2024-12-22 18:39:02,218",  "client": "127.0.0.1",  "path": "/auth/v1/token", "resource_id": "-", "user": 0, "request_id": "60335885-b4a0-486b-bc77-2bfa52ebaf2f", "name": "mtbls.presentation.rest_api.core.authorization_middleware", "message": "Unauthenticated user requests POST /auth/v1/token from host/IP 127.0.0.1." }
-{ "level_name": "INFO", "time": "2024-12-22 18:39:02,239",  "client": "127.0.0.1",  "path": "/auth/v1/token", "resource_id": "-", "user": 0, "request_id": "60335885-b4a0-486b-bc77-2bfa52ebaf2f", "name": "mtbls.infrastructure.auth.mtbls_ws2.mtbls_ws2_authentication_proxy", "message": "Login request from: help@ebi.ac.uk" }
+{ "level_name": "INFO", "time": "2024-12-22 18:39:02,239",  "client": "127.0.0.1",  "path": "/auth/v1/token", "resource_id": "-", "user": 0, "request_id": "60335885-b4a0-486b-bc77-2bfa52ebaf2f", "name": "mtbls.infrastructure.auth.mtbls_ws2.authentication.mtbls_ws2_proxy", "message": "Login request from: help@ebi.ac.uk" }
 { "level_name": "INFO", "time": "2024-12-22 18:39:02,370",  "client": "127.0.0.1",  "path": "/auth/v1/token", "resource_id": "-", "user": 0, "request_id": "60335885-b4a0-486b-bc77-2bfa52ebaf2f", "name": "uvicorn.access", "message": "127.0.0.1:51279 - "POST /auth/v1/token HTTP/1.1" 200" }
 { "level_name": "DEBUG", "time": "2024-12-22 18:39:16,340",  "client": "127.0.0.1",  "path": "/submissions/v1/investigation-files/MTBLS60", "resource_id": "MTBLS60", "user": 25432, "request_id": "54eb7ab4-675c-4ee7-8637-819fdf876105", "name": "mtbls.presentation.rest_api.core.authorization_middleware", "message": "User 25432 requests GET /submissions/v1/investigation-files/MTBLS60 from host/IP 127.0.0.1. Target resource id: MTBLS60" }
 { "level_name": "DEBUG", "time": "2024-12-22 18:39:16,340",  "client": "127.0.0.1",  "path": "/submissions/v1/investigation-files/MTBLS60", "resource_id": "MTBLS60", "user": 25432, "request_id": "54eb7ab4-675c-4ee7-8637-819fdf876105", "name": "mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies", "message": "User 25432 is granted to update resource MTBLS60" }
 { "level_name": "INFO", "time": "2024-12-22 18:39:16,890",  "client": "127.0.0.1",  "path": "/submissions/v1/investigation-files/MTBLS60", "resource_id": "MTBLS60", "user": 25432, "request_id": "54eb7ab4-675c-4ee7-8637-819fdf876105", "name": "uvicorn.access", "message": "127.0.0.1:51283 - "GET /submissions/v1/investigation-files/MTBLS60 HTTP/1.1" 200" }
 ```
-
 
 A `RequestTracker` object is created for each request automatically. Custom logging filters defined in logging configuration inject additional information using the `RequestTracker` object for the request.
 
@@ -139,8 +142,9 @@ class DefaultLogFilter(Filter):
 - REST API executables: `AuthorizationMiddleware` updates additional information.
 
 - Async Task Workers:
-    - Async task executor adds `request_tracker` parameter with `RequestTracker` data.
-    - Before starting async task execution on remote worker, `request_tracker` parameter is checked and updates additional information.
+
+  - Async task executor adds `request_tracker` parameter with `RequestTracker` data.
+  - Before starting async task execution on remote worker, `request_tracker` parameter is checked and updates additional information.
 
 ```Python hl_lines="11-12 15-19"
 class CeleryAsyncTaskExecutor(AsyncTaskExecutor):

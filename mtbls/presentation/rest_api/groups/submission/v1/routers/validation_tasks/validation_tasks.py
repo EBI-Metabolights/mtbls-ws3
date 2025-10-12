@@ -46,6 +46,7 @@ from mtbls.presentation.rest_api.core.responses import (
     Status,
 )
 from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
+    check_read_permission,
     check_update_permission,
 )
 from mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks.models import (  # noqa: E501
@@ -70,7 +71,7 @@ router = APIRouter(
 )
 @inject
 async def get_validation_history(
-    context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
+    context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
     offset: Annotated[
         Union[None, ZeroOrPositiveInt],
         Query(description="initial item index. 0 is the latest ones"),
@@ -179,7 +180,7 @@ async def create_validation_task(
 async def get_validation_task_result(  # noqa: PLR0913
     resource_id: Annotated[str, Depends(get_resource_id)],
     task_id: Annotated[Union[None, str], Depends(get_task_id)],
-    context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
+    context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
     async_task_service: AsyncTaskService = Depends(  # noqa: FAST002
         Provide["services.async_task_service"]
     ),
@@ -248,7 +249,7 @@ async def get_validation_task_result(  # noqa: PLR0913
 async def get_validation_task_report(  # noqa: PLR0913
     resource_id: Annotated[str, Depends(get_resource_id)],
     task_id: Annotated[Union[None, str], Depends(get_task_id)],
-    context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
+    context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
     min_violation_level: Annotated[
         Union[PolicyMessageType],
         Param(

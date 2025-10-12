@@ -1,0 +1,265 @@
+gateways:
+  cache:
+    redis:
+      connection:
+        password: "{{ redis.password }}"
+        db: "{{ redis.db }}"
+        redis_service:
+          host: "{{ redis.host }}"
+          port: "{{ redis.port }}"
+        socket_timeout: 0.4
+  database:
+    sqlite:
+      connection:
+        file_path: .test-temp/sqlite_test.db
+        url_scheme: sqlite+aiosqlite
+    postgresql:
+      connection:
+        host: "{{ postgresql.host }}"
+        port: "{{ postgresql.port }}"
+        user: "{{ postgresql.user }}"
+        password: "{{ postgresql.password }}"
+        database: "{{ postgresql.database }}"
+        url_scheme: postgresql+asyncpg
+    # mongodb:
+    #   connection:
+    #     url_scheme: mongodb
+    #     host: "{{ mongodb.host }}"
+    #     port: {{ mongodb.port }}
+    #     user: "{{ mongodb.user }}"
+    #     password: "{{ mongodb.password }}"
+    #     database: "{{ mongodb.database }}"
+services:
+  authentication:
+    mtbls_ws2:
+      host: "{{ authentication.mtbls_ws2.host }}"
+      port: "{{ authentication.mtbls_ws2.port }}"
+      base_context_path: "{{ authentication.mtbls_ws2.base_context_path }}"
+      scheme: "{{ authentication.mtbls_ws2.scheme }}"
+    standalone:
+      application_secret_key: "{{ authentication.standaloneapplication_secret_key }}"
+  policy_service:
+    opa:
+      validate_schema: false
+      timeout_in_seconds: 600
+      version_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/version"
+      validation_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/report/complete_report?pretty=true"
+      templates_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/templates"
+      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controlLists"
+      rule_definitions_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/rules"
+  system_health_check:
+    remote:
+      transfer_health_check:
+        health_check_url: "{{ system_health_check.remote.transfer_health_check.health_check_url }}"
+        timeout_in_seconds: 5
+    standalone:
+      transfer_health_check:
+        test: "{{ system_health_check.standalone.transfer_health_check.test }}"
+        test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
+repositories:
+  study_folders:
+    mounted_paths:
+      private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
+      deleted_private_metadata_files_root_path: "{{ mounted_paths.deleted_private_metadata_files_root_path }}"
+      audit_files_root_path: "{{ mounted_paths.audit_files_root_path }}"
+      internal_files_root_path: "{{ mounted_paths.internal_files_root_path }}"
+      private_data_files_root_path: "{{ mounted_paths.private_data_files_root_path }}"
+      deleted_private_data_files_root_path: "{{ mounted_paths.deleted_private_data_files_root_path }}"
+      report_files_root_path: "{{ mounted_paths.report_files_root_path }}"
+      public_studies_root_path: "{{ mounted_paths.public_studies_root_path }}"
+      deleted_public_studies_root_path: "{{ mounted_paths.deleted_public_studies_root_path }}"
+      indices_cache_root_path: "{{ mounted_paths.indices_cache_root_path }}"
+run:
+  submission:
+    default_dataset_license:
+      name: "CC0 1.0 Universal"
+      version: "1.0"
+    module_config:
+      loaded_sub_package_names:
+      - mtbls.presentation.rest_api.core
+      - mtbls.presentation.rest_api.groups.auth.v1
+      - mtbls.presentation.rest_api.groups.public.v1
+      - mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks
+      - mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license
+      - mtbls.presentation.rest_api.groups.curation.v1
+      - mtbls.presentation.rest_api.groups.system.v1
+      - mtbls.presentation.utils
+    authorized_endpoints:
+    - prefix: "/submissions/"
+      scopes:
+      - curator
+      - submitter
+    - prefix: "/curation/"
+      scopes:
+      - curator
+    api_server_config:
+      port: "{{ run.submission.port }}"
+      api_groups:
+      - config_name: "public"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/public/v1/routers
+      - config_name: "submission"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/submission/v1/routers/validation_tasks
+        - mtbls/presentation/rest_api/groups/submission/v1/routers/dataset_license
+      - config_name: "curation"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/curation/v1
+      - config_name: "auth"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/auth/v1
+      - config_name: "system"
+        enabled: true
+        router_paths:
+        - mtbls/presentation/rest_api/groups/system/v1
+      cors:
+        origins:
+        - .+
+        - http(s*)://.*\.ebi\.ac\.uk(:\d{1,5})?
+      server_info:
+        root_path: "{{ run.submission.server_info.root_path }}"
+        title: "EMBL-EBI MetaboLights Submission API"
+        description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
+        summary: Open MetaboLights Submission REST API
+        terms_of_service: https://www.ebi.ac.uk/about/terms-of-use
+        license_info:
+          name: Apache 2.0
+          identifier: Apache 2.0
+        contact:
+          name: MetaboLights
+          url: https://www.ebi.ac.uk/metabolights
+          email: metabolights-help@ebi.ac.uk
+        openapi_tags:
+        - name: "About API"
+          description: "Get information about API"
+        - name: "MetaboLights Submission"
+          description: "Study submission and validation"
+        - name: "MetaboLights Curation"
+          description: "Study curation endpoints (curators only)"
+        - name: "Public"
+          description: "Public MetaboLights studies and statistics"
+        - name: "Auth"
+          description: "Identity & Authentication & Authorization"
+        - name: "System"
+          description: "System configuration and status"
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: "{{ run.submission.logging.level }}"
+          formatter: "{{ run.submission.logging.selected_formatter }}"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter, correlation_id ]
+      root:
+        level: "{{ run.submission.logging.level }}"
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: "{{ run.submission.logging.level }}"
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+      filters:
+        correlation_id:
+          (): "asgi_correlation_id.CorrelationIdFilter"
+          default_value: "-"
+        default_filter:
+          (): "{{ run.submission.logging.default_filter_class }}"
+  common_worker:
+    module_config:
+      loaded_sub_package_names: []
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: "{{ run.common_worker.logging.level }}"
+          formatter: "{{ run.common_worker.logging.selected_formatter }}"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter, correlation_id ]
+      root:
+        level: "{{ run.common_worker.logging.level }}"
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: "{{ run.common_worker.logging.level }}"
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+      filters:
+        correlation_id:
+          (): "asgi_correlation_id.CorrelationIdFilter"
+          default_value: "-"
+        default_filter:
+          (): "{{ run.common_worker.logging.default_filter_class }}"
+  monitor:
+    port: "{{ run.monitor.port }}"
+  cli:
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: "{{ run.cli.logging.level }}"
+          formatter: "{{ run.cli.logging.selected_formatter }}"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter ]
+      root:
+        level: "{{ run.cli.logging.level }}"
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: "{{ run.cli.logging.level }}"
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+      filters:
+        default_filter:
+          (): "{{ run.cli.logging.default_filter_class }}"

@@ -4,7 +4,7 @@ Application configurations will be defined in yaml file(s) and managed by depend
 
 ### General design and coding principles
 
-- The content and structure of a configuration file depend on the application's dependency container and selected service/repository implementations.
+- The content and structure of a configuration file is dynamic and depends on the application's dependency container and selected service/repository implementations.
 - Application dependency container loads configuration file and uses its content to initiate container elements (resource, service, repository, etc.).
 - Any configuration related to business logic can be defined in config file. They can be injected by dependency injection mechanism.
 
@@ -75,6 +75,7 @@ class Ws3CoreContainer(containers.DeclarativeContainer):
 
 class GatewaysContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
+    runtime_config = providers.Configuration()
     database_client: DatabaseClient = providers.Singleton(
         DatabaseClientImpl,
         db_connection=config.database.postgresql.connection,
@@ -82,7 +83,7 @@ class GatewaysContainer(containers.DeclarativeContainer):
     )
 
 class Ws3ApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["config.yaml"])
+    config = providers.Configuration()
 
     core = providers.Container(
         Ws3CoreContainer,
@@ -97,14 +98,14 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
 
 ### Secrets
 
-Secrets are stored in a different yaml file named `config-secrets.yaml`. They are referenced in config file as a template (e.g.`{{ postgresql.password }}` ) and rendered with `Jinja2` template framework.
+Secrets are stored in a different yaml file. They are referenced in config file as a template (e.g.`{{ postgresql.password }}` ) and rendered with `Jinja2` template framework.
 
 Each application should render config file after creating dependency container.
 
-```Python  hl_lines="2-3 13"
+```Python  hl_lines="2-3 12-15"
 class Ws3ApplicationContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(yaml_files=["config.yaml"])
-    secrets = providers.Configuration(yaml_files=["config-secrets.yaml"])
+    config = providers.Configuration()
+    secrets = providers.Configuration()
     core = providers.Container(
         Ws3CoreContainer,
         config=config,

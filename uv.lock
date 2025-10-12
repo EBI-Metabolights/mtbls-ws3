@@ -1011,7 +1011,7 @@ requires-dist = [
     { name = "asgi-correlation-id", marker = "extra == 'ws3'", specifier = ">=4.3.4,<5" },
     { name = "asyncpg", marker = "extra == 'ws3'", specifier = ">=0.30.0" },
     { name = "celery", extras = ["redis"], marker = "extra == 'ws3'", specifier = ">=5.5.3" },
-    { name = "dependency-injector", specifier = ">=4.42.0,<5" },
+    { name = "dependency-injector", specifier = ">=4.48.2,<5" },
     { name = "email-validator", specifier = ">2.1.1" },
     { name = "fastapi", marker = "extra == 'ws3'", specifier = ">=0.115.5" },
     { name = "flower", marker = "extra == 'ws3'", specifier = ">=2.0.1,<3" },

@@ -145,10 +145,8 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             and permission.update
         ):
             error_log_message = (
-                "User %s from host %s has no permission to access %s",
-                context.user.id_,
-                client_host,
-                route_path,
+                f"User {context.user.id_} from host {client_host} "
+                f"has no permission to access {route_path}",
             )
             logger.error(error_log_message)
             raise AuthorizationError(error_log_message)
@@ -172,10 +170,8 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         if authorized_path and not scope_match:
             if user.is_authenticated:
                 error_log_message = (
-                    "User %s from host %s has no permission to access %s",
-                    user.user_detail.id_,
-                    client_host,
-                    route_path,
+                    f"User {user.user_detail.id_} from host {client_host} "
+                    f"has no permission to access {route_path}",
                 )
                 logger.error(error_log_message)
                 raise AuthorizationError(error_log_message)

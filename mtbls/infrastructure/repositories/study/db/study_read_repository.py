@@ -69,6 +69,7 @@ class SqlDbStudyReadRepository(
     async def get_study_by_filter(
         self, filter_, include_revisions, include_submitters
     ) -> None | StudyOutput:
+        study_entity: None | StudyOutput = None
         async with self.database_client.session() as session:
             stmt = select(Study).where(filter_())
             if include_submitters:
