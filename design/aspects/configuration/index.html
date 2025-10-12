@@ -45,6 +45,8 @@
       
     
     
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -236,7 +238,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../../.." title="MetaboLights ws3" class="md-nav__button md-logo" aria-label="MetaboLights ws3" data-md-component="logo">
       
@@ -597,50 +601,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#general-design-and-coding-principles" class="md-nav__link">
-    <span class="md-ellipsis">
-      General design and coding principles
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#secrets" class="md-nav__link">
-    <span class="md-ellipsis">
-      Secrets
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -654,7 +614,7 @@
 <p>Application configurations will be defined in yaml file(s) and managed by dependency injection mechanism.</p>
 <h3 id="general-design-and-coding-principles">General design and coding principles<a class="headerlink" href="#general-design-and-coding-principles" title="Permanent link">&para;</a></h3>
 <ul>
-<li>The content and structure of a configuration file depend on the application's dependency container and selected service/repository implementations.</li>
+<li>The content and structure of a configuration file is dynamic and depends on the application's dependency container and selected service/repository implementations.</li>
 <li>Application dependency container loads configuration file and uses its content to initiate container elements (resource, service, repository, etc.).</li>
 <li>Any configuration related to business logic can be defined in config file. They can be injected by dependency injection mechanism.</li>
 </ul>
@@ -715,31 +675,32 @@
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10"></a><a href="#__codelineno-1-10"><span class="linenos" data-linenos="10 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">GatewaysContainer</span><span class="p">(</span><span class="n">containers</span><span class="o">.</span><span class="n">DeclarativeContainer</span><span class="p">):</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11"></a><a href="#__codelineno-1-11"><span class="linenos" data-linenos="11 "></span></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12"></a><a href="#__codelineno-1-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="n">database_client</span><span class="p">:</span> <span class="n">DatabaseClient</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13"></a><a href="#__codelineno-1-13"><span class="linenos" data-linenos="13 "></span></a>        <span class="n">DatabaseClientImpl</span><span class="p">,</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="hll"><a href="#__codelineno-1-14"><span class="linenos" data-linenos="14 "></span></a>        <span class="n">db_connection</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">database</span><span class="o">.</span><span class="n">postgresql</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span>
-</span></span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15"></a><a href="#__codelineno-1-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="n">db_pool_size</span><span class="o">=</span><span class="n">runtime_config</span><span class="o">.</span><span class="n">db_pool_size</span><span class="p">,</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16"></a><a href="#__codelineno-1-16"><span class="linenos" data-linenos="16 "></span></a>    <span class="p">)</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17"></a><a href="#__codelineno-1-17"><span class="linenos" data-linenos="17 "></span></a>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18"></a><a href="#__codelineno-1-18"><span class="linenos" data-linenos="18 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">Ws3ApplicationContainer</span><span class="p">(</span><span class="n">containers</span><span class="o">.</span><span class="n">DeclarativeContainer</span><span class="p">):</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="hll"><a href="#__codelineno-1-19"><span class="linenos" data-linenos="19 "></span></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">(</span><span class="n">yaml_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">])</span>
-</span></span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20"></a><a href="#__codelineno-1-20"><span class="linenos" data-linenos="20 "></span></a>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21"></a><a href="#__codelineno-1-21"><span class="linenos" data-linenos="21 "></span></a>    <span class="n">core</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22"></a><a href="#__codelineno-1-22"><span class="linenos" data-linenos="22 "></span></a>        <span class="n">Ws3CoreContainer</span><span class="p">,</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="hll"><a href="#__codelineno-1-23"><span class="linenos" data-linenos="23 "></span></a>        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-</span></span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24"></a><a href="#__codelineno-1-24"><span class="linenos" data-linenos="24 "></span></a>    <span class="p">)</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25"></a><a href="#__codelineno-1-25"><span class="linenos" data-linenos="25 "></span></a>
-</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26"></a><a href="#__codelineno-1-26"><span class="linenos" data-linenos="26 "></span></a>    <span class="n">gateways</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
-</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27"></a><a href="#__codelineno-1-27"><span class="linenos" data-linenos="27 "></span></a>        <span class="n">GatewaysContainer</span><span class="p">,</span>
-</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="hll"><a href="#__codelineno-1-28"><span class="linenos" data-linenos="28 "></span></a>        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">gateways</span><span class="p">,</span>
-</span></span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29"></a><a href="#__codelineno-1-29"><span class="linenos" data-linenos="29 "></span></a>    <span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12"></a><a href="#__codelineno-1-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="n">runtime_config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13"></a><a href="#__codelineno-1-13"><span class="linenos" data-linenos="13 "></span></a>    <span class="n">database_client</span><span class="p">:</span> <span class="n">DatabaseClient</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="hll"><a href="#__codelineno-1-14"><span class="linenos" data-linenos="14 "></span></a>        <span class="n">DatabaseClientImpl</span><span class="p">,</span>
+</span></span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15"></a><a href="#__codelineno-1-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="n">db_connection</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">database</span><span class="o">.</span><span class="n">postgresql</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16"></a><a href="#__codelineno-1-16"><span class="linenos" data-linenos="16 "></span></a>        <span class="n">db_pool_size</span><span class="o">=</span><span class="n">runtime_config</span><span class="o">.</span><span class="n">db_pool_size</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17"></a><a href="#__codelineno-1-17"><span class="linenos" data-linenos="17 "></span></a>    <span class="p">)</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18"></a><a href="#__codelineno-1-18"><span class="linenos" data-linenos="18 "></span></a>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="hll"><a href="#__codelineno-1-19"><span class="linenos" data-linenos="19 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">Ws3ApplicationContainer</span><span class="p">(</span><span class="n">containers</span><span class="o">.</span><span class="n">DeclarativeContainer</span><span class="p">):</span>
+</span></span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20"></a><a href="#__codelineno-1-20"><span class="linenos" data-linenos="20 "></span></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21"></a><a href="#__codelineno-1-21"><span class="linenos" data-linenos="21 "></span></a>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22"></a><a href="#__codelineno-1-22"><span class="linenos" data-linenos="22 "></span></a>    <span class="n">core</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="hll"><a href="#__codelineno-1-23"><span class="linenos" data-linenos="23 "></span></a>        <span class="n">Ws3CoreContainer</span><span class="p">,</span>
+</span></span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24"></a><a href="#__codelineno-1-24"><span class="linenos" data-linenos="24 "></span></a>        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25"></a><a href="#__codelineno-1-25"><span class="linenos" data-linenos="25 "></span></a>    <span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26"></a><a href="#__codelineno-1-26"><span class="linenos" data-linenos="26 "></span></a>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27"></a><a href="#__codelineno-1-27"><span class="linenos" data-linenos="27 "></span></a>    <span class="n">gateways</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="hll"><a href="#__codelineno-1-28"><span class="linenos" data-linenos="28 "></span></a>        <span class="n">GatewaysContainer</span><span class="p">,</span>
+</span></span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29"></a><a href="#__codelineno-1-29"><span class="linenos" data-linenos="29 "></span></a>        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">gateways</span><span class="p">,</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30"></a><a href="#__codelineno-1-30"><span class="linenos" data-linenos="30 "></span></a>    <span class="p">)</span>
 </span></code></pre></div>
 <h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
-<p>Secrets are stored in a different yaml file named <code>config-secrets.yaml</code>. They are referenced in config file as a template (e.g.<code>{{ postgresql.password }}</code> ) and rendered with <code>Jinja2</code> template framework.</p>
+<p>Secrets are stored in a different yaml file. They are referenced in config file as a template (e.g.<code>{{ postgresql.password }}</code> ) and rendered with <code>Jinja2</code> template framework.</p>
 <p>Each application should render config file after creating dependency container.</p>
 <div class="language-Python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">Ws3ApplicationContainer</span><span class="p">(</span><span class="n">containers</span><span class="o">.</span><span class="n">DeclarativeContainer</span><span class="p">):</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="hll"><a href="#__codelineno-2-2"><span class="linenos" data-linenos=" 2 "></span></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">(</span><span class="n">yaml_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">])</span>
-</span></span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="hll"><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a>    <span class="n">secrets</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">(</span><span class="n">yaml_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;config-secrets.yaml&quot;</span><span class="p">])</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="hll"><a href="#__codelineno-2-2"><span class="linenos" data-linenos=" 2 "></span></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+</span></span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="hll"><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a>    <span class="n">secrets</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
 </span></span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos=" 4 "></span></a>    <span class="n">core</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos=" 5 "></span></a>        <span class="n">Ws3CoreContainer</span><span class="p">,</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos=" 6 "></span></a>        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
@@ -748,9 +709,13 @@
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a><a href="#__codelineno-2-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="o">...</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><a href="#__codelineno-2-10"><span class="linenos" data-linenos="10 "></span></a><span class="c1"># initiate container and render secrets</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><a href="#__codelineno-2-11"><span class="linenos" data-linenos="11 "></span></a><span class="n">container</span> <span class="o">=</span> <span class="n">Ws3ApplicationContainer</span><span class="p">()</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><a href="#__codelineno-2-12"><span class="linenos" data-linenos="12 "></span></a><span class="n">container</span><span class="o">.</span><span class="n">init_resources</span><span class="p">()</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="hll"><a href="#__codelineno-2-13"><span class="linenos" data-linenos="13 "></span></a><span class="n">render_config_secrets</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">config</span><span class="p">(),</span> <span class="n">container</span><span class="o">.</span><span class="n">secrets</span><span class="p">())</span>
-</span></span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a><a href="#__codelineno-2-14"><span class="linenos" data-linenos="14 "></span></a><span class="o">...</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="hll"><a href="#__codelineno-2-12"><span class="linenos" data-linenos="12 "></span></a><span class="n">set_application_configuration</span><span class="p">(</span>
+</span></span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="hll"><a href="#__codelineno-2-13"><span class="linenos" data-linenos="13 "></span></a>        <span class="n">container</span><span class="p">,</span>
+</span></span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="hll"><a href="#__codelineno-2-14"><span class="linenos" data-linenos="14 "></span></a>        <span class="n">config_file_path</span><span class="o">=</span><span class="s2">&quot;tests/data/config/mtbls-base-config.yaml&quot;</span><span class="p">,</span>
+</span></span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="hll"><a href="#__codelineno-2-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="n">secrets_file_path</span><span class="o">=</span><span class="s2">&quot;tests/data/config/mtbls-base-config-secrets.yaml&quot;</span><span class="p">,</span>
+</span></span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16"></a><a href="#__codelineno-2-16"><span class="linenos" data-linenos="16 "></span></a>    <span class="p">)</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17"></a><a href="#__codelineno-2-17"><span class="linenos" data-linenos="17 "></span></a><span class="n">container</span><span class="o">.</span><span class="n">init_resources</span><span class="p">()</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18"></a><a href="#__codelineno-2-18"><span class="linenos" data-linenos="18 "></span></a><span class="o">...</span>
 </span></code></pre></div>
 <div class="admonition example">
 <p class="admonition-title">Example config.yaml</p>
@@ -902,7 +867,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.annotate", "content.code.copy", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.annotate", "content.code.copy", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>

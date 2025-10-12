@@ -45,6 +45,8 @@
       
     
     
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -236,7 +238,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../../.." title="MetaboLights ws3" class="md-nav__button md-logo" aria-label="MetaboLights ws3" data-md-component="logo">
       
@@ -615,68 +619,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#general-design-and-coding-principles" class="md-nav__link">
-    <span class="md-ellipsis">
-      General design and coding principles
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      Authentication
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authorization" class="md-nav__link">
-    <span class="md-ellipsis">
-      Authorization
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#identity-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      Identity Management
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -693,12 +635,12 @@
 <li>Authentication can be completed with username/password or user API token. After authentication, a new JWT token will be created and shared with user.</li>
 <li>Users use the generated JWT tokens to access restricted endpoints.</li>
 <li>JWT tokens will be validated by authentication service. Neither other services nor endpoints will check JWT token.</li>
-<li>Authenticated or unauthenticated user information  will be stored in request context. Other services or endpoints can access it.</li>
-<li>If a request has a JWT token and it is not valid (e.g. invalid format, expired, etc.), authentication service will return error message.</li>
+<li>Authenticated or unauthenticated user information will be stored in request context. Other services or endpoints can access it.</li>
+<li>If a request has a JWT token and it is not valid (e.g. invalid format, expired, etc.), authentication service will return error message .</li>
 <li>If the requested path contains resource id (MTBLS, REQ), authorization service checks permissions for the user. Other services or endpoints can access permission.</li>
 </ul>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
-<p>Authentication service methods are shown below. Implementations should support at least  JWT_TOKEN token and username/password authentications.
+<p>Authentication service methods are shown below. Implementations should support at least JWT_TOKEN token and username/password authentications.
 Default implementatations are listed below:</p>
 <ul>
 <li><code>standalone</code>: Create and check JWT tokens. User information is fetched from database.</li>
@@ -809,7 +751,7 @@ Default implementatations are listed below:</p>
 </span></code></pre></div>
 <h3 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h3>
 <p>The authorization service determines the user's permissions for the requested resource (MTBLSxxx or REQxxx) and can be used by any endpoint.</p>
-<p><div class="language-Python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthorizationService</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<div class="language-Python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthorizationService</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="hll"><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span>
 </span></span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="hll"><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>        <span class="bp">self</span><span class="p">,</span>
@@ -826,7 +768,7 @@ Default implementatations are listed below:</p>
 </span></span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="hll"><a href="#__codelineno-3-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="n">sub_resource</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span></span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="hll"><a href="#__codelineno-3-16"><span class="linenos" data-linenos="16 "></span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StudyPermissionContext</span><span class="p">:</span> <span class="o">...</span>
 </span></span></code></pre></div>
-It returns <code>StudyPermissionContext</code> object that defines all possible user's permissions (read, write, delete, create).</p>
+<p>It returns <code>StudyPermissionContext</code> object that defines all possible user's permissions (read, write, delete, create).</p>
 <div class="language-Python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="k">class</span><span class="w"> </span><span class="nc">ResourcePermission</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="hll"><a href="#__codelineno-4-2"><span class="linenos" data-linenos=" 2 "></span></a>    <span class="n">create</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </span></span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="hll"><a href="#__codelineno-4-3"><span class="linenos" data-linenos=" 3 "></span></a>    <span class="n">read</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -985,7 +927,7 @@ It returns <code>StudyPermissionContext</code> object that defines all possible 
     
     
       
-      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.annotate", "content.code.copy", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.annotate", "content.code.copy", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
