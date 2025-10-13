@@ -67,7 +67,7 @@ uv run pytest
 # test curator metabolights-help@ebi.ac.uk with password test.123
 # test user metabolights-dev@ebi.ac.uk with password test.123
 # test studies MTBLS800001 MTBLS800002 MTBLS800003
-uv run python mtbls/run/rest_api/submission/main_local.py
+uv run python tests/run/main_local.py
 
 # open your IDE (vscode, pycharm, etc.) and set python interpreter as .venv/bin/python
 
