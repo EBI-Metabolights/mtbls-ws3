@@ -621,27 +621,6 @@
 
 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
 <h2 id="metabolights-ws3">MetaboLights WS3<a class="headerlink" href="#metabolights-ws3" title="Permanent link">&para;</a></h2>
-<!-- <img src="https://www.ebi.ac.uk/metabolights/img/MetaboLightsLogo.png" width="50" height="50" alt="Metabolights">  -->
-
-<p><a href="https:/www.ebi.ac.uk/metabolights" target="_blank">
-    <img src="https://img.shields.io/badge/Homepage-MetaboLights-blue" alt="MetaboLights">
-</a>
-<a href="https://github.com/EBI-Metabolights/metabolights-utils" target="_blank">
-    <img src="https://img.shields.io/badge/Github-MetaboLights-blue" alt="MetaboLights Github">
-</a>
-<a href="https://isa-specs.readthedocs.io/en/latest/isatab.html" target="_blank">
-    <img src="https://img.shields.io/badge/ISA--Tab-v1.0-blue" alt="ISA-Tab version">
-</a>
-<a href="https://github.com/EBI-Metabolights/metabolights-utils/blob/master/LICENCE" target="_blank">
-    <img src="https://img.shields.io/badge/Licence-Apache%20v2.0-blue" alt="License">
-</a></p>
-<p><img alt="Python" src="https://img.shields.io/badge/Python-3.12%7C3.13-dark_blue" /></p>
-<!-- ![Coverage](https://img.shields.io/badge/Coverage-85%25-dark_blue) -->
-
-<p><img alt="Package Manager" src="https://img.shields.io/badge/Package%20Manger-UV-dark_blue" />
-<img alt="Lint" src="https://img.shields.io/badge/Lint-Ruff-dark_blue" />
-<img alt="Unit Test" src="https://img.shields.io/badge/Unit%20Test-PyTest-dark_blue" />
-<img alt="REST Framework" src="https://img.shields.io/badge/Rest%20Framework-FastAPI-dark_blue" /></p>
 <hr />
 <p>The <code>mtbls-ws3</code> is Python application stack to manage MetaboLights open repository. It provides REST API endpoints for the metabolomics community and other MetaboLights applications.</p>
 <hr />
@@ -712,6 +691,17 @@
 </span></code></pre></div>
 <h2 id="design-development">Design &amp; Development<a class="headerlink" href="#design-development" title="Permanent link">&para;</a></h2>
 <p>You can find design details <a href="design/architecture/">Design Section</a></p>
+<p>Before committing and pushing your updates:</p>
+<ul>
+<li>Add/update unit tests.</li>
+<li>Run following commands and fix all issues and</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a>uv<span class="w"> </span>run<span class="w"> </span>lint-imports
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>uv<span class="w"> </span>run<span class="w"> </span>pre-commit
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a>uv<span class="w"> </span>run<span class="w"> </span>pytest
+</span></code></pre></div>
 
 
 
