@@ -40,6 +40,7 @@ ws3 = [
     "pyjwt>=2.9.0",
     "asgi-correlation-id>=4.3.4,<5",
     "greenlet>=3.2.4",
+    "fastmcp>=2.12.4",
 ]
 
 [dependency-groups]
