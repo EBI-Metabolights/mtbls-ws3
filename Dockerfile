@@ -1,13 +1,8 @@
 ARG CONTAINER_REGISTRY_PREFIX=docker.io/
-ARG UV_CONTAINER_IMAGE=ghcr.io/astral-sh/uv:0.9.1-python3.13-bookworm
 
-FROM ${CONTAINER_REGISTRY_PREFIX}python:3.13-trixie AS builder
+FROM ${CONTAINER_REGISTRY_PREFIX}astral/uv:0.9-python3.13-trixie-slim AS builder
 
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
-
-
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
 
 WORKDIR /app-root
 COPY . .

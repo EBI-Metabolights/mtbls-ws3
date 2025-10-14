@@ -21,7 +21,9 @@ stages:
 
 lint_and_test:
   stage: lint
-  image: $CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG
+  image:
+    name: ghcr.io/astral-sh/uv:0.9.1-python3.13-bookworm
+    pull_policy: if-not-present
   tags:
   - mtbls
   - docker
@@ -54,58 +56,55 @@ lint_and_test:
   - uv run pre-commit run
   - echo "Run unit tests"
   - uv run pytest
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-venv
+    paths:
+    - .venv
 
 build_docker:
   stage: build
-  image: $CI_REGISTRY_IMAGE/docker:latest
+  image:
+    name: ${CICD_GITLAB_REGISTRY}docker:28.5.1-dind
+    pull_policy: if-not-present
   tags:
-  - mtbls
-  - docker
+    - docker
+    - mtbls
   script:
   - docker version
-  - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
-  - CURRENT_PATH="$(pwd)"
-  - echo "CURRENT_PATH $CURRENT_PATH"
-  - rm -rf $CONFIG_DIR
-  - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
-  - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
-  - echo "CONFIG_DIR $CONFIG_DIR"
-  - CICD_PROJECT_ROOT_PATH="$(realpath $CONFIG_DIR)"
-  - cd $CONFIG_DIR
-  - ls -al
-  - echo checkout $APPS_PROJECT_BRANCH_NAME
-  - git checkout $APPS_PROJECT_BRANCH_NAME
+  - git reset --hard origin/$APPS_PROJECT_BRANCH_NAME
   - git status
-  - git pull
-  - export DOCKER_CONFIG=$(realpath $CICD_PROJECT_ROOT_PATH/$DOCKER_CONFIG_FILE_PATH)
-  - cd $CURRENT_PATH
-  - echo DOCKER_CONFIG $DOCKER_CONFIG
-  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
-  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
   - ls -al
-  - echo "docker --config $DOCKER_CONFIG build  --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME ."
-  - docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME .
-  - echo "docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME ."
-  - docker --config $DOCKER_CONFIG build --build-arg UV_CONTAINER_IMAGE=$CI_REGISTRY_IMAGE/uv:$UV_CONTAINER_IMAGE_TAG --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME .
-  - docker --config $DOCKER_CONFIG push $IMAGE_NAME
-  - docker --config $DOCKER_CONFIG push $LATEST_IMAGE_NAME
+  - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=${CICD_GITLAB_REGISTRY} --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME ."
+  - docker build --build-arg CONTAINER_REGISTRY_PREFIX=${CICD_GITLAB_REGISTRY} --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $IMAGE_NAME .
+  - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=${CICD_GITLAB_REGISTRY} --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME ."
+  - docker build --build-arg CONTAINER_REGISTRY_PREFIX=${CICD_GITLAB_REGISTRY} --build-arg GROUP1_ID=$MTBLS_NFS_USER_GROUP1_ID --build-arg GROUP2_ID=$MTBLS_NFS_USER_GROUP2_ID --build-arg USER_ID=$MTBLS_NFS_USER_ID -t $LATEST_IMAGE_NAME .
+  - docker push $IMAGE_NAME
+  - docker push $LATEST_IMAGE_NAME
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-venv
+    paths:
+    - .venv
 
 deploy_ws_worker:
   stage: deploy-ws-worker
-  image: $CI_REGISTRY_IMAGE/k8s:1.23.17
+  image:
+    name: ${CICD_GITLAB_REGISTRY}alpine/k8s:1.23.17
+    pull_policy: if-not-present
   tags:
-  - mtbls
-  - docker
+    - docker
+    - mtbls
   variables:
     CHART_NAME: mtbls-ws3
   extends: .kube_deploy_script
 
 deploy_ws:
   stage: deploy-ws
-  image: $CI_REGISTRY_IMAGE/k8s:1.23.17
+  image:
+    name: ${CICD_GITLAB_REGISTRY}alpine/k8s:1.23.17
+    pull_policy: if-not-present
   tags:
-  - mtbls
-  - docker
+    - docker
+    - mtbls
   variables:
     CHART_NAME: mtbls-ws3-worker
   extends: .kube_deploy_script
@@ -121,34 +120,39 @@ deploy_ws:
   - apk add --no-cache git
   - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
   - CURRENT_PATH="$(pwd)"
+  - export CICD_PROJECT_ROOT_PATH="$CURRENT_PATH/$CONFIG_DIR"
+  - export K8S_CONFIG_FILE_PATH="$CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH"
+  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
+
   - echo "CURRENT_PATH $CURRENT_PATH"
+  - echo "CICD_PROJECT_ROOT_PATH $CICD_PROJECT_ROOT_PATH"
+  - echo "K8S_CONFIG_FILE_PATH $K8S_CONFIG_FILE_PATH"
+  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
+
   - rm -rf $CONFIG_DIR
   - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
   - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
-  - echo "CONFIG_DIR $CONFIG_DIR"
-  - CICD_PROJECT_ROOT_PATH="$(realpath $CONFIG_DIR)"
-  - export K8S_CONFIG_FILE_PATH=$(realpath $CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH)
-  - echo $K8S_CONFIG_FILE_PATH
   - cd $CONFIG_DIR
   - ls -al
   - echo checkout $APPS_PROJECT_BRANCH_NAME
   - git checkout $APPS_PROJECT_BRANCH_NAME
   - git status
-  - git pull
-  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
-  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
-  - ls -al
+  - echo "cd $DEPLOYMENTS_FOLDER_SCRIPTS"
   - cd $DEPLOYMENTS_FOLDER_SCRIPTS
+  - echo "initial_setup.sh file content"
   - cat initial_setup.sh
   - bash initial_setup.sh
-  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
   - echo "DEPLOYMENTS_CHART_PATH $DEPLOYMENTS_CHART_PATH"
   - cd $DEPLOYMENTS_CHART_PATH
+  - echo "template.sh.sh file content"
   - cat template.sh
   - echo template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
+  - echo "install.sh file content"
   - cat install.sh
   - echo install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - cd $CURRENT_PATH
+  - echo "Cleanup - remove config directory"
   - rm -rf $CONFIG_DIR

@@ -8,6 +8,8 @@ SECTION_DB_VALUE_MAP = {
     "submitters": "Submitters",
     "data": "Data",
     "top-submitters": "Topsubmitters",
+    "all-studies": "Stats_number",
+    "total-size": "Stats_size",
 }
 
 
@@ -16,6 +18,8 @@ class StatisticCategory(enum.StrEnum):
     SUBMITTERS = "submitters"
     TOP_SUBMITTERS = "top-submitters"
     INFO = "info"
+    REPOSITORY_SIZE = "total-size"
+    ALL_STUDIES = "all-studies"
 
     def get_db_value(self):
         return SECTION_DB_VALUE_MAP.get(self.value)

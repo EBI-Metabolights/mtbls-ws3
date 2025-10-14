@@ -1,88 +1,27 @@
 # MetaboLights v3
 
+<!-- <img src="https://www.ebi.ac.uk/metabolights/img/MetaboLightsLogo.png" width="50" height="50" alt="Metabolights">  -->
+
+<a href="https:/www.ebi.ac.uk/metabolights" target="_blank">
+    <img src="https://img.shields.io/badge/Homepage-MetaboLights-blue" alt="MetaboLights">
+</a>
+<a href="https://github.com/EBI-Metabolights/metabolights-utils" target="_blank">
+    <img src="https://img.shields.io/badge/Github-MetaboLights-blue" alt="MetaboLights Github">
+</a>
+<a href="https://isa-specs.readthedocs.io/en/latest/isatab.html" target="_blank">
+    <img src="https://img.shields.io/badge/ISA--Tab-v1.0-blue" alt="ISA-Tab version">
+</a>
+<a href="https://github.com/EBI-Metabolights/metabolights-utils/blob/master/LICENCE" target="_blank">
+    <img src="https://img.shields.io/badge/Licence-Apache%20v2.0-blue" alt="License">
+</a>
+
+![Python](https://img.shields.io/badge/Python-3.12%7C3.13-dark_blue)
+
+<!-- ![Coverage](https://img.shields.io/badge/Coverage-85%25-dark_blue) -->
+
+![Package Manager](https://img.shields.io/badge/Package%20Manger-UV-dark_blue)
+![Lint](https://img.shields.io/badge/Lint-Ruff-dark_blue)
+![Unit Test](https://img.shields.io/badge/Unit%20Test-PyTest-dark_blue)
+![REST Framework](https://img.shields.io/badge/Rest%20Framework-FastAPI-dark_blue)
+
 You can find technical documentation on (this website)[https://ebi-metabolights.github.io/mtbls-ws3/]
-
-## Development Environment
-
-Development environment for linux or mac
-
-```bash
-
-# install python package manager uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# add $HOME/.local/bin to your PATH
-export PATH=$HOME/.local/bin:$PATH
-
-# RESTART your terminal or OPEN NEW one
-
-# install git from https://git-scm.com/downloads
-# Linux command
-apt update; apt install git -y
-
-# Mac command
-# brew install git
-# clone project from github
-git clone https://github.com/EBI-Metabolights/mtbls-ws3
-
-cd mtbls-ws3
-
-# install python using uv tool.
-uv python install 3.13
-
-# install python dependencies
-uv sync
-
-# run lint-imports verify architecture
-uv run lint-imports
-# =============
-# Import Linter
-# =============
-
-# ---------
-# Contracts
-# ---------
-
-# Analyzed 448 files, 1603 dependencies.
-# --------------------------------------
-
-# Architecture Layer Dependencies KEPT
-# Restricted Async Task Imports KEPT
-# Restricted Dependency Injection KEPT
-# Independent Implementations in Infrastructure Layer KEPT
-# Independent Rest API Groups in Presentation Layer KEPT
-# External Framework Independence (Infrastructure) KEPT
-# External Framework Independence (Presentation) KEPT
-# No Business Logic In Infrastructure Layer KEPT
-# No Business Logic In Utils KEPT
-
-
-# install pre-commit to check repository integrity and format checking
-uv run pre-commit
-
-# install pre-commit to check repository integrity and format checking
-uv run pytest
-
-# Run and test webservice server on local
-# test curator metabolights-help@ebi.ac.uk with password test.123
-# test user metabolights-dev@ebi.ac.uk with password test.123
-# test studies MTBLS800001 MTBLS800002 MTBLS800003
-uv run python tests/run/main_local.py
-
-# open your IDE (vscode, pycharm, etc.) and set python interpreter as .venv/bin/python
-
-```
-
-## Update repository
-
-Run following tasks before committing and pushing your updates, and fix all issues.
-
-```bash
-
-uv run lint-imports
-
-uv run pre-commit
-
-uv run pytest
-
-```
