@@ -52,7 +52,11 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         route_path, _, _ = route_path.partition("?")
         auth: AuthCredentials = request.auth
         user: Union[AuthenticatedUser, UnauthenticatedUser] = request.user
-        client_host = request.client.host
+
+        client_host = request.headers.get("X-Forwarded-For")
+        if not client_host:
+            client_host = request.client.host
+
         resource_id = None
         method = request.method
         match = re.match(".*/(REQ[1-9][0-9]*|MTBLS[1-9][0-9]*)(/.*|$)", route_path)
