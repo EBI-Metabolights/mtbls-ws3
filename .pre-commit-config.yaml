@@ -40,13 +40,13 @@ repos:
     name: 🟢 Check end of file character
     exclude: resources/.+\.(js|css)$
   - id: trailing-whitespace
-    name: 🟢  Check training whitespaces
+    name: 🟢  Check trailing whitespaces
     exclude: (tests/data/.+|resources/.+\.(js|css))$
 - repo: https://github.com/astral-sh/uv-pre-commit
   rev: 0.9.1
   hooks:
   - id: uv-lock
-    name: ✅ Check training whitespaces
+    name: ✅ Check UV lock file
 - repo: https://github.com/lk16/detect-missing-init
   rev: v0.1.6
   hooks:
