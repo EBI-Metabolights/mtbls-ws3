@@ -329,7 +329,7 @@ async def get_validation_task_report(  # noqa: PLR0913
 
 
 @router.delete(
-    "/{resource_id}/validations/{task_id}",
+    "/{resource_id}/tasks/{task_id}",
     summary="Delete running validation task.",
     description="If there is a task running, terminate the task",
     response_model=APIResponse[DeleteTaskResponse],
