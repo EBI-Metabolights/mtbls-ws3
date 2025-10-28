@@ -206,6 +206,7 @@ if __name__ == "__main__":
             port=server_configuration.port,
             root_path=config.root_path,
             log_config=log_config,
+            forwarded_allow_ips="*",
         )
     except Exception as ex:
         raise ex

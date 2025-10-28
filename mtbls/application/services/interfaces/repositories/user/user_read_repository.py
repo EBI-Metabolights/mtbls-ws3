@@ -18,6 +18,7 @@ class UserReadRepository(AbstractReadRepository[UserOutput, int]):
     @abc.abstractmethod
     async def get_user_by_api_token(
         self,
+        username: str,
         api_token: str,
         include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...

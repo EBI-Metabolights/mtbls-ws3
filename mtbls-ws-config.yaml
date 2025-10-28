@@ -37,7 +37,12 @@ services:
       base_context_path: "{{ authentication.mtbls_ws2.base_context_path }}"
       scheme: "{{ authentication.mtbls_ws2.scheme }}"
     standalone:
-      application_secret_key: "{{ authentication.standaloneapplication_secret_key }}"
+      application_secret_key: "{{ authentication.standalone.application_secret_key }}"
+    keycloak:
+      host: "{{ authentication.keycloak.host }}"
+      realm_name: "{{ authentication.keycloak.real_name }}"
+      client_id: "{{ authentication.keycloak.client_id }}"
+      client_secret: "{{ authentication.keycloak.client_secret }}"
   policy_service:
     opa:
       validate_schema: false
