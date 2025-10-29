@@ -19,6 +19,9 @@ from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.application.services.interfaces.health_check_service import (
     SystemHealthCheckService,
 )
+from mtbls.application.services.interfaces.ontology_search_service import (
+    OntologySearchService,
+)
 from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -37,6 +40,9 @@ from mtbls.infrastructure.auth.standalone.standalone_authorization_service impor
     AuthorizationServiceImpl,
 )
 from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
+from mtbls.infrastructure.ontology_search.ols.ols_search_service import (
+    OlsOntologySearchService,
+)
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
@@ -90,6 +96,12 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         http_client=gateways.http_client,
         config=config.policy_service.opa,
         max_polling_in_seconds=60,
+    )
+
+    ontology_search_service: OntologySearchService = providers.Singleton(
+        OlsOntologySearchService,
+        http_client=gateways.http_client,
+        config=config.ontology_search_service.ols,
     )
 
     system_health_check_service: SystemHealthCheckService = providers.Singleton(

@@ -52,6 +52,10 @@ services:
       templates_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/templates"
       control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controls"
       rule_definitions_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/rules"
+  ontology_search_service:
+    ols:
+      timeout_in_seconds: 10
+      default_search_result_size: 30
   system_health_check:
     remote:
       transfer_health_check:
