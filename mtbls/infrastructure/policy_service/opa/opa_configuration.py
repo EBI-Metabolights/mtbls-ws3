@@ -10,6 +10,6 @@ class OpaConfiguration(BaseConfiguration):
         "http://policy-engine:8181/v1/data/metabolights/validation/v2/templates"
     )
     control_lists_url: str = (
-        "http://policy-engine:8181/v1/data/metabolights/validation/v2/controlLists"
+        "http://policy-engine:8181/v1/data/metabolights/validation/v2/controls"
     )
     rule_definitions_url: str = "http://policy-engine:8181/v1/data/metabolights/validation/v2/configuration/rules"

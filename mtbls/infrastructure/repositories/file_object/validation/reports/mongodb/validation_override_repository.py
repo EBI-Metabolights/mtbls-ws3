@@ -11,7 +11,7 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
 )
 from mtbls.domain.entities.base_entity import BaseEntity
 from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
-from mtbls.domain.entities.validation_report import ValidationReport
+from mtbls.domain.entities.validation.validation_report import ValidationReport
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.query_options import QueryOptions

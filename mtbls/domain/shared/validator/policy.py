@@ -6,7 +6,7 @@ from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from pydantic import Field, field_validator
 from typing_extensions import Annotated
 
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.modifier import UpdateLog
 from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPhase
 

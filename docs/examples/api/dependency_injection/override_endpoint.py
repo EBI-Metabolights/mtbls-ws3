@@ -11,7 +11,7 @@ from mtbls.application.use_cases.validation.validation_overrides import (
     patch_validation_overrides,
 )
 from mtbls.domain.entities.user import UserOutput
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.validation import (
     ValidationOverrideInput,
 )

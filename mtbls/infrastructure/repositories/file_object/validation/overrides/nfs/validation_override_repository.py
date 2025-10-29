@@ -4,7 +4,7 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
     ValidationOverrideRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity
-from mtbls.domain.entities.validation_override import (
+from mtbls.domain.entities.validation.validation_override import (
     ValidationOverrideFileObject,
 )
 from mtbls.infrastructure.persistence.db.mongodb.config import (

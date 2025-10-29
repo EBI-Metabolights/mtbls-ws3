@@ -50,7 +50,7 @@ services:
       version_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/version"
       validation_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/report/complete_report?pretty=true"
       templates_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/templates"
-      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controlLists"
+      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controls"
       rule_definitions_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/rules"
   system_health_check:
     remote:

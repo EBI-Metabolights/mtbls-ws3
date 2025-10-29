@@ -19,7 +19,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
 from mtbls.application.use_cases.validation.validation_task import (
     get_study_validation_result,
 )
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.exceptions.async_task import (
     AsyncTaskCheckStatusFailure,
     AsyncTaskNotFoundError,

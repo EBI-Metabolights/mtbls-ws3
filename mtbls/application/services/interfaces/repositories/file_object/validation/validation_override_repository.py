@@ -4,7 +4,7 @@ from mtbls.application.services.interfaces.repositories.default.abstract_write_r
 from mtbls.application.services.interfaces.repositories.file_object.base import (
     BaseFileObjectRepository,
 )
-from mtbls.domain.entities.validation_override import (
+from mtbls.domain.entities.validation.validation_override import (
     ValidationOverrideFileObject,
 )
 

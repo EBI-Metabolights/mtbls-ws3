@@ -5,7 +5,7 @@ import uuid
 from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.types import PolicyMessageType
 from mtbls.domain.shared.validator.validation import (
     ValidationOverride,

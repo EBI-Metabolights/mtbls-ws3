@@ -3,7 +3,7 @@ import logging
 from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.validation import (
     ValidationOverrideInput,
 )
@@ -19,4 +19,4 @@ async def patch_validation_overrides(
     repo = validation_override_service
     overrides_content = await repo.get_validation_overrides(resource_id=resource_id)
     version = overrides_content.validation_version
-    print(version)
+    return ValidationOverrideList(validation_version=version)

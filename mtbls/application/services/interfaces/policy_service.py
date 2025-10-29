@@ -8,14 +8,18 @@ from mtbls.domain.shared.validator.validation import VersionedValidationsMap
 
 
 class PolicyService(abc.ABC):
+    @abc.abstractmethod
     async def get_templates(self) -> dict[str, Any]: ...
 
+    @abc.abstractmethod
     async def get_control_lists(self) -> dict[str, Any]: ...
 
+    @abc.abstractmethod
     async def get_rule_definitions(
         self, version: Union[None, str] = None
     ) -> VersionedValidationsMap: ...
 
+    @abc.abstractmethod
     async def validate_study(
         self,
         resource_id: str,
