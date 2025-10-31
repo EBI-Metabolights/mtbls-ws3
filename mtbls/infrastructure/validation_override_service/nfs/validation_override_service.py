@@ -93,7 +93,7 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
                 resource_id=resource_id, object_key=self.validation_overrides_object_key
             )
             study_object.category = ResourceCategory.INTERNAL_RESOURCE
-            self.file_object_repository.object_created(study_object=study_object)
+            await self.file_object_repository.object_created(study_object=study_object)
             return initiated_overrides
         try:
             await self.file_object_repository.download(
