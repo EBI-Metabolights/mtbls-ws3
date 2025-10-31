@@ -111,8 +111,9 @@ class OlsOntologySearchService(OntologySearchService):
                     keyword.lower(),
                     set([x.lower() for x in x.synonym if x]),
                 ),
-                x.term,
+                x.term.lower(),
                 rank.get(x.term_source_ref.upper(), len(ontologies)),
+                x.term_source_ref.upper(),
             ),
         )
         return OntologyTermSearchResult(success=True, result=result, page=page or 0)
