@@ -12,7 +12,7 @@ variables:
   CONFIG_DIR: "config-files"
 workflow:
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "staging"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "keycloak" || $CI_COMMIT_BRANCH == "staging"
 stages:
 - lint
 - build
@@ -111,7 +111,7 @@ deploy_ws:
 
 .kube_deploy_script:
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "keycloak"
     when: on_success
   - if: $CI_COMMIT_BRANCH == "main"
     when: manual
