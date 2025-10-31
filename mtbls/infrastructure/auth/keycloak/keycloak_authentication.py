@@ -21,7 +21,7 @@ from mtbls.infrastructure.auth.keycloak.keycloak_authentication_config import (
 logger = logging.getLogger(__name__)
 
 
-class KeycloakAuthentication(AuthenticationService):
+class KeycloakAuthenticationService(AuthenticationService):
     def __init__(
         self,
         config: Union[dict[str, Any], KeycloakAuthenticationConfiguration],
@@ -37,7 +37,6 @@ class KeycloakAuthentication(AuthenticationService):
             self.config: KeycloakAuthenticationConfiguration = (
                 KeycloakAuthenticationConfiguration.model_validate(config)
             )
-        self.backend_ws_base_url = self.config.get_url()
         self.user_read_repository = user_read_repository
         self.keycloak_openid = KeycloakOpenID(
             server_url=self.config.host,
