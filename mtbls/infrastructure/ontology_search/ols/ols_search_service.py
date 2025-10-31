@@ -44,6 +44,32 @@ class OlsOntologySearchService(OntologySearchService):
             return OntologyTermSearchResult(
                 success=False, message="Invalid rule definition"
             )
+        if (
+            not rule.ontologies
+            and rule.ontology_validation_type
+            == OntologyValidationType.SELECTED_ONTOLOGY
+        ):
+            return OntologyTermSearchResult(
+                success=False,
+                message=f"Ontology list is not defined for "
+                f"{OntologyValidationType.SELECTED_ONTOLOGY}",
+            )
+
+        if rule.ontologies is None:
+            rule.ontologies = []
+        if (
+            not rule.allowed_parent_ontology_terms
+            and rule.ontology_validation_type
+            == OntologyValidationType.CHILD_ONTOLOGY_TERM
+        ):
+            return OntologyTermSearchResult(
+                success=False,
+                message=f"Parent ontology terms are not defined for "
+                f"{OntologyValidationType.CHILD_ONTOLOGY_TERM}",
+            )
+        if rule.allowed_parent_ontology_terms is None:
+            rule.allowed_parent_ontology_terms = []
+
         validation_type = rule.ontology_validation_type
         if validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM:
             validation_type_name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
