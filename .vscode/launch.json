@@ -1,0 +1,81 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run mtbls-ws3 FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/rest_api/submission/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${cwd}",
+      "env": {
+        "PYTHONPATH": "${cwd}",
+        "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Run mtbls-ws3 Celery Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/worker/common/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${cwd}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "jinja": true,
+      "justMyCode": false
+    },
+    {
+      "name": "Run Celery Flower Monitor",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/worker/monitor/flower/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${cwd}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "jinja": true,
+      "justMyCode": false
+    },
+    {
+      "name": "Run LOCAL mtbls-ws3 FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tests/run/rest_api/submission/main_local.py",
+      "console": "integratedTerminal",
+      "cwd": "${cwd}",
+      "env": {
+        "PYTHONPATH": "${cwd}",
+        "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Run Current file",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Run Submission MCP Server",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/mcp/submission/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
+    }
+  ]
+}
