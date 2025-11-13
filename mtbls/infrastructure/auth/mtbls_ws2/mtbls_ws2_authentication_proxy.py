@@ -57,8 +57,8 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
                 json={"token": token},
                 timeout=5,
             )
-            if response and response.headers and response.headers.get("Jwt"):
-                return response.headers.get("Jwt")
+            if response and response.headers and response.headers.get("jwt"):
+                return response.headers.get("jwt")
             raise Exception("Invalid response from backend")
         except Exception as ex:
             logger.warning("error: %s", str(ex))
@@ -75,8 +75,8 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
                 json={"email": username, "secret": password},
                 timeout=5,
             )
-            if response and response.headers and response.headers.get("Jwt"):
-                return response.headers["Jwt"]
+            if response and response.headers and response.headers.get("jwt"):
+                return response.headers["jwt"]
 
             raise Exception("Invalid response from backend")
         except Exception as ex:
@@ -120,8 +120,8 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
                 json={"Jwt": token, "User": email},
                 timeout=5,
             )
-            if response and response.headers and response.headers.get("User"):
-                return response.headers.get("User")
+            if response and response.headers and response.headers.get("user"):
+                return response.headers.get("user")
 
             raise Exception("Invalid response from backend")
         except Exception as ex:

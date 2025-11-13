@@ -48,7 +48,7 @@ services:
       application_secret_key: "{{ authentication.standalone.application_secret_key }}"
     keycloak:
       host: "{{ authentication.keycloak.host }}"
-      realm_name: "{{ authentication.keycloak.real_name }}"
+      realm_name: "{{ authentication.keycloak.realm_name }}"
       client_id: "{{ authentication.keycloak.client_id }}"
       client_secret: "{{ authentication.keycloak.client_secret }}"
   policy_service:

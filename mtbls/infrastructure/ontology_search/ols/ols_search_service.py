@@ -1,5 +1,9 @@
+import logging
+import re
 from typing import Any
 from urllib.parse import quote
+
+from pydantic import HttpUrl, ValidationError
 
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.ontology_search_service import (
@@ -13,10 +17,13 @@ from mtbls.domain.entities.ontology.ontology_search import (
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
     OntologyValidationType,
+    ParentOntologyTerms,
 )
 from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.infrastructure.ontology_search.ols.ols_configuration import OlsConfiguration
 from mtbls.infrastructure.ontology_search.ols.schemas import OlsSearchResultItem
+
+logger = logging.getLogger(__name__)
 
 
 class OlsOntologySearchService(OntologySearchService):
@@ -44,23 +51,84 @@ class OlsOntologySearchService(OntologySearchService):
             return OntologyTermSearchResult(
                 success=False, message="Invalid rule definition"
             )
-        validation_type = rule.ontology_validation_type
-        if validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM:
-            validation_type_name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
+        if (
+            not rule.ontologies
+            and rule.ontology_validation_type
+            == OntologyValidationType.SELECTED_ONTOLOGY
+        ):
             return OntologyTermSearchResult(
                 success=False,
-                message=f"{validation_type_name} is not supported",
+                message=f"Ontology list is not defined for "
+                f"{OntologyValidationType.SELECTED_ONTOLOGY}",
             )
-        exact_match_response, exact_match_result = await self.search_by_validation_type(
-            validation_type, keyword, rule, page, size, True
-        )
-        if exact_match:
-            response = exact_match_response
+        is_uri = False
+        try:
+            is_uri = HttpUrl(url=keyword) is not None
+        except ValidationError:
+            pass
+
+        if rule.ontologies is None:
+            rule.ontologies = []
+        curie_match = re.match(r"^([A-Za-z0-9]+):([A-Za-z0-9_]+)$", keyword)
+        result = []
+        exact_match_result = []
+        if is_uri:
+            exact_match = True
+            logger.debug("Searching by IRI with exact match: %s", keyword)
+            response, exact_match_result = await self.search_term(
+                keyword,
+                page=page,
+                size=size,
+                exact_match_only=exact_match,
+                query_fields=["iri"],
+            )
+            result = exact_match_result
+        elif curie_match:
+            exact_match = True
+            logger.debug("Searching by Compact URI with exact match: %s", keyword)
+            ontology, _ = curie_match.groups()
+
+            response, exact_match_result = await self.search_term(
+                keyword,
+                ontology_filter=[ontology],
+                page=page,
+                size=size,
+                exact_match_only=exact_match,
+                query_fields=["obo_id"],
+            )
             result = exact_match_result
         else:
-            response, result = await self.search_by_validation_type(
-                validation_type, keyword, rule, page, size, False
+            if (
+                not rule.allowed_parent_ontology_terms
+                and rule.ontology_validation_type
+                == OntologyValidationType.CHILD_ONTOLOGY_TERM
+            ):
+                message = (
+                    f"Parent ontology terms are not defined for "
+                    f"{OntologyValidationType.CHILD_ONTOLOGY_TERM}: {keyword}",
+                )
+                logger.debug(message)
+                return OntologyTermSearchResult(success=False, message=message)
+
+            validation_type = rule.ontology_validation_type
+            if validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM:
+                name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
+                message = f"{name} is not supported for searching: '{keyword}'"
+                return OntologyTermSearchResult(success=False, message=message)
+
+            (
+                exact_match_response,
+                exact_match_result,
+            ) = await self.search_by_validation_type(
+                validation_type, keyword, rule, page, size, True
             )
+            if exact_match:
+                response = exact_match_response
+                result = exact_match_result
+            else:
+                response, result = await self.search_by_validation_type(
+                    validation_type, keyword, rule, page, size, False
+                )
         if not response:
             return OntologyTermSearchResult(
                 success=False, message="No response. Check validation type.", result=[]
@@ -85,8 +153,9 @@ class OlsOntologySearchService(OntologySearchService):
                     keyword.lower(),
                     set([x.lower() for x in x.synonym if x]),
                 ),
-                x.term,
+                x.term.lower(),
                 rank.get(x.term_source_ref.upper(), len(ontologies)),
+                x.term_source_ref.upper(),
             ),
         )
         return OntologyTermSearchResult(success=True, result=result, page=page or 0)
@@ -114,6 +183,8 @@ class OlsOntologySearchService(OntologySearchService):
                 exact_match_only=exact_match,
             )
         elif validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM:
+            if rule.allowed_parent_ontology_terms is None:
+                rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
             parents = [
                 x.term_accession_number
                 for x in rule.allowed_parent_ontology_terms.parents
@@ -208,6 +279,7 @@ class OlsOntologySearchService(OntologySearchService):
         query_fields: None | list[str] = None,
         page: None | int = None,
         size: None | int = None,
+        field_list: None | list[str] = None,
     ) -> tuple[HttpResponse, list[OntologyTermHit]]:
         if not size or size <= 0:
             size = self.config.default_search_result_size
@@ -216,10 +288,19 @@ class OlsOntologySearchService(OntologySearchService):
             query_fields_str = "label,synonym"
         else:
             query_fields_str = ",".join(query_fields)
-
+        if not field_list:
+            field_list = [
+                "iri",
+                "label",
+                "ontology_prefix",
+                "obo_id",
+                "description",
+                "type",
+                "synonym",
+            ]
         params = {
             "q": keyword,
-            "fieldList": "iri,label,ontology_prefix,obo_id,description,type,synonym",
+            "fieldList": ",".join(field_list),
             "queryFields": query_fields_str,
             "exact": exact_match_only,
             "obsoletes": False,
@@ -274,7 +355,7 @@ class OlsOntologySearchService(OntologySearchService):
         return result, hits
 
     async def search_accession(
-        self, accession: str, ontology: str
+        self, accession: str, ontology: None | str = None
     ) -> tuple[HttpResponse, OlsSearchResultItem]:
         if not ontology or not accession:
             return HttpResponse(
@@ -284,8 +365,11 @@ class OlsOntologySearchService(OntologySearchService):
             ), []
 
         iri = quote(quote(accession, safe=""), safe="")
+        if ontology:
+            url = f"{self.config.origin_url}/api/ontologies/{ontology}/terms/{iri}"
+        else:
+            url = f"{self.config.origin_url}/api/terms/{iri}"
 
-        url = f"{self.config.origin_url}/api/ontologies/{ontology}/terms/{iri}"
         params = {"lang": "en"}
         headers = {"Accept": "application/json"}
         result: HttpResponse = await self.http_client.send_request(
