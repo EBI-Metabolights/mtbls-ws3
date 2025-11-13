@@ -42,6 +42,7 @@ ws3 = [
     "fastmcp>=2.12.4",
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
+    "elasticsearch<8.5.1"
 ]
 
 [dependency-groups]

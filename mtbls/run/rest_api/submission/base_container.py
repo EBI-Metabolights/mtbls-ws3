@@ -20,6 +20,7 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
+from mtbls.application.services.interfaces.search_port import SearchPort
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -57,6 +58,8 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
+from mtbls.infrastructure.search.es.es_client import ElasticsearchClient, ElasticsearchClientConfig
+from mtbls.infrastructure.search.es.study.es_study_search_gateway import ElasticsearchStudyGateway
 
 
 class GatewaysContainer(containers.DeclarativeContainer):
@@ -67,6 +70,22 @@ class GatewaysContainer(containers.DeclarativeContainer):
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
     )
+    
+    elasticsearch_client: ElasticsearchClient  = providers.Singleton(
+        ElasticsearchClient,
+        config=providers.Factory(
+            ElasticsearchClientConfig,
+            hosts=config.search.elasticsearch.connection.hosts,
+            api_key=config.search.elasticsearch.connection.api_key,
+            request_timeout_in_seconds=config.search.elasticsearch.connection.request_timeout_in_seconds.as_float(),
+            verify_certs=config.search.elasticsearch.connection.verify_certs.as_bool(),
+        )
+    )
+    elasticsearch_study_gateway: SearchPort = providers.Singleton(
+        ElasticsearchStudyGateway,
+        config=config.search.elasticsearch, # currently we rely on default config values. If we ever want to change them we can use the example above.
+    )
+    
 
     # mongodb_connection: MongoDbConnection = providers.Resource(
     #     create_config_from_dict,

@@ -236,6 +236,8 @@ class OlsOntologySearchService(OntologySearchService):
                 x.lower() for x in ontology_filter if x and x.strip()
             }
 
+
+
         if parents:
             params.update({"childrenOf": ",".join([x for x in parents if x])})
         elif ontology_filter:
