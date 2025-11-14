@@ -61,6 +61,15 @@ class OlsOntologySearchService(OntologySearchService):
                 message=f"Ontology list is not defined for "
                 f"{OntologyValidationType.SELECTED_ONTOLOGY}",
             )
+
+        if not rule.allowed_parent_ontology_terms:
+            rule.allowed_parent_ontology_terms = ParentOntologyTerms(
+                parents=[], exclude_by_label_pattern=[], exclude_by_accession=[]
+            )
+        if not rule.allowed_parent_ontology_terms.exclude_by_accession:
+            rule.allowed_parent_ontology_terms.exclude_by_accession = []
+        if not rule.allowed_parent_ontology_terms.exclude_by_label_pattern:
+            rule.allowed_parent_ontology_terms.exclude_by_label_pattern = []
         is_uri = False
         try:
             is_uri = HttpUrl(url=keyword) is not None
@@ -177,8 +186,6 @@ class OlsOntologySearchService(OntologySearchService):
                 if (item.term_source_ref, item.term_accession_number) not in terms:
                     result.append(item)
 
-        if not rule.allowed_parent_ontology_terms:
-            rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
         excluded_patterns = rule.allowed_parent_ontology_terms.exclude_by_label_pattern
         excluded_iri_list = rule.allowed_parent_ontology_terms.exclude_by_accession
         if is_child_ontology_search and (excluded_patterns or excluded_iri_list):
@@ -226,7 +233,6 @@ class OlsOntologySearchService(OntologySearchService):
         exact_match: bool,
     ):
         response = result = None
-
         parent_iri_list = [
             x.term_accession_number for x in rule.allowed_parent_ontology_terms.parents
         ]
