@@ -176,6 +176,9 @@ class OlsOntologySearchService(OntologySearchService):
             for item in exact_match_result:
                 if (item.term_source_ref, item.term_accession_number) not in terms:
                     result.append(item)
+
+        if not rule.allowed_parent_ontology_terms:
+            rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
         excluded_patterns = rule.allowed_parent_ontology_terms.exclude_by_label_pattern
         excluded_iri_list = rule.allowed_parent_ontology_terms.exclude_by_accession
         if is_child_ontology_search and (excluded_patterns or excluded_iri_list):
@@ -223,8 +226,6 @@ class OlsOntologySearchService(OntologySearchService):
         exact_match: bool,
     ):
         response = result = None
-        if not rule.allowed_parent_ontology_terms:
-            rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
 
         parent_iri_list = [
             x.term_accession_number for x in rule.allowed_parent_ontology_terms.parents
