@@ -1,0 +1,34 @@
+{
+  "files.exclude": {
+    "**/__pycache__": true,
+    ".*cache*": true,
+    ".*coverage*": true
+  },
+  "editor.scrollbar.verticalScrollbarSize": 0.3,
+  "editor.scrollbar.vertical": "visible",
+  "files.associations": {
+    "*.json": "json",
+    "*.py": "python"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.unusedImports": "explicit"
+    }
+  },
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": [],
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  }
+}

@@ -9,8 +9,7 @@ dist*/
 .metabolights*/
 coverage*/
 .DS_Store
-.*/
-
+.temp/
 *-x/
 # Byte-compiled / optimized / DLL files
 __pycache__/

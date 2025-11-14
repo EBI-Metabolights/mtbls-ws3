@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Any
+from typing import Any, OrderedDict
 from urllib.parse import quote
 
 from pydantic import HttpUrl, ValidationError
@@ -98,11 +98,20 @@ class OlsOntologySearchService(OntologySearchService):
             )
             result = exact_match_result
         else:
+            validation_type = rule.ontology_validation_type
+            is_child_ontology_search = (
+                validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
+            )
+            is_selected_ontology_search = (
+                validation_type == OntologyValidationType.SELECTED_ONTOLOGY
+            )
+            is_selected_ontology_terms = (
+                validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM
+            )
             if (
                 not rule.allowed_parent_ontology_terms
-                and rule.ontology_validation_type
-                == OntologyValidationType.CHILD_ONTOLOGY_TERM
-            ):
+                or not rule.allowed_parent_ontology_terms.parents
+            ) and is_child_ontology_search:
                 message = (
                     f"Parent ontology terms are not defined for "
                     f"{OntologyValidationType.CHILD_ONTOLOGY_TERM}: {keyword}",
@@ -111,11 +120,29 @@ class OlsOntologySearchService(OntologySearchService):
                 return OntologyTermSearchResult(success=False, message=message)
 
             validation_type = rule.ontology_validation_type
-            if validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM:
+            if not rule.ontologies and is_selected_ontology_search:
+                message = (
+                    f"Ontologies are not defined for "
+                    f"{OntologyValidationType.SELECTED_ONTOLOGY}: {keyword}",
+                )
+                logger.debug(message)
+                return OntologyTermSearchResult(success=False, message=message)
+
+            if is_selected_ontology_terms:
                 name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
                 message = f"{name} is not supported for searching: '{keyword}'"
                 return OntologyTermSearchResult(success=False, message=message)
 
+            rule.ontologies = rule.ontologies or []
+            if is_child_ontology_search:
+                rule.ontologies = list(
+                    OrderedDict.fromkeys(
+                        [
+                            x.term_source_ref
+                            for x in rule.allowed_parent_ontology_terms.parents
+                        ]
+                    )
+                )
             (
                 exact_match_response,
                 exact_match_result,
@@ -142,9 +169,28 @@ class OlsOntologySearchService(OntologySearchService):
             for item in exact_match_result:
                 if (item.term_source_ref, item.term_accession_number) not in terms:
                     result.append(item)
+        excluded_patterns = rule.allowed_parent_ontology_terms.exclude_by_label_pattern
+        excluded_iri_list = rule.allowed_parent_ontology_terms.exclude_by_accession
+        if is_child_ontology_search and (excluded_patterns or excluded_iri_list):
 
-        ontologies = rule.ontologies or []
+            def is_included(term: OntologyTermHit):
+                if not term:
+                    False
+                if excluded_iri_list:
+                    for iri in excluded_iri_list:
+                        match = term.term_accession_number == iri
+                        if match:
+                            return False
+                if excluded_patterns:
+                    for pattern in excluded_patterns:
+                        match = re.match(pattern, term.term)
+                        if match:
+                            return False
+                return True
 
+            result = list(filter(is_included, result))
+
+        ontologies = rule.ontologies
         rank = {value.upper(): i for i, value in enumerate(ontologies)}
         result.sort(
             key=lambda x: (
