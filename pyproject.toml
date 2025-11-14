@@ -7,19 +7,19 @@ requires-python = ">=3.12,<4"
 readme = "README.md"
 license = "Apache-2.0"
 dependencies = [
+    "dependency-injector>=4.48.2,<5",
     "pydantic>=2.10.2,<3",
     "python-dateutil>=2.9.0.post0,<3",
     "pytz>=2025.2",
     "pyyaml>=6.0.2",
-    "dependency-injector>=4.48.2,<5",
     "jsonpath-ng>=1.7.0,<2",
     "ujson>=5.10.0,<6",
     "aiocache>=0.12.2",
     "aiofiles>=23.2.1",
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
-    "metabolights-utils>=1.4.9,<2",
     "python-multipart>=0.0.9",
+    "metabolights-utils>=1.4.11,<2",
 ]
 
 [project.optional-dependencies]

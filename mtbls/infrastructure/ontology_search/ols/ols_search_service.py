@@ -108,6 +108,10 @@ class OlsOntologySearchService(OntologySearchService):
             is_selected_ontology_terms = (
                 validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM
             )
+            has_parent_terms = (
+                rule.allowed_parent_ontology_terms
+                and rule.allowed_parent_ontology_terms.parents
+            )
             if (
                 not rule.allowed_parent_ontology_terms
                 or not rule.allowed_parent_ontology_terms.parents
@@ -134,8 +138,8 @@ class OlsOntologySearchService(OntologySearchService):
                 return OntologyTermSearchResult(success=False, message=message)
 
             rule.ontologies = rule.ontologies or []
-            if is_child_ontology_search:
-                rule.ontologies = list(
+            if has_parent_terms:
+                parent_sources = list(
                     OrderedDict.fromkeys(
                         [
                             x.term_source_ref
@@ -143,6 +147,9 @@ class OlsOntologySearchService(OntologySearchService):
                         ]
                     )
                 )
+                for item in parent_sources:
+                    if item not in rule.ontologies:
+                        rule.ontologies.append(item)
             (
                 exact_match_response,
                 exact_match_result,
@@ -216,6 +223,12 @@ class OlsOntologySearchService(OntologySearchService):
         exact_match: bool,
     ):
         response = result = None
+        if not rule.allowed_parent_ontology_terms:
+            rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
+
+        parent_iri_list = [
+            x.term_accession_number for x in rule.allowed_parent_ontology_terms.parents
+        ]
         if validation_type == OntologyValidationType.ANY_ONTOLOGY_TERM:
             response, result = await self.search_term(
                 keyword, page=page, size=size, exact_match_only=exact_match
@@ -229,16 +242,10 @@ class OlsOntologySearchService(OntologySearchService):
                 exact_match_only=exact_match,
             )
         elif validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM:
-            if rule.allowed_parent_ontology_terms is None:
-                rule.allowed_parent_ontology_terms = ParentOntologyTerms(parents=[])
-            parents = [
-                x.term_accession_number
-                for x in rule.allowed_parent_ontology_terms.parents
-            ]
             response, result = await self.search_term(
                 keyword,
                 ontology_filter=rule.ontologies,
-                parents=parents,
+                parents=parent_iri_list,
                 page=page,
                 size=size,
                 exact_match_only=exact_match,
