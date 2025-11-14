@@ -3,11 +3,8 @@
 
 from typing import Any, Dict, List
 from uuid import uuid4
-from elasticsearch import Elasticsearch
-from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.search_port import SearchPort
-from mtbls.application.services.interfaces.study_search_service import StudySearchService
-from mtbls.domain.entities.search.study.index_search import FacetBucket, FacetResponse, IndexSearchInput, IndexSearchResponse, IndexSearchResult
+from mtbls.domain.entities.search.study.index_search import FacetBucket, FacetResponse, IndexSearchInput, IndexSearchResult
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 from mtbls.infrastructure.search.es.es_configuration import ElasticsearchConfiguration, StudyElasticSearchConfiguration
 
