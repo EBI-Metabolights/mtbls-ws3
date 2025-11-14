@@ -42,11 +42,36 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
         ).model_dump(by_alias=True),
     ),
     "Search unit terms in the selected ontologies": Example(
-        summary="Search from the selected ontologies",
+        summary="Search unit ontology terms in parent ontology terms",
         value=BaseOntologyValidation(
-            ontology_validation_type=OntologyValidationType.SELECTED_ONTOLOGY,
-            ontologies=["UO", "EFO"],
-            allowed_parent_ontology_terms=None,
+            ontology_validation_type=OntologyValidationType.CHILD_ONTOLOGY_TERM,
+            ontologies=["UO", "EFO", "NCIT"],
+            allowed_parent_ontology_terms=ParentOntologyTerms(
+                exclude_by_label_pattern=[r"^.*unit$", r"^.*Unit of.*$"],
+                exclude_by_accession=[],
+                parents=[
+                    OntologyTerm(
+                        term="unit",
+                        term_source_ref="UO",
+                        term_accession_number="http://purl.obolibrary.org/obo/UO_0000000",
+                    ),
+                    OntologyTerm(
+                        term="unit",
+                        term_source_ref="EFO",
+                        term_accession_number="http://purl.obolibrary.org/obo/UO_0000000",
+                    ),
+                    OntologyTerm(
+                        term="Qualifier",
+                        term_source_ref="NCIT",
+                        term_accession_number="http://purl.obolibrary.org/obo/NCIT_C41009",
+                    ),
+                    OntologyTerm(
+                        term="Unit of Measure",
+                        term_source_ref="NCIT",
+                        term_accession_number="http://purl.obolibrary.org/obo/NCIT_C25709",
+                    ),
+                ],
+            ),
         ).model_dump(by_alias=True),
     ),
     "Search mass spectrometry instruments": Example(
