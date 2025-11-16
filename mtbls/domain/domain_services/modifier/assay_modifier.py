@@ -11,6 +11,10 @@ from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from mtbls.domain.domain_services.modifier.base_isa_table_modifier import (
     IsaTableModifier,
 )
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import UpdateLog
 
 logger = logging.getLogger(__name__)
@@ -29,8 +33,8 @@ class AssayFileModifier(IsaTableModifier):
         self,
         model: MetabolightsStudyModel,
         isa_table_file: IsaTableFile,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
         max_row_number_limit: int = 10,
     ):
         super().__init__(

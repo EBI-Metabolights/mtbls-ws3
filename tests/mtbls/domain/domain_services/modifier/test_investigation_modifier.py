@@ -15,6 +15,10 @@ from metabolights_utils.models.metabolights.model import (
 from mtbls.domain.domain_services.modifier.metabolights_study_model_modifier import (
     InvestigationFileModifier,
 )
+from mtbls.domain.entities.validation.validation_configuration import (
+    OntologyTerm,
+    ProtocolParameterDefinition,
+)
 
 
 @pytest.fixture(scope="function")
@@ -52,6 +56,8 @@ class TestNoModification:
         modifier: InvestigationFileModifier,
     ):
         modifier.modify()
+        # with Path("model_MTBLS1.json").open("w") as f:
+        #     f.write(modifier.model.model_dump_json(by_alias=True, indent=4))
         assert len(modifier.update_logs) == 0
 
     @pytest.mark.asyncio
@@ -60,6 +66,8 @@ class TestNoModification:
         ms_modifier: InvestigationFileModifier,
     ):
         ms_modifier.modify()
+        # with Path("model_MTBLS5195.json").open("w") as f:
+        #     f.write(ms_modifier.model.model_dump_json(by_alias=True, indent=4))
         assert len(ms_modifier.update_logs) == 0
 
 
@@ -153,6 +161,7 @@ class TestUpdateOntologies:
         modifier: InvestigationFileModifier,
     ):
         contact = modifier.model.investigation.studies[0].study_contacts.people[0]
+
         contact.roles[0].term = ""
         contact.roles[0].term_source_ref = ""
 
@@ -161,11 +170,11 @@ class TestUpdateOntologies:
         ].term_accession_number = "http://purl.obolibrary.org/obo/NCIT_C25936"
 
         modifier.update_ontologies()
-        assert contact.roles[0].term == "Investigator"
-        assert contact.roles[0].term_source_ref == "NCIT"
+        role = modifier.model.investigation.studies[0].study_contacts.people[0].roles[0]
+        assert role.term == "Investigator"
+        assert role.term_source_ref == "NCIT"
         assert (
-            contact.roles[0].term_accession_number
-            == "http://purl.obolibrary.org/obo/NCIT_C25936"
+            role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
         )
         assert len(modifier.update_logs) == 1
 
@@ -207,13 +216,12 @@ class TestUpdateOntologies:
         metabolights_model = modifier.model
         study = metabolights_model.investigation.studies[0]
         design_type = study.study_design_descriptors.design_types[5]
-        expected_term_accession_number = design_type.term_accession_number
-        expected_term_source_ref = design_type.term_source_ref
+        design_type.term = "untargeted metabolite profiling"
+        expected_term_accession_number = "http://purl.obolibrary.org/obo/MSIO_0000101"
+        expected_term_source_ref = "MSIO"
 
-        design_type.term_accession_number = (
-            "http://purl.obolibrary.org/obo/CHMO_0000591"
-        )
-        design_type.term_source_ref = "NCIT"
+        design_type.term_accession_number = ""
+        design_type.term_source_ref = ""
         modifier.update_ontologies()
         assert expected_term_accession_number == design_type.term_accession_number
         assert expected_term_source_ref == design_type.term_source_ref
@@ -456,10 +464,12 @@ class Test_rule_i_100_360_004_01:
         modifier.rule_i_100_360_004_01()
 
         assert len(people) == 1
+        modifier.update_logs.clear()
         contact = people[0]
+        people.clear()
         email = "test@ebi.ac.uk"
         submitters = metabolights_model.study_db_metadata.submitters
-
+        submitters.clear()
         submitters.append(
             Submitter(
                 first_name="Test",
@@ -470,12 +480,13 @@ class Test_rule_i_100_360_004_01:
             )
         )
         modifier.rule_i_100_360_004_01()
-        submitter = metabolights_model.study_db_metadata.submitters[0]
+        contact = people[-1]
+        submitter = metabolights_model.study_db_metadata.submitters[-1]
         assert contact.first_name == submitter.first_name
         assert contact.last_name == "Last Name"
         assert contact.email == submitter.user_name
         assert contact.affiliation == submitter.affiliation
-        assert contact.roles[0].term == "Author"
+        assert contact.roles[0].term == "Investigator"
         expected_logs_count = 5
 
         assert len(modifier.update_logs) == expected_logs_count
@@ -547,12 +558,11 @@ class Test_rule_i_100_360_004_01:
         people = study.study_contacts.people
         people[0].roles.clear()
         modifier.rule_i_100_360_004_01()
-
-        assert people[0].roles[0].term == "Author"
-        assert people[0].roles[0].term_source_ref == "NCIT"
+        role = people[0].roles[0]
+        assert role.term == "Investigator"
+        assert role.term_source_ref == "NCIT"
         assert (
-            people[0].roles[0].term_accession_number
-            == "http://purl.obolibrary.org/obo/NCIT_C42781"
+            role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
         )
         assert len(modifier.update_logs) == 1
 
@@ -905,10 +915,18 @@ class TestUpdateProtocolParameters:
         study = metabolights_model.investigation.studies[0]
         protocols = study.study_protocols.protocols
         expected_number_of_parameters = len(protocols[2].parameters) + 1
-        template_parameters = templates["studyProtocolTemplates"]["NMR"]["protocols"][
-            2
-        ]["parameters"]
-
+        test_protocol = templates.protocol_templates["NMR"][0].protocols[2]
+        test_protocol_def = templates.protocol_templates["NMR"][0].protocol_definitions[
+            test_protocol
+        ]
+        template_parameters = test_protocol_def.parameters
+        test_protocol_def.parameter_definitions["Test"] = ProtocolParameterDefinition(
+            format="Text",
+            definition="",
+            type=OntologyTerm(
+                term="Test", term_source_ref="", term_accession_number=""
+            ),
+        )
         template_parameters.append("Test")
         modifier.update_protocol_parameters()
         assert expected_number_of_parameters == len(protocols[2].parameters)

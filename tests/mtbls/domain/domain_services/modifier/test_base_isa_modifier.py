@@ -29,6 +29,7 @@ all_technique_names = [
     "GC-MS",
     "DI-MS",
     "NMR",
+    "MRImaging",
     "MSImaging",
     "CE-MS",
     "FIA-MS",
@@ -37,8 +38,6 @@ all_technique_names = [
     "LC-DAD",
     "MALDI-MS",
     "MS",
-    "SPE-IMS-MS",
-    "TD-GC-MS",
 ]
 
 
@@ -49,7 +48,7 @@ class TestGetProtocolTemplate:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_protocol_template(technique_name=technique)
-        assert len(template) > 0
+        assert template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -60,7 +59,7 @@ class TestGetProtocolTemplate:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_protocol_template(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
 
 class TestOrderedProtocolNames:
@@ -70,7 +69,7 @@ class TestOrderedProtocolNames:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) > 0
+        assert template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -81,7 +80,7 @@ class TestOrderedProtocolNames:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -93,7 +92,7 @@ class TestOrderedProtocolNames:
     ):
         sample_modifier.templates = {}
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
 
 class TestGetProtocolParametersInAssay:

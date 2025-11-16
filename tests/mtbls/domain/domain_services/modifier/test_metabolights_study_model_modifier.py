@@ -1,5 +1,3 @@
-import json
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -74,32 +72,26 @@ def ms_base_01_modifier(
 class TestNoModification:
     @pytest.mark.asyncio
     async def test_modify_no_modification_01(
-        self,
-        modifier: MetabolightsStudyModelModifier,
+        self, modifier: MetabolightsStudyModelModifier
     ):
-        modifier.modify()
-        assert len(modifier.update_logs) == 0
+        update_logs = modifier.modify()
+
+        # with Path("model_MTBLS1.json").open("w") as f:
+        #     json.dump(modifier.model.model_dump(by_alias=True), f, indent=4)
+        assert len(update_logs) == 0
 
     @pytest.mark.asyncio
     async def test_modify_no_modification_02(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
-        with Path("model_MTBLS5195_base_1.json").open("w") as f:
-            json.dump(ms_modifier.model.model_dump(by_alias=True), f, indent=4)
-
         ms_modifier.modify()
-
-        with Path("model_MTBLS5195_output.json").open("w") as f:
-            json.dump(ms_modifier.model.model_dump(by_alias=True), f, indent=4)
-        assert len(ms_modifier.update_logs) > 0
+        assert len(ms_modifier.update_logs) == 0
 
 
 class TestUpdateColumnHeaders:
     @pytest.mark.asyncio
     async def test_update_column_headers_01(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -130,8 +122,7 @@ class TestUpdateColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_update_column_headers_02(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay_name = "s_MTBLS1.txt"
 
@@ -158,8 +149,7 @@ class TestUpdateColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_update_column_headers_04(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -173,8 +163,7 @@ class TestUpdateColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_update_column_headers_05(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -190,8 +179,7 @@ class TestUpdateColumnHeaders:
 class TestAddColumnHeaders:
     @pytest.mark.asyncio
     async def test_add_column_headers_01(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -216,8 +204,7 @@ class TestAddColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_add_column_headers_02(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -255,8 +242,7 @@ class TestAddColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_add_column_headers_03(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -270,8 +256,7 @@ class TestAddColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_add_column_headers_04(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -287,8 +272,7 @@ class TestAddColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_add_column_headers_05(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay_name = "s_MTBLS1.txt"
 
@@ -301,8 +285,7 @@ class TestAddColumnHeaders:
 
     @pytest.mark.asyncio
     async def test_add_column_headers_06(
-        self,
-        ms_modifier: MetabolightsStudyModelModifier,
+        self, ms_modifier: MetabolightsStudyModelModifier
     ):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
@@ -319,10 +302,7 @@ class TestAddColumnHeaders:
 
 class TestModify:
     @pytest.mark.asyncio
-    async def test_modify_01(
-        self,
-        ms_base_01_modifier: MetabolightsStudyModelModifier,
-    ):
+    async def test_modify_01(self, ms_base_01_modifier: MetabolightsStudyModelModifier):
         ms_base_01_modifier.modify()
 
         assert len(ms_base_01_modifier.update_logs) > 1

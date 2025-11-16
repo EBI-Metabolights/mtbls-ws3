@@ -79,7 +79,6 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         OpaPolicyService,
         http_client=gateways.http_client,
         config=config.policy_service.opa,
-        max_polling_in_seconds=60,
     )
 
     async_task_service: AsyncTaskService = providers.Singleton(

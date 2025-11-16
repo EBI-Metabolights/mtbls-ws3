@@ -45,7 +45,9 @@ class UserReadRepository(AbstractReadRepository[UserOutput, int]):
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod
-    async def get_study_submitters_by_accession(self, id_: int) -> list[UserOutput]: ...
+    async def get_study_submitters_by_accession(
+        self, accession_number: str
+    ) -> list[UserOutput]: ...
 
     @abc.abstractmethod
     async def get_study_submitters_by_study_table_id(

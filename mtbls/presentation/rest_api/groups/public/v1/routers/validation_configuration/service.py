@@ -13,10 +13,7 @@ logger = getLogger(__name__)
 async def get_validation_configuration(
     policy_service: PolicyService,
 ) -> ValidationConfiguration:
-    controls_dict = await policy_service.get_control_lists()
-    templates_dict = await policy_service.get_templates()
+    controls: ValidationControls = await policy_service.get_control_lists()
+    templates: FileTemplates = await policy_service.get_templates()
 
-    return ValidationConfiguration(
-        controls=ValidationControls.model_validate(controls_dict, by_alias=True),
-        templates=FileTemplates.model_validate(templates_dict, by_alias=True),
-    )
+    return ValidationConfiguration(controls=controls, templates=templates)

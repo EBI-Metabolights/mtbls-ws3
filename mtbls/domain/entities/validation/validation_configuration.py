@@ -2,9 +2,8 @@ import datetime
 import enum
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
-
-from mtbls.domain.entities.ontology.ontology_term import OntologyTerm, StudyBaseModel
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic.alias_generators import to_camel, to_pascal
 
 
 class IsaTabFileType(enum.StrEnum):
@@ -18,6 +17,7 @@ class OntologyValidationType(enum.StrEnum):
     CHILD_ONTOLOGY_TERM = "child-ontology-term"
     SELECTED_ONTOLOGY = "ontology-term-in-selected-ontologies"
     SELECTED_ONTOLOGY_TERM = "selected-ontology-term"
+    ONLY_CHECK_CONSTRAINTS = "check-only-constraints"
 
 
 class ConstraintType(enum.StrEnum):
@@ -27,6 +27,12 @@ class ConstraintType(enum.StrEnum):
     REQUIRED = "required"
 
 
+class EnforcementLevel(enum.StrEnum):
+    REQUIRED = "required"
+    RECOMMENDED = "recommended"
+    OPTIONAL = "optional"
+
+
 class StudyCategoryStr(enum.StrEnum):
     OTHER = "other"
     MS_MHD_ENABLED = "ms-mhd-enabled"
@@ -34,6 +40,35 @@ class StudyCategoryStr(enum.StrEnum):
     MS_OTHER = "ms-other"
     NMR = "nmr"
     MS_MHD_LEGACY = "ms-mhd-legacy"
+
+
+class StudyBaseModel(BaseModel):
+    """Base model class to convert python attributes to camel case"""
+
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        json_schema_serialization_defaults_required=True,
+        field_title_generator=lambda field, field_info: to_pascal(
+            field.replace("_", " ").strip()
+        ),
+    )
+
+
+class OntologyTerm(StudyBaseModel):
+    term: Annotated[str, Field(description="Ontology term")]
+
+    term_accession_number: Annotated[
+        str,
+        Field(
+            description="The accession number from the Term Source "
+            "associated with the term.",
+        ),
+    ]
+    term_source_ref: Annotated[
+        str,
+        Field(description="Source reference name of ontology term. e.g., EFO, OBO."),
+    ]
 
 
 class OntologyTermPlaceholder(StudyBaseModel):
@@ -50,16 +85,13 @@ class OntologyTermPlaceholder(StudyBaseModel):
 class FieldSelector(StudyBaseModel):
     name: Annotated[
         str,
-        Field(
-            description="Linked field name. "
-            "e.g., Sample Name, Source Name, Protocol REF"
-        ),
+        Field(description="Node name. e.g., Sample Name, Source Name, Protocol REF"),
     ]
     value: Annotated[
         None | str,
         Field(
-            description="Value of the linked field. "
-            "e.g. Protocol REF with value 'Sample collection'"
+            description="Node value to match."
+            " e.g. Protocol REF with value 'Sample collection'"
         ),
     ]
 
@@ -72,42 +104,41 @@ class SelectionCriteria(StudyBaseModel):
     study_created_at_or_after: Annotated[
         None | datetime.datetime,
         Field(description="Filter to select studies created after the defined date."),
-    ]
+    ] = None
     study_created_before: Annotated[
         None | datetime.datetime,
         Field(description="Filter to select studies created before the defined date."),
-    ]
+    ] = None
     study_category_filter: Annotated[
         None | list[StudyCategoryStr],
         Field(description="Filter to select studies with the defined category"),
-    ]
+    ] = None
     template_version_filter: Annotated[
         None | list[str],
         Field(description="Filter to select studies with the defined template version"),
-    ]
+    ] = None
     isa_file_template_name_filter: Annotated[
         None | list[str],
         Field(
             description="Filter to select ISA-TAB file template. "
             "LC-MS, GC-MS, etc. for assay, minimum, clinical, etc. for sample"
         ),
-    ]
+    ] = None
     linked_field_and_value_filter: Annotated[
         None | list[FieldSelector],
         Field(
             description="Filter by linked field and its value. "
             "Current rule will be selected if the field "
-            "is an attribute of ISA-TAB node "
-            "(Sample Name, Source Name, Protocol REF)."
+            "is an attribute of ISA-TAB node (Sample Name, Source Name, Protocol REF)."
             "Characteristics can be linked to Sample Name or Source Name. "
             "Parameter Value can be linked to Protocol REF with value. "
             "e.g., {name: 'Protocol REF', 'value': 'Mass spectrometry'}, "
-            "Units can be linked to Parameter Value, "
-            "Factor Value and Characteristic fields."
+            "Units can be linked to Parameter Value, Factor Value "
+            "and Characteristic fields."
             "Comments can be linked to ISA-TAB nodes "
             "(Sample Name, Source Name, Protocol REF, etc.)"
         ),
-    ]
+    ] = None
 
 
 class AdditionalSource(StudyBaseModel):
@@ -139,15 +170,15 @@ class ParentOntologyTerms(StudyBaseModel):
     exclude_by_label_pattern: Annotated[
         None | list[str],
         Field(description="Label match regex patterns to filter ontology terms."),
-    ] = None
+    ] = []
     exclude_by_accession: Annotated[
         None | list[str],
         Field(description="Accession numbers of the excluded ontology terms."),
-    ] = None
+    ] = []
     parents: Annotated[
         list[OntologyTerm],
         Field(description="List of parent ontology terms"),
-    ]
+    ] = []
 
 
 class BaseOntologyValidation(StudyBaseModel):
@@ -175,18 +206,18 @@ class BaseOntologyValidation(StudyBaseModel):
     ] = None
 
 
-class OntologyValidation(BaseOntologyValidation):
+class FieldValueValidation(BaseOntologyValidation):
     allowed_missing_ontology_terms: Annotated[
         None | list[OntologyTerm], Field(description="Allowed missing ontology terms")
-    ]
+    ] = []
     allowed_other_sources: Annotated[
         None | list[AdditionalSource],
         Field(description="Allowed values from other non ontology sources."),
-    ]
+    ] = []
     allowed_placeholders: Annotated[
         None | list[OntologyTermPlaceholder],
         Field(description="Allowed placeholders for term source and accession"),
-    ]
+    ] = []
 
     terms: Annotated[
         None | list[OntologyTerm],
@@ -196,15 +227,12 @@ class OntologyValidation(BaseOntologyValidation):
             "it defines ordered allowed ontology terms, "
             "otherwise it lists ordered and recommended ontology terms."
         ),
-    ]
+    ] = []
 
     unexpected_terms: Annotated[
         None | list[str],
         Field(description="unexpected terms."),
-    ] = None
-
-
-class FieldValidationDefinition(OntologyValidation):
+    ] = []
     rule_name: Annotated[
         str,
         Field(
@@ -216,7 +244,7 @@ class FieldValidationDefinition(OntologyValidation):
     description: Annotated[
         str,
         Field(description="Definition of rule and summary of selection criteria."),
-    ]
+    ] = ""
     field_name: Annotated[
         str,
         Field(
@@ -227,12 +255,38 @@ class FieldValidationDefinition(OntologyValidation):
     selection_criteria: Annotated[
         SelectionCriteria, Field(description="Field selection criteria")
     ]
+    enforcement_level: Annotated[
+        EnforcementLevel, Field(description="Rule enforcement level")
+    ] = EnforcementLevel.REQUIRED
+
+    validation_type: Annotated[
+        OntologyValidationType, Field(description="Validation rule type")
+    ] = OntologyValidationType.ANY_ONTOLOGY_TERM
     constraints: Annotated[
         None | list[FieldConstraint], Field(description="Field constraints")
-    ] = None
+    ] = []
     default_value: Annotated[
         None | OntologyTerm, Field(description="Default ontology term")
-    ]
+    ] = None
+
+    ontologies: Annotated[
+        None | list[str],
+        Field(
+            description="Ordered ontology source references. "
+            "If validation type is ontology-term-in-selected-ontologies, "
+            "it defines ontology sources, "
+            "otherwise it lists recommended ontology sources."
+        ),
+    ] = []
+
+    allowed_parent_ontology_terms: Annotated[
+        None | ParentOntologyTerms,
+        Field(
+            description="Parent ontology terms to "
+            "find the allowed child ontology terms. "
+            "Applicable only for validation type child-ontology-term"
+        ),
+    ] = None
 
 
 class ColumnDescription(StudyBaseModel):
@@ -279,6 +333,63 @@ class IsaTableFileTemplate(StudyBaseModel):
     ]
 
 
+class ProtocolParameterDefinition(StudyBaseModel):
+    definition: Annotated[str, Field(description="Definition of protocol parameter.")]
+    type: Annotated[
+        OntologyTerm, Field(description="Ontology term of protocol parameter type")
+    ]
+    type_curie: Annotated[
+        str,
+        Field(
+            description="Compact URI presentation (obo_id) of protocol parameter type. "
+            "e.g. MS:1000831, OBI:0001139"
+        ),
+    ] = ""
+    format: Annotated[
+        Literal["Text", "Ontology", "Numeric"],
+        Field(description="value representation format"),
+    ]
+    examples: Annotated[
+        list[str], Field(description="Example protocol parameter values.")
+    ] = []
+
+
+class ProtocolDefinition(StudyBaseModel):
+    name: Annotated[str, Field(description="Name of protocol")]
+    description: Annotated[str, Field(description="Description of protocol")]
+    type: Annotated[OntologyTerm, Field(description="Ontology term of protocol type")]
+    type_curie: Annotated[
+        str, Field(description="Compact URI presentation (obo_id) of protocol type")
+    ] = ""
+    parameters: Annotated[list[str], Field(description="Parameters of protocol")] = []
+    parameter_definitions: Annotated[
+        dict[str, ProtocolParameterDefinition],
+        Field(
+            description="Definition of protocol parameter "
+            "listed in the `parameters` field",
+        ),
+    ] = {}
+
+
+class StudyProtocolTemplate(StudyBaseModel):
+    version: Annotated[str, Field(description="Template version")]
+    description: Annotated[str, Field(description="Template description")] = ""
+    protocols: Annotated[list[str], Field(description="Ordered protocol names")] = []
+    protocol_definitions: Annotated[
+        dict[str, ProtocolDefinition],
+        Field(description="Definition of protocol listed in the `protocols` field"),
+    ] = []
+
+
+class OntologySourceReferenceTemplate(StudyBaseModel):
+    source_name: Annotated[str, Field(description="Source name")]
+    source_file: Annotated[str, Field(description="Source file")]
+    source_version: Annotated[str, Field(description="Source version")]
+    source_description: Annotated[
+        str, Field(description="Source description and full name")
+    ]
+
+
 class FileTemplates(StudyBaseModel):
     assay_file_header_templates: Annotated[
         dict[str, list[IsaTableFileTemplate]],
@@ -292,11 +403,19 @@ class FileTemplates(StudyBaseModel):
         dict[str, list[IsaTableFileTemplate]],
         Field(description="maf file templates"),
     ] = {}
+    protocol_templates: Annotated[
+        dict[str, list[StudyProtocolTemplate]],
+        Field(description="Study protocol templates"),
+    ] = {}
+    ontology_source_reference_templates: Annotated[
+        dict[str, OntologySourceReferenceTemplate],
+        Field(description="Ontology source templates"),
+    ] = {}
 
 
 class ValidationControls(StudyBaseModel):
     assay_file_controls: Annotated[
-        dict[str, list[FieldValidationDefinition]],
+        dict[str, list[FieldValueValidation]],
         Field(
             description="Controls for assay file columns. "
             "Field value validations are ordered by precedence. "
@@ -305,7 +424,7 @@ class ValidationControls(StudyBaseModel):
         ),
     ] = {}
     sample_file_controls: Annotated[
-        dict[str, list[FieldValidationDefinition]],
+        dict[str, list[FieldValueValidation]],
         Field(
             description="Controls for sample file columns. "
             "Field value validations are ordered by precedence. "
@@ -314,7 +433,7 @@ class ValidationControls(StudyBaseModel):
         ),
     ] = {}
     investigation_file_controls: Annotated[
-        dict[str, list[FieldValidationDefinition]],
+        dict[str, list[FieldValueValidation]],
         Field(
             description="Controls for investigation file fields. "
             "Field value validations are ordered by precedence. "
@@ -325,5 +444,10 @@ class ValidationControls(StudyBaseModel):
 
 
 class ValidationConfiguration(StudyBaseModel):
-    controls: Annotated[ValidationControls, Field(description="File templates")]
-    templates: Annotated[FileTemplates, Field(description="File templates")]
+    controls: Annotated[
+        ValidationControls,
+        Field(description="Investigation, sample, assay validation controls"),
+    ] = ValidationControls()
+    templates: Annotated[
+        FileTemplates, Field(description="Investigation, sample, assay file templates")
+    ] = FileTemplates()

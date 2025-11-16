@@ -17,6 +17,10 @@ from mtbls.domain.domain_services.modifier.base_modifier import OntologyItem
 from mtbls.domain.domain_services.modifier.column_update_handler import (
     IsaTableColumnUpdateHandler,
 )
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 
 
 class IsaTableModifier(BaseIsaModifier):
@@ -24,8 +28,8 @@ class IsaTableModifier(BaseIsaModifier):
         self,
         model: MetabolightsStudyModel,
         isa_table_file: IsaTableFile,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
         max_row_number_limit: int = 10,
     ):
         super().__init__(model, templates, control_lists, isa_table_file.file_path)
@@ -100,13 +104,13 @@ class IsaTableModifier(BaseIsaModifier):
         return self.update_logs
 
     def update_ontology_columns(self):
-        technique = self._identify_assay_technique()
+        template_type = self._identify_template_type()
 
-        category = self._identify_template_category()
+        file_type = self._identify_file_type()
         structure = ColumnsStructure
         for header in self.isa_table_file.table.headers:
             if header.column_structure == structure.SINGLE_COLUMN:
-                self.update_single_column(technique, category, header)
+                self.update_single_column(template_type, file_type, header)
             elif header.column_structure in {
                 structure.ONTOLOGY_COLUMN,
                 structure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY,
@@ -115,7 +119,9 @@ class IsaTableModifier(BaseIsaModifier):
                     control_terms,
                     control_source_refs,
                     control_accessions,
-                ) = self._get_header_control_terms(header, technique, category)
+                ) = self._get_header_control_terms(header, template_type, file_type)
+                if not control_terms:
+                    continue
                 if header.column_structure == structure.ONTOLOGY_COLUMN:
                     term_column_index = header.column_index
                     term_source_ref_column_index = header.column_index + 1
@@ -144,25 +150,25 @@ class IsaTableModifier(BaseIsaModifier):
                     source_ref_lower = source_ref.lower()
                     accession_lower = accession.lower()
                     term_lower = term.lower()
-                    if control_terms:
-                        if source_ref and source_ref_lower in control_source_refs:
-                            current_source_ref = control_source_refs[source_ref_lower]
-                        if accession and accession_lower in control_accessions:
-                            current_accession = control_accessions[
-                                accession_lower
-                            ].term_accession_number
-                        if term in current_ontologies:
-                            onto = current_ontologies[term]
-                        elif term_lower in control_terms:
-                            key = term_lower
-                            if len(control_terms[key]) == 1:
-                                ontology = list(control_terms[key].values())
-                                onto = ontology[0] if ontology else None
-                            elif len(control_terms[key]) > 1:
-                                if source_ref_lower in control_terms[key]:
-                                    onto = control_terms[key][source_ref_lower]
-                            if onto:
-                                current_ontologies[term] = onto
+
+                    if source_ref and source_ref_lower in control_source_refs:
+                        current_source_ref = control_source_refs[source_ref_lower]
+                    if accession and accession_lower in control_accessions:
+                        current_accession = control_accessions[
+                            accession_lower
+                        ].term_accession_number
+                    if term in current_ontologies:
+                        onto = current_ontologies[term]
+                    elif term_lower in control_terms:
+                        key = term_lower
+                        if len(control_terms[key]) == 1:
+                            ontology = list(control_terms[key].values())
+                            onto = ontology[0] if ontology else None
+                        elif len(control_terms[key]) > 1:
+                            if source_ref_lower in control_terms[key]:
+                                onto = control_terms[key][source_ref_lower]
+                        if onto:
+                            current_ontologies[term] = onto
 
                     if term not in updated_rows:
                         updated_rows[term] = {}
@@ -258,18 +264,21 @@ class IsaTableModifier(BaseIsaModifier):
                                 )
 
     def _get_header_control_terms(
-        self, header: IsaTableColumn, technique: str, category: str
+        self, header: IsaTableColumn, technique: str, file_type: str
     ):
         structure = ColumnsStructure
-        terms = self.get_control_list_terms(category, header.column_header, technique)
+        rule, terms = self.get_related_rule(file_type, technique, header.column_header)
+        # terms = self.get_control_list_terms(category, header.column_header, technique)
 
         is_unit_column = (
             header.column_structure == structure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
         )
-        unit_terms = self.get_control_list_terms("unitColumns", "Unit", None)
+        _, unit_terms = self.get_related_rule(file_type, technique, "Unit")
+        # unit_terms = self.get_control_list_terms("unitColumns", "Unit", None)
         unit_term_sources: dict[str, str] = {}
         unit_term_accession_numbers: dict[str, str] = {}
-
+        unit_terms = unit_terms or {}
+        terms = terms or {}
         for x in unit_terms:
             unit_term_sources.update(
                 {
@@ -281,6 +290,8 @@ class IsaTableModifier(BaseIsaModifier):
                 {x.term_accession_number.lower(): x for x in unit_terms[x].values()}
             )
         control_terms = terms if not is_unit_column else unit_terms
+        if not control_terms:
+            return {}, {}, {}
 
         term_sources: dict[str, str] = {}
         term_accession_numbers: dict[str, OntologyAnnotation] = {}
@@ -308,37 +319,45 @@ class IsaTableModifier(BaseIsaModifier):
 
         return control_terms, control_source_refs, control_accessions
 
-    def _identify_template_category(self):
+    def _identify_file_type(self):
         category = ""
         if self.isa_table_file.file_path.startswith("a_"):
-            category = "assayColumns"
+            category = "assay"
         elif self.isa_table_file.file_path.startswith("s_"):
-            category = "sampleColumns"
+            category = "sample"
         return category
 
-    def _identify_assay_technique(self):
-        technique = None
-        if self.isa_table_file.file_path in self.model.assays:
-            technique = self.model.assays[
-                self.isa_table_file.file_path
-            ].assay_technique.name
-        elif self.isa_table_file.file_path in self.model.metabolite_assignments:
-            technique = self.model.metabolite_assignments[
-                self.isa_table_file.file_path
-            ].assay_technique.name
+    def _identify_template_type(self):
+        file_type = self._identify_file_type()
+        if file_type == "assay":
+            technique = None
+            if self.isa_table_file.file_path in self.model.assays:
+                technique = self.model.assays[
+                    self.isa_table_file.file_path
+                ].assay_technique.name
+            elif self.isa_table_file.file_path in self.model.metabolite_assignments:
+                technique = self.model.metabolite_assignments[
+                    self.isa_table_file.file_path
+                ].assay_technique.name
 
-        return technique
+            return technique
+        elif file_type == "sample":
+            return self.model.study_db_metadata.sample_template
+        return ""
 
     def update_single_column(
         self,
-        technique: str,
-        category: str,
+        template_type: str,
+        file_type: str,
         header: IsaTableColumn,
     ):
-        control_terms = self.get_control_list_terms(
-            category, header.column_header, technique
+        # control_terms = self.get_control_list_terms(
+        #     category, header.column_header, technique
+        # )
+        rule, control_lists = self.get_related_rule(
+            file_type, template_type, header.column_header
         )
-        if not control_terms:
+        if not control_lists:
             return
         term_column_name = header.column_name
         current_ontologies: dict[str, OntologyAnnotation] = {}
@@ -350,8 +369,10 @@ class IsaTableModifier(BaseIsaModifier):
                 onto = current_ontologies[term]
             else:
                 key = term.lower()
-                if key in control_terms and control_terms[key]:
-                    onto: OntologyAnnotation = list(control_terms[key].values())[0]
+                controls = list(control_lists.get(key, {}).values())
+                if controls:
+                    onto: OntologyAnnotation = controls[0]
+                if onto:
                     current_ontologies[key] = onto
             if onto:
                 if onto.term != term:

@@ -14,12 +14,13 @@ dependencies = [
     "pyyaml>=6.0.2",
     "jsonpath-ng>=1.7.0,<2",
     "ujson>=5.10.0,<6",
-    "aiocache>=0.12.2",
     "aiofiles>=23.2.1",
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
     "python-multipart>=0.0.9",
     "metabolights-utils>=1.4.11,<2",
+    "cachetools>=6.2.2",
+    "cachetools-async>=0.0.5",
 ]
 
 [project.optional-dependencies]

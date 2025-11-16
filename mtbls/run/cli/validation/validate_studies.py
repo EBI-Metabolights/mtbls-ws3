@@ -89,9 +89,6 @@ def run_validation_cli(
         click.echo("Configuration error")
         exit(1)
     container.init_resources()
-    # render secrets in config file
-
-    # container.wire(packages=[mtbls.__name__])
     policy_service: PolicyService = container.services.policy_service()
 
     study_read_repository: StudyReadRepository = (
@@ -127,6 +124,90 @@ def run_validation_cli(
     )
 
 
+@click.command(name="create-model")
+@click.argument("studies_root_path")
+@click.argument("resource_id")
+@click.argument("target_path")
+def create_study_model_task(
+    studies_root_path: str,
+    resource_id: str,
+    target_path: str,
+    config_file: Union[None, str] = None,
+    secrets_file: Union[None, str] = None,
+):
+    container: MtblsCliApplicationContainer = MtblsCliApplicationContainer()
+    success = set_application_configuration(container, config_file, secrets_file)
+    if not success:
+        click.echo("Configuration error")
+        exit(1)
+    container.init_resources()
+    # render secrets in config file
+
+    study_read_repository: StudyReadRepository = (
+        container.repositories.study_read_repository()
+    )
+    internal_files_object_repository: FileObjectReadRepository = (
+        container.repositories.internal_files_object_repository()
+    )
+    user_read_repository: UserReadRepository = (
+        container.repositories.user_read_repository()
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("CLI container started")
+    request_tracker = get_request_tracker()
+    request_tracker.update_request_tracker(
+        RequestTrackerModel(
+            user_id=0,
+            route_path="cli/create-model",
+            resource_id="",
+            client="local",
+            request_id=str(uuid.uuid4()),
+            task_id="",
+        )
+    )
+
+    asyncio.run(
+        create_model(
+            studies_root_path=Path(studies_root_path),
+            resource_id=resource_id,
+            target_path=Path(target_path),
+            study_read_repository=study_read_repository,
+            internal_files_object_repository=internal_files_object_repository,
+            user_read_repository=user_read_repository,
+        )
+    )
+
+
+async def create_model(
+    studies_root_path: Path,
+    resource_id: str,
+    target_path: Path,
+    study_read_repository: StudyReadRepository,
+    user_read_repository: UserReadRepository,
+    internal_files_object_repository: FileObjectReadRepository,
+):
+    provider = DataFileIndexMetabolightsStudyProvider(
+        resource_id=resource_id,
+        data_file_index_file_key="DATA_FILES/data_file_index.json",
+        internal_files_object_repository=internal_files_object_repository,
+        study_read_repository=study_read_repository,
+        user_read_repository=user_read_repository,
+    )
+    study_path = studies_root_path / Path(resource_id)
+    model = await provider.load_study(
+        study_id=resource_id,
+        study_path=str(study_path),
+        connection=provider.db_metadata_collector,
+        load_sample_file=True,
+        load_assay_files=True,
+        load_maf_files=True,
+        load_folder_metadata=True,
+    )
+
+    with target_path.open("w") as f:
+        f.write(model.model_dump_json(indent=4, by_alias=True))
+
+
 async def run_validation_and_save_report(
     validation_reports_root_path: Path,
     studies_root_path: Path,
@@ -137,7 +218,7 @@ async def run_validation_and_save_report(
     internal_files_object_repository: FileObjectReadRepository,
 ) -> PolicySummaryResult:
     logger = logging.getLogger(__name__)
-    resource_id = "REQ202507083000065"
+    resource_id = "MTBLS1"
     study = await study_read_repository.get_study_by_accession(resource_id)
     resource_ids = [(study.accession_number, study.release_date, study.status)]
     # resource_ids = await study_read_repository.select_fields(
@@ -156,10 +237,6 @@ async def run_validation_and_save_report(
         user_read_repository=user_read_repository,
     )
 
-    # selected_resource_ids = [x for x in resource_ids.data if x[0] in selection]
-    # selected_resource_ids.sort(
-    #   key=lambda x: int(x[0].removeprefix("MTBLS").removeprefix("REQ")), reverse=True
-    # )
     with summary_file.open("w") as fw:
         for resource_id, release_date, status in resource_ids:
             release_date_str = release_date.strftime("%Y-%m-%d %H-%M-%S")
@@ -354,5 +431,6 @@ async def modify_model(
 
 
 if __name__ == "__main__":
-    study_root_path = "/nfs/public/rw/metabolomics/test/data/studies/metadata-files"
-    run_validation_cli([study_root_path])
+    study_root_path = "/nfs/public/rw/metabolomics/prod/data/studies/metadata-files"
+    # run_validation_cli([study_root_path])
+    create_study_model_task([study_root_path, "MTBLS1", "MTBLS1_base.json"])

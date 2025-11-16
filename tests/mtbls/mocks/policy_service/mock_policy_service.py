@@ -6,6 +6,10 @@ from typing import Any, Union
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.application.services.interfaces.policy_service import PolicyService
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.validator.policy import ValidationResult
 from mtbls.domain.shared.validator.validation import Validation, VersionedValidationsMap
 
@@ -29,9 +33,14 @@ class MockPolicyService(PolicyService):
                 },
             )
         with Path("tests/mtbls/mocks/policy_service/templates.json").open() as f:
-            self.templates = json.load(f)
+            self.templates = FileTemplates.model_validate(
+                json.load(f)["result"], by_alias=True
+            )
         with Path("tests/mtbls/mocks/policy_service/control_lists.json").open() as f:
-            self.control_lists = json.load(f)
+            self.control_lists = ValidationControls.model_validate(
+                json.load(f)["result"], by_alias=True
+            )
+
         self.validation_result = ValidationResult()
 
     async def set_result(self, validation_result: ValidationResult):
@@ -40,13 +49,13 @@ class MockPolicyService(PolicyService):
     async def get_service_url(self):
         return "localhost"
 
-    async def get_templates(self) -> dict[str, Any]:
+    async def get_templates(self) -> FileTemplates:
         return self.templates
 
     async def get_rule_definitions(self) -> dict[str, Any]:
         return self.rule_definitions
 
-    async def get_control_lists(self) -> dict[str, Any]:
+    async def get_control_lists(self) -> None | ValidationControls:
         return self.control_lists
 
     async def get_supported_validation_versions(self) -> list[str]:

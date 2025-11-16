@@ -110,7 +110,7 @@ class TestUpdateOntologyColumns:
         sample_table.data["Term Accession Number"][0] = ""
         sample_modifier.update_ontology_columns()
         assert sample_table.data["Characteristics[Organism]"][0] == "Homo sapiens"
-        assert sample_table.data["Term Source REF"][0] == "NCBITaxon"
+        assert sample_table.data["Term Source REF"][0] == "NCBITAXON"
         assert (
             sample_table.data["Term Accession Number"][0]
             == "http://purl.obolibrary.org/obo/NCBITaxon_9606"
@@ -131,7 +131,7 @@ class TestUpdateOntologyColumns:
         )
         sample_modifier.update_ontology_columns()
         assert sample_table.data["Characteristics[Organism]"][0] == "Homo sapiens"
-        assert sample_table.data["Term Source REF"][0] == "NCBITaxon"
+        assert sample_table.data["Term Source REF"][0] == "NCBITAXON"
         assert (
             sample_table.data["Term Accession Number"][0]
             == "http://purl.obolibrary.org/obo/NCBITaxon_9606"

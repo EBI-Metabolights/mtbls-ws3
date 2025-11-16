@@ -1,8 +1,8 @@
 from fastapi.openapi.models import Example
 
-from mtbls.domain.entities.ontology.ontology_term import OntologyTerm
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
+    OntologyTerm,
     OntologyValidationType,
     ParentOntologyTerms,
 )

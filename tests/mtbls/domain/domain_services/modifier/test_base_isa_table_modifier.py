@@ -35,7 +35,7 @@ class TestUpdateSingleColumn:
     @pytest.mark.asyncio
     async def test_update_single_column_01(self, modifier: AssayFileModifier):
         technique = "LC-MS"
-        category = "assayColumns"
+        category = "assay"
         file_name = modifier.isa_table_file.file_path
         table_file = modifier.model.assays[file_name]
         column_header = "Parameter Value[Scan polarity]"
@@ -47,7 +47,7 @@ class TestUpdateSingleColumn:
         table_file.table.data[header.column_name][0] = "POSITIVE"
         table_file.table.data[header.column_name][1] = "NEGATIVE"
         modifier.update_single_column(
-            technique=technique, category=category, header=header
+            template_type=technique, file_type=category, header=header
         )
         assert table_file.table.data[header.column_name][0] == "positive"
         assert table_file.table.data[header.column_name][1] == "negative"

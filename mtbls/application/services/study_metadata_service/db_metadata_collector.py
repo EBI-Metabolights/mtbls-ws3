@@ -87,6 +87,8 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 sample_template=study.sample_type or "",
                 template_version=study.template_version or "",
                 reserved_mhd_accession=study.mhd_accession or "",
+                reserved_accession=study.reserved_accession or "",
+                reserved_submission_id=study.reserved_submission_id or "",
                 mhd_model_version=study.mhd_model_version or "",
                 dataset_license=study.dataset_license or "",
                 dataset_license_version=study.dataset_license_version or "",

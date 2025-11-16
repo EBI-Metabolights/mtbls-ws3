@@ -1,6 +1,7 @@
 from logging import getLogger
 
-from aiocache import cached
+from cachetools import TTLCache
+from cachetools_async import cached
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter
 from fastapi.openapi import docs
@@ -23,7 +24,7 @@ server_config: ApiServerConfiguration = None
 
 
 @router.get("/version", response_model=APIResponse[Version], tags=["About API"])
-@cached(ttl=600)
+@cached(cache=TTLCache(maxsize=1, ttl=600))
 async def get_version_info():
     return default_response
 

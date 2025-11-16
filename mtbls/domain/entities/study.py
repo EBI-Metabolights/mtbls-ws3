@@ -30,6 +30,8 @@ class StudyInput(BaseStudy):
     dataset_license: Union[None, str] = None
     dataset_license_version: Union[None, str] = None
     dataset_license_agreeing_user: Union[None, str] = None
+    reserved_accession: Union[None, str] = None
+    reserved_submission_id: Union[None, str] = None
     first_public_date: Union[None, datetime.datetime] = None
     first_private_date: Union[None, datetime.datetime] = None
     revision_number: int = 0

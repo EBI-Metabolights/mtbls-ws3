@@ -1,10 +1,11 @@
 import abc
+import datetime
 import logging
 import re
 from abc import abstractmethod
-from functools import lru_cache
-from typing import Any, Literal, Union
+from typing import Literal, Union
 
+from cachetools import TTLCache, cached
 from metabolights_utils.models.isa.assay_file import AssayFile
 from metabolights_utils.models.isa.investigation_file import (
     OntologyAnnotation,
@@ -14,7 +15,12 @@ from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.domain.domain_services.modifier.base_modifier import (
     BaseModifier,
-    OntologyItem,
+)
+from mtbls.domain.entities.validation.validation_configuration import (
+    FieldValueValidation,
+    FileTemplates,
+    StudyProtocolTemplate,
+    ValidationControls,
 )
 from mtbls.domain.shared.modifier import UpdateLog
 
@@ -34,18 +40,127 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
     def __init__(
         self,
         model: MetabolightsStudyModel,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
         file_path: str,
     ):
         self.model = model
         self.templates = templates
-        self.control_lists = control_lists
+        self.control_lists: ValidationControls = control_lists
         self._term_cache = {}
         self.protocol_parameters: dict[str, dict[str, list[str]]] = {}
         self.protocol_parameters_cache: dict[str, list[str]] = {}
         self.update_logs: list[UpdateLog] = []
         self.file_path = file_path
+
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    def get_related_rule(
+        self,
+        file_type: Literal["investigation", "sample", "assay"],
+        file_template_name: str,
+        rule_key: str,
+    ) -> tuple[None | FieldValueValidation, None | dict[str, OntologyAnnotation]]:
+        if not self.model:
+            logger.warning("Model is not valid")
+            return None, None
+        if not self.control_lists:
+            if self.model.investigation.studies[0].identifier:
+                logger.warning(
+                    "Control list is not valid: %s",
+                    self.model.investigation.studies[0].identifier,
+                )
+            else:
+                logger.warning("Control list is not valid")
+            return None, None
+        if not hasattr(self.control_lists, file_type + "_file_controls"):
+            return None, None
+        rules_dict: dict[str, list[FieldValueValidation]] = getattr(
+            self.control_lists, file_type + "_file_controls"
+        )
+        rules = rules_dict.get(rule_key, None)
+
+        if not rules:
+            return None, None
+        version = self.model.study_db_metadata.template_version
+        study_category = self.model.study_db_metadata.study_category
+        category = study_category.name.lower() if study_category is not None else ""
+        study_created = ""
+        if len(self.model.study_db_metadata.reserved_submission_id) > 12:
+            study_created = self.model.study_db_metadata.reserved_submission_id[3:11]
+        if not version or not category or not study_created:
+            logger.warning(
+                "Template version '%s', study category '%s' or study created '%s'"
+                "values are not set properly",
+                version,
+                category,
+                study_created,
+            )
+            return None, None
+        for rule in rules:
+            if not rule.selection_criteria:
+                continue
+            criteria = rule.selection_criteria
+            template_filter = criteria.isa_file_template_name_filter
+            created_at_or_after = criteria.study_created_at_or_after
+            result = all(
+                [
+                    self.check_match(criteria.isa_file_type, file_type),
+                    self.check_match(criteria.study_category_filter, category),
+                    self.check_match(template_filter, file_template_name),
+                    self.check_match(criteria.template_version_filter, version),
+                    self.check_equal_or_greater(created_at_or_after, study_created),
+                    self.check_less(criteria.study_created_before, study_created),
+                ]
+            )
+            if result:
+                control_terms: dict[str, dict[str, OntologyAnnotation]] = {}
+                if rule.terms:
+                    for term in rule.terms:
+                        item = OntologyAnnotation.model_validate(
+                            term, from_attributes=True
+                        )
+                        key = term.term.lower()
+                        second_key = term.term_source_ref.lower()
+                        if key not in control_terms:
+                            control_terms[key] = {}
+                        if second_key not in control_terms[key]:
+                            control_terms[key][second_key] = item
+                return rule, control_terms
+        return None, None
+
+    def check_match(self, criterion: None | str | list[str], value: str):
+        if criterion is None:
+            return True
+        if isinstance(criterion, str):
+            return criterion == value
+
+        if isinstance(criterion, list):
+            return any([True for x in criterion if x == value])
+
+        return False
+
+    def check_equal_or_greater(self, criterion: None | str | list[str], value: str):
+        if criterion is None:
+            return True
+        if isinstance(criterion, str):
+            return criterion <= value
+
+        if isinstance(criterion, list):
+            return any([True for x in criterion if x <= value])
+
+        return False
+
+    def check_less(self, criterion: None | str | list[str], value: str):
+        if criterion is None:
+            return True
+        if isinstance(criterion, str):
+            return criterion > value
+        if isinstance(criterion, datetime.datetime):
+            return criterion.isoformat() > value
+        if isinstance(criterion, list):
+            return any([True for x in criterion if x > value])
+
+        return False
 
     def modifier_update(
         self,
@@ -100,66 +215,26 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                 new_value=source_str[0],
             )
 
-    @lru_cache(1)
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_control_list_terms(
         self,
-        category: Union[
+        file_type: Union[
             None,
-            Literal[
-                "sampleColumns", "investigationFile", "unitColumns", "assayColumns"
-            ],
+            Literal["sample", "investigation", "assay"],
         ],
         parameter: str,
         technique_name: Union[None, str] = None,
     ):
-        key = f"{category}:{parameter}:{technique_name}"
+        key = f"{file_type}:{parameter}:{technique_name}"
         if key in self._term_cache:
             return self._term_cache[key]
-        simple_control_list = category in (
-            "sampleColumns",
-            "investigationFile",
-            "unitColumns",
-        )
-        configuration = self.control_lists
-        control_terms: dict[str, dict[str, OntologyAnnotation]] = {}
-        ontology_items = []
-        if simple_control_list:
-            if (
-                category in configuration
-                and parameter in configuration[category]
-                and "terms" in configuration[category][parameter]
-                and configuration[category][parameter]["terms"]
-            ):
-                terms = configuration[category][parameter]["terms"]
-                ontology_items = [
-                    OntologyItem.model_validate(x, from_attributes=True) for x in terms
-                ]
 
-        elif (
-            category in configuration
-            and parameter in configuration[category]
-            and "controlList" in configuration[category][parameter]
-            and configuration[category][parameter]["controlList"]
-        ):
-            control_lists = configuration[category][parameter]["controlList"]
-            for item in control_lists:
-                if "techniques" in item and technique_name in item["techniques"]:
-                    if "values" in item and item["values"]:
-                        ontology_items = [
-                            OntologyItem.model_validate(x, from_attributes=True)
-                            for x in item["values"]
-                        ]
-                    break
-        for item in ontology_items:
-            key = item.term.lower()
-            if key not in control_terms:
-                control_terms[key] = {}
-                second_key = item.term_source_ref.lower()
-                if item.term_source_ref not in control_terms[key]:
-                    control_terms[key][second_key] = {}
-                control_terms[key][second_key] = item
-        self._term_cache[key] = control_terms
-        return control_terms
+        rule, control_terms = self.get_related_rule(
+            file_type=file_type, file_template_name=technique_name, rule_key=parameter
+        )
+
+        self._term_cache[key] = control_terms or {}
+        return self._term_cache[key]
 
     def get_protocol_parameters(self, techniques: set[str]) -> dict[str, list[str]]:
         if not techniques:
@@ -174,50 +249,54 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
         self.protocol_parameters[key] = ordered_protocol_params
         for technique_name in techniques_list:
             result = self.get_protocol_template(technique_name)
-            if result:
-                for protocol in result:
-                    name = ""
-                    if "name" in protocol and protocol["name"]:
-                        name = protocol["name"]
-                        if name not in ordered_protocol_params:
-                            ordered_protocol_params[name] = []
-                    if name and "parameters" in protocol and protocol["parameters"]:
-                        params = protocol["parameters"]
-                        for item in params:
-                            if item not in ordered_protocol_params[name]:
-                                ordered_protocol_params[name].append(item)
+            if not result:
+                continue
+            for protocol in result.protocols:
+                protocol_def = result.protocol_definitions.get(protocol)
+                if not protocol_def:
+                    continue
+                if protocol not in ordered_protocol_params:
+                    ordered_protocol_params[protocol] = []
+                for param in protocol_def.parameters:
+                    if param not in ordered_protocol_params[protocol]:
+                        ordered_protocol_params[protocol].append(param)
+
         if not self.protocol_parameters[key]:
             del self.protocol_parameters[key]
             return {}
         return self.protocol_parameters[key]
 
-    def get_protocol_template(self, technique_name: str) -> list[dict[str, Any]]:
+    def get_protocol_template(
+        self, technique_name: str
+    ) -> None | StudyProtocolTemplate:
         if (
             not technique_name
             or not self.templates
-            or "studyProtocolTemplates" not in self.templates
+            or not self.templates.protocol_templates
         ):
-            return []
-        templates = {
-            x: self.templates["studyProtocolTemplates"][x]
-            for x in self.templates["studyProtocolTemplates"]
-        }
-        if technique_name in templates and "protocols" in templates[technique_name]:
-            return templates[technique_name]["protocols"]
-        return []
+            logger.warning("Protocol template is not defined for %s", technique_name)
+            return None
+
+        version = self.model.study_db_metadata.template_version
+        templates = self.templates.protocol_templates.get(technique_name, [])
+        filtered = [x for x in templates if x.version == version]
+        return filtered[0] if filtered else None
 
     def get_ordered_protocol_names(self, technique_name: str) -> list[str]:
         if not technique_name:
             return []
         ordered_protocol_names: list[str] = []
         result = self.get_protocol_template(technique_name)
-        if result:
-            for protocol in result:
-                name = ""
-                if "name" in protocol and protocol["name"]:
-                    name = protocol["name"]
-                    if name not in ordered_protocol_names:
-                        ordered_protocol_names.append(name)
+        if not result:
+            return ordered_protocol_names
+
+        for protocol in result.protocols:
+            protocol_def = result.protocol_definitions.get(protocol)
+            if not protocol_def:
+                continue
+            if protocol not in ordered_protocol_names:
+                ordered_protocol_names.append(protocol)
+
         return ordered_protocol_names
 
     def get_protocol_parameters_in_assay(
@@ -300,9 +379,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
     def get_term_by_accession_number(
         self,
         accession_number: str,
-        category: Literal[
-            "sampleColumns", "investigationFile", "unitColumns", "assayColumns"
-        ],
+        category: Literal["sample", "investigation", "assay"],
         parameter: str,
         technique_name: Union[None, str] = None,
     ):

@@ -1,14 +1,19 @@
-import datetime
 import logging
 from typing import Any, Union
 
 import jsonschema
+from cachetools import TTLCache
+from cachetools_async import cached
 from metabolights_utils.models.metabolights import get_study_model_schema
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.domain.entities.http_response import HttpResponse
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.shared.validator.policy import PolicyInput, ValidationResult
 from mtbls.domain.shared.validator.validation import Validation, VersionedValidationsMap
@@ -29,61 +34,66 @@ class OpaPolicyService(PolicyService):
         self.config = config
         if isinstance(self.config, dict):
             self.config = OpaConfiguration.model_validate(config)
-        self.control_lists_last_update_time: float = 0.0
-        self.templates_last_update_time: float = 0.0
-        self.version_update_time: float = 0.0
-        self.rule_definitions_update_time: float = 0.0
-        self.max_polling_in_seconds = max_polling_in_seconds
         self.versions: list[str] = []
         self.rule_definitions: dict[str, Validation] = {}
+        self.control_lists: None | ValidationControls = None
+        self.templates: None | dict[str, Any] = None
 
     async def get_service_url(self):
         return self.config.validation_url
 
-    async def get_templates(self) -> dict[str, Any]:
-        now = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        if now - self.templates_last_update_time > self.max_polling_in_seconds:
-            self.templates = await self.get_http_response(
-                self.config.templates_url, "result"
-            )
-            self.templates_last_update_time = now
+    @cached(cache=TTLCache(maxsize=10, ttl=60))
+    async def get_templates(self) -> None | FileTemplates:
+        try:
+            result = await self.get_http_response(self.config.templates_url, "result")
+            try:
+                self.control_lists = FileTemplates.model_validate(result, by_alias=True)
+            except Exception as ex:
+                logger.error("Validation templates conversion error: %s", ex)
+                return None
+
+        except Exception as ex:
+            logger.warning("Validation templates fetch error: %s", ex)
+            return None
         return self.templates
 
+    @cached(cache=TTLCache(maxsize=10, ttl=60))
     async def get_rule_definitions(self) -> dict[str, Any]:
-        now = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        if now - self.rule_definitions_update_time > self.max_polling_in_seconds:
-            rules = await self.get_http_response(
-                self.config.rule_definitions_url, "result"
-            )
-            self.rule_definitions_update_time = now
-            validations_map = VersionedValidationsMap(
-                validation_version=rules["validation_version"],
-                validations={
-                    x["rule_id"]: Validation.model_validate(x)
-                    for x in rules["violations"]
-                },
-            )
-            self.rule_definitions = validations_map
-
+        rules = await self.get_http_response(self.config.rule_definitions_url, "result")
+        validations_map = VersionedValidationsMap(
+            validation_version=rules["validation_version"],
+            validations={
+                x["rule_id"]: Validation.model_validate(x) for x in rules["violations"]
+            },
+        )
+        self.rule_definitions = validations_map
         return self.rule_definitions
 
-    async def get_control_lists(self) -> dict[str, Any]:
-        now = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        if now - self.control_lists_last_update_time > self.max_polling_in_seconds:
-            self.control_lists = await self.get_http_response(
+    @cached(cache=TTLCache(maxsize=10, ttl=60))
+    async def get_control_lists(self) -> None | ValidationControls:
+        try:
+            result = await self.get_http_response(
                 self.config.control_lists_url, "result"
             )
-            self.control_lists_last_update_time = now
+            try:
+                self.control_lists = ValidationControls.model_validate(
+                    result, by_alias=True
+                )
+            except Exception as ex:
+                logger.error("Validation control list conversion error: %s", ex)
+                return None
+
+        except Exception as ex:
+            logger.warning("Validation control list fetch error: %s", ex)
+            return None
         return self.control_lists
 
+    @cached(cache=TTLCache(maxsize=10, ttl=60))
     async def get_supported_validation_versions(self) -> list[str]:
-        now = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        if now - self.version_update_time > self.max_polling_in_seconds:
-            versions_result = await self.get_http_response(
-                self.config.version_url, "result"
-            )
-            self.versions = [versions_result]
-            self.version_update_time = now
+        versions_result = await self.get_http_response(
+            self.config.version_url, "result"
+        )
+        self.versions = [versions_result]
         return self.versions
 
     async def validate_study(
