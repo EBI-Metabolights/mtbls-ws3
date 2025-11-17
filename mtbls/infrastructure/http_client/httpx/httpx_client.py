@@ -43,6 +43,12 @@ class HttpxClient(HttpClient):
                 timeout=timeout,
                 json=json,
             )
+            if response.status_code == 404:
+                return HttpResponse(
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    json_data={},
+                )
             if raise_error_for_status:
                 response.raise_for_status()
             try:
