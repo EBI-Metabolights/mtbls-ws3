@@ -83,10 +83,13 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
             return None, None
         version = self.model.study_db_metadata.template_version
         study_category = self.model.study_db_metadata.study_category
-        category = study_category.name.lower() if study_category is not None else ""
-        study_created = ""
-        if len(self.model.study_db_metadata.reserved_submission_id) > 12:
-            study_created = self.model.study_db_metadata.reserved_submission_id[3:11]
+        category = (
+            study_category.name.lower().replace("_", "-")
+            if study_category is not None
+            else ""
+        )
+        study_created = self.model.study_db_metadata.created_at or ""
+
         if not version or not category or not study_created:
             logger.warning(
                 "Template version '%s', study category '%s' or study created '%s'"

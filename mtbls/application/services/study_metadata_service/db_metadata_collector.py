@@ -102,6 +102,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 revision_date=study.revision_datetime.isoformat()
                 if study.revision_datetime
                 else "",
+                created_at=study.created_at.isoformat() if study.created_at else "",
             )
             submitters: list[
                 UserOutput

@@ -100,7 +100,7 @@ class SelectionCriteria(StudyBaseModel):
     isa_file_type: Annotated[
         IsaTabFileType,
         Field(description="ISA-TAB file type."),
-    ]
+    ] = None
     study_created_at_or_after: Annotated[
         None | datetime.datetime,
         Field(description="Filter to select studies created after the defined date."),

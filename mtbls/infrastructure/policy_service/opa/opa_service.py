@@ -48,6 +48,10 @@ class OpaPolicyService(PolicyService):
             result = await self.get_http_response(self.config.templates_url, "result")
             try:
                 self.control_lists = FileTemplates.model_validate(result, by_alias=True)
+                logger.debug(
+                    "Templates are fetched from remote service: %s",
+                    self.config.templates_url,
+                )
             except Exception as ex:
                 logger.error("Validation templates conversion error: %s", ex)
                 return None
@@ -59,14 +63,31 @@ class OpaPolicyService(PolicyService):
 
     @cached(cache=TTLCache(maxsize=10, ttl=60))
     async def get_rule_definitions(self) -> dict[str, Any]:
-        rules = await self.get_http_response(self.config.rule_definitions_url, "result")
-        validations_map = VersionedValidationsMap(
-            validation_version=rules["validation_version"],
-            validations={
-                x["rule_id"]: Validation.model_validate(x) for x in rules["violations"]
-            },
-        )
-        self.rule_definitions = validations_map
+        try:
+            result = await self.get_http_response(
+                self.config.rule_definitions_url, "result"
+            )
+            try:
+                rules = FileTemplates.model_validate(result, by_alias=True)
+                validations_map = VersionedValidationsMap(
+                    validation_version=rules["validation_version"],
+                    validations={
+                        x["rule_id"]: Validation.model_validate(x)
+                        for x in rules["violations"]
+                    },
+                )
+                self.rule_definitions = validations_map
+                logger.debug(
+                    "Validation rules are fetched from remote service: %s",
+                    self.config.rule_definitions_url,
+                )
+            except Exception as ex:
+                logger.error("Validation rules conversion error: %s", ex)
+                return None
+
+        except Exception as ex:
+            logger.warning("Validation rules fetch error: %s", ex)
+            return None
         return self.rule_definitions
 
     @cached(cache=TTLCache(maxsize=10, ttl=60))
@@ -78,6 +99,10 @@ class OpaPolicyService(PolicyService):
             try:
                 self.control_lists = ValidationControls.model_validate(
                     result, by_alias=True
+                )
+                logger.debug(
+                    "Control lists are fetched from remote service: %s",
+                    self.config.control_lists_url,
                 )
             except Exception as ex:
                 logger.error("Validation control list conversion error: %s", ex)
