@@ -26,7 +26,6 @@ async def search_study_index(
     elasticsearch_study_search_service = Depends(
         Provide["gateways.elasticsearch_study_gateway"]
     ),
-
 ):
     if not q:
         response.status_code = status.HTTP_400_BAD_REQUEST

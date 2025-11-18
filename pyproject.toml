@@ -189,6 +189,7 @@ modules = [
    "mtbls.infrastructure.caching.redis_sentinel",
    "mtbls.infrastructure.pub_sub.celery",
    "mtbls.infrastructure.pub_sub.threading",
+   "mtbls.infrastructure.search.es"
 ]
 
 ignore_imports = [
