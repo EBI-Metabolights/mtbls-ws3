@@ -4,12 +4,12 @@ from typing import Any, Dict, List, Optional
 
 from elasticsearch import ApiError, AsyncElasticsearch
 from pydantic import BaseModel, Field
-from mtbls.application.services.interfaces.search_port import SearchPort
 
 class ElasticsearchClientConfig(BaseModel):
-    hosts: List[str] = Field(default_factory=list, description="List of Elasticsearch host URLs")
+    hosts: List[str] | str = Field(default_factory=list, description="List of Elasticsearch host URLs")
     api_key: Optional[str] = Field(None, description="API key for Elasticsearch authentication")    
-    request_timeout: float = Field(5.0, description="Request timeout in seconds")
+    request_timeout: Optional[float] = Field(5.0, description="Request timeout in seconds")
+    verify_certs: bool = Field(default=True, description="Verify SSL certificates for HTTPS connections")
     
     
 class ElasticsearchClient:
@@ -24,6 +24,7 @@ class ElasticsearchClient:
     async def start(self) -> None:
         if self._es is not None:
             return  # Already started
+        print(f"current hosts value: {self._config.hosts}  ")
         self._es = AsyncElasticsearch(
             hosts=self._config.hosts or None,
             api_key=self._config.api_key,

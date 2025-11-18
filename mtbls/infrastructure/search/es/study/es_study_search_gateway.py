@@ -23,13 +23,17 @@ class ElasticsearchStudyGateway(SearchPort):
         elif isinstance(self._config, dict):
             self._config = StudyElasticSearchConfiguration.model_validate(config)
         super().__init__()
+
+    @property
+    def config(self) -> StudyElasticSearchConfiguration:
+        return self._config
         
     async def search(
         self, 
         query: IndexSearchInput 
         ) -> IndexSearchResult:
         dsl = self._build_search_payload(query)
-        es_resp = self._client.search(
+        es_resp = await self._client.search(
             index=self.config.index_name,
             body=dsl
         )
@@ -52,10 +56,22 @@ class ElasticsearchStudyGateway(SearchPort):
         must_not: List[Dict[str, Any]] = []
         if req.query:
             must.append({
-                "multi_match": {
-                    "query": req.query,
-                    "fields": list(self.config.search_fields),
-                    "operator": "and"
+                "bool": {
+                    "should": [
+                        {
+                            "multi_match": {
+                                "query": req.query,
+                                "fields": list(self.config.search_fields),
+                                "operator": "and"
+                            }
+                        },
+                        # prefix match (fast)
+                        *[
+                            {"prefix": {field: req.query.lower()}}
+                            for field in self.config.search_fields
+                        ]
+                    ],
+                    "minimum_should_match": 1
                 }
             })
 
@@ -104,7 +120,7 @@ class ElasticsearchStudyGateway(SearchPort):
             dsl["aggs"] = aggs
 
         if self.config.source_includes:
-            dsl["_source"] = {"includes": list(self.config.source_includes)}
+            dsl["_source"] = {"includes": list(self._config.source_includes)}
 
         dsl.setdefault("timeout", "3s")
 

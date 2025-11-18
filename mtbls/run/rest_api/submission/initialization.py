@@ -198,6 +198,7 @@ async def init_elasticsearch_client(elasticsearch_client: ElasticsearchClient):
     if not elasticsearch_client:
         logger.info("Elasticsearch client is not initialized.")
         return
+    await elasticsearch_client.start()
     elasticsearch_client_name = get_service_name(elasticsearch_client)
     logger.info("Elasticsearch client initialized: %s", elasticsearch_client_name)
     logger.info("Elasticsearch connection: %s", await elasticsearch_client.get_info())
