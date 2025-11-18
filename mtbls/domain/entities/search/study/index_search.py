@@ -45,7 +45,7 @@ class IndexSearchInput(BaseSearchInput):
         Field(default=None, description="Sort configuration")
     ]
     filters: Annotated[
-        List[FilterModel],
+        Optional[List[FilterModel]],
         Field(default_factory=list, description="Applied filters (derived from selected facets)")
     ]
     facets: Annotated[

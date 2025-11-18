@@ -35,7 +35,7 @@ async def search_study_index(
         Provide["gateways.http_client"]
     ),
     elasticsearch_study_search_service = Depends(
-        Provide["gateways.elasticsearch_gateway"]
+        Provide["gateways.elasticsearch_study_gateway"]
     ),
 
 ):
@@ -43,6 +43,6 @@ async def search_study_index(
         response.status_code = status.HTTP_400_BAD_REQUEST
         response_message = APIErrorResponse(error="Search query is not valid.")
         return response_message
-    result = await elasticsearch_study_search_service.search(input=q)
-    
+    result = await elasticsearch_study_search_service.search(query=q)
+    response: APIResponse[IndexSearchResult] = APIResponse[IndexSearchResult](content=result)
     return response

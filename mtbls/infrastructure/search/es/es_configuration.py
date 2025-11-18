@@ -17,7 +17,6 @@ class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
         "submitters.email",
         "submitters.orcid",
         "protocolDescriptions",
-        "funders",
         "country",
         "annotations",
         "publications.title",

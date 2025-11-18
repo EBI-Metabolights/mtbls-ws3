@@ -75,15 +75,16 @@ class GatewaysContainer(containers.DeclarativeContainer):
         ElasticsearchClient,
         config=providers.Factory(
             ElasticsearchClientConfig,
-            hosts=config.search.elasticsearch.connection.hosts,
-            api_key=config.search.elasticsearch.connection.api_key,
-            request_timeout_in_seconds=config.search.elasticsearch.connection.request_timeout_in_seconds.as_float(),
-            verify_certs=config.search.elasticsearch.connection.verify_certs.as_bool(),
+            hosts=config.database.elasticsearch.connection.hosts,
+            api_key=config.database.elasticsearch.connection.api_key,
+            request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
+            verify_certs=config.database.elasticsearch.connection.verify_certs,
         )
     )
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
-        config=config.search.elasticsearch, # currently we rely on default config values. If we ever want to change them we can use the example above.
+        client=elasticsearch_client,
+        config=None,  # rely on default gateway config; adjust if custom search settings are added
     )
     
 
