@@ -89,12 +89,18 @@ async def run_validation_task_with_modifiers(
     phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
 ) -> Union[Dict[str, Any], PolicyResultList]:
-    modifier_result = await run_isa_metadata_modifier_task(
-        resource_id,
-        study_metadata_service_factory=study_metadata_service_factory,
-        policy_service=policy_service,
-        serialize_result=False,
-    )
+    try:
+        modifier_result = await run_isa_metadata_modifier_task(
+            resource_id,
+            study_metadata_service_factory=study_metadata_service_factory,
+            policy_service=policy_service,
+            serialize_result=False,
+        )
+    except Exception as ex:
+        logger.error("Error to modify %s: %s", resource_id, ex)
+        logger.exception(ex)
+        modifier_result = None
+
     return await run_validation_task(
         resource_id,
         modifier_result=modifier_result,
