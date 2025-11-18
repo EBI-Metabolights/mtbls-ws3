@@ -45,6 +45,7 @@ nav:
     - Logging: design/aspects/logging.md
     - Auth: design/aspects/auth.md
     - Async Tasks: design/aspects/async_tasks.md
+    - Caching: design/aspects/caching.md
   # - Presentation:
   #   - REST API: api.md
 

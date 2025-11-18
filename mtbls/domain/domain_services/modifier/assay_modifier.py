@@ -108,7 +108,8 @@ class AssayFileModifier(IsaTableModifier):
 
     def get_isa_table_protocol_ref_columns(self, file_name: str):
         protocol_ref_columns: Dict[str, Tuple[int, set[str]]] = {}
-
+        if file_name not in self.model.assays:
+            return protocol_ref_columns
         protocol_ref_column_name = "protocol ref"
         current_protocol_ref = None
         for header in self.model.assays[file_name].table.headers:
@@ -203,6 +204,8 @@ class AssayFileModifier(IsaTableModifier):
 
     def get_valid_data_file_columns(self, file_name: str):
         files_columns: Dict[str, IsaTableColumn] = {}
+        if file_name not in self.model.assays:
+            return files_columns
         for header in self.model.assays[file_name].table.headers:
             if " Data File" in header.column_header:
                 data = self.model.assays[file_name].table.data
