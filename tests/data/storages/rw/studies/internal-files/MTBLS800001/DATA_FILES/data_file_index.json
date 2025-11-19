@@ -1,0 +1,47 @@
+{
+  "private_data_files": {
+    "FILES/DERIVED_FILES": {
+      "file_difference": null,
+      "name": "DERIVED_FILES",
+      "parent_relative_path": "FILES",
+      "relative_path": "FILES/DERIVED_FILES",
+      "modified_time": 1763380655.396444,
+      "is_dir": true,
+      "extension": "",
+      "is_stop_folder": false,
+      "sub_filename": "",
+      "is_empty": false,
+      "file_size": 0
+    },
+    "FILES/RAW_FILES": {
+      "file_difference": null,
+      "name": "RAW_FILES",
+      "parent_relative_path": "FILES",
+      "relative_path": "FILES/RAW_FILES",
+      "modified_time": 1763380655.39412,
+      "is_dir": true,
+      "extension": "",
+      "is_stop_folder": false,
+      "sub_filename": "",
+      "is_empty": false,
+      "file_size": 0
+    },
+    "FILES/SUPPLEMENTARY_FILES": {
+      "file_difference": null,
+      "name": "SUPPLEMENTARY_FILES",
+      "parent_relative_path": "FILES",
+      "relative_path": "FILES/SUPPLEMENTARY_FILES",
+      "modified_time": 1763380655.398586,
+      "is_dir": true,
+      "extension": "",
+      "is_stop_folder": false,
+      "sub_filename": "",
+      "is_empty": false,
+      "file_size": 0
+    }
+  },
+  "public_data_files": {},
+  "index_datetime": "2025-11-19T08:59:01.231617+00:00",
+  "study_id": "MTBLS800001",
+  "revision_number_on_public_ftp": 0
+}

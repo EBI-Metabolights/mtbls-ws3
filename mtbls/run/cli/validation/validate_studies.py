@@ -433,4 +433,4 @@ async def modify_model(
 if __name__ == "__main__":
     study_root_path = "/nfs/public/rw/metabolomics/prod/data/studies/metadata-files"
     # run_validation_cli([study_root_path])
-    create_study_model_task([study_root_path, "MTBLS1", "MTBLS1_base.json"])
+    create_study_model_task([study_root_path, "MTBLS1", "model_MTBLS1_base.json"])
