@@ -60,13 +60,14 @@ class FacetBucket(BaseModel):
 
 class FacetResponse(BaseModel):
     # Search UI wants: { <facetName>: { data: [{value, count}, ...] } }
+    type: Literal["value", "range"]
     data: List[FacetBucket]
 
 
 class IndexSearchResult(BaseModel):
     results: List[Dict[str, Any]]
     totalResults: int
-    facets: Dict[str, FacetResponse] = Field(default_factory=dict)
+    facets: Dict[str, List[FacetResponse]] = Field(default_factory=dict)
     requestId: str
 
 class IndexSearchResultEnvelope(BaseSearchResult):
