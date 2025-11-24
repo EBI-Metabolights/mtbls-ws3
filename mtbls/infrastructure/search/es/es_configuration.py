@@ -35,11 +35,17 @@ class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
         "description",
         "publicReleaseDate",
         "modifiedTime",
-        "sizeInBytes",
         "organisms",
         "organismParts",
         "assayTechniques",
         "technologyTypes",
         "country",
+        "designDescriptors",
+        "sizeInBytes",
+        "publications",
+        "submitters",
+        "url",
+        "factors",
+        "sampleTypes",
     )
     

@@ -4,9 +4,10 @@
 from typing import Any, Dict, List
 from uuid import uuid4
 from mtbls.application.services.interfaces.search_port import SearchPort
-from mtbls.domain.entities.search.study.index_search import FacetBucket, FacetResponse, IndexSearchInput, IndexSearchResult
+from mtbls.domain.entities.search.study.facet_configuration import FACET_CONFIG
+from mtbls.domain.entities.search.study.index_search import IndexSearchInput, IndexSearchResult
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
-from mtbls.infrastructure.search.es.es_configuration import ElasticsearchConfiguration, StudyElasticSearchConfiguration
+from mtbls.infrastructure.search.es.es_configuration import StudyElasticSearchConfiguration
 
 
 class ElasticsearchStudyGateway(SearchPort):
@@ -29,24 +30,28 @@ class ElasticsearchStudyGateway(SearchPort):
         return self._config
         
     async def search(
-        self, 
-        query: IndexSearchInput 
-        ) -> IndexSearchResult:
+        self,
+        query: IndexSearchInput,
+        raw: bool = False,
+    ) -> IndexSearchResult | Dict[str, Any]:
         dsl = self._build_search_payload(query)
         es_resp = await self._client.search(
             index=self.config.index_name,
             body=dsl
         )
-        
+
+        if raw:
+            return es_resp
+
         results = [self._map_hit(h) for h in es_resp.get("hits", {}).get("hits", [])]
         total = self._extract_total(es_resp)
-        facets = self._map_aggs_to_searchui(query, es_resp.get("aggregations") or {})
+        facets = self._map_aggs_to_searchui(es_resp.get("aggregations") or {})
 
         return IndexSearchResult(
             results=results,
             totalResults=total,
             facets=facets,
-            requestId=str(uuid4()),
+            requestId=str(uuid4()),# useless currently 
         )
         
     
@@ -100,7 +105,7 @@ class ElasticsearchStudyGateway(SearchPort):
         from_ = (req.page.current - 1) * size
 
         # Aggregations (value + range based on UI facets config)
-        aggs = self._build_aggs(req)
+        aggs = self._build_aggs()
 
         dsl: Dict[str, Any] = {
             "track_total_hits": True,
@@ -126,41 +131,52 @@ class ElasticsearchStudyGateway(SearchPort):
 
         return dsl
 
-    def _build_aggs(self, req: IndexSearchInput) -> Dict[str, Any]:
+    def _build_aggs(self) -> Dict[str, Any]:
         """
-        Supports Search UI facet config:
-          - { "<field>": { type: "value" } }
-          - { "<field>": { type: "range", ranges: [{from,to?,name?}, ...] } }
+        Supports server-side facet config:
+        FACET_CONFIG = {
+            "organisms": {
+                "type": "value",
+                "field": "organisms.keyword",
+                "size": 20,
+            },
+            ...
+        }
         """
-        if not req.facets:
-            return {}
 
         aggs: Dict[str, Any] = {}
-        for facet_name, spec in req.facets.items():
-            ftype = (spec or {}).get("type")
+
+        for facet_name, spec in FACET_CONFIG.items():
+            if not spec:
+                continue
+
+            ftype = spec.get("type")
+            # allow config to alias an underlying field; fall back to facet_name
+            field = spec.get("field") or facet_name
+
             if ftype == "value":
                 aggs[facet_name] = {
                     "terms": {
-                        "field": facet_name,
-                        "size": (spec.get("size") or self.config.facet_size),
-                        "order": {"_count": "desc"}
+                        "field": field,  # 👈 WAS facet_name
+                        "size": spec.get("size") or self.config.facet_size,
+                        "order": {"_count": "desc"},
                     }
                 }
+
             elif ftype == "range":
-                # convert UI ranges to ES filters aggregation
-                ranges = (spec or {}).get("ranges") or []
-                # allow UI to alias a different underlying field via spec["field"]
-                field = (spec.get("field") or facet_name)
+                ranges = spec.get("ranges") or []
                 aggs[facet_name] = {
                     "filters": {
                         "filters": {
-                            self._range_key(r): self._range_query(field, r) for r in ranges
+                            self._range_key(r): self._range_query(field, r)
+                            for r in ranges
                         }
                     }
                 }
+
             else:
-                # ignore unknown facet types in this minimal iteration
                 continue
+
         return aggs
     
     @staticmethod
@@ -203,39 +219,35 @@ class ElasticsearchStudyGateway(SearchPort):
             q["range"][field]["lte"] = r["to"]
         return q
 
-    def _map_aggs_to_searchui(
-        self,
-        req: IndexSearchInput,
-        aggs: Dict[str, Any]
-    ) -> Dict[str, FacetResponse]:
-        """
-        Map ES aggs response into Search UI facets shape:
-          { facetName: { data: [{value, count}, ...] } }
-        """
-        if not aggs or not req.facets:
-            return {}
+    def _map_aggs_to_searchui(self, aggs: Dict[str, Any]) -> Dict[str, Any]:
+        out: Dict[str, Any] = {}
 
-        out: Dict[str, FacetResponse] = {}
-
-        for facet_name, spec in (req.facets or {}).items():
-            ftype = (spec or {}).get("type")
+        for facet_name, spec in FACET_CONFIG.items():
+            ftype = spec.get("type")
             agg_resp = aggs.get(facet_name)
             if not agg_resp:
                 continue
 
-            buckets: List[FacetBucket] = []
+            buckets: List[Dict[str, Any]] = []
 
             if ftype == "value":
                 for b in agg_resp.get("buckets", []):
-                    buckets.append(FacetBucket(value=b.get("key"), count=int(b.get("doc_count", 0))))
+                    buckets.append({
+                        "value": b.get("key"),
+                        "count": int(b.get("doc_count", 0)),
+                    })
             elif ftype == "range":
-                # "filters" agg returns buckets keyed by filter name
-                filters = agg_resp.get("buckets", {})
-                for key, b in filters.items():
-                    buckets.append(FacetBucket(value=key, count=int(b.get("doc_count", 0))))
+                for key, b in (agg_resp.get("buckets") or {}).items():
+                    buckets.append({
+                        "value": key,
+                        "count": int(b.get("doc_count", 0)),
+                    })
             else:
                 continue
 
-            out[facet_name] = FacetResponse(data=buckets)
+            out[facet_name] = [{
+                "type": ftype,
+                "data": buckets,
+            }]
 
         return out
