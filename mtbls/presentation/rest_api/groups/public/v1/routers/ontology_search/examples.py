@@ -12,6 +12,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
         summary="Search terms in any ontology. "
         "Results will be sorted the provided ontology order",
         value=BaseOntologyValidation(
+            field_name="Characteristics[Organism part]",
+            rule_name="organism-part-rule-01",
             ontology_validation_type=OntologyValidationType.ANY_ONTOLOGY_TERM,
             ontologies=["EFO", "NCBITAXON", "UBERON", "BTO", "NCIT", "MSIO"],
             allowed_parent_ontology_terms=None,
@@ -20,6 +22,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search organism ontology terms": Example(
         summary="Search organism ontology terms from the selected ontologies",
         value=BaseOntologyValidation(
+            field_name="Characteristics[Organism]",
+            rule_name="organism-rule-01",
             ontology_validation_type=OntologyValidationType.SELECTED_ONTOLOGY,
             ontologies=["NCBITAXON", "ENVO"],
             allowed_parent_ontology_terms=None,
@@ -28,6 +32,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search organism part ontology terms": Example(
         summary="Search organism part ontology terms from the selected ontologies",
         value=BaseOntologyValidation(
+            field_name="Characteristics[Organism part]",
+            rule_name="organism-part-rule-02",
             ontology_validation_type=OntologyValidationType.SELECTED_ONTOLOGY,
             ontologies=["UBERON", "BTO", "NCIT", "MSIO"],
             allowed_parent_ontology_terms=None,
@@ -36,6 +42,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search disease terms": Example(
         summary="Search disease terms from the selected ontologies",
         value=BaseOntologyValidation(
+            field_name="Characteristics[Disease]",
+            rule_name="disease-rule-02",
             ontology_validation_type=OntologyValidationType.SELECTED_ONTOLOGY,
             ontologies=["UBERON", "BTO", "NCIT", "MSIO"],
             allowed_parent_ontology_terms=None,
@@ -44,6 +52,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search unit terms in the selected ontologies": Example(
         summary="Search unit ontology terms in parent ontology terms",
         value=BaseOntologyValidation(
+            field_name="Unit",
+            rule_name="unit-rule-02",
             ontology_validation_type=OntologyValidationType.CHILD_ONTOLOGY_TERM,
             ontologies=["UO", "EFO", "NCIT"],
             allowed_parent_ontology_terms=ParentOntologyTerms(
@@ -78,6 +88,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
         summary="Search mass spectrometry instrument "
         "ontology terms in parent ontology terms",
         value=BaseOntologyValidation(
+            field_name="Parameter Value[Instrument]",
+            rule_name="ms-intrument-rule-02",
             ontology_validation_type=OntologyValidationType.CHILD_ONTOLOGY_TERM,
             ontologies=["MS"],
             allowed_parent_ontology_terms=ParentOntologyTerms(
@@ -96,6 +108,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search study factor ontology terms": Example(
         summary="Search study factor ontology terms in selected ontologies",
         value=BaseOntologyValidation(
+            field_name="Study Factor Type",
+            rule_name="study-factor-type-02",
             ontology_validation_type=OntologyValidationType.ANY_ONTOLOGY_TERM,
             ontologies=["BTO", "EFO", "NCIT"],
             allowed_parent_ontology_terms=None,
@@ -104,6 +118,8 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search study contact role ontology terms": Example(
         summary="Search study contact role ontology terms in parent ontology term",
         value=BaseOntologyValidation(
+            field_name="Study Contact Roles",
+            rule_name="study-contact-roles-02",
             ontology_validation_type=OntologyValidationType.CHILD_ONTOLOGY_TERM,
             ontologies=["NCIT"],
             allowed_parent_ontology_terms=ParentOntologyTerms(

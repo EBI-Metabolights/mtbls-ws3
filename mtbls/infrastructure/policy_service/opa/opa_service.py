@@ -68,12 +68,11 @@ class OpaPolicyService(PolicyService):
                 self.config.rule_definitions_url, "result"
             )
             try:
-                rules = FileTemplates.model_validate(result, by_alias=True)
                 validations_map = VersionedValidationsMap(
-                    validation_version=rules["validation_version"],
+                    validation_version=result["validation_version"],
                     validations={
-                        x["rule_id"]: Validation.model_validate(x)
-                        for x in rules["violations"]
+                        x["rule_id"]: Validation.model_validate(x, by_name=True)
+                        for x in result["violations"]
                     },
                 )
                 self.rule_definitions = validations_map

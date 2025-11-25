@@ -1,8 +1,8 @@
 import datetime
 import enum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_camel, to_pascal
 
 
@@ -31,6 +31,7 @@ class EnforcementLevel(enum.StrEnum):
     REQUIRED = "required"
     RECOMMENDED = "recommended"
     OPTIONAL = "optional"
+    NOT_APPLICABLE = "not-applicable"
 
 
 class StudyCategoryStr(enum.StrEnum):
@@ -70,6 +71,9 @@ class OntologyTerm(StudyBaseModel):
         Field(description="Source reference name of ontology term. e.g., EFO, OBO."),
     ]
 
+    def __str__(self):
+        return f"[{self.term}, {self.term_source_ref}, {self.term_accession_number}]"
+
 
 class OntologyTermPlaceholder(StudyBaseModel):
     term_accession_number: Annotated[
@@ -80,6 +84,9 @@ class OntologyTermPlaceholder(StudyBaseModel):
         str,
         Field(description="Source reference name of placeholder. e.g., MTBLS."),
     ]
+
+    def __str__(self):
+        return f"[{self.term_source_ref}, {self.term_accession_number}]"
 
 
 class FieldSelector(StudyBaseModel):
@@ -153,17 +160,22 @@ class AdditionalSource(StudyBaseModel):
         ),
     ]
 
+    def __str__(self):
+        return f"[{self.source_label}, {self.accession_prefix}]"
+
 
 class FieldConstraint(StudyBaseModel):
-    type_: Annotated[
-        ConstraintType, Field(alias="type", description="Constraint type.")
-    ]
     constraint: Annotated[
-        None | str | int | bool, Field(description="Constraint value")
+        None | str | int | float | bool, Field(description="Constraint value")
     ] = None
     error_message: Annotated[
-        str, Field(description="Error message if value does not satisfy the constraint")
+        str,
+        Field(description="Error message if value does not satisfy the constraint."),
     ] = ""
+    enforcement_level: Annotated[
+        EnforcementLevel,
+        Field(description="Rule enforcement level for the constraint."),
+    ] = EnforcementLevel.REQUIRED
 
 
 class ParentOntologyTerms(StudyBaseModel):
@@ -182,6 +194,21 @@ class ParentOntologyTerms(StudyBaseModel):
 
 
 class BaseOntologyValidation(StudyBaseModel):
+    field_name: Annotated[
+        str,
+        Field(
+            description="Name of the column header or investigation field name. "
+            "e.g., Parameter Value[Instrument], Study Assay Measurement Type."
+        ),
+    ]
+    rule_name: Annotated[
+        str,
+        Field(
+            description="Unique name id for the the field. "
+            "Rule naming convention is <Field name>-<incremental number>. "
+            "e.g., Parameter Value[Instrument]-01, Parameter Value[Instrument]-02"
+        ),
+    ]
     ontology_validation_type: Annotated[
         None | OntologyValidationType, Field(description="Validation rule type")
     ] = OntologyValidationType.ANY_ONTOLOGY_TERM
@@ -233,38 +260,28 @@ class FieldValueValidation(BaseOntologyValidation):
         None | list[str],
         Field(description="unexpected terms."),
     ] = []
-    rule_name: Annotated[
-        str,
-        Field(
-            description="Unique name id for the the field. "
-            "Rule naming convention is <Field name>-<incremental number>. "
-            "e.g., Parameter Value[Instrument]-01, Parameter Value[Instrument]-02"
-        ),
-    ]
     description: Annotated[
         str,
         Field(description="Definition of rule and summary of selection criteria."),
     ] = ""
-    field_name: Annotated[
-        str,
-        Field(
-            description="Name of the column header or investigation field name. "
-            "e.g., Parameter Value[Instrument], Study Assay Measurement Type."
-        ),
-    ]
     selection_criteria: Annotated[
         SelectionCriteria, Field(description="Field selection criteria")
     ]
-    enforcement_level: Annotated[
-        EnforcementLevel, Field(description="Rule enforcement level")
+    term_enforcement_level: Annotated[
+        EnforcementLevel, Field(description="Rule enforcement level for ontology terms")
+    ] = EnforcementLevel.REQUIRED
+    unexpected_term_enforcement_level: Annotated[
+        EnforcementLevel,
+        Field(description="Rule enforcement level for unexpected terms"),
     ] = EnforcementLevel.REQUIRED
 
     validation_type: Annotated[
         OntologyValidationType, Field(description="Validation rule type")
     ] = OntologyValidationType.ANY_ONTOLOGY_TERM
     constraints: Annotated[
-        None | list[FieldConstraint], Field(description="Field constraints")
-    ] = []
+        None | dict[ConstraintType, FieldConstraint],
+        Field(description="Field constraints"),
+    ] = {}
     default_value: Annotated[
         None | OntologyTerm, Field(description="Default ontology term")
     ] = None
@@ -287,6 +304,25 @@ class FieldValueValidation(BaseOntologyValidation):
             "Applicable only for validation type child-ontology-term"
         ),
     ] = None
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def validate_model(cls, v: Any, handler) -> Self:
+        if isinstance(v, dict):
+            enforcement = v.get("enforcementLevel", None)
+            if enforcement:
+                v["termEnforcementLevel"] = enforcement
+            constraints = v.get("constraints", None)
+            if isinstance(constraints, list):
+                new_constraints = {}
+                for item in constraints:
+                    new_constraints[item.get("type")] = item
+                v["constraints"] = new_constraints
+        validation_type = v.get("validationType", None)
+        if validation_type == "check-only-constraints":
+            v["termEnforcementLevel"] = EnforcementLevel.NOT_APPLICABLE
+
+        return handler(v)
 
 
 class ColumnDescription(StudyBaseModel):
@@ -322,6 +358,22 @@ class ColumnDescription(StudyBaseModel):
         if isinstance(val, int) and val > 0:
             return val
         return None
+
+
+class InvestigationFileSection(StudyBaseModel):
+    name: Annotated[str, Field(description="Section name")]
+    fields: Annotated[list[str], Field(description="Section row prefixes")]
+    default_comments: Annotated[
+        list[str], Field(description="Default comments for the section")
+    ]
+
+
+class InvestigationFileTemplate(StudyBaseModel):
+    version: Annotated[str, Field(description="Template version")]
+    description: Annotated[str, Field(description="Template name")]
+    sections: Annotated[
+        list[InvestigationFileSection], Field(description="Investigation file sections")
+    ]
 
 
 class IsaTableFileTemplate(StudyBaseModel):
@@ -378,7 +430,7 @@ class StudyProtocolTemplate(StudyBaseModel):
     protocol_definitions: Annotated[
         dict[str, ProtocolDefinition],
         Field(description="Definition of protocol listed in the `protocols` field"),
-    ] = []
+    ] = {}
 
 
 class OntologySourceReferenceTemplate(StudyBaseModel):
@@ -403,13 +455,17 @@ class FileTemplates(StudyBaseModel):
         dict[str, list[IsaTableFileTemplate]],
         Field(description="maf file templates"),
     ] = {}
+    investigation_file_templates: Annotated[
+        dict[str, list[InvestigationFileTemplate]],
+        Field(description="investigation file templates"),
+    ] = {}
     protocol_templates: Annotated[
         dict[str, list[StudyProtocolTemplate]],
         Field(description="Study protocol templates"),
     ] = {}
     ontology_source_reference_templates: Annotated[
         dict[str, OntologySourceReferenceTemplate],
-        Field(description="Ontology source templates"),
+        Field(description="Ontology source reference templates"),
     ] = {}
 
 
