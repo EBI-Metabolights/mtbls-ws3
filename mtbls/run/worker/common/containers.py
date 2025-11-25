@@ -16,6 +16,9 @@ from mtbls.application.services.interfaces.auth.authorization_service import (
     AuthorizationService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
+from mtbls.application.services.interfaces.ontology_search_service import (
+    OntologySearchService,
+)
 from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -34,6 +37,9 @@ from mtbls.infrastructure.auth.standalone.standalone_authorization_service impor
     AuthorizationServiceImpl,
 )
 from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
+from mtbls.infrastructure.ontology_search.ols.ols_search_service import (
+    OlsOntologySearchService,
+)
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
@@ -93,6 +99,11 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
     cache_service: CacheService = providers.Singleton(
         RedisCacheImpl,
         config=cache_config,
+    )
+    ontology_search_service: OntologySearchService = providers.Singleton(
+        OlsOntologySearchService,
+        http_client=gateways.http_client,
+        config=config.ontology_search_service.ols,
     )
     oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
 

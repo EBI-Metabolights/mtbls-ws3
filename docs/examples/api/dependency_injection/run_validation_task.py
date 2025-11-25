@@ -12,6 +12,9 @@ from mtbls.application.remote_tasks.common.utils import run_coroutine
 from mtbls.application.services.interfaces.async_task.async_task_result import (
     AsyncTaskResult,
 )
+from mtbls.application.services.interfaces.ontology_search_service import (
+    OntologySearchService,
+)
 from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -33,6 +36,9 @@ def run_validation(  # noqa: PLR0913
         "services.study_metadata_service_factory"
     ],
     policy_service: PolicyService = Provide["services.policy_service"],
+    ontology_search_service: OntologySearchService = Provide[
+        "services.ontology_search_service"
+    ],
     **kwargs,
 ) -> AsyncTaskResult:
     try:
@@ -44,6 +50,7 @@ def run_validation(  # noqa: PLR0913
                 policy_service=policy_service,
                 phases=phases,
                 serialize_result=serialize_result,
+                ontology_search_service=ontology_search_service,
             )
         else:
             coroutine = run_validation_task(
@@ -53,6 +60,7 @@ def run_validation(  # noqa: PLR0913
                 policy_service=policy_service,
                 phases=phases,
                 serialize_result=serialize_result,
+                ontology_search_service=ontology_search_service,
             )
         return run_coroutine(coroutine)
     except Exception as ex:
