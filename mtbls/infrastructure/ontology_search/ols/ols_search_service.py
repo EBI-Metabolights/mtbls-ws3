@@ -1,3 +1,5 @@
+import hashlib
+import json
 import logging
 import re
 from typing import Any, OrderedDict
@@ -5,6 +7,7 @@ from urllib.parse import quote
 
 from pydantic import HttpUrl, ValidationError
 
+from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.ontology_search_service import (
     OntologySearchService,
@@ -30,9 +33,11 @@ class OlsOntologySearchService(OntologySearchService):
     def __init__(
         self,
         http_client: HttpClient,
+        cache_service: CacheService,
         config: None | OlsConfiguration | dict[str, Any] = None,
     ):
         self.http_client = http_client
+        self.cache_service = cache_service
         self.config = config
         if not self.config:
             self.config = OlsConfiguration()
@@ -412,6 +417,13 @@ class OlsOntologySearchService(OntologySearchService):
             )
         return result, hits
 
+    def url_cache_key(
+        self, url: str, params: dict[str, str], headers: dict[str, str]
+    ) -> str:
+        key_data = {"url": url, "params": params, "headers": headers}
+        key_str = json.dumps(key_data, sort_keys=True)
+        return hashlib.sha256(key_str.encode()).hexdigest()
+
     async def search_accession(
         self, accession: str, ontology: None | str = None
     ) -> tuple[HttpResponse, OlsSearchResultItem]:
@@ -430,17 +442,34 @@ class OlsOntologySearchService(OntologySearchService):
 
         params = {"lang": "en"}
         headers = {"Accept": "application/json"}
-        result: HttpResponse = await self.http_client.send_request(
-            HttpRequestType.GET,
-            url,
-            params=params,
-            headers=headers,
-            timeout=self.config.timeout_in_seconds,
-            follow_redirects=True,
-        )
-        if result.error or result.json_data.get("status", 200) != 200:
-            return result, []
+        cache_key = self.url_cache_key(url, params, headers)
+        cache_result = await self.cache_service.get_value(cache_key)
+        cache_result_used = False
+        if cache_result:
+            try:
+                result: HttpResponse = HttpResponse.model_validate(
+                    cache_result, by_alias=True
+                )
+                cache_result_used = True
+            except Exception as ex:
+                logger.exception(ex)
 
+        if not cache_result_used:
+            result: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.GET,
+                url,
+                params=params,
+                headers=headers,
+                timeout=self.config.timeout_in_seconds,
+                follow_redirects=True,
+            )
+            if result.error or result.json_data.get("status", 200) != 200:
+                return result, []
+            timeout = self.config.success_result_cache_timeout_in_seconds
+            result_str = result.model_dump_json(indent=2, by_alias=True)
+            self.cache_service.set_value(
+                cache_key, result_str, expiration_time_in_seconds=timeout
+            )
         if not result.json_data:
             return result, []
 

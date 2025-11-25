@@ -91,6 +91,10 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     gateways = providers.DependenciesContainer()
     cache_config = providers.Configuration()
 
+    cache_service: CacheService = providers.Singleton(
+        RedisCacheImpl,
+        config=cache_config,
+    )
     policy_service: PolicyService = providers.Singleton(
         OpaPolicyService,
         http_client=gateways.http_client,
@@ -100,6 +104,7 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     ontology_search_service: OntologySearchService = providers.Singleton(
         OlsOntologySearchService,
         http_client=gateways.http_client,
+        cache_service=cache_service,
         config=config.ontology_search_service.ols,
     )
 
@@ -118,10 +123,6 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         async_task_registry=core.async_task_registry,
     )
 
-    cache_service: CacheService = providers.Singleton(
-        RedisCacheImpl,
-        config=cache_config,
-    )
     oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
 
     authentication_service: AuthenticationService = providers.Singleton(
