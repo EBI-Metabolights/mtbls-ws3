@@ -62,6 +62,30 @@ from mtbls.infrastructure.search.es.es_client import ElasticsearchClient, Elasti
 from mtbls.infrastructure.search.es.study.es_study_search_gateway import ElasticsearchStudyGateway
 
 
+def _append_port_to_hosts(hosts, port):
+    if not hosts or port in (None, "", 0):
+        return hosts
+
+    try:
+        port_str = str(int(port))
+    except (TypeError, ValueError):
+        return hosts
+
+    def _format(host: str) -> str:
+        if not host:
+            return host
+        host_str = str(host)
+        scheme_split = host_str.split("://", 1)
+        host_body = scheme_split[-1]
+        if ":" in host_body:
+            return host_str  # already has a port
+        return f"{host_str}:{port_str}"
+
+    if isinstance(hosts, (list, tuple)):
+        return [_format(h) for h in hosts]
+    return _format(hosts)
+
+
 class GatewaysContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     runtime_config = providers.Configuration()
@@ -75,7 +99,11 @@ class GatewaysContainer(containers.DeclarativeContainer):
         ElasticsearchClient,
         config=providers.Factory(
             ElasticsearchClientConfig,
-            hosts=config.database.elasticsearch.connection.hosts,
+            hosts=providers.Callable(
+                _append_port_to_hosts,
+                config.database.elasticsearch.connection.hosts,
+                config.database.elasticsearch.connection.port,
+            ),
             api_key=config.database.elasticsearch.connection.api_key,
             request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
             verify_certs=config.database.elasticsearch.connection.verify_certs,
