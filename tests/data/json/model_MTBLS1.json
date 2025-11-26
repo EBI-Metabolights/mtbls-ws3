@@ -255,7 +255,7 @@
                 "termSourceRef": "OBI"
               },
               "technologyType": {
-                "term": "NMR spectroscopy",
+                "term": "NMR spectroscopy assay",
                 "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0000623",
                 "termSourceRef": "OBI"
               },

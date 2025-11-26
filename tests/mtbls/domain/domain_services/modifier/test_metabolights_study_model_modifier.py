@@ -76,10 +76,10 @@ class TestNoModification:
     ):
         update_logs = modifier.modify()
 
-        # from pathlib import Path
+        from pathlib import Path
 
-        # with Path("model_MTBLS1.json").open("w") as f:
-        #     f.write(modifier.model.model_dump_json(by_alias=True, indent=4))
+        with Path("model_MTBLS1.json").open("w") as f:
+            f.write(modifier.model.model_dump_json(by_alias=True, indent=4))
         assert len(update_logs) == 0
 
     @pytest.mark.asyncio
@@ -87,10 +87,10 @@ class TestNoModification:
         self, ms_modifier: MetabolightsStudyModelModifier
     ):
         ms_modifier.modify()
-        # from pathlib import Path
+        from pathlib import Path
 
-        # with Path("model_MTBLS5195.json").open("w") as f:
-        #     f.write(ms_modifier.model.model_dump_json(by_alias=True, indent=4))
+        with Path("model_MTBLS5195.json").open("w") as f:
+            f.write(ms_modifier.model.model_dump_json(by_alias=True, indent=4))
         assert len(ms_modifier.update_logs) == 0
 
 
