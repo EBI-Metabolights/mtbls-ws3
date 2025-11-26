@@ -103,8 +103,12 @@ class InvestigationFileModifier(BaseIsaModifier):
                 term_source_data = isa_table.table.data[term_source_column_name]
                 for idx, val in enumerate(isa_table.table.data[column_name]):
                     if val and len(term_source_data) > idx:
-                        if term_source_data[idx]:
-                            ontology_sources.add(term_source_data[idx])
+                        if term_source_data[idx] and len(term_source_data[idx]) > 1:
+                            source: str = term_source_data[idx]
+                            try:
+                                int(source)
+                            except Exception:
+                                ontology_sources.add(term_source_data[idx])
 
     def update_column_term_sources(
         self,
@@ -202,12 +206,7 @@ class InvestigationFileModifier(BaseIsaModifier):
     def update_ontology_sources_from_templates(
         self, current_ontology_source_references, references, missing_set, exist_set
     ):
-        templates = {}
-        if self.templates and self.templates.ontology_source_reference_templates:
-            for item, val in self.templates.ontology_source_reference_templates.items():
-                templates[item] = OntologySourceReference.model_validate(
-                    val, from_attributes=True
-                )
+        templates = self.templates.ontology_source_reference_templates
 
         if exist_set:
             for ref in exist_set:
@@ -965,7 +964,7 @@ class InvestigationFileModifier(BaseIsaModifier):
 
                     if main_technique == "MS":
                         ms_item: OntologyAnnotation = OntologyItem(
-                            term="mass spectrometry",
+                            term="mass spectrometry assay",
                             term_source_ref="OBI",
                             term_accession_number="http://purl.obolibrary.org/obo/OBI_0000470",
                         )
@@ -976,7 +975,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                         )
                     elif main_technique == "NMR":
                         nmr_item: OntologyAnnotation = OntologyItem(
-                            term="NMR spectroscopy",
+                            term="NMR spectroscopy assay",
                             term_source_ref="OBI",
                             term_accession_number="http://purl.obolibrary.org/obo/OBI_0000623",
                         )

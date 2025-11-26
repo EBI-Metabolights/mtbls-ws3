@@ -18,7 +18,7 @@ dependencies = [
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
     "python-multipart>=0.0.9",
-    "metabolights-utils>=1.4.12",
+    "metabolights-utils>=1.4.15",
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
 ]
@@ -51,14 +51,15 @@ dev = [
     "ruff>=0.14.0",
     "commitizen>=4.9.1",
     "pre-commit>=4.0.1,<5",
-    "mkdocs-material>=9.5.49,<10",
-    "openpyxl>=3.1.5",
 ]
 test = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
     "aiosqlite>=0.21.0",
+]
+docs = [
+    "mkdocs-material>=9.5.49,<10",
 ]
 
 [tool.uv]

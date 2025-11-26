@@ -47,7 +47,7 @@ class OpaPolicyService(PolicyService):
         try:
             result = await self.get_http_response(self.config.templates_url, "result")
             try:
-                self.control_lists = FileTemplates.model_validate(result, by_alias=True)
+                self.templates = FileTemplates.model_validate(result, by_alias=True)
                 logger.debug(
                     "Templates are fetched from remote service: %s",
                     self.config.templates_url,
