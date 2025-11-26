@@ -1,4 +1,5 @@
 
+from typing import Any
 from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
@@ -35,3 +36,18 @@ def test_study_search_with_basic_query(
     result = APIResponse[IndexSearchResult].model_validate(response.json())
     assert result.content.totalResults == 1
     assert result.content.results[0]["studyId"] == "MTBLS123"
+
+
+def test_get_study_index_mapping(public_api_client: TestClient, submission_api_container):
+    url = "/public/v2/public-study-index/mapping"
+    mock_mapping = {"public-study-search-index": {"mappings": {"properties": {}}}}
+
+    mock_gateway = AsyncMock()
+    mock_gateway.get_index_mapping.return_value = mock_mapping
+    submission_api_container.gateways.elasticsearch_study_gateway.override(mock_gateway)
+
+    response = public_api_client.get(url)
+
+    assert response.status_code == 200
+    result = APIResponse[Any].model_validate(response.json())
+    assert result.content == mock_mapping
