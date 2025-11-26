@@ -374,6 +374,15 @@ class InvestigationFileTemplate(StudyBaseModel):
     sections: Annotated[
         list[InvestigationFileSection], Field(description="Investigation file sections")
     ]
+    default_comments: Annotated[
+        dict[str, str], Field(description="Default comments")
+    ] = {}
+    default_field_values: Annotated[
+        dict[str, str], Field(description="Default field values")
+    ] = {}
+    default_comment_values: Annotated[
+        dict[str, str], Field(description="Default comment values")
+    ] = {}
 
 
 class IsaTableFileTemplate(StudyBaseModel):
