@@ -109,7 +109,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
     async def update_isa_table_rows(
         self,
         object_key: str,
-        updates: IsaTableDataUpdates = None,
+        updates: None | IsaTableDataUpdates = None,
     ) -> list[IsaTableRow]: ...
 
     async def save_isa_table_file(

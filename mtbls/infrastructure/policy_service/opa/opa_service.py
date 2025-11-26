@@ -62,7 +62,9 @@ class OpaPolicyService(PolicyService):
         return self.templates
 
     @cached(cache=TTLCache(maxsize=10, ttl=60))
-    async def get_rule_definitions(self) -> dict[str, Any]:
+    async def get_rule_definitions(
+        self, version: Union[None, str] = None
+    ) -> None | VersionedValidationsMap:
         try:
             result = await self.get_http_response(
                 self.config.rule_definitions_url, "result"

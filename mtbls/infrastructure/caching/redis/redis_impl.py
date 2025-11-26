@@ -19,11 +19,11 @@ class RedisCacheImpl(CacheService):
             socket_connect_timeout=self.connection.socket_timeout,
         )
         rc = self.connection
-        self.url_repr = (
+        self.url_repr: str = (
             f"redis://:***@{rc.redis_service.host}:{rc.redis_service.port}/{rc.db}"
         )
 
-    async def get_connection_repr(self) -> None:
+    async def get_connection_repr(self) -> str:
         return self.url_repr
 
     async def ping(self) -> None:

@@ -105,7 +105,7 @@ class FieldSelector(StudyBaseModel):
 
 class SelectionCriteria(StudyBaseModel):
     isa_file_type: Annotated[
-        IsaTabFileType,
+        None | IsaTabFileType,
         Field(description="ISA-TAB file type."),
     ] = None
     study_created_at_or_after: Annotated[

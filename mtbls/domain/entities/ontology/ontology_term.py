@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from metabolights_utils.common import CamelCaseModel
+from pydantic import ConfigDict, Field
 from pydantic.alias_generators import to_camel, to_pascal
 
 
-class StudyBaseModel(BaseModel):
+class StudyBaseModel(CamelCaseModel):
     """Base model class to convert python attributes to camel case"""
 
     model_config = ConfigDict(

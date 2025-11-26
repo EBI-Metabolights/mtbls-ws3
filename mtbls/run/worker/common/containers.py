@@ -81,7 +81,7 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
     gateways = providers.DependenciesContainer()
     cache_config = providers.Configuration()
 
-    cache_service: CacheService = providers.Singleton(
+    cache_service: CacheService = providers.Factory(
         RedisCacheImpl,
         config=cache_config,
     )
@@ -105,7 +105,6 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         queue_names=["common", "validation", "datamover", "compute", ""],
         async_task_registry=core.async_task_registry,
     )
-
     oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
 
     authentication_service: AuthenticationService = providers.Singleton(

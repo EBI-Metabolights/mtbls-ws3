@@ -3,6 +3,8 @@ import logging
 import time
 from typing import Any, Dict, Union
 
+from cachetools import TTLCache
+from cachetools_async import cached
 from dependency_injector.wiring import Provide, inject
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
@@ -36,7 +38,7 @@ from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPha
 logger = logging.getLogger(__name__)
 
 
-all_validation_phases = [
+all_validation_phases: list[ValidationPhase] = [
     ValidationPhase.PHASE_1,
     ValidationPhase.PHASE_2,
     ValidationPhase.PHASE_3,
@@ -130,7 +132,7 @@ async def run_validation_task(  # noqa: PLR0913
     resource_id: str,
     study_metadata_service_factory: StudyMetadataServiceFactory,
     policy_service: PolicyService,
-    modifier_result: Union[dict, StudyMetadataModifierResult] = None,
+    modifier_result: Union[None, dict, StudyMetadataModifierResult] = None,
     phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
     ontology_search_service: None | OntologySearchService = None,
@@ -138,41 +140,51 @@ async def run_validation_task(  # noqa: PLR0913
     logger.info("Running validation for %s", resource_id)
     metadata_service = await study_metadata_service_factory.create_service(resource_id)
     result_list: PolicyResultList = PolicyResultList()
-    if modifier_result and isinstance(modifier_result, dict):
-        modifier_result = StudyMetadataModifierResult.model_validate(modifier_result)
-    if modifier_result and modifier_result.has_error:
-        logger.error(
-            "Modifier failed for %s: %s.",
-            resource_id,
-            modifier_result.error_message or "",
-        )
+    modifier_result_input: None | StudyMetadataModifierResult = None
+    if modifier_result:
+        if isinstance(modifier_result, dict):
+            modifier_result_input = StudyMetadataModifierResult.model_validate(
+                modifier_result
+            )
+        if modifier_result_input and modifier_result_input.has_error:
+            logger.error(
+                "Modifier failed for %s: %s.",
+                resource_id,
+                modifier_result_input.error_message or "",
+            )
     if isinstance(phases, ValidationPhase):
-        phases = [phases]
+        input_phases: list[ValidationPhase] = [phases]
     elif isinstance(phases, list):
-        phases = [
+        input_phases: list[ValidationPhase] = [
             ValidationPhase(x)
             for x in phases
             if isinstance(x, str) and x in validation_phase_names
         ]
     else:
-        phases = all_validation_phases
+        input_phases = all_validation_phases
 
     logger.debug(
-        "Running %s validation for phases %s", resource_id, [str(x) for x in phases]
+        "Running %s validation for phases %s",
+        resource_id,
+        [str(x) for x in input_phases],
     )
 
-    if not resource_id or not phases:
+    if not resource_id or not input_phases:
         logger.error("Invalid resource id or phases for %s", resource_id)
-        raise ValueError(message="Inputs are not valid")
+        raise ValueError("resource id or phases input is not valid")
 
     try:
         logger.debug("Get MetaboLights validation input model.")
-        model = await get_input_data(metadata_service, phases)
+        model = await get_input_data(metadata_service, input_phases)
         logger.debug("Validate using policy service.")
         policy_result = await validate_by_policy_service(
-            resource_id, model, modifier_result, policy_service, ontology_search_service
+            resource_id,
+            model,
+            modifier_result_input,
+            policy_service,
+            ontology_search_service,
         )
-        policy_result.phases = phases
+        policy_result.phases = input_phases
         result_list.results.append(policy_result)
 
     except Exception as ex:
@@ -195,7 +207,7 @@ async def run_validation_task(  # noqa: PLR0913
 async def validate_by_policy_service(
     resource_id: str,
     model: MetabolightsStudyModel,
-    modifier_result: StudyMetadataModifierResult,
+    modifier_result: None | StudyMetadataModifierResult,
     policy_service: PolicyService,
     ontology_search_service: None | OntologySearchService = None,
 ) -> PolicyResult:
@@ -205,7 +217,12 @@ async def validate_by_policy_service(
         policy_result.metadata_modifier_enabled = True
         if modifier_result.error_message:
             policy_result.metadata_updates = [
-                UpdateLog(action="Modifier failed. " + modifier_result.error_message)
+                UpdateLog(
+                    action="Modifier failed. " + modifier_result.error_message,
+                    source="",
+                    old_value="",
+                    new_value="",
+                )
             ]
         elif modifier_result.logs:
             policy_result.metadata_updates = modifier_result.logs
@@ -238,7 +255,7 @@ async def validate_by_policy_service(
     return policy_result
 
 
-def investigation_value_parser(value: str) -> str:
+def investigation_value_parser(value: str) -> tuple[None | str, None | str, None | str]:
     parts = value.split("\t")
     if len(parts) == 3:
         _, _, part_3 = value.split("\t")
@@ -252,7 +269,7 @@ def investigation_value_parser(value: str) -> str:
     return term, source, accession
 
 
-def isa_table_value_parser(value: str):
+def isa_table_value_parser(value: str) -> tuple[None | str, None | str, None | str]:
     term, source, accession = [
         x.strip() for x in value.strip("[]").split(",", maxsplit=2)
     ]
@@ -317,6 +334,15 @@ def escape(s: str) -> str:
     return s.replace("\t", " ").replace("\n", " ")
 
 
+@cached(cache=TTLCache(maxsize=2048, ttl=600))
+async def search_exact_match_term(
+    ontology_search_service: OntologySearchService,
+    term: str,
+    rule: FieldValueValidation,
+):
+    return await ontology_search_service.search(term, rule, exact_match=True)
+
+
 async def post_process_validation_messages(
     model: MetabolightsStudyModel,
     policy_result: PolicyResult,
@@ -330,13 +356,19 @@ async def post_process_validation_messages(
         "rule_s_200_900_001_01": ("sample", isa_table_value_parser),
         "rule_i_200_900_001_01": ("investigation", investigation_value_parser),
     }
+    default_rule_value = ("", lambda x: "", "", "")
+
     new_violations = []
     controls = await policy_service.get_control_lists()
+    if not controls:
+        logger.error("Policy service does not return control lists")
+        return
     created_at = model.study_db_metadata.created_at
     sample_template = model.study_db_metadata.sample_template
     template_version = model.study_db_metadata.template_version
 
-    study_category = model.study_db_metadata.study_category.value
+    study_category = model.study_db_metadata.study_category
+    category_name = study_category.name.lower().replace("_", "-")
 
     search_keys = set(search_validation_rules.keys())
     for violation in policy_result.messages.violations:
@@ -344,22 +376,22 @@ async def post_process_validation_messages(
         if identifier not in search_keys:
             new_violations.append(violation)
             continue
-        isa_table_type = search_validation_rules.get(identifier)[0]
-        template_name = None
+        isa_table_type = search_validation_rules.get(identifier, default_rule_value)[0]
+        template_name = ""
         if isa_table_type == "sample":
-            template_name == sample_template
+            template_name = sample_template
         elif isa_table_type == "assay":
             assay_file = model.assays.get(violation.source_file, None)
             if assay_file:
                 template_name = assay_file.assay_technique.name
 
-        parser = search_validation_rules.get(identifier)[1]
+        parser = search_validation_rules.get(identifier, default_rule_value)[1]
         new_values = []
         deleted_values = []
         rule = find_rule(
             controls,
             isa_table_type,
-            study_category,
+            category_name,
             template_version,
             template_name,
             created_at,
@@ -368,7 +400,7 @@ async def post_process_validation_messages(
             rule and rule.validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
         )
         parents = []
-        if is_child_rule:
+        if is_child_rule and rule and rule.allowed_parent_ontology_terms:
             parents = rule.allowed_parent_ontology_terms.parents
         for value in violation.values:
             term, source, accession = parser(value)
@@ -377,9 +409,9 @@ async def post_process_validation_messages(
                 new_values.append(value)
                 continue
 
-            if is_child_rule:
-                search = await ontology_search_service.search(
-                    term, rule, exact_match=True
+            if is_child_rule and rule and term:
+                search = await search_exact_match_term(
+                    ontology_search_service, term, rule
                 )
                 if not search.result:
                     logger.warning("'%s' is not valid or a child of parents.", value)
@@ -399,7 +431,7 @@ async def post_process_validation_messages(
                 else:
                     deleted_values.append(value)
 
-            else:
+            elif accession and source:
                 search = await ontology_search_service.find_by_accession(
                     accession, ontology=source
                 )
@@ -440,7 +472,7 @@ async def post_process_validation_messages(
             violation.values = new_values
             new_violations.append(violation)
         else:
-            logger.info(
+            logger.debug(
                 "Terms in violation are validated "
                 "and the violation is removed: "
                 "%s %s %s",
@@ -449,7 +481,6 @@ async def post_process_validation_messages(
                 ", ".join(violation.values),
             )
     policy_result.messages.violations = new_violations
-    return policy_result
 
 
 async def get_input_data(

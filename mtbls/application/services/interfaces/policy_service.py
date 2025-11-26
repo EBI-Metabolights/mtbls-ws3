@@ -21,7 +21,7 @@ class PolicyService(abc.ABC):
     @abc.abstractmethod
     async def get_rule_definitions(
         self, version: Union[None, str] = None
-    ) -> VersionedValidationsMap: ...
+    ) -> None | VersionedValidationsMap: ...
 
     @abc.abstractmethod
     async def validate_study(
