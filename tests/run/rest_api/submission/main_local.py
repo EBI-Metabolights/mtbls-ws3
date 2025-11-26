@@ -36,6 +36,7 @@ if __name__ == "__main__":
     container = Ws3ApplicationContainer()
     config_file_path = "mtbls-ws-config.yaml"
     secrets_file_path = "mtbls-ws-config-secrets.yaml"
+
     set_application_configuration(
         container,
         config_file_path=config_file_path,
