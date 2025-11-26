@@ -30,6 +30,13 @@ class ElasticsearchStudyGateway(SearchPort):
     @property
     def config(self) -> StudyElasticSearchConfiguration:
         return self._config
+
+    async def get_index_mapping(self) -> Dict[str, Any]:
+        """
+        Return the ES mapping for the configured index.
+        """
+        mapping = await self._client.get_mapping(self.config.index_name)
+        return mapping.get(self.config.index_name, mapping)
         
     async def search(
         self,

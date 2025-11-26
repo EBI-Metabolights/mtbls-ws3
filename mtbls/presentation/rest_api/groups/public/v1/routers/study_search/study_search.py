@@ -55,3 +55,18 @@ async def search_study_index_raw(
     result = await elasticsearch_study_search_service.search(query=q, raw=True)
     response: APIResponse[Any] = APIResponse[Any](content=result.body)
     return response
+
+@router.get(
+    "/mapping",
+    summary="Get Elasticsearch mapping for the public study index.",
+    description="Returns the mapping of the configured public study index.",
+    response_model=APIResponse[Any],
+)
+@inject
+async def get_study_index_mapping(
+    elasticsearch_study_search_service = Depends(
+        Provide["gateways.elasticsearch_study_gateway"]
+    ),
+):
+    mapping = await elasticsearch_study_search_service.get_index_mapping()
+    return APIResponse[Any](content=mapping)

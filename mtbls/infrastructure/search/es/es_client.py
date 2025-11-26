@@ -1,9 +1,12 @@
 
 
+import logging
 from typing import Any, Dict, List, Optional
 
 from elasticsearch import ApiError, AsyncElasticsearch
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 class ElasticsearchClientConfig(BaseModel):
     hosts: List[str] | str = Field(default_factory=list, description="List of Elasticsearch host URLs")
@@ -24,7 +27,12 @@ class ElasticsearchClient:
     async def start(self) -> None:
         if self._es is not None:
             return  # Already started
-        print(f"current hosts value: {self._config.hosts}  ")
+        logger.info(
+            "Connecting to Elasticsearch hosts: %s (timeout=%s, verify_certs=%s)",
+            self._config.hosts,
+            self._config.request_timeout,
+            self._config.verify_certs,
+        )
         self._es = AsyncElasticsearch(
             hosts=self._config.hosts or None,
             api_key=self._config.api_key,
@@ -34,9 +42,15 @@ class ElasticsearchClient:
         try: 
             ok = await self._es.ping()
             if not ok:
+                logger.error("Elasticsearch hosts %s reachable but ping returned False.", self._config.hosts)
                 raise ConnectionError("Elasticsearch ping failed")
+            logger.info("Elasticsearch connection established successfully.")
         except ApiError as e:
+            logger.error("Elasticsearch API error during startup: %s", e)
             raise RuntimeError(f"Elasticsearch connection error: {e}") from e
+        except Exception as exc:
+            logger.error("Unexpected Elasticsearch connection failure: %s", exc, exc_info=True)
+            raise
 
     async def ensure_started(self) -> None:
         if self._es is None:
@@ -68,3 +82,8 @@ class ElasticsearchClient:
         await self.ensure_started()
         assert self._es is not None, "Elasticsearch client not connected. Has start() been called?"
         return await self._es.info()
+
+    async def get_mapping(self, index: str) -> Dict[str, Any]:
+        await self.ensure_started()
+        assert self._es is not None, "Elasticsearch client not connected. Has start() been called?"
+        return await self._es.indices.get_mapping(index=index)
