@@ -7,12 +7,12 @@ repos:
   - id: validate-pyproject
     name: 🔍 Validate pyproject.toml
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.28.0
+  rev: v8.30.0
   hooks:
     - id: gitleaks
       name: "🔒 Security · Detect hardcoded secrets"
 - repo: https://github.com/hukkin/mdformat
-  rev: 0.7.22
+  rev: 1.0.0
   hooks:
     - id: mdformat
       name: "🟢  Markdown · Format markdown"
@@ -43,7 +43,7 @@ repos:
     name: 🟢  Check trailing whitespaces
     exclude: (tests/data/.+|resources/.+\.(js|css))$
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.9.1
+  rev: 0.9.13
   hooks:
   - id: uv-lock
     name: ✅ Check UV lock file
@@ -54,7 +54,7 @@ repos:
     name: 🔍 Detect missing __init__.py files
     args: [ "--create", "--track", "--python-folders", "mtbls" ]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.0
+  rev: v0.14.6
   hooks:
   - id: ruff-check
     name: 🔍 Check Format with Ruff
@@ -67,7 +67,7 @@ repos:
   - id: ruff-format
     name: 🐍 python · Format with Ruff
 - repo: https://github.com/seddonym/import-linter.git
-  rev: "v2.5.2"
+  rev: "v2.7"
   hooks:
   - id: import-linter
     name: 🪵 architecture and package structure check (lint-imports)
@@ -75,7 +75,7 @@ repos:
     additional_dependencies: [ dependency_injector ]
     args: [ "--no-cache" ]
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.9.1
+  rev: v4.10.0
   hooks:
   - id: commitizen
     name: "🗒️ git · Validate commit message"
