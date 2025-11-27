@@ -1,8 +1,5 @@
-
-
 from datetime import datetime, timezone
 from typing import Dict, List
-
 
 
 def build_year_ranges(start_year: int = 2012) -> List[Dict[str, str]]:
@@ -26,6 +23,7 @@ def build_year_ranges(start_year: int = 2012) -> List[Dict[str, str]]:
         )
     return ranges
 
+
 def _iso_utc(dt: datetime) -> str:
     """Return ISO8601 UTC string with trailing 'Z' (like JS)."""
     if dt.tzinfo is None:
@@ -34,7 +32,8 @@ def _iso_utc(dt: datetime) -> str:
         dt = dt.astimezone(timezone.utc)
     return dt.isoformat().replace("+00:00", "Z")
 
-GB = 1024 ** 3  
+
+GB = 1024**3
 YEAR_RANGES = build_year_ranges(2012)
 
 VALUE_FACETS = {
@@ -90,20 +89,19 @@ VALUE_FACETS = {
         "type": "value",
         "field": "organismClass",
     },
-    
 }
 FACET_CONFIG = {
     **VALUE_FACETS,
-        "sizeInBytes": {
+    "sizeInBytes": {
         "type": "range",
         "field": "sizeInBytes",
         "ranges": [
-            {"from": 0,          "to": GB,         "name": "0 - 1GiB"},
-            {"from": GB,        "to": GB * 10,    "name": "1GiB - 10GiB"},
-            {"from": GB * 10,   "to": GB * 100,   "name": "10GiB - 100GiB"},
-            {"from": GB * 100,  "to": GB * 500,   "name": "100GiB - 500GiB"},
-            {"from": GB * 500,  "to": GB * 1024,  "name": "500GiB - 1TiB"},
-            {"from": GB * 1024,                   "name": "1TiB+"},
+            {"from": 0, "to": GB, "name": "0 - 1GiB"},
+            {"from": GB, "to": GB * 10, "name": "1GiB - 10GiB"},
+            {"from": GB * 10, "to": GB * 100, "name": "10GiB - 100GiB"},
+            {"from": GB * 100, "to": GB * 500, "name": "100GiB - 500GiB"},
+            {"from": GB * 500, "to": GB * 1024, "name": "500GiB - 1TiB"},
+            {"from": GB * 1024, "name": "1TiB+"},
         ],
     },
     "publicReleaseDate": {

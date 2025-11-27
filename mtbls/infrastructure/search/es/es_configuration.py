@@ -1,8 +1,10 @@
 from typing import Optional, Tuple
+
 from pydantic import BaseModel
 
+
 class ElasticsearchConfiguration(BaseModel):
-    origin_url: str = "" # do we want this to be a secret?
+    origin_url: str = ""  # do we want this to be a secret?
 
 
 class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
@@ -25,10 +27,9 @@ class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
         "publications.pubmedId^2",
         "contactFullnames^2",
         "contactEmails^2",
-        
     )
     facet_size: int = 25
-    
+
     source_includes: Optional[Tuple[str, ...]] = (
         "studyId",
         "title",
@@ -48,4 +49,3 @@ class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
         "factors",
         "sampleTypes",
     )
-    

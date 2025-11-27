@@ -58,8 +58,13 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
-from mtbls.infrastructure.search.es.es_client import ElasticsearchClient, ElasticsearchClientConfig
-from mtbls.infrastructure.search.es.study.es_study_search_gateway import ElasticsearchStudyGateway
+from mtbls.infrastructure.search.es.es_client import (
+    ElasticsearchClient,
+    ElasticsearchClientConfig,
+)
+from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
+    ElasticsearchStudyGateway,
+)
 
 
 def _append_port_to_hosts(hosts, port):
@@ -94,8 +99,8 @@ class GatewaysContainer(containers.DeclarativeContainer):
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
     )
-    
-    elasticsearch_client: ElasticsearchClient  = providers.Singleton(
+
+    elasticsearch_client: ElasticsearchClient = providers.Singleton(
         ElasticsearchClient,
         config=providers.Factory(
             ElasticsearchClientConfig,
@@ -107,14 +112,13 @@ class GatewaysContainer(containers.DeclarativeContainer):
             api_key=config.database.elasticsearch.connection.api_key,
             request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
             verify_certs=config.database.elasticsearch.connection.verify_certs,
-        )
+        ),
     )
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
         client=elasticsearch_client,
         config=None,  # rely on default gateway config; adjust if custom search settings are added
     )
-    
 
     # mongodb_connection: MongoDbConnection = providers.Resource(
     #     create_config_from_dict,

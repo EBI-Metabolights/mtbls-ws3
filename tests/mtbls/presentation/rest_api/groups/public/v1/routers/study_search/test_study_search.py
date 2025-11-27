@@ -1,4 +1,3 @@
-
 from typing import Any
 from unittest.mock import AsyncMock
 
@@ -38,7 +37,9 @@ def test_study_search_with_basic_query(
     assert result.content.results[0]["studyId"] == "MTBLS123"
 
 
-def test_get_study_index_mapping(public_api_client: TestClient, submission_api_container):
+def test_get_study_index_mapping(
+    public_api_client: TestClient, submission_api_container
+):
     url = "/public/v2/public-study-index/mapping"
     mock_mapping = {"public-study-search-index": {"mappings": {"properties": {}}}}
 

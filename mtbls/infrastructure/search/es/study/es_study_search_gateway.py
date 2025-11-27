@@ -1,23 +1,23 @@
-
-
-
 from typing import Any, Dict, List
 from uuid import uuid4
-from elasticsearch import Elasticsearch
-from mtbls.application.services.interfaces.http_client import HttpClient
+
 from mtbls.application.services.interfaces.search_port import SearchPort
 from mtbls.domain.entities.search.study.facet_configuration import FACET_CONFIG
-from mtbls.domain.entities.search.study.index_search import IndexSearchInput, IndexSearchResult
+from mtbls.domain.entities.search.study.index_search import (
+    IndexSearchInput,
+    IndexSearchResult,
+)
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
-from mtbls.infrastructure.search.es.es_configuration import StudyElasticSearchConfiguration
+from mtbls.infrastructure.search.es.es_configuration import (
+    StudyElasticSearchConfiguration,
+)
 
 
 class ElasticsearchStudyGateway(SearchPort):
-    
     def __init__(
         self,
         client: ElasticsearchClient,
-        config: None | StudyElasticSearchConfiguration | dict[str, Any]
+        config: None | StudyElasticSearchConfiguration | dict[str, Any],
     ):
         self._client = client
         self._config = config
@@ -37,17 +37,14 @@ class ElasticsearchStudyGateway(SearchPort):
         """
         mapping = await self._client.get_mapping(self.config.index_name)
         return mapping.get(self.config.index_name, mapping)
-        
+
     async def search(
         self,
         query: IndexSearchInput,
         raw: bool = False,
     ) -> IndexSearchResult | Dict[str, Any]:
         dsl = self._build_search_payload(query)
-        es_resp = await self._client.search(
-            index=self.config.index_name,
-            body=dsl
-        )
+        es_resp = await self._client.search(index=self.config.index_name, body=dsl)
 
         if raw:
             return es_resp
@@ -60,34 +57,35 @@ class ElasticsearchStudyGateway(SearchPort):
             results=results,
             totalResults=total,
             facets=facets,
-            requestId=str(uuid4()),# useless currently 
+            requestId=str(uuid4()),  # useless currently
         )
-        
-    
+
     def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
         must: List[Dict[str, Any]] = []
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
         if req.query:
-            must.append({
-                "bool": {
-                    "should": [
-                        {
-                            "multi_match": {
-                                "query": req.query,
-                                "fields": list(self.config.search_fields),
-                                "operator": "and"
-                            }
-                        },
-                        # prefix match (fast)
-                        *[
-                            {"prefix": {field: req.query.lower()}}
-                            for field in self.config.search_fields
-                        ]
-                    ],
-                    "minimum_should_match": 1
+            must.append(
+                {
+                    "bool": {
+                        "should": [
+                            {
+                                "multi_match": {
+                                    "query": req.query,
+                                    "fields": list(self.config.search_fields),
+                                    "operator": "and",
+                                }
+                            },
+                            # prefix match (fast)
+                            *[
+                                {"prefix": {field: req.query.lower()}}
+                                for field in self.config.search_fields
+                            ],
+                        ],
+                        "minimum_should_match": 1,
+                    }
                 }
-            })
+            )
 
         # Filters (simple value filters; operator all/any/none)
         for f in req.filters:
@@ -124,7 +122,7 @@ class ElasticsearchStudyGateway(SearchPort):
                 "bool": {
                     "must": must or [{"match_all": {}}],
                     "filter": filter_clauses,
-                    "must_not": must_not
+                    "must_not": must_not,
                 }
             },
             "sort": sort_clause,
@@ -187,7 +185,7 @@ class ElasticsearchStudyGateway(SearchPort):
                 continue
 
         return aggs
-    
+
     @staticmethod
     def _extract_total(es_resp: Dict[str, Any]) -> int:
         total = es_resp.get("hits", {}).get("total", 0)
@@ -241,22 +239,28 @@ class ElasticsearchStudyGateway(SearchPort):
 
             if ftype == "value":
                 for b in agg_resp.get("buckets", []):
-                    buckets.append({
-                        "value": b.get("key"),
-                        "count": int(b.get("doc_count", 0)),
-                    })
+                    buckets.append(
+                        {
+                            "value": b.get("key"),
+                            "count": int(b.get("doc_count", 0)),
+                        }
+                    )
             elif ftype == "range":
                 for key, b in (agg_resp.get("buckets") or {}).items():
-                    buckets.append({
-                        "value": key,
-                        "count": int(b.get("doc_count", 0)),
-                    })
+                    buckets.append(
+                        {
+                            "value": key,
+                            "count": int(b.get("doc_count", 0)),
+                        }
+                    )
             else:
                 continue
 
-            out[facet_name] = [{
-                "type": ftype,
-                "data": buckets,
-            }]
+            out[facet_name] = [
+                {
+                    "type": ftype,
+                    "data": buckets,
+                }
+            ]
 
         return out
