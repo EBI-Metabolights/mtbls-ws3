@@ -20,6 +20,7 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
+from mtbls.application.services.interfaces.search_port import SearchPort
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -57,6 +58,37 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
+from mtbls.infrastructure.search.es.es_client import (
+    ElasticsearchClient,
+    ElasticsearchClientConfig,
+)
+from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
+    ElasticsearchStudyGateway,
+)
+
+
+def _append_port_to_hosts(hosts, port):
+    if not hosts or port in (None, "", 0):
+        return hosts
+
+    try:
+        port_str = str(int(port))
+    except (TypeError, ValueError):
+        return hosts
+
+    def _format(host: str) -> str:
+        if not host:
+            return host
+        host_str = str(host)
+        scheme_split = host_str.split("://", 1)
+        host_body = scheme_split[-1]
+        if ":" in host_body:
+            return host_str  # already has a port
+        return f"{host_str}:{port_str}"
+
+    if isinstance(hosts, (list, tuple)):
+        return [_format(h) for h in hosts]
+    return _format(hosts)
 
 
 class GatewaysContainer(containers.DeclarativeContainer):
@@ -66,6 +98,26 @@ class GatewaysContainer(containers.DeclarativeContainer):
         DatabaseClientImpl,
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
+    )
+
+    elasticsearch_client: ElasticsearchClient = providers.Singleton(
+        ElasticsearchClient,
+        config=providers.Factory(
+            ElasticsearchClientConfig,
+            hosts=providers.Callable(
+                _append_port_to_hosts,
+                config.database.elasticsearch.connection.hosts,
+                config.database.elasticsearch.connection.port,
+            ),
+            api_key=config.database.elasticsearch.connection.api_key,
+            request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
+            verify_certs=config.database.elasticsearch.connection.verify_certs,
+        ),
+    )
+    elasticsearch_study_gateway: SearchPort = providers.Singleton(
+        ElasticsearchStudyGateway,
+        client=elasticsearch_client,
+        config=None,  # rely on default gateway config; adjust if custom search settings are added
     )
 
     # mongodb_connection: MongoDbConnection = providers.Resource(
