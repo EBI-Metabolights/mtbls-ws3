@@ -37,6 +37,7 @@ class StudyInput(BaseStudy):
     revision_number: int = 0
     revision_datetime: Union[None, datetime.datetime] = None
     sample_type: Union[None, str] = "minimum"
+    study_template: Union[None, str] = "minimum"
     template_version: str = "1.0"
     data_policy_agreement: int = 0
     mhd_accession: Union[None, str] = None

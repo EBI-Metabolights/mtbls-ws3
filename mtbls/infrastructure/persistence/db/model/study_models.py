@@ -302,6 +302,9 @@ class Study(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(
         nullable=False, server_default=func.now()
     )
+    study_template: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default=text("minimum"), default="minimum"
+    )
 
 
 class Statistic(Base):
