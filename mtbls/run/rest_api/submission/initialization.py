@@ -30,7 +30,9 @@ async def init_application(  # noqa: PLR0913
         "repositories.user_read_repository"
     ],
     policy_service: PolicyService = Provide["services.policy_service"],
-    elasticsearch_client: ElasticsearchClient = Provide["gateways.elasticsearch_client"],
+    elasticsearch_client: ElasticsearchClient = Provide[
+        "gateways.elasticsearch_client"
+    ],
     test_database_connection: bool = True,
     test_cache_service: bool = True,
     test_async_task_service: bool = True,
@@ -193,6 +195,7 @@ async def init_database_client(database_client: DatabaseClient):
     database_client_name = get_service_name(database_client)
     logger.info("Database client initialized: %s", database_client_name)
     logger.info("Database connection: %s", await database_client.get_connection_repr())
+
 
 async def init_elasticsearch_client(elasticsearch_client: ElasticsearchClient) -> bool:
     if not elasticsearch_client:
