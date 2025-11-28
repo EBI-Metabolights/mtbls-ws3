@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 import time
 from typing import Any, Dict, Union
 
@@ -28,6 +29,7 @@ from mtbls.application.services.interfaces.study_metadata_service_factory import
 )
 from mtbls.domain.entities.validation.validation_configuration import (
     FieldValueValidation,
+    MetadataFileType,
     OntologyValidationType,
     ValidationControls,
 )
@@ -288,7 +290,7 @@ def find_rule(
         controls, isa_table_type + "_file_controls"
     )
     control_list = selected_controls.get(template_name, [])
-
+    rule = None
     for control in control_list:
         criteria = control.selection_criteria
         match = all(
@@ -302,8 +304,10 @@ def find_rule(
             ]
         )
         if match:
-            return control
-    return None
+            rule = control
+            break
+
+    return rule
 
 
 def match_equal(criterion, val) -> bool:
@@ -351,15 +355,18 @@ async def post_process_validation_messages(
 ) -> None:
     if not ontology_search_service or not policy_result:
         return None
+    controls = await policy_service.get_control_lists()
+    file_templates = await policy_service.get_templates()
+
     search_validation_rules = {
         "rule_a_200_900_001_01": ("assay", isa_table_value_parser),
         "rule_s_200_900_001_01": ("sample", isa_table_value_parser),
         "rule_i_200_900_001_01": ("investigation", investigation_value_parser),
+        "rule_m_200_900_001_01": ("assignment", isa_table_value_parser),
     }
-    default_rule_value = ("", lambda x: "", "", "")
+    default_rule_value = ("", lambda x: "", "", "", MetadataFileType.INVESTIGATION)
 
     new_violations = []
-    controls = await policy_service.get_control_lists()
     if not controls:
         logger.error("Policy service does not return control lists")
         return
@@ -376,7 +383,10 @@ async def post_process_validation_messages(
         if identifier not in search_keys:
             new_violations.append(violation)
             continue
-        isa_table_type = search_validation_rules.get(identifier, default_rule_value)[0]
+        search_params = search_validation_rules.get(identifier, default_rule_value)
+        isa_table_type = search_params[0]
+        parser = search_params[1]
+
         template_name = ""
         if isa_table_type == "sample":
             template_name = sample_template
@@ -385,9 +395,31 @@ async def post_process_validation_messages(
             if assay_file:
                 template_name = assay_file.assay_technique.name
 
-        parser = search_validation_rules.get(identifier, default_rule_value)[1]
         new_values = []
         deleted_values = []
+        default_controls = file_templates.configuration.default_file_controls.get(
+            MetadataFileType(isa_table_type), []
+        )
+        field_key = violation.source_column_header
+        if not field_key:
+            field_key = "__default__"
+        default_template_key = None
+        for default_control in default_controls:
+            match = re.match(default_control.key_pattern, field_key)
+            if match:
+                default_template_key = default_control.default_key
+                break
+        default_rule = None
+        if default_template_key:
+            default_rule = find_rule(
+                controls,
+                isa_table_type,
+                category_name,
+                template_version,
+                default_template_key,
+                created_at,
+            )
+
         rule = find_rule(
             controls,
             isa_table_type,
@@ -396,6 +428,7 @@ async def post_process_validation_messages(
             template_name,
             created_at,
         )
+        selected_rule = rule or default_rule
         is_child_rule = (
             rule and rule.validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
         )
@@ -404,9 +437,7 @@ async def post_process_validation_messages(
             parents = rule.allowed_parent_ontology_terms.parents
         for value in violation.values:
             term, source, accession = parser(value)
-
-            if source in {"MTBLS", "WoRM"}:
-                new_values.append(value)
+            if is_exceptional_term(selected_rule, term, source, accession):
                 continue
 
             if is_child_rule and rule and term:
@@ -481,6 +512,39 @@ async def post_process_validation_messages(
                 ", ".join(violation.values),
             )
     policy_result.messages.violations = new_violations
+
+
+def is_exceptional_term(
+    default_rule: FieldValueValidation, term: str, source: str, accession: str
+):
+    if not default_rule:
+        return False
+    accession = accession or ""
+    source = source or ""
+    term = term or ""
+    if default_rule.allowed_placeholders:
+        for item in default_rule.allowed_placeholders:
+            if (
+                item.term_accession_number == accession
+                and item.term_source_ref == source
+            ):
+                return True
+    if default_rule.allowed_other_sources:
+        for item in default_rule.allowed_other_sources:
+            if (
+                accession.startswith(item.accession_prefix)
+                and item.source_label == source
+            ):
+                return True
+    if default_rule.allowed_missing_ontology_terms:
+        for item in default_rule.allowed_missing_ontology_terms:
+            if (
+                item.term == term
+                and item.term_accession_number == accession
+                and item.term_source_ref == source
+            ):
+                return True
+        return False
 
 
 async def get_input_data(
