@@ -4,47 +4,7 @@
       "__default__": [
         {
           "ruleName": "default-assay-file-rule-01",
-          "description": "default",
           "fieldName": "",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "optional",
-          "validationType": "any-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "MTBLS",
-              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
-            },
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [
-            {
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
-              "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
-            }
-          ],
-          "terms": [],
           "ontologies": [
             "OBI",
             "EFO",
@@ -73,29 +33,7 @@
             "MP"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": [
-            "unknown",
-            "undefined",
-            "n/a",
-            "na",
-            "not applicable",
-            "not available",
-            "none",
-            "null",
-            "nill",
-            "not specified",
-            "not provided",
-            "-",
-            "--",
-            "---"
-          ]
-        }
-      ],
-      "Sample Name": [
-        {
-          "ruleName": "Sample Name-01",
-          "description": "",
-          "fieldName": "Sample Name",
+          "description": "default",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -105,195 +43,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
-          "validationType": "check-only-constraints",
-          "constraints": [
-            {
-              "type": "pattern",
-              "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
-              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters"
-            }
-          ],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Parameter Value[Scan polarity]": [
-        {
-          "ruleName": "Parameter Value[Scan polarity]-01",
-          "description": "",
-          "fieldName": "Parameter Value[Scan polarity]",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": [
-              "ms-mhd-enabled"
-            ],
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Mass spectrometry"
-              }
-            ]
-          },
-          "enforcementLevel": "required",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [
-            {
-              "term": "negative ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000150",
-              "termSourceRef": "AFO"
-            },
-            {
-              "term": "positive ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000151",
-              "termSourceRef": "AFO"
-            },
-            {
-              "term": "alternating ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000152",
-              "termSourceRef": "AFO"
-            }
-          ],
-          "ontologies": [
-            "AFO"
-          ],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Scan polarity]-02",
-          "description": "",
-          "fieldName": "Parameter Value[Scan polarity]",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": "2025-11-01T00:00:00",
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Mass spectrometry"
-              }
-            ]
-          },
-          "enforcementLevel": "required",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [
-            {
-              "term": "negative ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000150",
-              "termSourceRef": "AFO"
-            },
-            {
-              "term": "positive ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000151",
-              "termSourceRef": "AFO"
-            },
-            {
-              "term": "alternating ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000152",
-              "termSourceRef": "AFO"
-            }
-          ],
-          "ontologies": [
-            "AFO"
-          ],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Scan polarity]-03",
-          "description": "",
-          "fieldName": "Parameter Value[Scan polarity]",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Mass spectrometry"
-              }
-            ]
-          },
-          "enforcementLevel": "required",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [
-            {
-              "term": "positive",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_001087",
-              "termSourceRef": "MTBLS"
-            },
-            {
-              "term": "negative",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_001088",
-              "termSourceRef": "MTBLS"
-            },
-            {
-              "term": "alternating",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_001089",
-              "termSourceRef": "MTBLS"
-            }
-          ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Parameter Value[Pulse sequence name]": [
-        {
-          "ruleName": "Parameter Value[Pulse sequence name]-01",
-          "description": "",
-          "fieldName": "Parameter Value[Pulse sequence name]",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": [
-              "NMR"
-            ],
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "NMR spectroscopy"
-              }
-            ]
-          },
-          "enforcementLevel": "recommended",
+          "termEnforcementLevel": "optional",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "any-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -318,6 +71,211 @@
             {
               "termAccessionNumber": "",
               "termSourceRef": ""
+            }
+          ],
+          "terms": [],
+          "unexpectedTerms": [
+            "unknown",
+            "undefined",
+            "n/a",
+            "na",
+            "not applicable",
+            "not available",
+            "none",
+            "null",
+            "nill",
+            "not specified",
+            "not provided",
+            "-",
+            "--",
+            "---"
+          ]
+        }
+      ],
+      "Sample Name": [
+        {
+          "ruleName": "Sample Name-01",
+          "fieldName": "Sample Name",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "not-applicable",
+          "validationType": "check-only-constraints",
+          "constraints": {
+            "pattern": {
+              "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
+              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters",
+              "enforcementLevel": "recommended"
+            }
+          },
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [],
+          "allowedPlaceholders": [],
+          "terms": [],
+          "unexpectedTerms": []
+        }
+      ],
+      "Parameter Value[Scan polarity]": [
+        {
+          "ruleName": "Parameter Value[Scan polarity]-01",
+          "fieldName": "Parameter Value[Scan polarity]",
+          "ontologies": [
+            "AFO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Protocol REF",
+                "value": "Mass spectrometry"
+              }
+            ]
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [],
+          "allowedPlaceholders": [],
+          "terms": [
+            {
+              "term": "negative ionization polarity",
+              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000150",
+              "termSourceRef": "AFO"
+            },
+            {
+              "term": "positive ionization polarity",
+              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000151",
+              "termSourceRef": "AFO"
+            },
+            {
+              "term": "alternating ionization polarity",
+              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000152",
+              "termSourceRef": "AFO"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Scan polarity]-02",
+          "fieldName": "Parameter Value[Scan polarity]",
+          "ontologies": [
+            "AFO",
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Protocol REF",
+                "value": "Mass spectrometry"
+              }
+            ]
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [],
+          "allowedPlaceholders": [],
+          "terms": [
+            {
+              "term": "negative",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "positive",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "alternating",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Parameter Value[Pulse sequence name]": [
+        {
+          "ruleName": "Parameter Value[Pulse sequence name]-01",
+          "fieldName": "Parameter Value[Pulse sequence name]",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "NMR"
+            ],
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Protocol REF",
+                "value": "NMR spectroscopy"
+              }
+            ]
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
             }
           ],
           "terms": [
@@ -617,18 +575,18 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[NMR Probe]": [
         {
           "ruleName": "Parameter Value[NMR Probe]-01",
-          "description": "",
           "fieldName": "Parameter Value[NMR Probe]",
+          "ontologies": [
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -645,9 +603,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -668,10 +627,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -1096,23 +1051,37 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Instrument]": [
         {
           "ruleName": "Parameter Value[Instrument]-01",
-          "description": "",
           "fieldName": "Parameter Value[Instrument]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [
+              "^.*instrument model$"
+            ],
+            "excludeByAccession": [],
+            "parents": [
+              {
+                "term": "instrument model",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000031",
+                "termSourceRef": "MS"
+              }
+            ]
+          },
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": [
               "LC-MS",
@@ -1131,9 +1100,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "child-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -1148,26 +1118,16 @@
           ],
           "allowedPlaceholders": [],
           "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": {
-            "excludeByLabelPattern": [
-              "^.*instrument model$"
-            ],
-            "excludeByAccession": [],
-            "parents": [
-              {
-                "term": "instrument model",
-                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000031",
-                "termSourceRef": "MS"
-              }
-            ]
-          },
           "unexpectedTerms": []
         },
         {
           "ruleName": "Parameter Value[Instrument]-03",
-          "description": "",
           "fieldName": "Parameter Value[Instrument]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -1184,9 +1144,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -2062,17 +2023,16 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Parameter Value[Instrument]-04",
-          "description": "",
           "fieldName": "Parameter Value[Instrument]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": "2025-12-01T00:00:00",
@@ -2089,9 +2049,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -2104,10 +2065,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -2337,17 +2294,16 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Parameter Value[Instrument]-05",
-          "description": "",
           "fieldName": "Parameter Value[Instrument]",
+          "ontologies": [
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -2364,9 +2320,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -2379,10 +2336,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -2592,18 +2545,19 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Chromatography Instrument]": [
         {
           "ruleName": "Parameter Value[Chromatography Instrument]-01",
-          "description": "",
           "fieldName": "Parameter Value[Chromatography Instrument]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -2620,9 +2574,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -2643,10 +2598,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3041,17 +2992,17 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Chromatography Instrument]-02",
+          "fieldName": "Parameter Value[Chromatography Instrument]",
           "ontologies": [
             "MS",
             "MTBLS"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Chromatography Instrument]-02",
           "description": "",
-          "fieldName": "Parameter Value[Chromatography Instrument]",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3068,9 +3019,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -3091,10 +3043,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3434,19 +3382,18 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Ion source]": [
         {
           "ruleName": "Parameter Value[Ion source]-01",
-          "description": "",
           "fieldName": "Parameter Value[Ion source]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3463,9 +3410,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -3486,10 +3434,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3524,17 +3468,16 @@
               "termSourceRef": "MS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Parameter Value[Ion source]-02",
-          "description": "",
           "fieldName": "Parameter Value[Ion source]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3551,9 +3494,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -3574,10 +3518,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3597,17 +3537,16 @@
               "termSourceRef": "MS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Parameter Value[Ion source]-03",
-          "description": "",
           "fieldName": "Parameter Value[Ion source]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3624,9 +3563,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -3647,10 +3587,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3665,19 +3601,19 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Guard column]": [
         {
           "ruleName": "Parameter Value[Guard column]-01",
-          "description": "",
           "fieldName": "Parameter Value[Guard column]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3694,9 +3630,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -3717,10 +3654,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -3960,17 +3893,17 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Guard column]-02",
+          "fieldName": "Parameter Value[Guard column]",
           "ontologies": [
             "MS",
             "MTBLS"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Guard column]-02",
           "description": "",
-          "fieldName": "Parameter Value[Guard column]",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -3987,9 +3920,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4010,10 +3944,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -4068,19 +3998,16 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[NMR tube type]": [
         {
           "ruleName": "Parameter Value[NMR tube type]-01",
-          "description": "",
           "fieldName": "Parameter Value[NMR tube type]",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4097,9 +4024,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4120,10 +4048,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -4248,18 +4172,16 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "NMR Assay Name": [
         {
           "ruleName": "NMR Assay Name-01",
-          "description": "",
           "fieldName": "NMR Assay Name",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4269,30 +4191,31 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "check-only-constraints",
-          "constraints": [
-            {
-              "type": "pattern",
+          "constraints": {
+            "pattern": {
               "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
-              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters"
+              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters",
+              "enforcementLevel": "recommended"
             }
-          ],
+          },
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "MS Assay Name": [
         {
           "ruleName": "MS Assay Name-01",
-          "description": "",
           "fieldName": "MS Assay Name",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4302,30 +4225,34 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "not-applicable",
           "validationType": "check-only-constraints",
-          "constraints": [
-            {
-              "type": "pattern",
+          "constraints": {
+            "pattern": {
               "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
-              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters"
+              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters",
+              "enforcementLevel": "recommended"
             }
-          ],
+          },
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Autosampler model]": [
         {
           "ruleName": "Parameter Value[Autosampler model]-01",
-          "description": "",
           "fieldName": "Parameter Value[Autosampler model]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4342,9 +4269,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4365,10 +4293,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -4533,17 +4457,17 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Autosampler model]-02",
+          "fieldName": "Parameter Value[Autosampler model]",
           "ontologies": [
             "MS",
             "MTBLS"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Autosampler model]-02",
           "description": "",
-          "fieldName": "Parameter Value[Autosampler model]",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4560,9 +4484,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4583,10 +4508,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -4746,19 +4667,18 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Mass analyzer]": [
         {
           "ruleName": "Parameter Value[Mass analyzer]-01",
-          "description": "",
           "fieldName": "Parameter Value[Mass analyzer]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4773,9 +4693,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4796,10 +4717,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -4859,19 +4776,18 @@
               "termSourceRef": "MS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Solvent]": [
         {
           "ruleName": "Parameter Value[Solvent]-01",
-          "description": "",
           "fieldName": "Parameter Value[Solvent]",
+          "ontologies": [
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -4888,9 +4804,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -4911,10 +4828,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -5074,44 +4987,13 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Unit": [
         {
           "ruleName": "Unit-01",
-          "description": "",
           "fieldName": "Unit",
-          "selectionCriteria": {
-            "isaFileType": "assay",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "recommended",
-          "validationType": "child-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [],
-          "terms": [],
           "ontologies": [],
           "allowedParentOntologyTerms": {
             "excludeByLabelPattern": [
@@ -5144,14 +5026,47 @@
               }
             ]
           },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "not-applicable",
+          "validationType": "child-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
           "unexpectedTerms": []
         }
       ],
       "Parameter Value[Column model]": [
         {
           "ruleName": "Parameter Value[Column model]-01",
-          "description": "",
           "fieldName": "Parameter Value[Column model]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -5168,9 +5083,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -5191,10 +5107,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -6554,17 +6466,17 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Column model]-02",
+          "fieldName": "Parameter Value[Column model]",
           "ontologies": [
             "MS",
             "MTBLS"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Parameter Value[Column model]-02",
           "description": "",
-          "fieldName": "Parameter Value[Column model]",
           "selectionCriteria": {
             "isaFileType": "assay",
             "studyCreatedAtOrAfter": null,
@@ -6581,9 +6493,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -6604,10 +6517,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -6977,11 +6886,6 @@
               "termSourceRef": "MTBLS"
             }
           ],
-          "ontologies": [
-            "MS",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ]
@@ -6990,43 +6894,7 @@
       "__default__": [
         {
           "ruleName": "default-sample-file-rule-01",
-          "description": "default",
           "fieldName": "",
-          "selectionCriteria": {
-            "isaFileType": "sample",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "optional",
-          "validationType": "any-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "MTBLS",
-              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
-            },
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [
-            {
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
-              "termSourceRef": "MTBLS"
-            }
-          ],
-          "terms": [],
           "ontologies": [
             "OBI",
             "EFO",
@@ -7055,6 +6923,47 @@
             "MP"
           ],
           "allowedParentOntologyTerms": null,
+          "description": "default",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [],
           "unexpectedTerms": [
             "unknown",
             "undefined",
@@ -7078,11 +6987,17 @@
       "Factor Value[Disease]": [
         {
           "ruleName": "Factor Value[Disease]-01",
-          "description": "",
           "fieldName": "Factor Value[Disease]",
+          "ontologies": [
+            "MONDO",
+            "MP",
+            "SNOMED"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
-            "studyCreatedAtOrAfter": null,
+            "studyCreatedAtOrAfter": "2026-01-01T00:00:00",
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
@@ -7094,9 +7009,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [
             {
@@ -7117,20 +7033,70 @@
           ],
           "allowedPlaceholders": [],
           "terms": [],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Factor Value[Disease]-02",
+          "fieldName": "Factor Value[Disease]",
           "ontologies": [
             "MONDO",
             "MP",
             "SNOMED"
           ],
           "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Sample Name",
+                "value": null
+              }
+            ]
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [
+            {
+              "term": "Not Applicable",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+              "termSourceRef": "NCIT"
+            }
+          ],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
           "unexpectedTerms": []
         }
       ],
       "Characteristics[Sample type]": [
         {
           "ruleName": "Characteristics[Sample type]-01",
-          "description": "",
           "fieldName": "Characteristics[Sample type]",
+          "ontologies": [
+            "CHMO",
+            "MSIO",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -7145,9 +7111,10 @@
               }
             ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -7184,20 +7151,16 @@
               "termSourceRef": "MSIO"
             }
           ],
-          "ontologies": [
-            "CHMO",
-            "MSIO",
-            "MTBLS"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Sample Name": [
         {
           "ruleName": "Sample Name-01",
-          "description": "",
           "fieldName": "Sample Name",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -7207,61 +7170,28 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "check-only-constraints",
-          "constraints": [
-            {
-              "type": "pattern",
+          "constraints": {
+            "pattern": {
               "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
-              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters"
+              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters",
+              "enforcementLevel": "recommended"
             }
-          ],
+          },
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "__default_characteristic__": [
         {
-          "ruleName": "default-sample-file-rule-01",
-          "description": "default",
+          "ruleName": "default-sample-characteristic-rule-01",
           "fieldName": "",
-          "selectionCriteria": {
-            "isaFileType": "sample",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [
-            {
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
-              "termSourceRef": "MTBLS"
-            }
-          ],
-          "terms": [],
           "ontologies": [
             "OBI",
             "EFO",
@@ -7290,12 +7220,7 @@
             "MP"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "default-sample-file-rule-02",
           "description": "default",
-          "fieldName": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -7305,16 +7230,13 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
-            {
-              "sourceLabel": "MTBLS",
-              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
-            },
             {
               "sourceLabel": "wikidata",
               "accessionPrefix": "https://www.wikidata.org/wiki/"
@@ -7331,107 +7253,28 @@
             }
           ],
           "terms": [],
-          "ontologies": [
-            "OBI",
-            "EFO",
-            "CHMO",
-            "NCIT",
-            "NCBITAXON",
-            "MS",
-            "BTO",
-            "CHEBI",
-            "UO",
-            "MESH",
-            "BAO",
-            "OMIT",
-            "GO",
-            "ENVO",
-            "MSIO",
-            "PO",
-            "MONDO",
-            "UBERON",
-            "SNOMED",
-            "CL",
-            "CLO",
-            "MI",
-            "EDAM",
-            "HP",
-            "MP"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Characteristics[Disease]": [
         {
           "ruleName": "Characteristics[Disease]-01",
-          "description": "",
           "fieldName": "Characteristics[Disease]",
-          "selectionCriteria": {
-            "isaFileType": "sample",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              },
-              {
-                "name": "Sample Name",
-                "value": null
-              }
-            ]
-          },
-          "enforcementLevel": "required",
-          "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
-          "defaultValue": {
-            "term": "Not Applicable",
-            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
-            "termSourceRef": "NCIT"
-          },
-          "allowedMissingOntologyTerms": [
-            {
-              "term": "Not Applicable",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
-              "termSourceRef": "NCIT"
-            }
-          ],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [],
-          "terms": [],
           "ontologies": [
             "MONDO",
             "MP",
             "SNOMED"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Characteristics[Cell type]": [
-        {
-          "ruleName": "Characteristics[Cell type]-01",
           "description": "",
-          "fieldName": "Characteristics[Cell type]",
           "selectionCriteria": {
             "isaFileType": "sample",
-            "studyCreatedAtOrAfter": "2028-01-01T00:00:00",
+            "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
-            "templateVersionFilter": null,
+            "templateVersionFilter": [
+              "2.0"
+            ],
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": [
               {
@@ -7444,9 +7287,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": {
             "term": "Not Applicable",
             "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
@@ -7471,38 +7315,56 @@
           ],
           "allowedPlaceholders": [],
           "terms": [],
+          "unexpectedTerms": []
+        }
+      ],
+      "Characteristics[Cell type]": [
+        {
+          "ruleName": "Characteristics[Cell type]-01",
+          "fieldName": "Characteristics[Cell type]",
           "ontologies": [
             "CL",
             "CLO"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "__default_factor_value__": [
-        {
-          "ruleName": "default-sample-file-rule-01",
-          "description": "default",
-          "fieldName": "",
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Source Name",
+                "value": null
+              },
+              {
+                "name": "Sample Name",
+                "value": null
+              }
+            ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": {
+            "term": "Not Applicable",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+            "termSourceRef": "NCIT"
+          },
+          "allowedMissingOntologyTerms": [
             {
-              "sourceLabel": "MTBLS",
-              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
-            },
+              "term": "Not Applicable",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+              "termSourceRef": "NCIT"
+            }
+          ],
+          "allowedOtherSources": [
             {
               "sourceLabel": "wikidata",
               "accessionPrefix": "https://www.wikidata.org/wiki/"
@@ -7512,13 +7374,15 @@
               "accessionPrefix": "http://uri.interlex.org/base/ilx_"
             }
           ],
-          "allowedPlaceholders": [
-            {
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
-              "termSourceRef": "MTBLS"
-            }
-          ],
+          "allowedPlaceholders": [],
           "terms": [],
+          "unexpectedTerms": []
+        }
+      ],
+      "__default_factor_value__": [
+        {
+          "ruleName": "default-sample-factor_value-rule-01",
+          "fieldName": "",
           "ontologies": [
             "OBI",
             "EFO",
@@ -7547,14 +7411,7 @@
             "MP"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Characteristics[Organism part]": [
-        {
-          "ruleName": "Characteristics[Organism part]-01",
-          "description": "",
-          "fieldName": "Characteristics[Organism part]",
+          "description": "default",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -7562,19 +7419,19 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
           "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
             {
               "sourceLabel": "wikidata",
               "accessionPrefix": "https://www.wikidata.org/wiki/"
@@ -7584,59 +7441,20 @@
               "accessionPrefix": "http://uri.interlex.org/base/ilx_"
             }
           ],
-          "allowedPlaceholders": [],
-          "terms": [
+          "allowedPlaceholders": [
             {
-              "term": "blood plasma",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000131",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "blood serum",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000133",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "urine",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0001419",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "feces",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000440",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "leaf",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000713",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "exocarp",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000733",
-              "termSourceRef": "BTO"
-            },
-            {
-              "term": "Whole Organism",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C13413",
-              "termSourceRef": "NCIT"
-            },
-            {
-              "term": "exometabolome",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000131",
-              "termSourceRef": "MTBLS"
-            },
-            {
-              "term": "endometabolome",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000125",
-              "termSourceRef": "MTBLS"
-            },
-            {
-              "term": "blank",
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_002304",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
             }
           ],
+          "terms": [],
+          "unexpectedTerms": []
+        }
+      ],
+      "Characteristics[Organism part]": [
+        {
+          "ruleName": "Characteristics[Organism part]-01",
+          "fieldName": "Characteristics[Organism part]",
           "ontologies": [
             "UBERON",
             "BTO",
@@ -7644,20 +7462,15 @@
             "MSIO"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Characteristics[Organism part]-02",
           "description": "",
-          "fieldName": "Characteristics[Organism part]",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": [
-              "1.0"
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
             ],
+            "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": [
               {
@@ -7666,18 +7479,23 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [
+          "allowedOtherSources": [
             {
-              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
-              "termSourceRef": "MTBLS"
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
             }
           ],
+          "allowedPlaceholders": [],
           "terms": [
             {
               "term": "blood plasma",
@@ -7730,6 +7548,11 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Characteristics[Organism part]-02",
+          "fieldName": "Characteristics[Organism part]",
           "ontologies": [
             "BTO",
             "NCIT",
@@ -7740,14 +7563,7 @@
             "CHEBI"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Unit": [
-        {
-          "ruleName": "Unit-01",
           "description": "",
-          "fieldName": "Unit",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -7755,25 +7571,85 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
+            "linkedFieldAndValueFilter": [
+              {
+                "name": "Source Name",
+                "value": null
+              }
+            ]
           },
-          "enforcementLevel": "recommended",
-          "validationType": "child-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
+          "allowedOtherSources": [],
+          "allowedPlaceholders": [
             {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
             }
           ],
-          "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "blood plasma",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000131",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "blood serum",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000133",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "urine",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0001419",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "feces",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000440",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "leaf",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000713",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "exocarp",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/BTO_0000733",
+              "termSourceRef": "BTO"
+            },
+            {
+              "term": "Whole Organism",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C13413",
+              "termSourceRef": "NCIT"
+            },
+            {
+              "term": "exometabolome",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000131",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "endometabolome",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000125",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "blank",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_002304",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Unit": [
+        {
+          "ruleName": "Unit-01",
+          "fieldName": "Unit",
           "ontologies": [],
           "allowedParentOntologyTerms": {
             "excludeByLabelPattern": [
@@ -7806,19 +7682,54 @@
               }
             ]
           },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "child-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
           "unexpectedTerms": []
         }
       ],
       "Characteristics[Organism]": [
         {
           "ruleName": "Characteristics[Organism]-01",
-          "description": "",
           "fieldName": "Characteristics[Organism]",
+          "ontologies": [
+            "NCBITAXON",
+            "ENVO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": [
@@ -7828,9 +7739,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -7886,11 +7798,6 @@
               "termSourceRef": "ENVO"
             }
           ],
-          "ontologies": [
-            "NCBITAXON",
-            "ENVO"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": [
             "cat",
             "chicken",
@@ -7926,16 +7833,24 @@
         },
         {
           "ruleName": "Characteristics[Organism]-02",
-          "description": "",
           "fieldName": "Characteristics[Organism]",
+          "ontologies": [
+            "NCBITAXON",
+            "ENVO",
+            "MTBLS",
+            "WoRMs",
+            "EFO",
+            "NCIT",
+            "MSIO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
-            "templateVersionFilter": [
-              "1.0"
-            ],
+            "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": [
               {
@@ -7944,9 +7859,10 @@
               }
             ]
           },
-          "enforcementLevel": "required",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -8013,16 +7929,6 @@
               "termSourceRef": "MSIO"
             }
           ],
-          "ontologies": [
-            "NCBITAXON",
-            "ENVO",
-            "MTBLS",
-            "WoRMs",
-            "EFO",
-            "NCIT",
-            "MSIO"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": [
             "cat",
             "chicken",
@@ -8060,8 +7966,10 @@
       "Source Name": [
         {
           "ruleName": "Source Name-01",
-          "description": "",
           "fieldName": "Source Name",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
@@ -8071,34 +7979,39 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "check-only-constraints",
-          "constraints": [
-            {
-              "type": "pattern",
+          "constraints": {
+            "pattern": {
               "constraint": "^[a-zA-Z0-9][a-zA-Z0-9-_ ]+[a-zA-Z0-9]$",
-              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters"
+              "errorMessage": "Value must be at least 3 characters and contain only alphanumeric characters, space, - and _ characters",
+              "enforcementLevel": "recommended"
             }
-          ],
+          },
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ]
     },
-    "investigationFileControls": {
+    "assignmentFileControls": {
       "__default__": [
         {
-          "ruleName": "default-investigation-file-rule-01",
-          "description": "default",
+          "ruleName": "default-assignment-file-rule-01",
           "fieldName": "",
+          "ontologies": [
+            "CHEBI",
+            "EFO",
+            "CHMO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "default",
           "selectionCriteria": {
-            "isaFileType": "investigation",
+            "isaFileType": "assignment",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
@@ -8106,9 +8019,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "optional",
+          "termEnforcementLevel": "optional",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "any-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -8132,6 +8046,99 @@
             }
           ],
           "terms": [],
+          "unexpectedTerms": [
+            "unknown",
+            "undefined",
+            "n/a",
+            "na",
+            "not applicable",
+            "not available",
+            "none",
+            "null",
+            "nill",
+            "not specified",
+            "not provided",
+            "-",
+            "--",
+            "---",
+            "_",
+            "."
+          ]
+        }
+      ],
+      "Unit": [
+        {
+          "ruleName": "Unit-01",
+          "fieldName": "Unit",
+          "ontologies": [],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [
+              "^.*unit$",
+              "^.*Unit of.*$"
+            ],
+            "excludeByAccession": [
+              "http://purl.obolibrary.org/obo/NCIT_C41139"
+            ],
+            "parents": [
+              {
+                "term": "unit",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000000",
+                "termSourceRef": "UO"
+              },
+              {
+                "term": "unit",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000000",
+                "termSourceRef": "EFO"
+              },
+              {
+                "term": "Qualifier",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C41009",
+                "termSourceRef": "NCIT"
+              },
+              {
+                "term": "Unit of Measure",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C25709",
+                "termSourceRef": "NCIT"
+              }
+            ]
+          },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assignment",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "not-applicable",
+          "validationType": "child-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
+          "unexpectedTerms": []
+        }
+      ]
+    },
+    "investigationFileControls": {
+      "__default__": [
+        {
+          "ruleName": "default-investigation-file-rule-01",
+          "fieldName": "",
           "ontologies": [
             "OBI",
             "EFO",
@@ -8160,6 +8167,43 @@
             "MP"
           ],
           "allowedParentOntologyTerms": null,
+          "description": "default",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "optional",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "any-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [],
           "unexpectedTerms": [
             "unknown",
             "undefined",
@@ -8183,8 +8227,22 @@
       "Study Protocol Type": [
         {
           "ruleName": "Study Protocol Type-01",
-          "description": "",
           "fieldName": "Study Protocol Type",
+          "ontologies": [
+            "EFO",
+            "NCIT",
+            "MTBLS",
+            "CHEBI",
+            "CHMO",
+            "MONDO",
+            "PRIDE",
+            "GO",
+            "MESH",
+            "MI",
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8194,9 +8252,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -8272,8 +8331,16 @@
               "termSourceRef": "MTBLS"
             }
           ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Study Design Type": [
+        {
+          "ruleName": "Study Design Type-01",
+          "fieldName": "Study Design Type",
           "ontologies": [
             "EFO",
+            "MSIO",
             "NCIT",
             "MTBLS",
             "CHEBI",
@@ -8281,19 +8348,10 @@
             "MONDO",
             "PRIDE",
             "GO",
-            "MESH",
-            "MI",
-            "MS"
+            "MESH"
           ],
           "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        }
-      ],
-      "Study Design Type": [
-        {
-          "ruleName": "Study Design Type-01",
           "description": "",
-          "fieldName": "Study Design Type",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8303,9 +8361,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -8384,26 +8443,28 @@
               "termSourceRef": "MONDO"
             }
           ],
-          "ontologies": [
-            "EFO",
-            "NCIT",
-            "MTBLS",
-            "CHEBI",
-            "CHMO",
-            "MONDO",
-            "PRIDE",
-            "GO",
-            "MESH"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Person Roles": [
         {
           "ruleName": "Study Person Roles-01",
-          "description": "",
           "fieldName": "Study Person Roles",
+          "ontologies": [
+            "NCIT"
+          ],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [],
+            "excludeByAccession": [],
+            "parents": [
+              {
+                "term": "Personnel",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C60758",
+                "termSourceRef": "NCIT"
+              }
+            ]
+          },
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8413,9 +8474,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
           "validationType": "child-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": {
             "term": "Investigator",
             "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C25936",
@@ -8441,28 +8503,16 @@
               "termSourceRef": "NCIT"
             }
           ],
-          "ontologies": [
-            "NCIT"
-          ],
-          "allowedParentOntologyTerms": {
-            "excludeByLabelPattern": [],
-            "excludeByAccession": [],
-            "parents": [
-              {
-                "term": "Personnel",
-                "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C60758",
-                "termSourceRef": "NCIT"
-              }
-            ]
-          },
           "unexpectedTerms": []
         }
       ],
       "Study Assay Measurement Type": [
         {
           "ruleName": "Study Assay Measurement Type-01",
-          "description": "",
           "fieldName": "Study Assay Measurement Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8474,9 +8524,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -8493,14 +8544,17 @@
               "termSourceRef": "MSIO"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Study Assay Measurement Type-03",
-          "description": "",
           "fieldName": "Study Assay Measurement Type",
+          "ontologies": [
+            "MSIO",
+            "OBI"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8510,9 +8564,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "not-applicable",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -8534,19 +8589,26 @@
               "termSourceRef": "MSIO"
             }
           ],
-          "ontologies": [
-            "MSIO",
-            "OBI"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Protocol Components Type": [
         {
           "ruleName": "Study Protocol Components Type-01",
-          "description": "",
           "fieldName": "Study Protocol Components Type",
+          "ontologies": [
+            "EFO",
+            "NCIT",
+            "MTBLS",
+            "CHEBI",
+            "CHMO",
+            "MONDO",
+            "PRIDE",
+            "GO",
+            "MESH"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8556,9 +8618,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -8586,26 +8649,27 @@
             }
           ],
           "terms": [],
-          "ontologies": [
-            "EFO",
-            "NCIT",
-            "MTBLS",
-            "CHEBI",
-            "CHMO",
-            "MONDO",
-            "PRIDE",
-            "GO",
-            "MESH"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Protocol Parameter Name": [
         {
           "ruleName": "Study Protocol Parameter Name-01",
-          "description": "",
           "fieldName": "Study Protocol Parameter Name",
+          "ontologies": [
+            "MS",
+            "EFO",
+            "NCIT",
+            "MTBLS",
+            "CHMO",
+            "MONDO",
+            "PRIDE",
+            "GO",
+            "MESH",
+            "MI"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -8615,9 +8679,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -9013,27 +9078,16 @@
               "termSourceRef": ""
             }
           ],
-          "ontologies": [
-            "MS",
-            "EFO",
-            "NCIT",
-            "MTBLS",
-            "CHMO",
-            "MONDO",
-            "PRIDE",
-            "GO",
-            "MESH",
-            "MI"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Assay Technology Type": [
         {
           "ruleName": "Study Assay Technology Type-01",
-          "description": "",
           "fieldName": "Study Assay Technology Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -9045,9 +9099,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9059,14 +9114,14 @@
               "termSourceRef": "OBI"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Study Assay Technology Type-02",
-          "description": "",
           "fieldName": "Study Assay Technology Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -9085,9 +9140,10 @@
             ],
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9099,14 +9155,14 @@
               "termSourceRef": "OBI"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Study Assay Technology Type-03",
-          "description": "",
           "fieldName": "Study Assay Technology Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -9118,9 +9174,10 @@
             ],
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9132,52 +9189,18 @@
               "termSourceRef": "OBI"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Study Assay Technology Type-04",
-          "description": "",
-          "fieldName": "Study Assay Technology Type",
-          "selectionCriteria": {
-            "isaFileType": "investigation",
-            "studyCreatedAtOrAfter": "2025-12-01T00:00:00",
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": [
-              "MSImaging",
-              "MRImaging"
-            ],
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "required",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [
-            {
-              "term": "imaging assay",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0000185",
-              "termSourceRef": "OBI"
-            }
-          ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Study Assay Technology Type-05",
-          "description": "",
           "fieldName": "Study Assay Technology Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": "2025-12-01T00:00:00",
+            "studyCreatedBefore": null,
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": [
@@ -9186,9 +9209,10 @@
             ],
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9210,17 +9234,17 @@
               "termSourceRef": "OBI"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
-          "ruleName": "Study Assay Technology Type-06",
-          "description": "",
+          "ruleName": "Study Assay Technology Type-07",
           "fieldName": "Study Assay Technology Type",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
-            "studyCreatedAtOrAfter": "2025-12-01T00:00:00",
+            "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
@@ -9230,43 +9254,10 @@
             ],
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [],
-          "allowedPlaceholders": [],
-          "terms": [
-            {
-              "term": "other",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C17649",
-              "termSourceRef": "NCIT"
-            }
-          ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Study Assay Technology Type-07",
-          "description": "",
-          "fieldName": "Study Assay Technology Type",
-          "selectionCriteria": {
-            "isaFileType": "investigation",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": "2025-12-01T00:00:00",
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": [
-              "LC-DAD",
-              "GC-FID"
-            ],
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "required",
-          "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9283,16 +9274,25 @@
               "termSourceRef": "OBI"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Factor Type": [
         {
           "ruleName": "Study Factor Type-01",
-          "description": "",
           "fieldName": "Study Factor Type",
+          "ontologies": [
+            "EFO",
+            "MTBLS",
+            "ENVO",
+            "MESH",
+            "CHEBI",
+            "CHMO",
+            "NCIT",
+            "PO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
@@ -9302,9 +9302,10 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "recommended",
-          "validationType": "any-ontology-term",
-          "constraints": [],
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [
@@ -9388,37 +9389,29 @@
               "termSourceRef": "NCIT"
             }
           ],
-          "ontologies": [
-            "EFO",
-            "MTBLS",
-            "ENVO",
-            "MESH",
-            "CHEBI",
-            "CHMO",
-            "NCIT",
-            "PO"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Study Publication Status": [
         {
           "ruleName": "Study Publication Status-01",
-          "description": "",
           "fieldName": "Study Publication Status",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
-            "studyCreatedAtOrAfter": "2025-11-01T00:00:00",
+            "studyCreatedAtOrAfter": "2026-01-01T00:00:00",
             "studyCreatedBefore": null,
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9450,26 +9443,30 @@
               "termSourceRef": "EDAM"
             }
           ],
-          "ontologies": [],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         },
         {
           "ruleName": "Study Publication Status-02",
-          "description": "",
           "fieldName": "Study Publication Status",
+          "ontologies": [
+            "EFO",
+            "EDAM"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
           "selectionCriteria": {
             "isaFileType": "investigation",
             "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": "2025-11-01T00:00:00",
+            "studyCreatedBefore": "2026-01-01T00:00:00",
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "enforcementLevel": "required",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": [],
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
@@ -9477,10 +9474,6 @@
             {
               "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
               "termSourceRef": "MTBLS"
-            },
-            {
-              "termAccessionNumber": "",
-              "termSourceRef": ""
             }
           ],
           "terms": [
@@ -9510,45 +9503,13 @@
               "termSourceRef": "EDAM"
             }
           ],
-          "ontologies": [
-            "EFO",
-            "EDAM"
-          ],
-          "allowedParentOntologyTerms": null,
           "unexpectedTerms": []
         }
       ],
       "Unit": [
         {
           "ruleName": "Unit-01",
-          "description": "",
           "fieldName": "Unit",
-          "selectionCriteria": {
-            "isaFileType": "investigation",
-            "studyCreatedAtOrAfter": null,
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": null
-          },
-          "enforcementLevel": "recommended",
-          "validationType": "child-ontology-term",
-          "constraints": [],
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [],
-          "terms": [],
           "ontologies": [],
           "allowedParentOntologyTerms": {
             "excludeByLabelPattern": [
@@ -9581,6 +9542,34 @@
               }
             ]
           },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "child-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
           "unexpectedTerms": []
         }
       ]

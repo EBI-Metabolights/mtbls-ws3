@@ -1,16 +1,18 @@
-from typing import Any
-
 import pytest
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from metabolights_utils.models.parser.common import ParserMessage
 
 from mtbls.domain.domain_services.modifier.sample_modifier import SampleFileModifier
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 
 
 @pytest.fixture(scope="function")
 def sample_modifier(
-    templates: dict[str, Any],
-    control_lists: dict[str, Any],
+    templates: FileTemplates,
+    control_lists: ValidationControls,
     metabolights_model: MetabolightsStudyModel,
 ) -> SampleFileModifier:
     sample_file_name = metabolights_model.investigation.studies[0].file_name

@@ -50,7 +50,7 @@
         },
         {
           "sourceName": "MTBLS",
-          "sourceFile": "https://www.ebi.ac.uk/metabolights/resources/Metabolights.owl",
+          "sourceFile": "https://github.com/EBI-Metabolights/MtblsWS-Py/blob/main/resources/Metabolights.owl",
           "sourceVersion": "",
           "sourceDescription": "MetaboLights Controlled Vocabulary"
         },

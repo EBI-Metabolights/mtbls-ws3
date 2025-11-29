@@ -120,8 +120,7 @@ class IsaTableModifier(BaseIsaModifier):
                     control_source_refs,
                     control_accessions,
                 ) = self._get_header_control_terms(header, template_type, file_type)
-                if not control_terms:
-                    continue
+
                 if header.column_structure == structure.ONTOLOGY_COLUMN:
                     term_column_index = header.column_index
                     term_source_ref_column_index = header.column_index + 1
