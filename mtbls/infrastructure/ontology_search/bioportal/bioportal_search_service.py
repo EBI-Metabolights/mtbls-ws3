@@ -54,14 +54,13 @@ class BioPortalOntologySearchService(OntologySearchService):
         size: None | int = None,
         exact_match: bool = False,
     ) -> OntologyTermSearchResult:
-        if not rule or not rule.ontology_validation_type:
+        if not rule or not rule.validation_type:
             return OntologyTermSearchResult(
                 success=False, message="Invalid rule definition"
             )
         if (
             not rule.ontologies
-            and rule.ontology_validation_type
-            == OntologyValidationType.SELECTED_ONTOLOGY
+            and rule.validation_type == OntologyValidationType.SELECTED_ONTOLOGY
         ):
             return OntologyTermSearchResult(
                 success=False,
@@ -114,7 +113,7 @@ class BioPortalOntologySearchService(OntologySearchService):
             )
             result = exact_match_result
         else:
-            validation_type = rule.ontology_validation_type
+            validation_type = rule.validation_type
             is_child_ontology_search = (
                 validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
             )
@@ -139,7 +138,7 @@ class BioPortalOntologySearchService(OntologySearchService):
                 logger.debug(message)
                 return OntologyTermSearchResult(success=False, message=message)
 
-            validation_type = rule.ontology_validation_type
+            validation_type = rule.validation_type
             if not rule.ontologies and is_selected_ontology_search:
                 message = (
                     f"Ontologies are not defined for "
