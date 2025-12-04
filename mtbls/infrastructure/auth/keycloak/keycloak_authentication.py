@@ -38,12 +38,15 @@ class KeycloakAuthenticationService(AuthenticationService):
                 KeycloakAuthenticationConfiguration.model_validate(config)
             )
         self.user_read_repository = user_read_repository
+
+    def get_keycloak_service(self) -> KeycloakOpenID:
         self.keycloak_openid = KeycloakOpenID(
             server_url=self.config.host,
             realm_name=self.config.realm_name,
             client_id=self.config.client_id,
             client_secret_key=self.config.client_secret,
         )
+        return self.keycloak_openid
 
     @validate_inputs_outputs
     async def authenticate_with_token(
@@ -65,7 +68,7 @@ class KeycloakAuthenticationService(AuthenticationService):
 
     async def authenticate_with_password(self, username: str, password: str) -> str:
         try:
-            token = self.keycloak_openid.token(username, password)
+            token = self.get_keycloak_service().token(username, password)
             return token.get("access_token", "")
         except Exception as ex:
             logger.error("error: %s %s", username, str(ex))
@@ -73,7 +76,7 @@ class KeycloakAuthenticationService(AuthenticationService):
 
     async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
         try:
-            self.keycloak_openid.logout(refresh_jwt_token)
+            self.get_keycloak_service().logout(refresh_jwt_token)
             return True
         except Exception as ex:
             logger.warning("error: %s", str(ex))
@@ -86,7 +89,7 @@ class KeycloakAuthenticationService(AuthenticationService):
             raise NotImplementedError("Only Jwt Tokens can be validated.")
 
         try:
-            user_info = self.keycloak_openid.userinfo(token)
+            user_info = self.get_keycloak_service().userinfo(token)
             return user_info.get("email", "")
         except Exception as ex:
             logger.warning("error: %s", str(ex))
