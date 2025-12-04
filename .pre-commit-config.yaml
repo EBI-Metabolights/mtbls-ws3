@@ -30,7 +30,7 @@ repos:
     name: 🟢  Format json files
     args:
     - "--autofix"
-    - "--indent=4"
+    - "--indent=2"
     - "--no-sort-keys"
   - id: check-yaml
     name: 🟢  Check yaml files

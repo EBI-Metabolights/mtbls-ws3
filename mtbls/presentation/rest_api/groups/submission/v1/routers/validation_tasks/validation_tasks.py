@@ -117,7 +117,7 @@ async def get_validation_history(
 )
 @inject
 async def create_validation_task(
-    context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
+    context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
     run_metadata_modifiers: Annotated[
         bool,
         Field(

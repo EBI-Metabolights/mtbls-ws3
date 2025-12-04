@@ -118,14 +118,18 @@ async def apply_overrides_on_validations_result(
                             source_column_index=override.source_column_index,
                         )
                     )
-    violation_types: dict[PolicyMessageType, list[PolicyMessage]] = {}
-    for violation in validation_result.messages.violations:
-        if violation.type not in violation_types:
-            violation_types[violation.type] = []
-        violation_types[violation.type].append(violation)
 
-    status = select_message_type(set(violation_types.keys()))
-    validation_result.status = status
+    if not validation_result.messages.violations:
+        validation_result.status = PolicyMessageType.SUCCESS
+    else:
+        violation_types: dict[PolicyMessageType, list[PolicyMessage]] = {}
+        for violation in validation_result.messages.violations:
+            if violation.type not in violation_types:
+                violation_types[violation.type] = []
+            violation_types[violation.type].append(violation)
+        status = select_message_type(set(violation_types.keys()))
+        validation_result.status = status
+
     for summary in validation_result.messages.summary:
         if summary.identifier in summary_overrides:
             message_type = select_summary_message_type(

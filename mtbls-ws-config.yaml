@@ -29,6 +29,15 @@ gateways:
     #     user: "{{ mongodb.user }}"
     #     password: "{{ mongodb.password }}"
     #     database: "{{ mongodb.database }}"
+    elasticsearch:
+      connection:
+        hosts: "{{ elastic.hosts }}"
+        port: "{{ elastic.port }}"
+        username: "{{ elastic.username }}"
+        password: "{{ elastic.password }}"
+        verify_certs: false
+        api_key: "{{ elastic.api_key }}"
+        request_timeout_in_seconds: 5.0
 services:
   authentication:
     mtbls_ws2:

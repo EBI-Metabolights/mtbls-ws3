@@ -23,6 +23,7 @@ from mtbls.domain.shared.validator.validation import (
 from mtbls.presentation.rest_api.core.responses import APIResponse
 from mtbls.presentation.rest_api.groups.auth.v1.routers.dependencies import (
     check_curator_role,
+    check_read_permission,
 )
 from mtbls.presentation.rest_api.shared.data_types import RESOURCE_ID_IN_PATH
 from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
@@ -43,7 +44,7 @@ router = APIRouter(
 @inject
 async def get_validation_overrides_endpoint(
     resource_id: Annotated[str, Depends(get_resource_id)],
-    user: Annotated[UserOutput, Depends(check_curator_role)],
+    user: Annotated[UserOutput, Depends(check_read_permission)],
     validation_override_service: ValidationOverrideService = Depends(  # noqa: FAST002
         Provide["services.validation_override_service"]
     ),

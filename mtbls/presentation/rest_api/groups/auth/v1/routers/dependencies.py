@@ -53,7 +53,7 @@ async def check_read_permission(
             return context
 
     logger.warning(
-        "Unauthenticated user %s is not granted to view resource  %s",
+        "Unauthenticated user is not granted to view resource  %s",
         resource_id,
     )
     raise AuthorizationError(f"User has no authorization to read {resource_id}.")
