@@ -31,6 +31,7 @@ gateways:
     #     database: "{{ mongodb.database }}"
 services:
   authentication:
+    active_authentication_service: "standalone"
     mtbls_ws2:
       host: "{{ authentication.mtbls_ws2.host }}"
       port: "{{ authentication.mtbls_ws2.port }}"
@@ -101,6 +102,7 @@ run:
     - prefix: "/curation/"
       scopes:
       - curator
+      - submitter
     api_server_config:
       port: "{{ run.submission.port }}"
       api_groups:
