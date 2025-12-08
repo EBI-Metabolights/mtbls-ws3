@@ -53,7 +53,10 @@ lint_and_test:
   - echo "install dependencies"
   - uv sync --locked --extra ws3
   - echo "Run pre-commit tools"
-  - uv run pre-commit run
+  - uv run ruff format
+  - uv run ruff check
+  - uv run lint-imports
+  - uv run pre-commit run --all-files
   - echo "Run unit tests"
   - uv run pytest
   cache:

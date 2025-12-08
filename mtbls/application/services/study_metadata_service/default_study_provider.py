@@ -47,11 +47,15 @@ class AsyncLocalFolderMetadataCollector(AbstractFolderMetadataCollector):
         study_path,
         calculate_data_folder_size: bool = False,
         calculate_metadata_size: bool = False,
+        data_files_path: str = "FILES",
+        data_files_mapping_folder_name: None | str = None,
     ) -> tuple[Union[None, StudyFolderMetadata], list[GenericMessage]]:
         return self.collector.get_folder_metadata(
             study_path=study_path,
             calculate_data_folder_size=calculate_data_folder_size,
             calculate_metadata_size=calculate_metadata_size,
+            data_files_path=data_files_path,
+            data_files_mapping_folder_name=data_files_mapping_folder_name,
         )
 
 
@@ -161,6 +165,8 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
         study_path,
         calculate_data_folder_size: bool = False,
         calculate_metadata_size: bool = False,
+        data_files_path: str = "FILES",
+        data_files_mapping_folder_name: None | str = None,
     ) -> Tuple[Union[None, StudyFolderMetadata], List[GenericMessage]]:
         messages: List[GenericMessage] = []
         study_folder_metadata = StudyFolderMetadata()

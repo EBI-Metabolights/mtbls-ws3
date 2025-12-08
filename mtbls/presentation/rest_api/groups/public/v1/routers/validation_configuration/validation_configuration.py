@@ -31,15 +31,12 @@ async def get_validation_configuration(
         Provide["services.policy_service"]
     ),
 ):
-    controls_dict = await policy_service.get_control_lists()
-    templates_dict = await policy_service.get_templates()
+    controls: ValidationControls = await policy_service.get_control_lists()
+    templates: FileTemplates = await policy_service.get_templates()
 
-    return APIResponse[ValidationConfiguration](
-        content=ValidationConfiguration(
-            controls=ValidationControls.model_validate(controls_dict, by_alias=True),
-            templates=FileTemplates.model_validate(templates_dict, by_alias=True),
-        )
-    )
+    configuration = ValidationConfiguration(controls=controls, templates=templates)
+
+    return APIResponse[ValidationConfiguration](content=configuration)
 
 
 @router.get(
@@ -57,9 +54,8 @@ async def get_validation_templates(
         None | Literal["1.0", "2.0"], Query(title="template version")
     ] = None,
 ):
-    templates_dict = await policy_service.get_templates()
+    templates: FileTemplates = await policy_service.get_templates()
 
-    templates = FileTemplates.model_validate(templates_dict, by_alias=True)
     content = templates
     if version:
         filtered = FileTemplates()
@@ -76,5 +72,7 @@ async def get_validation_templates(
             filtered.assignment_file_header_templates[k] = [
                 x for x in items if x.version == version
             ]
+        for k, items in templates.protocol_templates.items():
+            filtered.protocol_templates[k] = [x for x in items if x.version == version]
         content = filtered
     return APIResponse[FileTemplates](content=content)

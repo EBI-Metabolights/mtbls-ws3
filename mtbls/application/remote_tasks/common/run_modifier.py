@@ -16,6 +16,10 @@ from mtbls.application.services.interfaces.study_metadata_service_factory import
 from mtbls.domain.domain_services.modifier.metabolights_study_model_modifier import (
     MetabolightsStudyModelModifier,
 )
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import StudyMetadataModifierResult
 
 logger = logging.getLogger(__name__)
@@ -72,8 +76,8 @@ async def run_isa_metadata_modifier_task(
             raise Exception(
                 f"Study load error:  {folder_errors[0].short} {folder_errors[0].detail}"
             )
-        control_lists = await policy_service.get_control_lists()
-        templates = await policy_service.get_templates()
+        control_lists: ValidationControls = await policy_service.get_control_lists()
+        templates: FileTemplates = await policy_service.get_templates()
         modifier = MetabolightsStudyModelModifier(
             model=modifier_model, templates=templates, control_lists=control_lists
         )

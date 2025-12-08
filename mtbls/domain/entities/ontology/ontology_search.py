@@ -27,5 +27,5 @@ class OntologyTermSearchResult(StudyBaseModel):
     success: Annotated[bool, Field(description="Search execution status.")] = False
     message: Annotated[
         None | str, Field(description="Message about search execution.")
-    ] = False
+    ] = None
     page: Annotated[int, Field(description="Current search result page.")] = 0

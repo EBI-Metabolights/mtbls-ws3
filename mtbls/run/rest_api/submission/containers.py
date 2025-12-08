@@ -36,6 +36,12 @@ from mtbls.domain.domain_services.configuration_generator import create_config_f
 from mtbls.infrastructure.auth.keycloak.keycloak_authentication import (
     KeycloakAuthenticationService,
 )
+from mtbls.infrastructure.auth.mtbls_ws2.mtbls_ws2_authentication_proxy import (
+    MtblsWs2AuthenticationProxy,
+)
+from mtbls.infrastructure.auth.standalone.standalone_authentication_service import (
+    AuthenticationServiceImpl,
+)
 from mtbls.infrastructure.auth.standalone.standalone_authorization_service import (
     AuthorizationServiceImpl,
 )
@@ -91,16 +97,20 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     gateways = providers.DependenciesContainer()
     cache_config = providers.Configuration()
 
+    cache_service: CacheService = providers.Factory(
+        RedisCacheImpl,
+        config=cache_config,
+    )
     policy_service: PolicyService = providers.Singleton(
         OpaPolicyService,
         http_client=gateways.http_client,
         config=config.policy_service.opa,
-        max_polling_in_seconds=60,
     )
 
     ontology_search_service: OntologySearchService = providers.Singleton(
         OlsOntologySearchService,
         http_client=gateways.http_client,
+        cache_service=cache_service,
         config=config.ontology_search_service.ols,
     )
 
@@ -119,18 +129,30 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         async_task_registry=core.async_task_registry,
     )
 
-    cache_service: CacheService = providers.Singleton(
-        RedisCacheImpl,
-        config=cache_config,
-    )
     oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
 
-    authentication_service: AuthenticationService = providers.Singleton(
-        KeycloakAuthenticationService,
-        config=config.authentication.keycloak,
-        http_client=gateways.http_client,
-        cache_service=cache_service,
-        user_read_repository=repositories.user_read_repository,
+    authentication_service: AuthenticationService = providers.Selector(
+        config.authentication.active_authentication_service,
+        standalone=providers.Singleton(
+            AuthenticationServiceImpl,
+            config=config.authentication.standalone,
+            cache_service=cache_service,
+            user_read_repository=repositories.user_read_repository,
+        ),
+        mtbls_ws2=providers.Singleton(
+            MtblsWs2AuthenticationProxy,
+            config=config.authentication.mtbls_ws2,
+            cache_service=cache_service,
+            http_client=gateways.http_client,
+            user_read_repository=repositories.user_read_repository,
+        ),
+        keycloak=providers.Singleton(
+            KeycloakAuthenticationService,
+            config=config.authentication.keycloak,
+            cache_service=cache_service,
+            http_client=gateways.http_client,
+            user_read_repository=repositories.user_read_repository,
+        ),
     )
     request_tracker: RequestTracker = providers.Singleton(RequestTracker)
     authorization_service: AuthorizationService = providers.Singleton(

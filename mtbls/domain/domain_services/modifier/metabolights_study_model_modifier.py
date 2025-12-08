@@ -17,6 +17,10 @@ from mtbls.domain.domain_services.modifier.investigation_modifier import (
 )
 from mtbls.domain.domain_services.modifier.maf_modifier import MafFileModifier
 from mtbls.domain.domain_services.modifier.sample_modifier import SampleFileModifier
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import UpdateLog
 
 
@@ -24,8 +28,8 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
     def __init__(
         self,
         model: MetabolightsStudyModel,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
     ):
         super().__init__(model, templates, control_lists, "")
         self.new_header_actions: dict[str, list[TsvAddColumnsAction]] = {}

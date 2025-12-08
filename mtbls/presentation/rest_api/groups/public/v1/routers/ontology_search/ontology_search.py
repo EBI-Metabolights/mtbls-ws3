@@ -56,7 +56,7 @@ async def search_ontologies(
         return response_message
     if not rule:
         rule = BaseOntologyValidation(
-            ontology_validation_type=OntologyValidationType.ANY_ONTOLOGY_TERM,
+            validation_type=OntologyValidationType.ANY_ONTOLOGY_TERM,
             ontologies=None,
             allowed_parent_ontology_terms=None,
         )

@@ -112,15 +112,19 @@ class TestUpdateUpadateOntologyColumn:
             metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         )
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = "kelvin"
-        assay_table.data["Term Source REF.2"][0] = ""
-        assay_table.data["Term Accession Number.2"][0] = ""
+        assay_table.data["Parameter Value[Instrument]"][0] = (
+            "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assay_table.data["Term Source REF.4"][0] = ""
+        assay_table.data["Term Accession Number.4"][0] = ""
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == "kelvin"
-        assert assay_table.data["Term Source REF.2"][0] == "UO"
+        assay_table.data["Parameter Value[Instrument]"][0] = (
+            "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.2"][0]
-            == "http://purl.obolibrary.org/obo/UO_0000012"
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -132,17 +136,20 @@ class TestUpdateUpadateOntologyColumn:
             metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         )
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = ""
-        assay_table.data["Term Source REF.2"][0] = ""
-        assay_table.data["Term Accession Number.2"][0] = (
-            "http://purl.obolibrary.org/obo/UO_0000012"
+        assay_table.data["Parameter Value[Instrument]"][0] = ""
+        assay_table.data["Term Source REF.4"][0] = ""
+        assay_table.data["Term Accession Number.4"][0] = (
+            "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == "kelvin"
-        assert assay_table.data["Term Source REF.2"][0] == "UO"
         assert (
-            assay_table.data["Term Accession Number.2"][0]
-            == "http://purl.obolibrary.org/obo/UO_0000012"
+            assay_table.data["Parameter Value[Instrument]"][0]
+            == "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
+        assert (
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -154,17 +161,32 @@ class TestUpdateUpadateOntologyColumn:
             metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         )
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = "Kelvin"
-        assay_table.data["Term Source REF.2"][0] = ""
-        assay_table.data["Term Accession Number.2"][0] = (
-            "http://purl.obolibrary.org/obo/UO_0000012"
+        assay_table.data["Parameter Value[Instrument]"][0] = (
+            "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assay_table.data["Term Source REF.4"][0] = ""
+        assay_table.data["Term Accession Number.4"][0] = (
+            "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == "kelvin"
-        assert assay_table.data["Term Source REF.2"][0] == "UO"
         assert (
-            assay_table.data["Term Accession Number.2"][0]
-            == "http://purl.obolibrary.org/obo/UO_0000012"
+            assay_table.data["Parameter Value[Instrument]"][0]
+            == "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
+        assert (
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+        )
+        assay_modifier.update_ontology_columns()
+        assert (
+            assay_table.data["Parameter Value[Instrument]"][0]
+            == "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
+        assert (
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -176,17 +198,30 @@ class TestUpdateUpadateOntologyColumn:
             metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         )
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = "Kelvin"
-        assay_table.data["Term Source REF.2"][0] = "uo"
-        assay_table.data["Term Accession Number.2"][0] = (
-            "http://purl.obolibrary.org/obo/UO_0000012"
+        assay_table.data["Parameter Value[Instrument]"][0] = (
+            "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assay_table.data["Term Source REF.4"][0] = "MTBLS"
+        assay_table.data["Term Accession Number.4"][0] = ""
+        assay_modifier.update_ontology_columns()
+        assert (
+            assay_table.data["Parameter Value[Instrument]"][0]
+            == "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
+        assert (
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == "kelvin"
-        assert assay_table.data["Term Source REF.2"][0] == "UO"
         assert (
-            assay_table.data["Term Accession Number.2"][0]
-            == "http://purl.obolibrary.org/obo/UO_0000012"
+            assay_table.data["Parameter Value[Instrument]"][0]
+            == "Bruker AVANCE DRX 700 MHz spectrometer"
+        )
+        assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
+        assert (
+            assay_table.data["Term Accession Number.4"][0]
+            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -198,18 +233,13 @@ class TestUpdateUpadateOntologyColumn:
             metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         )
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = "kelvin"
-        assay_table.data["Term Source REF.2"][0] = ""
-        assay_table.data["Term Accession Number.2"][0] = (
-            "http://purl.obolibrary.org/obo/UO_0000012"
-        )
+        assay_table.data["Unit"][0] = ""
+        assay_table.data["Term Source REF.2"][0] = "UO"
+        assay_table.data["Term Accession Number.2"][0] = ""
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == "kelvin"
-        assert assay_table.data["Term Source REF.2"][0] == "UO"
-        assert (
-            assay_table.data["Term Accession Number.2"][0]
-            == "http://purl.obolibrary.org/obo/UO_0000012"
-        )
+        assert assay_table.data["Unit"][0] == ""
+        assert assay_table.data["Term Source REF.2"][0] == ""
+        assert assay_table.data["Term Accession Number.2"][0] == ""
         assert len(assay_modifier.update_logs) == 1
 
     @pytest.mark.asyncio
@@ -219,13 +249,13 @@ class TestUpdateUpadateOntologyColumn:
         study = metabolights_model.investigation.studies[0]
         assay_file_name = study.study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Unit"][0] = ""
-        assay_table.data["Term Source REF.2"][0] = "uo"
-        assay_table.data["Term Accession Number.2"][0] = ""
+        assay_table.data["Parameter Value[Instrument]"][0] = ""
+        assay_table.data["Term Source REF.4"][0] = "uo"
+        assay_table.data["Term Accession Number.4"][0] = ""
         assay_modifier.update_ontology_columns()
-        assert assay_table.data["Unit"][0] == ""
-        assert assay_table.data["Term Source REF.2"][0] == ""
-        assert assay_table.data["Term Accession Number.2"][0] == ""
+        assert assay_table.data["Parameter Value[Instrument]"][0] == ""
+        assert assay_table.data["Term Source REF.4"][0] == ""
+        assert assay_table.data["Term Accession Number.4"][0] == ""
         assert len(assay_modifier.update_logs) == 1
 
 

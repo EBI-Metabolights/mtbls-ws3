@@ -56,12 +56,12 @@ async def patch_validation_overrides_endpoint(
         user.id_,
         [x.model_dump_json() for x in overrides],
     )
-    overrides = await patch_validation_overrides(
+    overrides_list = await patch_validation_overrides(
         resource_id=resource_id,
         validation_overrides=overrides,
         validation_override_service=validation_override_service,
     )
 
     return APIResponse[ValidationOverrideList](
-        content=overrides, success_message="Validation overrides are updated."
+        content=overrides_list, success_message="Validation overrides are updated."
     )

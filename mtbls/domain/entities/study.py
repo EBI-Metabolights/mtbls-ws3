@@ -30,16 +30,20 @@ class StudyInput(BaseStudy):
     dataset_license: Union[None, str] = None
     dataset_license_version: Union[None, str] = None
     dataset_license_agreeing_user: Union[None, str] = None
+    reserved_accession: Union[None, str] = None
+    reserved_submission_id: Union[None, str] = None
     first_public_date: Union[None, datetime.datetime] = None
     first_private_date: Union[None, datetime.datetime] = None
     revision_number: int = 0
     revision_datetime: Union[None, datetime.datetime] = None
     sample_type: Union[None, str] = "minimum"
+    study_template: Union[None, str] = "minimum"
     template_version: str = "1.0"
     data_policy_agreement: int = 0
     mhd_accession: Union[None, str] = None
     mhd_model_version: Union[None, str] = None
     study_category: StudyCategory = StudyCategory.OTHER
+    created_at: Union[None, datetime.datetime] = None
 
 
 class StudyOutput(StudyInput):

@@ -1,6 +1,13 @@
-from typing import Any
+import hashlib
+import json
+import logging
+import re
+from typing import Any, OrderedDict
 from urllib.parse import quote
 
+from pydantic import HttpUrl, ValidationError
+
+from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.ontology_search_service import (
     OntologySearchService,
@@ -13,24 +20,32 @@ from mtbls.domain.entities.ontology.ontology_search import (
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
     OntologyValidationType,
+    ParentOntologyTerms,
 )
 from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.infrastructure.ontology_search.ols.ols_configuration import OlsConfiguration
 from mtbls.infrastructure.ontology_search.ols.schemas import OlsSearchResultItem
+
+logger = logging.getLogger(__name__)
 
 
 class OlsOntologySearchService(OntologySearchService):
     def __init__(
         self,
         http_client: HttpClient,
+        cache_service: CacheService,
         config: None | OlsConfiguration | dict[str, Any] = None,
     ):
         self.http_client = http_client
-        self.config = config
-        if not self.config:
+        self.cache_service = cache_service
+        if not config:
             self.config = OlsConfiguration()
-        elif isinstance(self.config, dict):
+        elif isinstance(config, dict):
             self.config = OlsConfiguration.model_validate(config)
+        elif isinstance(config, OlsConfiguration):
+            self.config = config
+        else:
+            raise Exception("OLS configuration is not valid.")
 
     async def search(
         self,
@@ -40,27 +55,131 @@ class OlsOntologySearchService(OntologySearchService):
         size: None | int = 50,
         exact_match: bool = False,
     ) -> OntologyTermSearchResult:
-        if not rule or not rule.ontology_validation_type:
+        if not rule or not rule.validation_type:
             return OntologyTermSearchResult(
                 success=False, message="Invalid rule definition"
             )
-        validation_type = rule.ontology_validation_type
-        if validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM:
-            validation_type_name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
+        if (
+            not rule.ontologies
+            and rule.validation_type == OntologyValidationType.SELECTED_ONTOLOGY
+        ):
             return OntologyTermSearchResult(
                 success=False,
-                message=f"{validation_type_name} is not supported",
+                message=f"Ontology list is not defined for "
+                f"{OntologyValidationType.SELECTED_ONTOLOGY}",
             )
-        exact_match_response, exact_match_result = await self.search_by_validation_type(
-            validation_type, keyword, rule, page, size, True
-        )
-        if exact_match:
-            response = exact_match_response
+
+        if not rule.allowed_parent_ontology_terms:
+            rule.allowed_parent_ontology_terms = ParentOntologyTerms(
+                parents=[], exclude_by_label_pattern=[], exclude_by_accession=[]
+            )
+        if not rule.allowed_parent_ontology_terms.exclude_by_accession:
+            rule.allowed_parent_ontology_terms.exclude_by_accession = []
+        if not rule.allowed_parent_ontology_terms.exclude_by_label_pattern:
+            rule.allowed_parent_ontology_terms.exclude_by_label_pattern = []
+        is_uri = False
+        try:
+            is_uri = HttpUrl(url=keyword) is not None
+        except ValidationError:
+            pass
+
+        if rule.ontologies is None:
+            rule.ontologies = []
+        curie_match = re.match(r"^([A-Za-z0-9]+):([A-Za-z0-9_]+)$", keyword)
+        result = []
+        exact_match_result = []
+        is_child_ontology_search = False
+        if is_uri:
+            exact_match = True
+            logger.debug("Searching by IRI with exact match: %s", keyword)
+            response, exact_match_result = await self.search_term(
+                keyword,
+                page=page,
+                size=size,
+                exact_match_only=exact_match,
+                query_fields=["iri"],
+            )
+            result = exact_match_result
+        elif curie_match:
+            exact_match = True
+            logger.debug("Searching by Compact URI with exact match: %s", keyword)
+            ontology, _ = curie_match.groups()
+
+            response, exact_match_result = await self.search_term(
+                keyword,
+                ontology_filter=[ontology],
+                page=page,
+                size=size,
+                exact_match_only=exact_match,
+                query_fields=["obo_id"],
+            )
             result = exact_match_result
         else:
-            response, result = await self.search_by_validation_type(
-                validation_type, keyword, rule, page, size, False
+            validation_type = rule.validation_type
+            is_child_ontology_search = (
+                validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
             )
+            is_selected_ontology_search = (
+                validation_type == OntologyValidationType.SELECTED_ONTOLOGY
+            )
+            is_selected_ontology_terms = (
+                validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM
+            )
+            has_parent_terms = (
+                rule.allowed_parent_ontology_terms
+                and rule.allowed_parent_ontology_terms.parents
+            )
+            if (
+                not rule.allowed_parent_ontology_terms
+                or not rule.allowed_parent_ontology_terms.parents
+            ) and is_child_ontology_search:
+                message = (
+                    f"Parent ontology terms are not defined for "
+                    f"{OntologyValidationType.CHILD_ONTOLOGY_TERM}: {keyword}"
+                )
+                logger.debug(message)
+                return OntologyTermSearchResult(success=False, message=message)
+
+            validation_type = rule.validation_type
+            if not rule.ontologies and is_selected_ontology_search:
+                message = (
+                    f"Ontologies are not defined for "
+                    f"{OntologyValidationType.SELECTED_ONTOLOGY}: {keyword}"
+                )
+                logger.debug(message)
+                return OntologyTermSearchResult(success=False, message=message)
+
+            if is_selected_ontology_terms:
+                name = OntologyValidationType.SELECTED_ONTOLOGY_TERM.name
+                message = f"{name} is not supported for searching: '{keyword}'"
+                return OntologyTermSearchResult(success=False, message=message)
+
+            rule.ontologies = rule.ontologies or []
+            if has_parent_terms:
+                parent_sources = list(
+                    OrderedDict.fromkeys(
+                        [
+                            x.term_source_ref
+                            for x in rule.allowed_parent_ontology_terms.parents
+                        ]
+                    )
+                )
+                for item in parent_sources:
+                    if item not in rule.ontologies:
+                        rule.ontologies.append(item)
+            (
+                exact_match_response,
+                exact_match_result,
+            ) = await self.search_by_validation_type(
+                validation_type, keyword, rule, page, size, True
+            )
+            if exact_match:
+                response = exact_match_response
+                result = exact_match_result
+            else:
+                response, result = await self.search_by_validation_type(
+                    validation_type, keyword, rule, page, size, False
+                )
         if not response:
             return OntologyTermSearchResult(
                 success=False, message="No response. Check validation type.", result=[]
@@ -69,14 +188,35 @@ class OlsOntologySearchService(OntologySearchService):
             return OntologyTermSearchResult(
                 success=False, message=response.error_message or "", result=[]
             )
+        result = result or []
         if not exact_match and exact_match_result:
             terms = {(x.term_source_ref, x.term_accession_number) for x in result}
             for item in exact_match_result:
                 if (item.term_source_ref, item.term_accession_number) not in terms:
                     result.append(item)
 
-        ontologies = rule.ontologies or []
+        excluded_patterns = rule.allowed_parent_ontology_terms.exclude_by_label_pattern
+        excluded_iri_list = rule.allowed_parent_ontology_terms.exclude_by_accession
+        if is_child_ontology_search and (excluded_patterns or excluded_iri_list):
 
+            def is_included(term: OntologyTermHit):
+                if not term:
+                    False
+                if excluded_iri_list:
+                    for iri in excluded_iri_list:
+                        match = term.term_accession_number == iri
+                        if match:
+                            return False
+                if excluded_patterns:
+                    for pattern in excluded_patterns:
+                        match = re.match(pattern, term.term)
+                        if match:
+                            return False
+                return True
+
+            result = list(filter(is_included, result))
+
+        ontologies = rule.ontologies
         rank = {value.upper(): i for i, value in enumerate(ontologies)}
         result.sort(
             key=lambda x: (
@@ -85,8 +225,9 @@ class OlsOntologySearchService(OntologySearchService):
                     keyword.lower(),
                     set([x.lower() for x in x.synonym if x]),
                 ),
-                x.term,
+                x.term.lower(),
                 rank.get(x.term_source_ref.upper(), len(ontologies)),
+                x.term_source_ref.upper(),
             ),
         )
         return OntologyTermSearchResult(success=True, result=result, page=page or 0)
@@ -96,11 +237,19 @@ class OlsOntologySearchService(OntologySearchService):
         validation_type: OntologyValidationType,
         keyword: str,
         rule: BaseOntologyValidation,
-        page: int,
-        size: int,
+        page: None | int,
+        size: None | int,
         exact_match: bool,
     ):
-        response = result = None
+        response = result = parents = None
+        if (
+            rule.allowed_parent_ontology_terms
+            and rule.allowed_parent_ontology_terms.parents
+        ):
+            parents = rule.allowed_parent_ontology_terms.parents
+        parents = parents or []
+        parent_iri_list = [x.term_accession_number for x in parents]
+
         if validation_type == OntologyValidationType.ANY_ONTOLOGY_TERM:
             response, result = await self.search_term(
                 keyword, page=page, size=size, exact_match_only=exact_match
@@ -114,14 +263,10 @@ class OlsOntologySearchService(OntologySearchService):
                 exact_match_only=exact_match,
             )
         elif validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM:
-            parents = [
-                x.term_accession_number
-                for x in rule.allowed_parent_ontology_terms.parents
-            ]
             response, result = await self.search_term(
                 keyword,
                 ontology_filter=rule.ontologies,
-                parents=parents,
+                parents=parent_iri_list,
                 page=page,
                 size=size,
                 exact_match_only=exact_match,
@@ -178,10 +323,10 @@ class OlsOntologySearchService(OntologySearchService):
                 success=False, message=response.error_message or "", result=[]
             )
 
-        return OntologyTermSearchResult(success=True, result=[term], page=0)
+        return OntologyTermSearchResult(success=True, result=term, page=0)
 
     def position_rank(
-        self, term: str, keyword: str, synonym_set: set[str] = None
+        self, term: str, keyword: str, synonym_set: None | set[str] = None
     ) -> int:
         """Return rank based on position of search term in string."""
         if not synonym_set:
@@ -208,6 +353,7 @@ class OlsOntologySearchService(OntologySearchService):
         query_fields: None | list[str] = None,
         page: None | int = None,
         size: None | int = None,
+        field_list: None | list[str] = None,
     ) -> tuple[HttpResponse, list[OntologyTermHit]]:
         if not size or size <= 0:
             size = self.config.default_search_result_size
@@ -216,10 +362,19 @@ class OlsOntologySearchService(OntologySearchService):
             query_fields_str = "label,synonym"
         else:
             query_fields_str = ",".join(query_fields)
-
+        if not field_list:
+            field_list = [
+                "iri",
+                "label",
+                "ontology_prefix",
+                "obo_id",
+                "description",
+                "type",
+                "synonym",
+            ]
         params = {
             "q": keyword,
-            "fieldList": "iri,label,ontology_prefix,obo_id,description,type,synonym",
+            "fieldList": ",".join(field_list),
             "queryFields": query_fields_str,
             "exact": exact_match_only,
             "obsoletes": False,
@@ -243,16 +398,25 @@ class OlsOntologySearchService(OntologySearchService):
                 {"ontology": ",".join([x.lower() for x in ontology_filter if x])}
             )
 
-        result: HttpResponse = await self.http_client.send_request(
-            HttpRequestType.GET,
-            url,
-            params=params,
-            timeout=self.config.timeout_in_seconds,
-            follow_redirects=True,
-        )
-        if result.error:
-            return result, []
-        matches = result.json_data.get("response", {}).get("docs", [])
+        # params = {"lang": "en"}
+        headers = {"Accept": "application/json"}
+        cache_key, result = await self.find_in_cache(url, params, headers)
+
+        if not result:
+            result = await self.http_client.send_request(
+                HttpRequestType.GET,
+                url,
+                params=params,
+                timeout=self.config.timeout_in_seconds,
+                follow_redirects=True,
+            )
+            if result.error or not result.json_data or result.status_code != 200:
+                return result, []
+            await self.set_cache_value(cache_key, result)
+
+        matches = None
+        if result and result.json_data:
+            matches = result.json_data.get("response", {}).get("docs", [])
 
         if not matches:
             return result, []
@@ -271,9 +435,56 @@ class OlsOntologySearchService(OntologySearchService):
             )
         return result, hits
 
+    async def find_in_cache(
+        self, url, params, headers
+    ) -> tuple[str, None | HttpResponse]:
+        cache_key = self.url_cache_key(url, params, headers)
+        cache_result = await self.cache_service.get_value(cache_key)
+        result: None | HttpResponse = None
+        if cache_result:
+            try:
+                result = HttpResponse.model_validate_json(
+                    cache_result, by_alias=True, strict=True
+                )
+            except Exception as ex:
+                logger.exception(ex)
+        return (
+            cache_key,
+            result,
+        )
+
+    async def set_cache_value(self, cache_key: str, result: HttpResponse):
+        valid_response = None
+        hits = None
+        if not result or not result.json_data or result.status_code != 200:
+            return
+        if result and result.json_data:
+            response = result.json_data.get("response", {})
+            if response:
+                valid_response = True if "docs" in response else False
+                hits = response.get("docs", [])
+        if valid_response:
+            timeout = (
+                self.config.success_result_cache_timeout_in_seconds
+                if hits
+                else self.config.empty_result_cache_timeout_in_seconds
+            )
+
+            result_str = result.model_dump_json(by_alias=True)
+            await self.cache_service.set_value(
+                cache_key, result_str, expiration_time_in_seconds=timeout
+            )
+
+    def url_cache_key(
+        self, url: str, params: dict[str, str], headers: dict[str, str]
+    ) -> str:
+        key_data = {"url": url, "params": params, "headers": headers}
+        key_str = json.dumps(key_data, sort_keys=True)
+        return hashlib.sha256(key_str.encode()).hexdigest()
+
     async def search_accession(
-        self, accession: str, ontology: str
-    ) -> tuple[HttpResponse, OlsSearchResultItem]:
+        self, accession: str, ontology: None | str = None
+    ) -> tuple[HttpResponse, list[OntologyTermHit]]:
         if not ontology or not accession:
             return HttpResponse(
                 error=True,
@@ -282,24 +493,32 @@ class OlsOntologySearchService(OntologySearchService):
             ), []
 
         iri = quote(quote(accession, safe=""), safe="")
+        if ontology:
+            url = f"{self.config.origin_url}/api/ontologies/{ontology}/terms/{iri}"
+        else:
+            url = f"{self.config.origin_url}/api/terms/{iri}"
 
-        url = f"{self.config.origin_url}/api/ontologies/{ontology}/terms/{iri}"
         params = {"lang": "en"}
         headers = {"Accept": "application/json"}
-        result: HttpResponse = await self.http_client.send_request(
-            HttpRequestType.GET,
-            url,
-            params=params,
-            headers=headers,
-            timeout=self.config.timeout_in_seconds,
-            follow_redirects=True,
-        )
-        if result.error or result.json_data.get("status", 200) != 200:
-            return result, []
+        cache_key, result = await self.find_in_cache(url, params, headers)
 
+        if not result:
+            result = await self.http_client.send_request(
+                HttpRequestType.GET,
+                url,
+                params=params,
+                headers=headers,
+                timeout=self.config.timeout_in_seconds,
+                follow_redirects=True,
+            )
+            if result.error or not result.json_data or result.status_code != 200:
+                return result, []
+            await self.set_cache_value(cache_key, result)
         if not result.json_data:
             return result, []
 
-        return result, OlsSearchResultItem.model_validate(
-            result.json_data
-        ).convert_to_ontology_term_hit(self.config.origin, self.config.origin_url)
+        return result, [
+            OlsSearchResultItem.model_validate(
+                result.json_data
+            ).convert_to_ontology_term_hit(self.config.origin, self.config.origin_url)
+        ]

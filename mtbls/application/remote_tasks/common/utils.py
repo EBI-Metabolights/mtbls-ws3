@@ -3,7 +3,7 @@ import asyncio
 
 def run_coroutine(coroutine):
     try:
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         if loop.is_running():
             result = asyncio.ensure_future(coroutine)
         else:
