@@ -28,6 +28,7 @@ from mtbls.application.services.interfaces.study_metadata_service_factory import
     StudyMetadataServiceFactory,
 )
 from mtbls.domain.entities.validation.validation_configuration import (
+    BaseOntologyValidation,
     FieldValueValidation,
     MetadataFileType,
     OntologyValidationType,
@@ -463,18 +464,29 @@ async def post_process_validation_messages(
                     deleted_values.append(value)
 
             elif accession and source:
-                search = await ontology_search_service.find_by_accession(
-                    accession, ontology=source
+                search = await ontology_search_service.search(
+                    term,
+                    rule=BaseOntologyValidation(
+                        rule_name="exact-term-search-01",
+                        field_name="generic",
+                        validation_type=OntologyValidationType.SELECTED_ONTOLOGY,
+                        ontologies=[source],
+                    ),
+                    exact_match=True,
                 )
                 if not search.result:
                     logger.warning("'%s' is not found on ontology service", value)
                     new_values.append(value)
-                elif search.result[0].term != term:
+                elif (
+                    search.result[0].term != term
+                    or search.result[0].term_source_ref != source
+                    or search.result[0].term_accession_number != accession
+                ):
                     logger.warning(
-                        "Term '%s' (not '%s') is found for %s",
+                        "Term '%s' (%s) not found in %s",
                         search.result[0].term,
-                        term,
                         accession,
+                        source,
                     )
                     new_values.append(value)
                 else:
