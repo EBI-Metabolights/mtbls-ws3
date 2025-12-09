@@ -117,7 +117,8 @@ class GatewaysContainer(containers.DeclarativeContainer):
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
         client=elasticsearch_client,
-        config=None,  # rely on default gateway config; adjust if custom search settings are added
+        config=None,  # rely on default gateway config; adjust
+        # if custom search settings are added
     )
 
     # mongodb_connection: MongoDbConnection = providers.Resource(

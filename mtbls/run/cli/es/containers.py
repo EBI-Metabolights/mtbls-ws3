@@ -10,6 +10,9 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    SearchIndexManagementGateway,
+)
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -29,6 +32,9 @@ from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_mana
 )
 from mtbls.infrastructure.repositories.study.db.study_read_repository import (
     SqlDbStudyReadRepository,
+)
+from mtbls.infrastructure.search.es.manager.es_index_manager import (
+    ElasticsearchIndexManagementGateway,
 )
 
 
@@ -51,6 +57,10 @@ class GatewaysContainer(containers.DeclarativeContainer):
     )
     http_client: HttpClient = providers.Singleton(
         HttpxClient, max_timeount_in_seconds=60
+    )
+    search_index_management_gateway: SearchIndexManagementGateway = providers.Singleton(
+        ElasticsearchIndexManagementGateway,
+        config=config.database.elasticsearch.connection,
     )
 
 

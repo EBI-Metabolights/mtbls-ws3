@@ -265,6 +265,7 @@ class Study(Base):
     first_public_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
     first_private_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
 
+    created_at: Mapped[datetime.datetime] = mapped_column(nullable=True)
     dataset_license: Mapped[str] = mapped_column(String(255), nullable=True)
     dataset_license_version: Mapped[str] = mapped_column(String(255), nullable=True)
     dataset_license_agreeing_user: Mapped[str] = mapped_column(

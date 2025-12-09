@@ -18,5 +18,4 @@ async def patch_validation_overrides(
 ) -> ValidationOverrideList:
     repo = validation_override_service
     overrides_content = await repo.get_validation_overrides(resource_id=resource_id)
-    version = overrides_content.validation_version
-    print(version)
+    return overrides_content
