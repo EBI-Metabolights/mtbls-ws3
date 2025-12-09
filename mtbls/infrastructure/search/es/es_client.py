@@ -59,9 +59,7 @@ class ElasticsearchClient:
             logger.exception("Elasticsearch API error during startup: %s", e)
             raise RuntimeError(f"Elasticsearch connection error: {e}") from e
         except Exception as exc:
-            logger.exception(
-                "Unexpected Elasticsearch connection failure: %s", exc
-            )
+            logger.exception("Unexpected Elasticsearch connection failure: %s", exc)
             raise
 
     async def ensure_started(self) -> None:

@@ -40,6 +40,7 @@ class StudyInput(BaseStudy):
     mhd_accession: Union[None, str] = None
     mhd_model_version: Union[None, str] = None
     study_category: StudyCategory = StudyCategory.OTHER
+    created_at: Union[None, datetime.datetime] = None
 
 
 class StudyOutput(StudyInput):

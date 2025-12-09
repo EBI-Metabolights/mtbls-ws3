@@ -1,315 +1,315 @@
 {
-    "settings": {
-        "analysis": {
-            "analyzer": {
-                "rebuilt_whitespace": {
-                    "tokenizer": "whitespace",
-                    "filter": [
-                        "lowercase"
-                    ]
-                }
-            }
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "rebuilt_whitespace": {
+          "tokenizer": "whitespace",
+          "filter": [
+            "lowercase"
+          ]
         }
-    },
-    "mappings": {
-        "properties": {
-            "studyId": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "title": {
-                "type": "text"
-            },
-            "description": {
-                "type": "text"
-            },
-            "protocolDescriptions": {
-                "type": "text"
-            },
-            "size": {
-                "type": "keyword",
-                "index": false
-            },
-            "sizeInBytes": {
-                "type": "long"
-            },
-            "publicReleaseDate": {
-                "type": "date"
-            },
-            "submissionDate": {
-                "type": "date"
-            },
-            "modifiedTime": {
-                "type": "date"
-            },
-            "annotations": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "assayMainTechniques": {
-                "type": "keyword"
-            },
-            "assayTechniques": {
-                "type": "keyword"
-            },
-            "assaySubTechniques": {
-                "type": "keyword"
-            },
-            "designDescriptors": {
-                "type": "keyword"
-            },
-            "funders": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "organisms": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "organismParts": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "variants": {
-                "type": "keyword"
-            },
-            "sampleTypes": {
-                "type": "keyword"
-            },
-            "technologyTypes": {
-                "type": "keyword"
-            },
-            "factors": {
-                "type": "keyword"
-            },
-            "contactFullnames": {
-                "type": "text",
-                "analyzer": "rebuilt_whitespace",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "contactEmails": {
-                "type": "text",
-                "analyzer": "rebuilt_whitespace",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "organismSuperkingdom": {
-                "type": "keyword"
-            },
-            "organismKingdom": {
-                "type": "keyword"
-            },
-            "organismPhylum": {
-                "type": "keyword"
-            },
-            "organismClass": {
-                "type": "keyword"
-            },
-            "organismOrder": {
-                "type": "keyword"
-            },
-            "organismFamily": {
-                "type": "keyword"
-            },
-            "organismGenus": {
-                "type": "keyword"
-            },
-            "organismSpecies": {
-                "type": "keyword"
-            },
-            "grantIds": {
-                "type": "keyword"
-            },
-            "studyTypes": {
-                "type": "keyword"
-            },
-            "submitters": {
-                "properties": {
-                    "fullname": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "email": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "country": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "orcid": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    }
-                }
-            },
-            "contacts": {
-                "properties": {
-                    "firstName": {
-                        "type": "text"
-                    },
-                    "lastName": {
-                        "type": "text"
-                    },
-                    "midInitials": {
-                        "type": "text"
-                    },
-                    "email": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "orcid": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "affiliation": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "address": {
-                        "type": "text"
-                    },
-                    "roles": {
-                        "properties": {
-                            "term": {
-                                "type": "text",
-                                "fields": {
-                                    "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    }
-                                }
-                            },
-                            "termSourceRef": {
-                                "type": "text",
-                                "fields": {
-                                    "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    }
-                                }
-                            },
-                            "termAccessionNumber": {
-                                "type": "text",
-                                "fields": {
-                                    "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "country": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "publications": {
-                "properties": {
-                    "title": {
-                        "type": "text"
-                    },
-                    "authorList": {
-                        "type": "text"
-                    },
-                    "doi": {
-                        "type": "text",
-                        "analyzer": "rebuilt_whitespace",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    },
-                    "pubMedId": {
-                        "type": "text",
-                        "analyzer": "rebuilt_whitespace",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
-                    }
-                }
-            }
-        }
+      }
     }
+  },
+  "mappings": {
+    "properties": {
+      "studyId": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "title": {
+        "type": "text"
+      },
+      "description": {
+        "type": "text"
+      },
+      "protocolDescriptions": {
+        "type": "text"
+      },
+      "size": {
+        "type": "keyword",
+        "index": false
+      },
+      "sizeInBytes": {
+        "type": "long"
+      },
+      "publicReleaseDate": {
+        "type": "date"
+      },
+      "submissionDate": {
+        "type": "date"
+      },
+      "modifiedTime": {
+        "type": "date"
+      },
+      "annotations": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "assayMainTechniques": {
+        "type": "keyword"
+      },
+      "assayTechniques": {
+        "type": "keyword"
+      },
+      "assaySubTechniques": {
+        "type": "keyword"
+      },
+      "designDescriptors": {
+        "type": "keyword"
+      },
+      "funders": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "organisms": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "organismParts": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "variants": {
+        "type": "keyword"
+      },
+      "sampleTypes": {
+        "type": "keyword"
+      },
+      "technologyTypes": {
+        "type": "keyword"
+      },
+      "factors": {
+        "type": "keyword"
+      },
+      "contactFullnames": {
+        "type": "text",
+        "analyzer": "rebuilt_whitespace",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "contactEmails": {
+        "type": "text",
+        "analyzer": "rebuilt_whitespace",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "organismSuperkingdom": {
+        "type": "keyword"
+      },
+      "organismKingdom": {
+        "type": "keyword"
+      },
+      "organismPhylum": {
+        "type": "keyword"
+      },
+      "organismClass": {
+        "type": "keyword"
+      },
+      "organismOrder": {
+        "type": "keyword"
+      },
+      "organismFamily": {
+        "type": "keyword"
+      },
+      "organismGenus": {
+        "type": "keyword"
+      },
+      "organismSpecies": {
+        "type": "keyword"
+      },
+      "grantIds": {
+        "type": "keyword"
+      },
+      "studyTypes": {
+        "type": "keyword"
+      },
+      "submitters": {
+        "properties": {
+          "fullname": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "email": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "country": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "orcid": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "contacts": {
+        "properties": {
+          "firstName": {
+            "type": "text"
+          },
+          "lastName": {
+            "type": "text"
+          },
+          "midInitials": {
+            "type": "text"
+          },
+          "email": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "orcid": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "affiliation": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "address": {
+            "type": "text"
+          },
+          "roles": {
+            "properties": {
+              "term": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "termSourceRef": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "termAccessionNumber": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "country": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "publications": {
+        "properties": {
+          "title": {
+            "type": "text"
+          },
+          "authorList": {
+            "type": "text"
+          },
+          "doi": {
+            "type": "text",
+            "analyzer": "rebuilt_whitespace",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "pubMedId": {
+            "type": "text",
+            "analyzer": "rebuilt_whitespace",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

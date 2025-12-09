@@ -31,7 +31,7 @@ gateways:
     #     database: "{{ mongodb.database }}"
     elasticsearch:
       connection:
-        hosts: "{{ elasticsearch.host}}"
+        hosts: "{{ elasticsearch.hosts }}"
         port: "{{ elasticsearch.port }}"
         username: "{{ elasticsearch.username }}"
         password: "{{ elasticsearch.password }}"

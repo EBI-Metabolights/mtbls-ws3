@@ -77,7 +77,7 @@
       },
       "justMyCode": false
     },
-        {
+    {
       "name": "Python: Run ES CLI",
       "type": "debugpy",
       "request": "launch",
