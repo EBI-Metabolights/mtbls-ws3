@@ -31,6 +31,7 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 )
 from mtbls.application.utils.size_utils import get_size_in_str
 from mtbls.domain.entities.study import StudyOutput
+from mtbls.domain.enums.filter_operand import FilterOperand
 from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.enums.study_status import StudyStatus
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
@@ -67,7 +68,13 @@ async def get_public_studies(
     read_study_repository: StudyReadRepository,
 ) -> Dict[str, StudyQueryResult]:
     studies: list[StudyOutput] = await read_study_repository.get_studies(
-        filters=[EntityFilter(key="status", value=StudyStatus.PRIVATE)],
+        filters=[
+            EntityFilter(
+                key="status",
+                value=[StudyStatus.PUBLIC, StudyStatus.PRIVATE],
+                operand=FilterOperand.IN,
+            )
+        ],
         include_submitters=True,
     )
 

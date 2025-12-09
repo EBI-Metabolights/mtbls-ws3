@@ -76,6 +76,18 @@
         "PYTHONPATH": "${cwd}"
       },
       "justMyCode": false
+    },
+        {
+      "name": "Python: Run ES CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/cli/es/index_studies.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
     }
   ]
 }
