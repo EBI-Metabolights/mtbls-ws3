@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+from typing_extensions import get_origin
 
 from mtbls.application.services.interfaces.repositories.file_object.file_object_read_repository import (  # noqa: E501
     FileObjectReadRepository,
@@ -33,11 +34,13 @@ async def sync_search_index(
     index_cache_files_object_repository: FileObjectReadRepository,
     mappings_file_path: None | str = None,
     recreate_index: bool = True,
+    debug=False
 ):
     await index_management_gateway.create_index(
         index=index_name,
         delete_before=recreate_index,
         mappings_file_path=mappings_file_path,
+    
     )
     indexed_documents = await index_management_gateway.get_document_ids(
         index=index_name, update_field_name="updatedTime"
@@ -121,6 +124,16 @@ async def sync_search_index(
             )
             file_content = json.loads(target_path.read_text())
             model = PublicStudyLiteIndexModel.model_validate(file_content)
+            if debug:
+                for name, f in type(model).model_fields.items():
+                    if get_origin(f.annotation) is set:
+                        print("STILL A SET:", name, f.annotation)
+                for name in type(model).model_fields:
+                    try:
+                        model.model_dump(by_alias=True, include={name})
+                    except Exception as e:
+                        print("Dump fails on field:", name, "->", e)
+                    
             try:
                 body = model.model_dump(by_alias=True)
             except Exception as ex:

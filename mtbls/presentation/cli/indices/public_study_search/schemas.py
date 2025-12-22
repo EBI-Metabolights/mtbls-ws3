@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from typing import Dict, Generic, List, Set, Union
+from typing import Any, Dict, Generic, List, Set, Union
 
 from metabolights_utils.models.metabolights.model import CurationRequest
-from pydantic import ConfigDict, Field, computed_field
+from pydantic import ConfigDict, Field, computed_field, field_validator
 from typing_extensions import Annotated
 
 from mtbls.presentation.rest_api.core.base import APIBaseModel, T
@@ -13,6 +13,23 @@ from mtbls.presentation.rest_api.core.responses import (
     PaginatedResult,
 )
 
+
+def coerce_ontology_item(v: Any) -> OntologyModel:
+    if isinstance(v, OntologyModel):
+        return v
+    if isinstance(v, str):
+        # best-effort: keep the label, leave refs empty
+        return OntologyModel(term=v, term_source_ref="", term_accession_number="")
+    if isinstance(v, dict):
+        # allow both snake_case and camelCase keys if your cache varies
+        return OntologyModel(
+            term=v.get("term", ""),
+            term_source_ref=v.get("termSourceRef") or v.get("term_source_ref", "") or "",
+            term_accession_number=v.get("termAccessionNumber")
+            or v.get("term_accession_number", "")
+            or "",
+        )
+    raise TypeError(f"Unsupported ontology item type: {type(v)}")
 
 class OntologySourceReferenceModel(APIBaseModel):
     """
@@ -283,7 +300,7 @@ class AssayModel(APIBaseModel):
         ),
     ] = AssayTechniqueModel()
     assignment_files: Annotated[
-        Set[str],
+        List[str],
         Field(
             description="Relative paths of metabolite assignment files "
             "referenced in the assay file."
@@ -343,19 +360,22 @@ class StudyProtocolModel(APIBaseModel):
         str,
         Field(description="Protocol URI."),
     ] = ""
+
     version: Annotated[
         str,
         Field(description="Protocol version."),
     ] = ""
+
     parameters: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(description="Protocol parameters."),
-    ] = ""
+    ] = []
 
     components: Annotated[
-        set[ProtocolComponentModel],
+        List[ProtocolComponentModel],
         Field(description="Protocol components."),
-    ] = ""
+    ] = []
+
     model_config = ConfigDict(from_attributes=True)
 
     def __hash__(self) -> int:
@@ -396,83 +416,102 @@ class PublicStudyLiteIndexBaseModel(APIBaseModel):
     ] = ""
 
     publications: Annotated[
-        set[StudyPublicationModel],
+        List[StudyPublicationModel],
         Field(
             description="Studies.",
             json_schema_extra={"ontology_category": "organism"},
         ),
-    ] = set()
+    ] = []
 
     protocols: Annotated[
-        set[StudyProtocolModel],
+        List[StudyProtocolModel],
         Field(
             description="protocols and their definitions.",
             json_schema_extra={"nested": True},
         ),
-    ] = set()
+    ] = []
 
     organisms: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Organism terms defined in sample table.",
             json_schema_extra={"ontology_category": "organism"},
         ),
-    ] = set()
+    ] = []
 
     organism_parts: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Organism part terms defined in sample table.",
             json_schema_extra={"ontology_category": "organism_part"},
         ),
-    ] = set()
+    ] = []
 
     variants: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Variant terms defined in sample table.",
             json_schema_extra={"ontology_category": "variant"},
         ),
-    ] = set()
+    ] = []
 
     sample_types: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Sample type terms defined in sample table.",
             json_schema_extra={"ontology_category": "sample_type"},
         ),
-    ] = set()
+    ] = []
 
     factors: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Factors of the study.",
             json_schema_extra={"ontology_category": "factor"},
         ),
-    ] = set()
+    ] = []
 
     design_descriptors: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Design descriptor terms of the study.",
             json_schema_extra={"ontology_category": "design_descriptor"},
         ),
-    ] = set()
+    ] = []
 
     assay_techniques: Annotated[
-        set[AssayTechniqueModel],
+        List[AssayTechniqueModel],
         Field(description="Assay techniques of the study."),
-    ] = set()
+    ] = []
 
     technology_types: Annotated[
-        set[OntologyModel],
+        List[OntologyModel],
         Field(
             description="Technology types of the study."
             "Technology types may be `mass spectrometry assay`, "
             "`NMR spectrometry assay` "
             "or both for MetaboLights repository."
         ),
-    ] = set()
+    ] = []
+    
+    
+    @field_validator(
+        "organisms",
+        "organism_parts",
+        "variants",
+        "sample_types",
+        "factors",
+        "design_descriptors",
+        "technology_types",
+        mode="before",
+    )
+    @classmethod
+    def _coerce_ontology_lists(cls, v):
+        if v is None:
+            return []
+        if not isinstance(v, list):
+            v = list(v) # in case a set sneaks in
+        return [coerce_ontology_item(x) for x in v]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -578,19 +617,19 @@ class PublicStudyLiteIndexModel(PublicStudyLiteIndexBaseModel):
     ] = ""
 
     fundings: Annotated[
-        set[FundingModel],
+        List[FundingModel],
         Field(description="Founders and grant Ids of study."),
-    ] = set()
+    ] = []
 
     contacts: Annotated[
-        set[ContactModel],
+        List[ContactModel],
         Field(description="Contacts of the study."),
-    ] = set()
+    ] = []
 
     assays: Annotated[
-        set[AssayModel],
+        List[AssayModel],
         Field(description="Assay descriptions of the study."),
-    ] = set()
+    ] = []
 
     submitters: Annotated[
         List[Submitter],

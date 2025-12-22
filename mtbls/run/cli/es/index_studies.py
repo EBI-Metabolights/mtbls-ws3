@@ -83,7 +83,8 @@ def run_es_cli(
     )
     index_name = "completed-study-search-index"
     mappings_file_path = Path(
-        "resources/es/mappings/public_study_search_index_mapping.json"
+        #"resources/es/mappings/public_study_search_index_mapping.json"
+        "resources/es/mappings/complete_study_search_index_mapping.json"
     )
     enable_later = True
     if not enable_later:
