@@ -65,23 +65,26 @@ class ElasticsearchStudyGateway(SearchPort):
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
         if req.query:
+            should_clauses: List[Dict[str, Any]] = []
+            should_clauses.append(
+                {
+                    "multi_match": {
+                        "query": req.query,
+                        "fields": list(self.config.search_fields),
+                        "operator": "and",
+                    }
+                }
+            )
+            # prefix match (fast) on non-nested fields
+            should_clauses.extend(
+                [{"prefix": {field: req.query.lower()}} for field in self.config.search_fields]
+            )
+            # nested-aware search to keep simple queries working across nested docs
+            should_clauses.extend(self._nested_search_clauses(req.query))
             must.append(
                 {
                     "bool": {
-                        "should": [
-                            {
-                                "multi_match": {
-                                    "query": req.query,
-                                    "fields": list(self.config.search_fields),
-                                    "operator": "and",
-                                }
-                            },
-                            # prefix match (fast)
-                            *[
-                                {"prefix": {field: req.query.lower()}}
-                                for field in self.config.search_fields
-                            ],
-                        ],
+                        "should": should_clauses,
                         "minimum_should_match": 1,
                     }
                 }
@@ -91,13 +94,21 @@ class ElasticsearchStudyGateway(SearchPort):
         for f in req.filters:
             if not f.values:
                 continue
-            if f.operator == "none":
-                must_not.append({"terms": {f.field: f.values}})
-            elif f.operator == "any":
-                filter_clauses.append({"terms": {f.field: f.values}})
+            field, nested_path = self._resolve_filter_field(f.field)
+            if not field:
+                continue
+            operator = f.operator or "all"
+            if operator == "none":
+                must_not.append(self._build_filter_clause(field, f.values, nested_path, operator))
+            elif operator == "any":
+                filter_clauses.append(self._build_filter_clause(field, f.values, nested_path, operator))
             else:  # "all"
-                for v in f.values:
-                    filter_clauses.append({"term": {f.field: v}})
+                # For nested fields we deliberately pool across nested docs by adding one clause per value.
+                clauses = self._build_filter_clause(field, f.values, nested_path, operator)
+                if isinstance(clauses, list):
+                    filter_clauses.extend(clauses)
+                else:
+                    filter_clauses.append(clauses)
 
         # Sort
         sort_clause: List[Any] = []
@@ -138,13 +149,89 @@ class ElasticsearchStudyGateway(SearchPort):
 
         return dsl
 
+    def _nested_search_clauses(self, query: str) -> List[Dict[str, Any]]:
+        clauses: List[Dict[str, Any]] = []
+        for path, fields in self.config.nested_search_fields:
+            clauses.append(
+                {
+                    "nested": {
+                        "path": path,
+                        "score_mode": "avg",
+                        "query": {
+                            "multi_match": {
+                                "query": query,
+                                "fields": list(fields),
+                                "operator": "and",
+                            }
+                        },
+                    }
+                }
+            )
+        return clauses
+
+    def _resolve_filter_field(self, field: str) -> tuple[str | None, str | None]:
+        """
+        Given a UI filter field, resolve it to an ES field path and whether it is nested.
+        """
+        if field in FACET_CONFIG:
+            spec = FACET_CONFIG[field] or {}
+            return spec.get("field") or field, spec.get("nested_path")
+
+        for fname, spec in FACET_CONFIG.items():
+            if not spec:
+                continue
+            if spec.get("field") == field:
+                return field, spec.get("nested_path")
+
+        return field, None
+
+    def _build_filter_clause(
+        self, field: str, values: List[Any], nested_path: str | None, operator: str
+    ) -> Dict[str, Any] | List[Dict[str, Any]]:
+        if not nested_path:
+            if operator == "none":
+                return {"terms": {field: values}}
+            if operator == "any":
+                return {"terms": {field: values}}
+            return [{"term": {field: v}} for v in values]
+
+        # Nested filters: pooled across nested docs. Each value gets its own nested clause for "all",
+        # so a doc matches if the values are present anywhere within the nested set (not necessarily the same item).
+        if operator == "none":
+            return {
+                "nested": {
+                    "path": nested_path,
+                    "query": {"terms": {field: values}},
+                    "score_mode": "avg",
+                }
+            }
+        if operator == "any":
+            return {
+                "nested": {
+                    "path": nested_path,
+                    "query": {"terms": {field: values}},
+                    "score_mode": "avg",
+                }
+            }
+        return [
+            {
+                "nested": {
+                    "path": nested_path,
+                    "query": {"term": {field: v}},
+                    "score_mode": "avg",
+                }
+            }
+            for v in values
+        ]
+
     def _build_aggs(self) -> Dict[str, Any]:
         """
         Supports server-side facet config:
         FACET_CONFIG = {
             "organisms": {
                 "type": "value",
-                "field": "organisms.keyword",
+                "field": "organisms.term",
+                "nested_path": "organisms",
                 "size": 20,
             },
             ...
@@ -152,6 +239,7 @@ class ElasticsearchStudyGateway(SearchPort):
         """
 
         aggs: Dict[str, Any] = {}
+        nested_bucket_name = "values"
 
         for facet_name, spec in FACET_CONFIG.items():
             if not spec:
@@ -160,15 +248,21 @@ class ElasticsearchStudyGateway(SearchPort):
             ftype = spec.get("type")
             # allow config to alias an underlying field; fall back to facet_name
             field = spec.get("field") or facet_name
+            nested_path = spec.get("nested_path")
 
             if ftype == "value":
-                aggs[facet_name] = {
-                    "terms": {
-                        "field": field,  # 👈 WAS facet_name
-                        "size": spec.get("size") or self.config.facet_size,
-                        "order": {"_count": "desc"},
-                    }
+                terms_body = {
+                    "field": field,
+                    "size": spec.get("size") or self.config.facet_size,
+                    "order": {"_count": "desc"},
                 }
+                if nested_path:
+                    aggs[facet_name] = {
+                        "nested": {"path": nested_path},
+                        "aggs": {nested_bucket_name: {"terms": terms_body}},
+                    }
+                else:
+                    aggs[facet_name] = {"terms": terms_body}
 
             elif ftype == "range":
                 ranges = spec.get("ranges") or []
@@ -228,12 +322,17 @@ class ElasticsearchStudyGateway(SearchPort):
 
     def _map_aggs_to_searchui(self, aggs: Dict[str, Any]) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
+        nested_bucket_name = "values"
 
         for facet_name, spec in FACET_CONFIG.items():
             ftype = spec.get("type")
             agg_resp = aggs.get(facet_name)
             if not agg_resp:
                 continue
+            if spec.get("nested_path"):
+                agg_resp = agg_resp.get(nested_bucket_name)
+                if not agg_resp:
+                    continue
 
             buckets: List[Dict[str, Any]] = []
 

@@ -37,57 +37,60 @@ GB = 1024**3
 YEAR_RANGES = build_year_ranges(2012)
 
 VALUE_FACETS = {
+    # Nested ontology-style fields
     "technologyTypes": {
         "type": "value",
-        "field": "technologyTypes",
+        "field": "technologyTypes.term",
+        "nested_path": "technologyTypes",
     },
     "assayTechniques": {
         "type": "value",
-        "field": "assayTechniques",
-    },
-    "submitters_country": {
-        "type": "value",
-        "field": "submitters.country.keyword",
-    },
-    "studyTypes": {
-        "type": "value",
-        "field": "studyTypes",
+        "field": "assayTechniques.main",
+        "nested_path": "assayTechniques",
     },
     "factors": {
         "type": "value",
-        "field": "factors",
+        "field": "factors.term",
+        "nested_path": "factors",
     },
     "designDescriptors": {
         "type": "value",
-        "field": "designDescriptors",
+        "field": "designDescriptors.term",
+        "nested_path": "designDescriptors",
     },
     "organisms": {
         "type": "value",
-        "field": "organisms.keyword",
+        "field": "organisms.term",
+        "nested_path": "organisms",
     },
     "organismParts": {
         "type": "value",
-        "field": "organismParts.keyword",
+        "field": "organismParts.term",
+        "nested_path": "organismParts",
     },
     "variants": {
         "type": "value",
-        "field": "variants",
+        "field": "variants.term",
+        "nested_path": "variants",
     },
     "sampleTypes": {
         "type": "value",
-        "field": "sampleTypes",
+        "field": "sampleTypes.term",
+        "nested_path": "sampleTypes",
     },
-    "organismKingdom": {
+    "submitters_country": {
         "type": "value",
-        "field": "organismKingdom",
+        "field": "submitters.country",
+        "nested_path": "submitters",
     },
-    "organismPhylum": {
+    # Top-level keyword facets
+    "status": {
         "type": "value",
-        "field": "organismPhylum",
+        "field": "status",
     },
-    "organismClass": {
+    "curationRequest": {
         "type": "value",
-        "field": "organismClass",
+        "field": "curationRequest",
     },
 }
 FACET_CONFIG = {
