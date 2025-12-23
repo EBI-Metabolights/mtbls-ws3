@@ -1,37 +1,34 @@
+
+
 from typing import Any, Dict, List
 from uuid import uuid4
-
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
-from mtbls.domain.entities.search.study.facet_configuration import STUDY_FACET_CONFIG
-from mtbls.domain.entities.search.index_search import (
-    IndexSearchInput,
-    IndexSearchResult,
-)
+from mtbls.domain.entities.search.compound.facet_configuration import COMPOUND_FACET_CONFIG
+from mtbls.domain.entities.search.index_search import IndexSearchInput, IndexSearchResult
+from mtbls.infrastructure.search.es.compound.es_compound_configuration import CompoundElasticSearchConfiguration
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
-from mtbls.infrastructure.search.es.es_configuration import (
-    StudyElasticSearchConfiguration,
-)
 
 
-class ElasticsearchStudyGateway(BaseElasticSearchGateway):
+
+class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
     def __init__(
         self,
         client: ElasticsearchClient,
-        config: None | StudyElasticSearchConfiguration | dict[str, Any],
+        config: None | CompoundElasticSearchConfiguration | dict[str, Any],
     ):
         self._client = client
         self._config = config
         if not self._config:
-            self._config = StudyElasticSearchConfiguration()
+            self._config = CompoundElasticSearchConfiguration()
         elif isinstance(self._config, dict):
-            self._config = StudyElasticSearchConfiguration.model_validate(config)
+            self._config = CompoundElasticSearchConfiguration.model_validate(config)
         super().__init__()
-
+    
     @property
-    def config(self) -> StudyElasticSearchConfiguration:
+    def config(self) -> CompoundElasticSearchConfiguration:
         return self._config
-
-    async def get_index_mapping(self) -> Dict[str, Any]:
+    
+    async def get_index_mapping(self) -> dict[str, Any]:
         """
         Return the ES mapping for the configured index.
         """
@@ -39,12 +36,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             self.config.index_name, api_key_name=self.config.api_key_name
         )
         return mapping.get(self.config.index_name, mapping)
-
+    
     async def search(
         self,
         query: IndexSearchInput,
         raw: bool = False,
-    ) -> IndexSearchResult | Dict[str, Any]:
+    ) -> Any:
         dsl = self._build_search_payload(query)
         es_resp = await self._client.search(
             index=self.config.index_name,
@@ -57,7 +54,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         results = [self._map_hit(h) for h in es_resp.get("hits", {}).get("hits", [])]
         total = self._extract_total(es_resp)
-        facets = self._map_aggs_to_searchui(es_resp.get("aggregations") or {}, STUDY_FACET_CONFIG)
+        facets = self._map_aggs_to_searchui(es_resp.get("aggregations") or {})
 
         return IndexSearchResult(
             results=results,
@@ -66,7 +63,18 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             requestId=str(uuid4()),  # useless currently
         )
 
+
     def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
+        """" This is a carbon copy of the method from the search gateway for studies.
+        At some point the logic for searching compounds may change. We could maybe refactor this
+        logic to be available in the base class, to be later overridden.
+
+        Args:
+            req (IndexSearchInput): Search input, term, pagination, sorting, filters.
+
+        Returns:
+            Dict[str, Any]: Elasticsearch DSL payload.
+        """
         must: List[Dict[str, Any]] = []
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
@@ -143,7 +151,9 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         dsl.setdefault("timeout", "3s")
 
         return dsl
-
+    
+    
+    
     def _build_aggs(self) -> Dict[str, Any]:
         """
         Supports server-side facet config:
@@ -153,32 +163,49 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 "field": "organisms.keyword",
                 "size": 20,
             },
+            "species": {
+                "type": "value",
+                "field": "species_hits.species",
+                "nested_path": "species_hits",
+            },
             ...
         }
         """
 
         aggs: Dict[str, Any] = {}
 
-        for facet_name, spec in STUDY_FACET_CONFIG.items():
+        for facet_name, spec in COMPOUND_FACET_CONFIG.items():
             if not spec:
                 continue
 
             ftype = spec.get("type")
-            # allow config to alias an underlying field; fall back to facet_name
             field = spec.get("field") or facet_name
+            nested_path = spec.get("nested_path")
 
+            # ---- VALUE FACETS -------------------------------------------------
             if ftype == "value":
-                aggs[facet_name] = {
+                terms_agg = {
                     "terms": {
-                        "field": field,  # 👈 WAS facet_name
+                        "field": field,
                         "size": spec.get("size") or self.config.facet_size,
                         "order": {"_count": "desc"},
                     }
                 }
 
+                if nested_path:
+                    aggs[facet_name] = {
+                        "nested": {"path": nested_path},
+                        "aggs": {
+                            "values": terms_agg,  # 👈 inner name used in mapper
+                        },
+                    }
+                else:
+                    aggs[facet_name] = terms_agg
+
+            # ---- RANGE FACETS -------------------------------------------------
             elif ftype == "range":
                 ranges = spec.get("ranges") or []
-                aggs[facet_name] = {
+                filters_agg = {
                     "filters": {
                         "filters": {
                             self._range_key(r): self._range_query(field, r)
@@ -187,11 +214,69 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                     }
                 }
 
+                if nested_path:
+                    aggs[facet_name] = {
+                        "nested": {"path": nested_path},
+                        "aggs": {
+                            "ranges": filters_agg,  # 👈 inner name used in mapper
+                        },
+                    }
+                else:
+                    aggs[facet_name] = filters_agg
+
             else:
                 continue
 
         return aggs
 
+    
+    
+    def _map_aggs_to_searchui(self, aggs: Dict[str, Any]) -> Dict[str, Any]:
+        out: Dict[str, Any] = {}
 
+        for facet_name, spec in COMPOUND_FACET_CONFIG.items():
+            ftype = spec.get("type")
+            nested_path = spec.get("nested_path")
+            agg_resp = aggs.get(facet_name)
+            if not agg_resp:
+                continue
 
-   
+            # If this facet was nested, the actual buckets are under the inner agg
+            if nested_path:
+                if ftype == "value":
+                    agg_resp = agg_resp.get("values", {})
+                elif ftype == "range":
+                    agg_resp = agg_resp.get("ranges", {})
+                # if we still have nothing, skip
+                if not agg_resp:
+                    continue
+
+            buckets: List[Dict[str, Any]] = []
+
+            if ftype == "value":
+                only_true = spec.get("only_true", False)
+                for b in agg_resp.get("buckets", []):
+                    key = b.get("key")
+                    if only_true and not self._is_true_bucket(key):
+                        continue
+                    buckets.append({"value": key, "count": int(b.get("doc_count", 0))})
+
+            elif ftype == "range":
+                for key, b in (agg_resp.get("buckets") or {}).items():
+                    buckets.append(
+                        {
+                            "value": key,
+                            "count": int(b.get("doc_count", 0)),
+                        }
+                    )
+            else:
+                continue
+
+            out[facet_name] = [
+                {
+                    "type": ftype,
+                    "data": buckets,
+                }
+            ]
+
+        return out

@@ -25,7 +25,7 @@ class PageModel(BaseModel):
 class FilterModel(BaseModel):
     field: Annotated[str, Field(description="Field being filtered")]
     values: Annotated[
-        List[str], Field(default_factory=list, description="List of selected values")
+        List[Any], Field(default_factory=list, description="List of selected values")
     ]
     operator: Annotated[
         Optional[Literal["all", "any", "none"]],

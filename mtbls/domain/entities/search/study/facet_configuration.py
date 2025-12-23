@@ -90,7 +90,7 @@ VALUE_FACETS = {
         "field": "organismClass",
     },
 }
-FACET_CONFIG = {
+STUDY_FACET_CONFIG = {
     **VALUE_FACETS,
     "sizeInBytes": {
         "type": "range",

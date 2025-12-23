@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Depends, Response, status
 
-from mtbls.domain.entities.search.study.index_search import (
+from mtbls.domain.entities.search.index_search import (
     IndexSearchInput,
     IndexSearchResult,
 )

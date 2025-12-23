@@ -2,6 +2,7 @@ from dependency_injector import containers, providers
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
 from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import CompoundReadRepository
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
@@ -21,6 +22,7 @@ from mtbls.application.services.interfaces.repositories.user.user_write_reposito
     UserWriteRepository,
 )
 from mtbls.application.services.interfaces.search_port import SearchPort
+from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -33,10 +35,13 @@ from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
 # from mtbls.infrastructure.persistence.db.mongodb.config import (
 #     MongoDbConnection,
 # )
+from mtbls.infrastructure.persistence.db.mongodb.config import MongoDbConnection
+from mtbls.infrastructure.persistence.db.mongodb.db_client import MongoDatabaseClientImpl
 from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
     DatabaseClientImpl,
 )
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
+from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import MongoCompoundReadRepository
 from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
@@ -58,6 +63,7 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
+from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import ElasticsearchCompoundGateway
 from mtbls.infrastructure.search.es.es_client import (
     ElasticsearchClient,
     ElasticsearchClientConfig,
@@ -110,6 +116,7 @@ class GatewaysContainer(containers.DeclarativeContainer):
                 config.database.elasticsearch.connection.port,
             ),
             api_key=config.database.elasticsearch.connection.api_key,
+            api_keys=config.database.elasticsearch.connection.api_keys,
             request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
             verify_certs=config.database.elasticsearch.connection.verify_certs,
         ),
@@ -120,11 +127,21 @@ class GatewaysContainer(containers.DeclarativeContainer):
         config=None,  # rely on default gateway config; adjust if custom search settings are added
     )
 
-    # mongodb_connection: MongoDbConnection = providers.Resource(
-    #     create_config_from_dict,
-    #     MongoDbConnection,
-    #     config.database.mongodb.connection,
-    # )
+    mongodb_connection: MongoDbConnection = providers.Resource(
+         create_config_from_dict,
+         MongoDbConnection,
+         config.database.mongodb.connection,
+     )
+    document_database_client = providers.Singleton(
+        MongoDatabaseClientImpl,
+        db_connection=mongodb_connection,
+    )
+    
+    elasticsearch_compound_gateway: SearchPort = providers.Singleton(
+        ElasticsearchCompoundGateway,
+        client=elasticsearch_client,
+        config=None,  # rely on default gateway config; adjust if custom search settings are added
+    )
 
     pub_sub_broker: PubSubConnection = providers.Singleton(
         RedisConnectionProvider,
@@ -179,6 +196,13 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         entity_mapper=entity_mapper,
         alias_generator=alias_generator,
         database_client=gateways.database_client,
+    )
+    
+    compound_read_repository: CompoundReadRepository = providers.Singleton(
+        MongoCompoundReadRepository,
+        #entity_mapper=entity_mapper,
+        #alias_generator=alias_generator,
+        database_client=gateways.document_database_client,
     )
 
     # study_file_repository: StudyFileRepository = providers.Singleton(

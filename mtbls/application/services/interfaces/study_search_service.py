@@ -1,6 +1,6 @@
 import abc
 
-from mtbls.domain.entities.search.study.index_search import (
+from mtbls.domain.entities.search.index_search import (
     BaseSearchInput,
     BaseSearchResult,
 )

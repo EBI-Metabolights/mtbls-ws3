@@ -5,9 +5,11 @@ from pydantic import BaseModel
 
 class ElasticsearchConfiguration(BaseModel):
     origin_url: str = ""  # do we want this to be a secret?
+    api_key_name: Optional[str] = None
 
 
 class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
+    api_key_name: str = "study"
     index_name: str = "public-study-search-index"
     search_fields: Tuple[str, ...] = (
         "title^3",
