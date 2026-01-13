@@ -73,9 +73,8 @@ class ElasticsearchClient:
 
             api_key_value = self._resolve_api_key_value(key_name)
             logger.info(
-                "Connecting to Elasticsearch hosts: %s (api_key=%s, timeout=%s, verify_certs=%s)",
+                "Connecting to Elasticsearch hosts: %s (using configured API key, timeout=%s, verify_certs=%s)",
                 self._config.hosts,
-                key_name or "default",
                 self._config.request_timeout,
                 self._config.verify_certs,
             )
@@ -90,14 +89,12 @@ class ElasticsearchClient:
                 if not ok:
                     # Likely a restricted API key without cluster privileges; keep client and proceed.
                     logger.warning(
-                        "Elasticsearch ping failed for api_key=%s; proceeding anyway (restricted key or connectivity issue).",
-                        key_name or "default",
+                        "Elasticsearch ping failed; proceeding anyway (restricted key or connectivity issue)."
                     )
                 self._clients[key_name] = es
                 if ok:
                     logger.info(
-                        "Elasticsearch connection established successfully (api_key=%s).",
-                        key_name or "default",
+                        "Elasticsearch connection established successfully using a configured API key."
                     )
             except ApiError as e:
                 status = getattr(e, "status_code", None)
