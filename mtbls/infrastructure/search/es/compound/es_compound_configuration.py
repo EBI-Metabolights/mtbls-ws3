@@ -41,4 +41,9 @@ class CompoundElasticSearchConfiguration(ElasticsearchConfiguration):
         "counts",
         "species_hits",
         "spectra_count",
+        "organisms",
+        "organismParts",
+        "studyCount",
+        "studyIds",
+        "occurrences",
     )

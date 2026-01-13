@@ -44,12 +44,20 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
         "type": "value",
         "field": "charge",
     },
+    "organisms": {
+        "type": "value",
+        "field": "organisms",
+    },
 
     # If you don’t want to deal with nested aggs yet, you can still facet on species like this.
     # (It will count documents, not individual species_hits rows, but it’s usually fine.)
     "species": {
         "type": "value",
         "field": "species_hits.species",
+    },
+    "organismParts": {
+        "type": "value",
+        "field": "organismParts",
     },
 
     #
@@ -64,6 +72,16 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
             {"from": 500, "to": 1000, "name": "500–1000 Da"},
             {"from": 1000, "to": 2000, "name": "1000–2000 Da"},
             {"from": 2000, "name": "2000+ Da"},
+        ],
+    },
+    "studyCount": {
+        "type": "range",
+        "field": "studyCount",
+        "ranges": [
+            {"from": 1, "to": 1, "name": "1"},
+            {"from": 2, "to": 5, "name": "2–5"},
+            {"from": 6, "to": 9, "name": "6–9"},
+            {"from": 10, "name": "10+"},
         ],
     },
     "averagemass": {

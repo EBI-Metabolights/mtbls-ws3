@@ -78,40 +78,70 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         must: List[Dict[str, Any]] = []
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
+        numeric_query: float | None = None
         if req.query:
-            must.append(
-                {
-                    "bool": {
-                        "should": [
-                            {
-                                "multi_match": {
-                                    "query": req.query,
-                                    "fields": list(self.config.search_fields),
-                                    "operator": "and",
-                                }
-                            },
-                            # prefix match (fast)
-                            *[
-                                {"prefix": {field: req.query.lower()}}
-                                for field in self.config.search_fields
+            try:
+                numeric_query = float(req.query)
+            except (TypeError, ValueError):
+                numeric_query = None
+            # Only run text matching if this isn't purely numeric; numeric searches rely on scoring functions.
+            if numeric_query is None:
+                must.append(
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "multi_match": {
+                                        "query": req.query,
+                                        "fields": list(self.config.search_fields),
+                                        "operator": "and",
+                                    }
+                                },
+                                # prefix match (fast)
+                                *[
+                                    {"prefix": {field: req.query.lower()}}
+                                    for field in self.config.search_fields
+                                ],
                             ],
-                        ],
-                        "minimum_should_match": 1,
+                            "minimum_should_match": 1,
+                        }
                     }
-                }
-            )
+                )
 
         # Filters (simple value filters; operator all/any/none)
         for f in req.filters:
             if not f.values:
                 continue
-            if f.operator == "none":
-                must_not.append({"terms": {f.field: f.values}})
-            elif f.operator == "any":
-                filter_clauses.append({"terms": {f.field: f.values}})
-            else:  # "all"
+            spec = COMPOUND_FACET_CONFIG.get(f.field) or {}
+            if spec.get("type") == "range":
+                ranges = spec.get("ranges") or []
+                range_queries: List[Dict[str, Any]] = []
                 for v in f.values:
-                    filter_clauses.append({"term": {f.field: v}})
+                    rq = self._range_query_from_value(spec.get("field") or f.field, ranges, v)
+                    if rq:
+                        range_queries.append(rq)
+                if not range_queries:
+                    continue
+                if f.operator == "none":
+                    must_not.extend(range_queries)
+                elif f.operator == "any":
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
+                else:  # "all"
+                    filter_clauses.extend(range_queries)
+            else:
+                target_field = spec.get("field") or f.field
+                # Only coerce boolean-like values for facets that are explicitly boolean (only_true flag).
+                if spec.get("only_true"):
+                    normalized_values = [self._normalize_bool(v) for v in f.values]
+                else:
+                    normalized_values = list(f.values)
+                if f.operator == "none":
+                    must_not.append({"terms": {target_field: normalized_values}})
+                elif f.operator == "any":
+                    filter_clauses.append({"terms": {target_field: normalized_values}})
+                else:  # "all"
+                    for v in normalized_values:
+                        filter_clauses.append({"term": {target_field: v}})
 
         # Sort
         sort_clause: List[Any] = []
@@ -128,29 +158,95 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         # Aggregations (value + range based on UI facets config)
         aggs = self._build_aggs()
 
-        dsl: Dict[str, Any] = {
+        base_query: Dict[str, Any] = {
             "track_total_hits": True,
             "from": from_,
             "size": size,
-            "query": {
-                "bool": {
-                    "must": must or [{"match_all": {}}],
-                    "filter": filter_clauses,
-                    "must_not": must_not,
-                }
-            },
             "sort": sort_clause,
         }
 
+        bool_query = {
+            "bool": {
+                "must": must or [{"match_all": {}}],
+                "filter": filter_clauses,
+                "must_not": must_not,
+            }
+        }
+
+        if numeric_query is not None:
+            base_query["query"] = {
+                "function_score": {
+                    "query": bool_query,
+                    "functions": [
+                        {
+                            "gauss": {
+                                "exactmass": {
+                                    "origin": numeric_query,
+                                    "scale": "1",
+                                    "offset": 0,
+                                }
+                            },
+                            "weight": 2,
+                        },
+                        {
+                            "gauss": {
+                                "averagemass": {
+                                    "origin": numeric_query,
+                                    "scale": "1",
+                                    "offset": 0,
+                                }
+                            },
+                            "weight": 1.5,
+                        },
+                    ],
+                    "score_mode": "sum",
+                    "boost_mode": "sum",
+                }
+            }
+        else:
+            base_query["query"] = bool_query
+
         if aggs:
-            dsl["aggs"] = aggs
+            base_query["aggs"] = aggs
 
         if self.config.source_includes:
-            dsl["_source"] = {"includes": list(self._config.source_includes)}
+            base_query["_source"] = {"includes": list(self._config.source_includes)}
 
-        dsl.setdefault("timeout", "3s")
+        base_query.setdefault("timeout", "3s")
 
-        return dsl
+        return base_query
+
+    @staticmethod
+    def _range_query_from_value(field: str, ranges: List[Dict[str, Any]], value: Any) -> Dict[str, Any] | None:
+        """
+        Map a selected bucket name back to its range query.
+        Matches either the explicit 'name' or the derived _range_key form.
+        """
+        for r in ranges:
+            name = r.get("name")
+            if value == name or value == BaseElasticSearchGateway._range_key(r):
+                return BaseElasticSearchGateway._range_query(field, r)
+        return None
+
+    @staticmethod
+    def _normalize_bool(value: Any) -> Any:
+        """
+        Coerce common truthy/falsy representations to booleans; otherwise return original.
+        """
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, int):
+            if value == 1:
+                return True
+            if value == 0:
+                return False
+        if isinstance(value, str):
+            v = value.strip().lower()
+            if v in ("1", "true", "yes", "y"):
+                return True
+            if v in ("0", "false", "no", "n"):
+                return False
+        return value
     
     
     

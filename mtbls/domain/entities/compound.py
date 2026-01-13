@@ -11,7 +11,6 @@ class CompoundOutput(BaseCompound):
         from_attributes=True, strict=True, entity_type=Entity.Compound
     )
 
-
 class CompoundFlags(BaseModel):
     hasLiterature: Optional[bool] = None
     hasReactions: Optional[bool] = None
@@ -19,21 +18,13 @@ class CompoundFlags(BaseModel):
     hasPathways: Optional[bool] = None
     hasNMR: Optional[bool] = None
     hasMS: Optional[bool] = None
-    hasMolfile: Optional[bool] = None
-    hasSmiles: Optional[bool] = None
-    hasInchi: Optional[bool] = None
-    hasSynonyms: Optional[bool] = None
-    hasIupac: Optional[bool] = None
-    hasCitations: Optional[bool] = None
-    hasReactionsList: Optional[bool] = None
-    hasSpeciesHits: Optional[bool] = None
-    hasKegg: Optional[bool] = None
-    hasReactome: Optional[bool] = None
-    hasWikiPathways: Optional[bool] = None
-    hasSpectraListed: Optional[bool] = None
-    hasExactMass: Optional[bool] = None
-    hasAverageMass: Optional[bool] = None
-    hasCharge: Optional[bool] = None
+
+
+class MAFEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    index: Optional[int] = None
+    database_identifier: Optional[str] = None
+    metabolite_identification: Optional[str] = None
 
 
 class CompoundCounts(BaseModel):
@@ -80,8 +71,9 @@ class Reaction(BaseModel):
 
 class SpeciesHit(BaseModel):
     species: Optional[str] = None
-    study_ids: Optional[List[str]] = None
-    assay_sum: Optional[int] = None
+    species_accession: Optional[str] = None
+    maf_entry: Optional[MAFEntry] = None
+    assay_index: Optional[int] = None
 
 
 # ----- RAW submodels -----
@@ -98,7 +90,7 @@ class RawSpectra(BaseModel):
 
 
 class RawCompound(BaseModel):
-    flags: Optional[Dict[str, str]] = None  # additionalProperties: string
+    flags: Optional[Dict[str, Any]] = None  # accept bools/strings from Mongo
     id: Optional[str] = None
     name: Optional[str] = None
     definition: Optional[str] = None
@@ -125,6 +117,12 @@ class RawCompound(BaseModel):
     spectrum_ids: Optional[List[str]] = None
     spectra_count: Optional[int] = None
 
+class MAFEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    index: Optional[int] = None
+    database_identifier: Optional[str] = None
+    metabolite_identification: Optional[str] = None
+
 
 class Compound(BaseCompound):
     model_config = ConfigDict(
@@ -145,6 +143,7 @@ class Compound(BaseCompound):
     inchi: Optional[str] = None
     formula: Optional[str] = None
     charge: Optional[int] = None
+    organisms: Optional[List[str]] = None
     averagemass: Optional[float] = None
     exactmass: Optional[float] = None
 
@@ -156,6 +155,7 @@ class Compound(BaseCompound):
     citations: Optional[List[Citation]] = None
     reactions: Optional[List[Reaction]] = None
     species_hits: Optional[List[SpeciesHit]] = None
+    spectra: Optional[RawSpectra] = None
 
     spectrum_ids: Optional[List[str]] = None
     spectra_count: Optional[int] = None
@@ -171,6 +171,42 @@ class Compound(BaseCompound):
         - Drops the Mongo _id field.
         - Relies on Pydantic to validate/coerce types according to this model.
         """
+        return cls.from_mongo_with_raw(doc, include_raw=False)
+
+    @classmethod
+    def from_mongo_with_raw(cls, doc: Dict[str, Any], include_raw: bool = True) -> "Compound":
+        """
+        Build a Compound from a MongoDB document, with optional inclusion of the raw payload.
+        """
         data = dict(doc)  # shallow copy
         data.pop("_id", None)
+
+        # Map structure -> structure_molfile for clarity
+        structure = data.pop("structure", None)
+        if structure:
+            data["structure_molfile"] = structure
+
+        # Flatten species map into species_hits list
+        species_hits: List[SpeciesHit] = []
+        species_map: Dict[str, Any] = data.pop("species", {}) or {}
+        for species_name, entries in species_map.items():
+            for entry in entries or []:
+                species_hits.append(
+                    SpeciesHit(
+                        species=entry.get("Species") or species_name or None,
+                        species_accession=entry.get("SpeciesAccession"),
+                        maf_entry=entry.get("MAFEntry"),
+                        assay_index=entry.get("Assay"),
+                    )
+                )
+        if species_hits:
+            data["species_hits"] = species_hits
+
+        # Spectra passthrough (if present)
+        if "spectra" in doc:
+            data["spectra"] = doc.get("spectra")
+
+        if include_raw:
+            data["raw"] = RawCompound.model_validate(doc)
+
         return cls.model_validate(data)
