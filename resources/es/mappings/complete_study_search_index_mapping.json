@@ -54,7 +54,7 @@
       },
 
       "publications": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "title": { "type": "text" },
           "authorList": { "type": "text" },
@@ -85,7 +85,7 @@
       },
 
       "protocols": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "name": { "type": "keyword", "ignore_above": 256 },
           "description": { "type": "text" },
@@ -101,7 +101,7 @@
           },
 
           "parameters": {
-            "type": "nested",
+            "type": "object",
             "properties": {
               "term": { "type": "keyword", "ignore_above": 256 },
               "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -110,7 +110,7 @@
           },
 
           "components": {
-            "type": "nested",
+            "type": "object",
             "properties": {
               "name": { "type": "keyword", "ignore_above": 256 },
               "type": { "type": "keyword", "ignore_above": 256 },
@@ -122,7 +122,7 @@
       },
 
       "organisms": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -131,7 +131,7 @@
       },
 
       "organismParts": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -140,7 +140,7 @@
       },
 
       "variants": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -149,7 +149,7 @@
       },
 
       "sampleTypes": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -158,7 +158,7 @@
       },
 
       "factors": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -167,7 +167,7 @@
       },
 
       "designDescriptors": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -176,7 +176,7 @@
       },
 
       "technologyTypes": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "term": { "type": "keyword", "ignore_above": 256 },
           "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -185,7 +185,7 @@
       },
 
       "assayTechniques": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "name": { "type": "keyword", "ignore_above": 256 },
           "main": { "type": "keyword", "ignore_above": 256 },
@@ -195,7 +195,7 @@
       },
 
       "fundings": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "funder": {
             "type": "text",
@@ -210,7 +210,7 @@
       },
 
       "contacts": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "firstName": { "type": "text" },
           "lastName": { "type": "text" },
@@ -237,7 +237,7 @@
           "address": { "type": "text" },
 
           "roles": {
-            "type": "nested",
+            "type": "object",
             "properties": {
               "term": { "type": "keyword", "ignore_above": 256 },
               "termSourceRef": { "type": "keyword", "ignore_above": 256 },
@@ -248,7 +248,7 @@
       },
 
       "assays": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "filePath": { "type": "keyword", "ignore_above": 256 },
           "technologyPlatform": {
@@ -286,7 +286,7 @@
       },
 
       "submitters": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "fullname": {
             "type": "text",

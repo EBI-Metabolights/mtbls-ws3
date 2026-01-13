@@ -41,47 +41,38 @@ VALUE_FACETS = {
     "technologyTypes": {
         "type": "value",
         "field": "technologyTypes.term",
-        "nested_path": "technologyTypes",
     },
     "assayTechniques": {
         "type": "value",
         "field": "assayTechniques.main",
-        "nested_path": "assayTechniques",
     },
     "factors": {
         "type": "value",
         "field": "factors.term",
-        "nested_path": "factors",
     },
     "designDescriptors": {
         "type": "value",
         "field": "designDescriptors.term",
-        "nested_path": "designDescriptors",
     },
     "organisms": {
         "type": "value",
         "field": "organisms.term",
-        "nested_path": "organisms",
     },
     "organismParts": {
         "type": "value",
         "field": "organismParts.term",
-        "nested_path": "organismParts",
     },
     "variants": {
         "type": "value",
         "field": "variants.term",
-        "nested_path": "variants",
     },
     "sampleTypes": {
         "type": "value",
         "field": "sampleTypes.term",
-        "nested_path": "sampleTypes",
     },
     "submitters_country": {
         "type": "value",
         "field": "submitters.country",
-        "nested_path": "submitters",
     },
     # Top-level keyword facets
     "status": {

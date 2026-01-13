@@ -85,7 +85,9 @@
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "env": {
-        "PYTHONPATH": "${cwd}"
+        "PYTHONPATH": "${cwd}",
+        "SEARCH_VISIBILITY": "public",
+        "SEARCH_INDEX_NAME": "public-study-search-index"
       },
       "justMyCode": false
     }

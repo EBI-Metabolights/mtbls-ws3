@@ -34,8 +34,11 @@ async def sync_search_index(
     index_cache_files_object_repository: FileObjectReadRepository,
     mappings_file_path: None | str = None,
     recreate_index: bool = True,
-    debug=False
+    debug=False,
+    study_statuses: list[StudyStatus] | None = None,
 ):
+    if study_statuses is None:
+        study_statuses = [StudyStatus.PUBLIC]
     await index_management_gateway.create_index(
         index=index_name,
         delete_before=recreate_index,
@@ -62,7 +65,7 @@ async def sync_search_index(
             filters=[
                 EntityFilter(
                     key="status",
-                    value=[StudyStatus.PRIVATE, StudyStatus.PUBLIC],
+                    value=study_statuses,
                     operand=FilterOperand.IN,
                 )
             ],

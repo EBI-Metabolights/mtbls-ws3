@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import uuid
 from pathlib import Path
 from typing import Union
@@ -20,6 +21,7 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 from mtbls.application.services.interfaces.search_index_management_gateway import (
     SearchIndexManagementGateway,
 )
+from mtbls.domain.enums.study_status import StudyStatus
 from mtbls.presentation.cli.indices.public_study_search.update_json_files import (
     update_study_metadata_json_files,
 )
@@ -81,7 +83,18 @@ def run_es_cli(
             task_id="",
         )
     )
-    index_name = "completed-study-search-index"
+    index_name = os.getenv("SEARCH_INDEX_NAME") or "public-study-search-index"
+    search_visibility = (os.getenv("SEARCH_VISIBILITY") or "public").strip().lower()
+    if search_visibility == "public":
+        study_statuses = [StudyStatus.PUBLIC]
+    elif search_visibility == "all":
+        study_statuses = [StudyStatus.PRIVATE, StudyStatus.PUBLIC]
+    else:
+        logger.warning(
+            "Invalid SEARCH_VISIBILITY=%r; defaulting to 'public'.",
+            search_visibility,
+        )
+        study_statuses = [StudyStatus.PUBLIC]
     mappings_file_path = Path(
         #"resources/es/mappings/public_study_search_index_mapping.json"
         "resources/es/mappings/complete_study_search_index_mapping.json"
@@ -106,6 +119,7 @@ def run_es_cli(
             index_cache_files_object_repository=index_cache_files_object_repository,
             recreate_index=True,
             mappings_file_path=mappings_file_path,
+            study_statuses=study_statuses,
         )
     )
 
