@@ -10,7 +10,7 @@
             "EFO",
             "CHMO",
             "NCIT",
-            "NCBITAXON",
+            "NCBITaxon",
             "MS",
             "BTO",
             "CHEBI",
@@ -254,7 +254,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -605,7 +605,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -2322,7 +2322,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -2576,7 +2576,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -3010,7 +3010,8 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": [
-              "GC-MS"
+              "GC-MS",
+              "GCxGC-MS"
             ],
             "linkedFieldAndValueFilter": [
               {
@@ -3021,7 +3022,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -3604,6 +3605,139 @@
           "unexpectedTerms": []
         }
       ],
+      "Parameter Value[Column type]": [
+        {
+          "ruleName": "Parameter Value[Column type]-01",
+          "fieldName": "Parameter Value[Column type]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "LC-MS"
+            ],
+            "linkedFieldAndValueFilter": []
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "reverse phase",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000853",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "normal phase",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000855",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "HILIC",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000856",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Column model]-02",
+          "fieldName": "Parameter Value[Column model]",
+          "ontologies": [
+            "MS",
+            "MTBLS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "GC-MS",
+              "GCxGC-MS"
+            ],
+            "linkedFieldAndValueFilter": []
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "high polarity",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000991",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "medium polarity",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000989",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "term": "low polarity",
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000990",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
       "Parameter Value[Guard column]": [
         {
           "ruleName": "Parameter Value[Guard column]-01",
@@ -3632,7 +3766,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -3913,16 +4047,11 @@
             "isaFileTemplateNameFilter": [
               "GC-MS"
             ],
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Chromatography"
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -4026,7 +4155,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -4262,16 +4391,11 @@
             "isaFileTemplateNameFilter": [
               "LC-MS"
             ],
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Chromatography"
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -4477,16 +4601,11 @@
             "isaFileTemplateNameFilter": [
               "GC-MS"
             ],
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Protocol REF",
-                "value": "Chromatography"
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -4695,7 +4814,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -4806,7 +4925,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -5085,7 +5204,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -6484,7 +6603,8 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": [
-              "GC-MS"
+              "GC-MS",
+              "GCxGC-MS"
             ],
             "linkedFieldAndValueFilter": [
               {
@@ -6495,7 +6615,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "selected-ontology-term",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -6899,8 +7019,8 @@
             "OBI",
             "EFO",
             "CHMO",
+            "NCBITaxon",
             "NCIT",
-            "NCBITAXON",
             "MS",
             "BTO",
             "CHEBI",
@@ -6935,7 +7055,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "required",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -7052,12 +7172,7 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Sample Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "required",
@@ -7104,15 +7219,10 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
-          "unexpectedTermEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "recommended",
           "validationType": "ontology-term-in-selected-ontologies",
           "constraints": {},
           "defaultValue": null,
@@ -7196,8 +7306,8 @@
             "OBI",
             "EFO",
             "CHMO",
+            "NCBITaxon",
             "NCIT",
-            "NCBITAXON",
             "MS",
             "BTO",
             "CHEBI",
@@ -7316,6 +7426,55 @@
           "allowedPlaceholders": [],
           "terms": [],
           "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Characteristics[Disease]-01",
+          "fieldName": "Characteristics[Disease]",
+          "ontologies": [
+            "MONDO",
+            "MP",
+            "SNOMED"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": {
+            "term": "Not Applicable",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+            "termSourceRef": "NCIT"
+          },
+          "allowedMissingOntologyTerms": [
+            {
+              "term": "Not Applicable",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+              "termSourceRef": "NCIT"
+            }
+          ],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
+          "unexpectedTerms": []
         }
       ],
       "Characteristics[Cell type]": [
@@ -7377,6 +7536,54 @@
           "allowedPlaceholders": [],
           "terms": [],
           "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Characteristics[Cell type]-01",
+          "fieldName": "Characteristics[Cell type]",
+          "ontologies": [
+            "CL",
+            "CLO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": {
+            "term": "Not Applicable",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+            "termSourceRef": "NCIT"
+          },
+          "allowedMissingOntologyTerms": [
+            {
+              "term": "Not Applicable",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+              "termSourceRef": "NCIT"
+            }
+          ],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [],
+          "unexpectedTerms": []
         }
       ],
       "__default_factor_value__": [
@@ -7388,7 +7595,7 @@
             "EFO",
             "CHMO",
             "NCIT",
-            "NCBITAXON",
+            "NCBITaxon",
             "MS",
             "BTO",
             "CHEBI",
@@ -7423,7 +7630,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -7571,12 +7778,7 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
@@ -7656,9 +7858,7 @@
               "^.*unit$",
               "^.*Unit of.*$"
             ],
-            "excludeByAccession": [
-              "http://purl.obolibrary.org/obo/NCIT_C41139"
-            ],
+            "excludeByAccession": [],
             "parents": [
               {
                 "term": "unit",
@@ -7718,7 +7918,7 @@
           "ruleName": "Characteristics[Organism]-01",
           "fieldName": "Characteristics[Organism]",
           "ontologies": [
-            "NCBITAXON",
+            "NCBITaxon",
             "ENVO"
           ],
           "allowedParentOntologyTerms": null,
@@ -7760,37 +7960,37 @@
             {
               "term": "Homo sapiens",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_9606",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Mus musculus",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_10090",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Rattus norvegicus",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_10116",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Arabidopsis thaliana",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_3702",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Vitis vinifera",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_29760",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Escherichia coli",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_562",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Trypanosoma brucei",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_5691",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "sea water",
@@ -7835,7 +8035,7 @@
           "ruleName": "Characteristics[Organism]-02",
           "fieldName": "Characteristics[Organism]",
           "ontologies": [
-            "NCBITAXON",
+            "NCBITaxon",
             "ENVO",
             "MTBLS",
             "WoRMs",
@@ -7852,12 +8052,7 @@
             "studyCategoryFilter": null,
             "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "required",
@@ -7881,37 +8076,37 @@
             {
               "term": "Homo sapiens",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_9606",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Mus musculus",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_10090",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Rattus norvegicus",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_10116",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Arabidopsis thaliana",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_3702",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Vitis vinifera",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_29760",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Escherichia coli",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_562",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "Trypanosoma brucei",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCBITaxon_5691",
-              "termSourceRef": "NCBITAXON"
+              "termSourceRef": "NCBITaxon"
             },
             {
               "term": "sea water",
@@ -8144,7 +8339,7 @@
             "EFO",
             "CHMO",
             "NCIT",
-            "NCBITAXON",
+            "NCBITaxon",
             "MS",
             "BTO",
             "CHEBI",
@@ -8287,7 +8482,7 @@
             },
             {
               "term": "chromatography",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0000591",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0001000",
               "termSourceRef": "CHMO"
             },
             {
@@ -8296,7 +8491,7 @@
               "termSourceRef": "CHMO"
             },
             {
-              "term": "data transform",
+              "term": "data transformation",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0200000",
               "termSourceRef": "OBI"
             },
@@ -8363,7 +8558,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -8433,7 +8628,7 @@
               "termSourceRef": "EFO"
             },
             {
-              "term": "aging",
+              "term": "Aging",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C16269",
               "termSourceRef": "NCIT"
             },
@@ -8620,7 +8815,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -8681,7 +8876,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
@@ -9264,7 +9459,7 @@
           "allowedPlaceholders": [],
           "terms": [
             {
-              "term": "other",
+              "term": "Other",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C17649",
               "termSourceRef": "NCIT"
             },
@@ -9304,7 +9499,7 @@
           },
           "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "recommended",
-          "validationType": "ontology-term-in-selected-ontologies",
+          "validationType": "any-ontology-term",
           "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],

@@ -901,7 +901,7 @@ def add_annotation(
 
 def find_accession_id(source_ref: str, accession_number: str):
     ncbi_id = ""
-    if "NCBITAXON" in source_ref.upper() or "NCBITAXON" in accession_number.upper():
+    if "NCBITaxon" in source_ref.upper() or "NCBITaxon" in accession_number.upper():
         result = re.match("[^0-9]*([0-9]+)", accession_number)
         if result:
             ncbi_id = result.groups()[0]

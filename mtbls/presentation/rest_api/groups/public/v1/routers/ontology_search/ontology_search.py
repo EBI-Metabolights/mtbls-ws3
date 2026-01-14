@@ -78,7 +78,7 @@ async def search_ontologies(
 async def find_term_by_label(
     response: Response,
     ontology: Annotated[
-        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")
+        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITaxon")
     ],
     label: Annotated[str, Path(min_length=3, title="keyword to find an ontology term")],
     ontology_search_service: OntologySearchService = Depends(  # noqa: FAST002
@@ -103,7 +103,7 @@ async def find_term_by_label(
 async def find_term_by_accession(
     response: Response,
     ontology: Annotated[
-        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")
+        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITaxon")
     ],
     accession: Annotated[
         str, Header(min_length=3, title="Accession number of an ontology term")
