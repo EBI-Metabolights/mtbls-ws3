@@ -80,3 +80,8 @@ class BaseStudyRevision(BaseOutputEntity):
     model_config = ConfigDict(
         from_attributes=True, strict=True, entity_type=Entity.StudyRevision
     )
+
+class BaseCompound(BaseInputEntity):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Compound
+    )
