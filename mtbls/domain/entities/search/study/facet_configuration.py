@@ -37,57 +37,51 @@ GB = 1024**3
 YEAR_RANGES = build_year_ranges(2012)
 
 VALUE_FACETS = {
+    # Nested ontology-style fields
     "technologyTypes": {
         "type": "value",
-        "field": "technologyTypes",
+        "field": "technologyTypes.term",
     },
     "assayTechniques": {
         "type": "value",
-        "field": "assayTechniques",
-    },
-    "submitters_country": {
-        "type": "value",
-        "field": "submitters.country.keyword",
-    },
-    "studyTypes": {
-        "type": "value",
-        "field": "studyTypes",
+        "field": "assayTechniques.main",
     },
     "factors": {
         "type": "value",
-        "field": "factors",
+        "field": "factors.term",
     },
     "designDescriptors": {
         "type": "value",
-        "field": "designDescriptors",
+        "field": "designDescriptors.term",
     },
     "organisms": {
         "type": "value",
-        "field": "organisms.keyword",
+        "field": "organisms.term",
     },
     "organismParts": {
         "type": "value",
-        "field": "organismParts.keyword",
+        "field": "organismParts.term",
     },
     "variants": {
         "type": "value",
-        "field": "variants",
+        "field": "variants.term",
     },
     "sampleTypes": {
         "type": "value",
-        "field": "sampleTypes",
+        "field": "sampleTypes.term",
     },
-    "organismKingdom": {
+    "submitters_country": {
         "type": "value",
-        "field": "organismKingdom",
+        "field": "submitters.country",
     },
-    "organismPhylum": {
+    # Top-level keyword facets
+    "status": {
         "type": "value",
-        "field": "organismPhylum",
+        "field": "status",
     },
-    "organismClass": {
+    "curationRequest": {
         "type": "value",
-        "field": "organismClass",
+        "field": "curationRequest",
     },
 }
 STUDY_FACET_CONFIG = {

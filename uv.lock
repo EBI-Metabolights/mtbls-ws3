@@ -1654,6 +1654,7 @@ ws3 = [
     { name = "greenlet" },
     { name = "gunicorn" },
     { name = "httpx" },
+    { name = "numpy" },
     { name = "pandas" },
     { name = "psycopg2-binary" },
     { name = "pyjwt" },
