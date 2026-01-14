@@ -101,8 +101,7 @@ class ElasticsearchClient:
                 if status in (401, 403):
                     # Restricted API key cannot ping cluster; keep client and continue.
                     logger.warning(
-                        "Elasticsearch ping unauthorized for api_key=%s (status=%s); continuing.",
-                        key_name or "default",
+                        "Elasticsearch ping unauthorized for a configured API key (status=%s); continuing.",
                         status,
                     )
                     self._clients[key_name] = es
