@@ -179,11 +179,11 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """
         Given a UI filter field, resolve it to an ES field path and whether it is nested.
         """
-        if field in FACET_CONFIG:
-            spec = FACET_CONFIG[field] or {}
+        if field in STUDY_FACET_CONFIG:
+            spec = STUDY_FACET_CONFIG[field] or {}
             return spec.get("field") or field, spec.get("nested_path")
 
-        for fname, spec in FACET_CONFIG.items():
+        for fname, spec in STUDY_FACET_CONFIG.items():
             if not spec:
                 continue
             if spec.get("field") == field:
@@ -312,11 +312,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             q["range"][field]["lte"] = r["to"]
         return q
 
-    def _map_aggs_to_searchui(self, aggs: Dict[str, Any]) -> Dict[str, Any]:
+    def _map_aggs_to_searchui(self, aggs: Dict[str, Any], config: Dict[str, Any] | None = None) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
         nested_bucket_name = "values"
+        facet_config = config or STUDY_FACET_CONFIG
 
-        for facet_name, spec in FACET_CONFIG.items():
+        for facet_name, spec in facet_config.items():
             ftype = spec.get("type")
             agg_resp = aggs.get(facet_name)
             if not agg_resp:

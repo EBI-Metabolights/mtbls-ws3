@@ -72,7 +72,7 @@ VALUE_FACETS = {
     },
     "submitters_country": {
         "type": "value",
-        "field": "submitters.country",
+        "field": "submitters.country.keyword",
     },
     # Top-level keyword facets
     "status": {
