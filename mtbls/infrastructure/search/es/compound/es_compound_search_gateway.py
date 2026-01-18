@@ -1,12 +1,14 @@
-
-
-from typing import Any, Dict, List
+import re
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
 from mtbls.domain.entities.search.compound.facet_configuration import COMPOUND_FACET_CONFIG
 from mtbls.domain.entities.search.index_search import IndexSearchInput, IndexSearchResult
 from mtbls.infrastructure.search.es.compound.es_compound_configuration import CompoundElasticSearchConfiguration
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
+
+# Pattern to detect MetaboLights study IDs in query strings
+MTBLS_STUDY_ID_PATTERN = re.compile(r"^MTBLS\d+$", re.IGNORECASE)
 
 
 
@@ -27,7 +29,25 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
     @property
     def config(self) -> CompoundElasticSearchConfiguration:
         return self._config
-    
+
+    @staticmethod
+    def _extract_study_ids_from_query(query: Optional[str]) -> Tuple[Optional[List[str]], Optional[str]]:
+        """
+        Detect if query is a MetaboLights study ID pattern.
+
+        Returns:
+            Tuple of (detected_study_ids, remaining_query).
+            - If query matches MTBLS pattern: ([study_id], None)
+            - Otherwise: (None, original_query)
+        """
+        if not query:
+            return None, query
+        query_stripped = query.strip()
+        if MTBLS_STUDY_ID_PATTERN.match(query_stripped):
+            # Normalize to uppercase for consistent matching
+            return [query_stripped.upper()], None
+        return None, query
+
     async def get_index_mapping(self) -> dict[str, Any]:
         """
         Return the ES mapping for the configured index.
@@ -65,9 +85,13 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
 
 
     def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
-        """" This is a carbon copy of the method from the search gateway for studies.
-        At some point the logic for searching compounds may change. We could maybe refactor this
-        logic to be available in the base class, to be later overridden.
+        """Builds the Elasticsearch DSL query payload.
+
+        Supports:
+        - Text search across configured fields
+        - Numeric query scoring (Gaussian decay on mass fields)
+        - Study ID filtering via explicit `study_ids` param or auto-detection of MTBLS pattern
+        - Facet filtering with all/any/none operators
 
         Args:
             req (IndexSearchInput): Search input, term, pagination, sorting, filters.
@@ -79,9 +103,31 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
         numeric_query: float | None = None
-        if req.query:
+
+        # --- Study ID handling ---
+        # Priority: explicit study_ids param > auto-detected pattern in query
+        effective_study_ids: Optional[List[str]] = None
+        effective_query: Optional[str] = req.query
+
+        if req.study_ids:
+            # Explicit param provided - normalize to uppercase
+            effective_study_ids = [sid.upper() for sid in req.study_ids]
+        else:
+            # Check if query looks like a study ID
+            detected_ids, remaining_query = self._extract_study_ids_from_query(req.query)
+            if detected_ids:
+                effective_study_ids = detected_ids
+                effective_query = remaining_query  # None if query was just a study ID
+
+        # Add study_ids filter if we have any
+        if effective_study_ids:
+            # ANY (union) - compounds appearing in any of the listed studies
+            filter_clauses.append({"terms": {"studyIds": effective_study_ids}})
+
+        # --- Text/numeric query handling ---
+        if effective_query:
             try:
-                numeric_query = float(req.query)
+                numeric_query = float(effective_query)
             except (TypeError, ValueError):
                 numeric_query = None
             # Only run text matching if this isn't purely numeric; numeric searches rely on scoring functions.
@@ -92,14 +138,14 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                             "should": [
                                 {
                                     "multi_match": {
-                                        "query": req.query,
+                                        "query": effective_query,
                                         "fields": list(self.config.search_fields),
                                         "operator": "and",
                                     }
                                 },
                                 # prefix match (fast)
                                 *[
-                                    {"prefix": {field: req.query.lower()}}
+                                    {"prefix": {field: effective_query.lower()}}
                                     for field in self.config.search_fields
                                 ],
                             ],

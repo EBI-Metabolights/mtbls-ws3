@@ -61,6 +61,13 @@ class IndexSearchInput(BaseSearchInput):
             description="Facet configuration from the UI (value/range specs)",
         ),
     ]
+    study_ids: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']). Returns compounds appearing in ANY of the listed studies.",
+        ),
+    ]
 
 
 class FacetBucket(BaseModel):
