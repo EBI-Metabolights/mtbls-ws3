@@ -326,6 +326,20 @@ class Statistic(Base):
     sort_order = Column(BigInteger)
 
 
+class MtblsDataReuse(Base):
+    __tablename__ = "metabolights_data_reuse"
+    __table_args__ = {"sqlite_autoincrement": True}
+    __excluded_fields__: set[str] = set()
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
+    content_name = Column(String(300), nullable=False)
+    data_format = Column(String(50), nullable=False)
+    content = Column(Text, nullable=False)
+    updated_timestamp: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=False), nullable=False
+    )
+
+
 class StudyTasks(Base):
     __tablename__ = "study_tasks"
     __excluded_fields__: set[str] = set()

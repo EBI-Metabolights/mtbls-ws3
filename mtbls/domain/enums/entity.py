@@ -7,3 +7,4 @@ class Entity(enum.StrEnum):
     StudyRevision = "study_revision"
     StudyFile = "study_file"
     Statistic = "statistic"
+    MtblsDataReuse = "mtbls_data_reuse"
