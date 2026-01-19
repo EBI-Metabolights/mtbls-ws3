@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import CompoundReadRepository
+from mtbls.application.services.interfaces.repositories.compound.compound_similarity_repository import CompoundSimilarityRepository
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
@@ -42,6 +43,7 @@ from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
 )
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
 from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import MongoCompoundReadRepository
+from mtbls.infrastructure.repositories.compound.mongodb.compound_similarity_repository import MongoCompoundSimilarityRepository
 from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
@@ -204,6 +206,12 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         #entity_mapper=entity_mapper,
         #alias_generator=alias_generator,
         database_client=gateways.document_database_client,
+    )
+
+    compound_similarity_repository: CompoundSimilarityRepository = providers.Singleton(
+        MongoCompoundSimilarityRepository,
+        database_client=gateways.document_database_client,
+        config=None,  # Uses default CompoundSimilarityConfig
     )
 
     # study_file_repository: StudyFileRepository = providers.Singleton(
