@@ -65,7 +65,14 @@ class IndexSearchInput(BaseSearchInput):
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']). Returns compounds appearing in ANY of the listed studies.",
+            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']).",
+        ),
+    ]
+    study_ids_operator: Annotated[
+        Optional[Literal["any", "all"]],
+        Field(
+            default="any",
+            description="Operator for study_ids filter: 'any' returns compounds in ANY of the studies, 'all' returns compounds in ALL of the studies.",
         ),
     ]
 
@@ -86,6 +93,13 @@ class IndexSearchResult(BaseModel):
     totalResults: int
     facets: Dict[str, List[FacetResponse]] = Field(default_factory=dict)
     requestId: str
+    all_study_ids: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="All matching study IDs (only populated when include_all_ids=true and search has query/filters)",
+        ),
+    ]
 
 
 class IndexSearchResultEnvelope(BaseSearchResult):

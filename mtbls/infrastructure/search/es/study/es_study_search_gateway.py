@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
@@ -11,6 +11,9 @@ from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 from mtbls.infrastructure.search.es.es_configuration import (
     StudyElasticSearchConfiguration,
 )
+
+# Maximum number of study IDs to return in all_study_ids
+ALL_IDS_MAX_SIZE = 100
 
 
 class ElasticsearchStudyGateway(BaseElasticSearchGateway):
@@ -44,6 +47,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         self,
         query: IndexSearchInput,
         raw: bool = False,
+        include_all_ids: bool = False,
     ) -> IndexSearchResult | Dict[str, Any]:
         dsl = self._build_search_payload(query)
         es_resp = await self._client.search(
@@ -59,11 +63,17 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         total = self._extract_total(es_resp)
         facets = self._map_aggs_to_searchui(es_resp.get("aggregations") or {}, STUDY_FACET_CONFIG)
 
+        # Fetch all matching study IDs if requested and there's a meaningful query/filter
+        all_study_ids: Optional[List[str]] = None
+        if include_all_ids and self._has_query_or_filters(query):
+            all_study_ids = await self._fetch_all_matching_ids(query)
+
         return IndexSearchResult(
             results=results,
             totalResults=total,
             facets=facets,
             requestId=str(uuid4()),  # useless currently
+            all_study_ids=all_study_ids,
         )
 
     def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
@@ -155,6 +165,107 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         return dsl
 
+    def _has_query_or_filters(self, req: IndexSearchInput) -> bool:
+        """Check if the request has a text query or any filters applied."""
+        if req.query and req.query.strip():
+            return True
+        if req.filters:
+            for f in req.filters:
+                if f.values:
+                    return True
+        return False
+
+    async def _fetch_all_matching_ids(self, req: IndexSearchInput) -> List[str]:
+        """
+        Fetch all study IDs matching the query/filters (up to ALL_IDS_MAX_SIZE).
+        Uses the same query logic but with minimal _source and no aggregations.
+        """
+        dsl = self._build_ids_only_payload(req)
+        es_resp = await self._client.search(
+            index=self.config.index_name,
+            body=dsl,
+            api_key_name=self.config.api_key_name,
+        )
+
+        study_ids: List[str] = []
+        for hit in es_resp.get("hits", {}).get("hits", []):
+            source = hit.get("_source", {})
+            study_id = source.get("studyId")
+            if study_id:
+                study_ids.append(study_id)
+
+        return study_ids
+
+    def _build_ids_only_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
+        """
+        Build a payload for fetching only study IDs (no aggregations, minimal source).
+        Uses the same query/filter logic as _build_search_payload.
+        """
+        must: List[Dict[str, Any]] = []
+        filter_clauses: List[Dict[str, Any]] = []
+        must_not: List[Dict[str, Any]] = []
+
+        if req.query:
+            should_clauses: List[Dict[str, Any]] = []
+            should_clauses.append(
+                {
+                    "multi_match": {
+                        "query": req.query,
+                        "fields": list(self.config.search_fields),
+                        "operator": "and",
+                    }
+                }
+            )
+            should_clauses.extend(
+                [{"prefix": {field: req.query.lower()}} for field in self.config.search_fields]
+            )
+            should_clauses.extend(self._nested_search_clauses(req.query))
+            must.append(
+                {
+                    "bool": {
+                        "should": should_clauses,
+                        "minimum_should_match": 1,
+                    }
+                }
+            )
+
+        for f in req.filters:
+            if not f.values:
+                continue
+            field, nested_path = self._resolve_filter_field(f.field)
+            if not field:
+                continue
+            operator = f.operator or "all"
+            if operator == "none":
+                must_not.append(self._build_filter_clause(field, f.values, nested_path, operator))
+            elif operator == "any":
+                filter_clauses.append(self._build_filter_clause(field, f.values, nested_path, operator))
+            else:
+                clauses = self._build_filter_clause(field, f.values, nested_path, operator)
+                if isinstance(clauses, list):
+                    filter_clauses.extend(clauses)
+                else:
+                    filter_clauses.append(clauses)
+
+        dsl: Dict[str, Any] = {
+            "track_total_hits": False,  # Not needed for ID fetch
+            "from": 0,
+            "size": ALL_IDS_MAX_SIZE,
+            "_source": ["studyId"],
+            "query": {
+                "bool": {
+                    "must": must or [{"match_all": {}}],
+                    "filter": filter_clauses,
+                    "must_not": must_not,
+                }
+            },
+            "sort": [{"studyId": "asc"}],  # Deterministic ordering
+        }
+
+        dsl.setdefault("timeout", "10s")  # Allow more time for large result set
+
+        return dsl
+
     def _nested_search_clauses(self, query: str) -> List[Dict[str, Any]]:
         clauses: List[Dict[str, Any]] = []
         for path, fields in self.config.nested_search_fields:
@@ -183,7 +294,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             spec = STUDY_FACET_CONFIG[field] or {}
             return spec.get("field") or field, spec.get("nested_path")
 
-        for fname, spec in STUDY_FACET_CONFIG.items():
+        for _, spec in STUDY_FACET_CONFIG.items():
             if not spec:
                 continue
             if spec.get("field") == field:

@@ -2,7 +2,7 @@ from logging import getLogger
 from typing import Annotated, Any
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Body, Depends, Response, status
+from fastapi import APIRouter, Body, Depends, Query, Response, status
 
 from mtbls.domain.entities.search.index_search import (
     IndexSearchInput,
@@ -19,13 +19,18 @@ router = APIRouter(tags=["Public"], prefix="/public/v2/public-study-index")
     "/search",
     summary="MetaboLights Study Search from public study index.",
     description="MetaboLights search results from public study index. "
-    "Sanitised output format.",
+    "Sanitised output format. Set include_all_ids=true to get all matching "
+    "study IDs alongside paginated results (only when query or filters are applied).",
     response_model=APIResponse[IndexSearchResult],  # IndexSearchResult or raw dict
 )
 @inject
 async def search_study_index(
     response: Response,
     q: Annotated[IndexSearchInput, Body()],
+    include_all_ids: bool = Query(
+        default=False,
+        description="Include all matching study IDs in response (only populated when query or filters are applied)",
+    ),
     elasticsearch_study_search_service=Depends(
         Provide["gateways.elasticsearch_study_gateway"]
     ),
@@ -34,7 +39,9 @@ async def search_study_index(
         response.status_code = status.HTTP_400_BAD_REQUEST
         response_message = APIErrorResponse(error="Search query is not valid.")
         return response_message
-    result = await elasticsearch_study_search_service.search(query=q)
+    result = await elasticsearch_study_search_service.search(
+        query=q, include_all_ids=include_all_ids
+    )
     response: APIResponse[IndexSearchResult] = APIResponse[IndexSearchResult](
         content=result
     )
