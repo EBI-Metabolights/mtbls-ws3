@@ -560,11 +560,14 @@ class MongoDbStudyMetadataService(StudyMetadataService):
     async def save_study_model(
         self,
         model: MetabolightsStudyModel,
+        save_metadata_files: bool = True,
+        save_result_files: bool = True,
     ) -> bool:
         investigation_item = InvestigationItem.get_from_investigation(
             model.investigation
         )
         self.save_investigation_file(investigation_item)
+        # TODO complete saving metadata and result files tables
 
     async def load_investigation_file(
         self,
