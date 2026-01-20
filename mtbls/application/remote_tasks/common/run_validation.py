@@ -122,6 +122,8 @@ async def create_validation_configuration(
 
 
 def calculate_file_lines(file_paths: list[pathlib.Path]) -> dict[str, int]:
+    if not file_paths:
+        return {}
     files = [f for f in file_paths if f.is_file()]
     result = subprocess.check_output(["wc", "-l"] + files)
     return {
