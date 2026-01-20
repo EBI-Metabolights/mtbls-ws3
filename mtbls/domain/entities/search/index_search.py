@@ -40,6 +40,8 @@ class BaseSearchInput(BaseModel):
 
 
 class IndexSearchInput(BaseSearchInput):
+    """Base class for index search inputs with common fields."""
+
     query: Annotated[
         Optional[str], Field(default=None, description="Search term or query string")
     ]
@@ -61,11 +63,16 @@ class IndexSearchInput(BaseSearchInput):
             description="Facet configuration from the UI (value/range specs)",
         ),
     ]
+
+
+class CompoundSearchInput(IndexSearchInput):
+    """Search input for compound search with compound-specific filters."""
+
     study_ids: Annotated[
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']).",
+            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']). Returns compounds that appear in the specified studies.",
         ),
     ]
     study_ids_operator: Annotated[
@@ -73,6 +80,32 @@ class IndexSearchInput(BaseSearchInput):
         Field(
             default="any",
             description="Operator for study_ids filter: 'any' returns compounds in ANY of the studies, 'all' returns compounds in ALL of the studies.",
+        ),
+    ]
+
+
+class StudySearchInput(IndexSearchInput):
+    """Search input for study search with study-specific filters."""
+
+    database_identifiers: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter studies by compound database identifiers (e.g., ['HMDB0031111']). Returns studies containing these compounds.",
+        ),
+    ]
+    metabolite_identifications: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter studies by compound names (e.g., ['Lithocholic acid 3-O-glucuronide']). Returns studies containing these compounds.",
+        ),
+    ]
+    study_ids: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter to specific study IDs (e.g., ['MTBLS1', 'MTBLS2']). Primarily used internally after resolving chemical filters.",
         ),
     ]
 

@@ -1,6 +1,6 @@
 
 import logging
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import (  # noqa: E501
     CompoundReadRepository,
@@ -35,3 +35,40 @@ class MongoCompoundReadRepository(CompoundReadRepository):
             except Exception as ex:
                 logger.exception(ex)
                 return None
+
+    async def get_compounds_by_ids(
+        self, ids: List[str]
+    ) -> Tuple[List[Compound], List[str]]:
+        """
+        Retrieve multiple compounds by their IDs using MongoDB $in operator.
+
+        Args:
+            ids: List of compound IDs to retrieve
+
+        Returns:
+            Tuple of (found_compounds, missing_ids)
+        """
+        if not ids:
+            return ([], [])
+
+        async with self.database_client.database() as database:
+            collection = database[self.collection_name]
+            cursor = collection.find({"id": {"$in": ids}})
+            docs = list(cursor)
+
+        # Build compounds from documents
+        found_compounds: List[Compound] = []
+        found_ids: set[str] = set()
+
+        for doc in docs:
+            try:
+                compound = Compound.from_mongo_with_raw(doc, include_raw=self.include_raw)
+                found_compounds.append(compound)
+                found_ids.add(doc.get("id", ""))
+            except Exception as ex:
+                logger.exception(f"Failed to parse compound document: {ex}")
+
+        # Determine which IDs were not found
+        missing_ids = [id_ for id_ in ids if id_ not in found_ids]
+
+        return (found_compounds, missing_ids)

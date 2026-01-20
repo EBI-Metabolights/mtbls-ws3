@@ -1,16 +1,21 @@
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import uuid4
 
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
 from mtbls.domain.entities.search.study.facet_configuration import STUDY_FACET_CONFIG
 from mtbls.domain.entities.search.index_search import (
-    IndexSearchInput,
     IndexSearchResult,
+    StudySearchInput,
 )
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 from mtbls.infrastructure.search.es.es_configuration import (
     StudyElasticSearchConfiguration,
 )
+
+if TYPE_CHECKING:
+    from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
+        ElasticsearchAssignmentGateway,
+    )
 
 # Maximum number of study IDs to return in all_study_ids
 ALL_IDS_MAX_SIZE = 100
@@ -21,9 +26,11 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         self,
         client: ElasticsearchClient,
         config: None | StudyElasticSearchConfiguration | dict[str, Any],
+        assignment_gateway: Optional["ElasticsearchAssignmentGateway"] = None,
     ):
         self._client = client
         self._config = config
+        self._assignment_gateway = assignment_gateway
         if not self._config:
             self._config = StudyElasticSearchConfiguration()
         elif isinstance(self._config, dict):
@@ -45,11 +52,14 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
     async def search(
         self,
-        query: IndexSearchInput,
+        query: StudySearchInput,
         raw: bool = False,
         include_all_ids: bool = False,
     ) -> IndexSearchResult | Dict[str, Any]:
-        dsl = self._build_search_payload(query)
+        # Resolve chemical filters to study IDs if present
+        resolved_query = await self._resolve_chemical_filters(query)
+
+        dsl = self._build_search_payload(resolved_query)
         es_resp = await self._client.search(
             index=self.config.index_name,
             body=dsl,
@@ -65,8 +75,8 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         # Fetch all matching study IDs if requested and there's a meaningful query/filter
         all_study_ids: Optional[List[str]] = None
-        if include_all_ids and self._has_query_or_filters(query):
-            all_study_ids = await self._fetch_all_matching_ids(query)
+        if include_all_ids and self._has_query_or_filters(resolved_query):
+            all_study_ids = await self._fetch_all_matching_ids(resolved_query)
 
         return IndexSearchResult(
             results=results,
@@ -76,7 +86,72 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             all_study_ids=all_study_ids,
         )
 
-    def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
+    def _has_chemical_filters(self, req: StudySearchInput) -> bool:
+        """Check if the request has chemical filters (database identifiers or metabolite identifications)."""
+        if req.database_identifiers:
+            return True
+        if req.metabolite_identifications:
+            return True
+        return False
+
+    async def _resolve_chemical_filters(self, req: StudySearchInput) -> StudySearchInput:
+        """
+        If chemical filters are present, query the assignment gateway to get matching study IDs,
+        then add them as study_ids filter on the request.
+
+        Returns a new StudySearchInput with resolved study_ids if chemical filters were present,
+        or the original request unchanged if not.
+        """
+        if not self._has_chemical_filters(req):
+            return req
+
+        if not self._assignment_gateway:
+            # No assignment gateway configured - skip chemical filter resolution
+            return req
+
+        # Query assignment index for study IDs matching the chemical filters
+        matching_study_ids = await self._assignment_gateway.find_study_ids_by_compounds(
+            database_identifiers=req.database_identifiers,
+            metabolite_identifications=req.metabolite_identifications,
+        )
+
+        if not matching_study_ids:
+            # No studies match the chemical filters - return impossible filter
+            # by setting study_ids to a non-existent ID to ensure zero results
+            return StudySearchInput(
+                query=req.query,
+                page=req.page,
+                sort=req.sort,
+                filters=req.filters,
+                facets=req.facets,
+                study_ids=["__NO_MATCHING_STUDIES__"],
+                database_identifiers=None,  # Already resolved
+                metabolite_identifications=None,  # Already resolved
+            )
+
+        # Combine with any existing study_ids filter (intersection)
+        if req.study_ids:
+            # Intersect: only keep study IDs that are in both lists
+            existing_set = set(req.study_ids)
+            combined_study_ids = [sid for sid in matching_study_ids if sid in existing_set]
+            if not combined_study_ids:
+                # No intersection - return impossible filter
+                combined_study_ids = ["__NO_MATCHING_STUDIES__"]
+        else:
+            combined_study_ids = matching_study_ids
+
+        return StudySearchInput(
+            query=req.query,
+            page=req.page,
+            sort=req.sort,
+            filters=req.filters,
+            facets=req.facets,
+            study_ids=combined_study_ids,
+            database_identifiers=None,  # Already resolved
+            metabolite_identifications=None,  # Already resolved
+        )
+
+    def _build_search_payload(self, req: StudySearchInput) -> Dict[str, Any]:
         must: List[Dict[str, Any]] = []
         filter_clauses: List[Dict[str, Any]] = []
         must_not: List[Dict[str, Any]] = []
@@ -126,6 +201,10 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 else:
                     filter_clauses.append(clauses)
 
+        # Study IDs filter (from resolved chemical filters or explicit study_ids parameter)
+        if req.study_ids:
+            filter_clauses.append({"terms": {"studyId": req.study_ids}})
+
         # Sort
         sort_clause: List[Any] = []
         if req.sort:
@@ -165,17 +244,19 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         return dsl
 
-    def _has_query_or_filters(self, req: IndexSearchInput) -> bool:
-        """Check if the request has a text query or any filters applied."""
+    def _has_query_or_filters(self, req: StudySearchInput) -> bool:
+        """Check if the request has a text query, filters, or study_ids applied."""
         if req.query and req.query.strip():
             return True
         if req.filters:
             for f in req.filters:
                 if f.values:
                     return True
+        if req.study_ids:
+            return True
         return False
 
-    async def _fetch_all_matching_ids(self, req: IndexSearchInput) -> List[str]:
+    async def _fetch_all_matching_ids(self, req: StudySearchInput) -> List[str]:
         """
         Fetch all study IDs matching the query/filters (up to ALL_IDS_MAX_SIZE).
         Uses the same query logic but with minimal _source and no aggregations.
@@ -196,7 +277,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         return study_ids
 
-    def _build_ids_only_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
+    def _build_ids_only_payload(self, req: StudySearchInput) -> Dict[str, Any]:
         """
         Build a payload for fetching only study IDs (no aggregations, minimal source).
         Uses the same query/filter logic as _build_search_payload.
@@ -246,6 +327,10 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                     filter_clauses.extend(clauses)
                 else:
                     filter_clauses.append(clauses)
+
+        # Study IDs filter (from resolved chemical filters or explicit study_ids parameter)
+        if req.study_ids:
+            filter_clauses.append({"terms": {"studyId": req.study_ids}})
 
         dsl: Dict[str, Any] = {
             "track_total_hits": False,  # Not needed for ID fetch

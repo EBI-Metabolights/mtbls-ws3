@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
 from mtbls.domain.entities.search.compound.facet_configuration import COMPOUND_FACET_CONFIG
-from mtbls.domain.entities.search.index_search import IndexSearchInput, IndexSearchResult
+from mtbls.domain.entities.search.index_search import CompoundSearchInput, IndexSearchResult
 from mtbls.infrastructure.search.es.compound.es_compound_configuration import CompoundElasticSearchConfiguration
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
@@ -59,7 +59,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
     
     async def search(
         self,
-        query: IndexSearchInput,
+        query: CompoundSearchInput,
         raw: bool = False,
     ) -> Any:
         dsl = self._build_search_payload(query)
@@ -84,7 +84,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         )
 
 
-    def _build_search_payload(self, req: IndexSearchInput) -> Dict[str, Any]:
+    def _build_search_payload(self, req: CompoundSearchInput) -> Dict[str, Any]:
         """Builds the Elasticsearch DSL query payload.
 
         Supports:
@@ -94,7 +94,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         - Facet filtering with all/any/none operators
 
         Args:
-            req (IndexSearchInput): Search input, term, pagination, sorting, filters.
+            req (CompoundSearchInput): Search input, term, pagination, sorting, filters.
 
         Returns:
             Dict[str, Any]: Elasticsearch DSL payload.

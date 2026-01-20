@@ -40,6 +40,7 @@ gateways:
         api_keys:
           study: "{{ elasticsearch.api_keys.study }}"
           compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
         request_timeout_in_seconds: 5.0
 services:
   authentication:

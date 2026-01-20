@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from mtbls.domain.entities.search.index_search import (
-    IndexSearchInput,
+    CompoundSearchInput,
     PageModel,
     SortModel,
     FilterModel,
@@ -80,8 +80,8 @@ class TestBuildSearchPayloadStudyIds:
         return ElasticsearchCompoundGateway(client=mock_client, config=None)
 
     @pytest.fixture
-    def base_request(self) -> IndexSearchInput:
-        return IndexSearchInput(
+    def base_request(self) -> CompoundSearchInput:
+        return CompoundSearchInput(
             query=None,
             page=PageModel(current=1, size=25),
             sort=None,
@@ -182,7 +182,7 @@ class TestBuildSearchPayloadIntegration:
         return ElasticsearchCompoundGateway(client=mock_client, config=None)
 
     def test_study_ids_with_facet_filters(self, gateway):
-        request = IndexSearchInput(
+        request = CompoundSearchInput(
             query="aspirin",
             page=PageModel(current=1, size=25),
             sort=None,
@@ -200,7 +200,7 @@ class TestBuildSearchPayloadIntegration:
         assert {"terms": {"organisms": ["Homo sapiens"]}} in bool_query["filter"]
 
     def test_study_ids_with_sorting_and_pagination(self, gateway):
-        request = IndexSearchInput(
+        request = CompoundSearchInput(
             query=None,
             page=PageModel(current=2, size=10),
             sort=SortModel(field="name", direction="asc"),

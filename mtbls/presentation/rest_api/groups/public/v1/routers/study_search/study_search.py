@@ -5,8 +5,8 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Depends, Query, Response, status
 
 from mtbls.domain.entities.search.index_search import (
-    IndexSearchInput,
     IndexSearchResult,
+    StudySearchInput,
 )
 from mtbls.presentation.rest_api.core.responses import APIErrorResponse, APIResponse
 
@@ -26,7 +26,7 @@ router = APIRouter(tags=["Public"], prefix="/public/v2/public-study-index")
 @inject
 async def search_study_index(
     response: Response,
-    q: Annotated[IndexSearchInput, Body()],
+    q: Annotated[StudySearchInput, Body()],
     include_all_ids: bool = Query(
         default=False,
         description="Include all matching study IDs in response (only populated when query or filters are applied)",
@@ -58,7 +58,7 @@ async def search_study_index(
 @inject
 async def search_study_index_raw(
     response: Response,
-    q: Annotated[IndexSearchInput, Body()],
+    q: Annotated[StudySearchInput, Body()],
     elasticsearch_study_search_service=Depends(
         Provide["gateways.elasticsearch_study_gateway"]
     ),

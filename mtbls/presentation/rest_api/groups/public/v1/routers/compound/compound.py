@@ -1,9 +1,9 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from dependency_injector.wiring import Provide, inject
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import (
     CompoundReadRepository,
@@ -20,12 +20,49 @@ logger = getLogger(__name__)
 
 router = APIRouter(tags=["Public"], prefix="/public/v2/compound")
 
+# Maximum number of compounds that can be retrieved in a single batch request
+BATCH_SIZE_LIMIT = 100
+
 
 class CompoundWithSimilar(BaseModel):
     """Compound with optional similar compounds."""
 
     compound: Optional[Compound] = None
     similar_compounds: Optional[List[SimilarCompound]] = None
+
+
+class BatchCompoundRequest(BaseModel):
+    """Request model for batch compound retrieval."""
+
+    compound_ids: Annotated[
+        List[str],
+        Field(
+            description="List of compound IDs to retrieve (e.g., ['MTBLC1', 'MTBLC2'])",
+            min_length=1,
+            max_length=BATCH_SIZE_LIMIT,
+        ),
+    ]
+
+
+class BatchCompoundResult(BaseModel):
+    """Result model for batch compound retrieval."""
+
+    compounds: Annotated[
+        List[Compound],
+        Field(description="List of compounds that were found"),
+    ]
+    missing_ids: Annotated[
+        List[str],
+        Field(description="List of compound IDs that were not found"),
+    ]
+    total_requested: Annotated[
+        int,
+        Field(description="Total number of IDs requested"),
+    ]
+    total_found: Annotated[
+        int,
+        Field(description="Number of compounds found"),
+    ]
 
 
 @router.get(
@@ -114,3 +151,49 @@ async def get_similar_compounds(
         )
         response.message = str(e)
         return response
+
+
+@router.post(
+    "/batch",
+    summary="Get multiple compounds by IDs.",
+    description=f"Retrieve multiple compounds in a single request by providing a list of compound IDs. "
+    f"Maximum {BATCH_SIZE_LIMIT} compounds per request. Returns found compounds and a list of any IDs that were not found.",
+    response_model=APIResponse[BatchCompoundResult],
+)
+@inject
+async def get_compounds_batch(
+    request: BatchCompoundRequest = Body(...),
+    include_raw: bool = Query(
+        default=False,
+        description="Include raw MongoDB document in response for each compound",
+    ),
+    compound_read_repository: CompoundReadRepository = Depends(
+        Provide["repositories.compound_read_repository"]
+    ),
+):
+    """
+    Batch retrieve compounds by their IDs.
+
+    This endpoint is more efficient than making multiple individual requests
+    when you need to retrieve several compounds at once.
+    """
+    # Deduplicate IDs while preserving order
+    unique_ids = list(dict.fromkeys(request.compound_ids))
+
+    compounds, missing_ids = await compound_read_repository.get_compounds_by_ids(unique_ids)
+
+    # Strip raw field if not requested
+    if not include_raw:
+        for compound in compounds:
+            compound.raw = None
+
+    result = BatchCompoundResult(
+        compounds=compounds,
+        missing_ids=missing_ids,
+        total_requested=len(unique_ids),
+        total_found=len(compounds),
+    )
+
+    response: APIResponse[BatchCompoundResult] = APIResponse[BatchCompoundResult]()
+    response.content = result
+    return response

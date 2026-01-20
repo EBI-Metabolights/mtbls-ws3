@@ -7,7 +7,7 @@ from fastapi.params import Depends
 
 from dependency_injector.wiring import Provide, inject
 
-from mtbls.domain.entities.search.index_search import IndexSearchInput, IndexSearchResult
+from mtbls.domain.entities.search.index_search import CompoundSearchInput, IndexSearchResult
 from mtbls.presentation.rest_api.core.responses import APIErrorResponse, APIResponse
 
 
@@ -22,7 +22,7 @@ router = APIRouter(tags=["Public"], prefix="/public/v2/public-compound-index")
 @inject
 async def search_compound_index(
     response: Response,
-    q: Annotated[IndexSearchInput, Body()],
+    q: Annotated[CompoundSearchInput, Body()],
     elasticsearch_compound_search_service=Depends(
         Provide["gateways.elasticsearch_compound_gateway"]
     ),
