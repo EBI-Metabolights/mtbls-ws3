@@ -128,6 +128,30 @@ class TestFindStudyIdsByCompounds:
         )
 
         assert result == ["MTBLS1", "MTBLS2", "MTBLS3"]
+        mock_client.search.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_all_operator_builds_bucket_selector(self, gateway, mock_client):
+        await gateway.find_study_ids_by_compounds(
+            database_identifiers=["HMDB1", "HMDB2"],
+            metabolite_identifications=["Aspirin"],
+            database_identifiers_operator="all",
+            metabolite_identifications_operator="any",
+        )
+
+        call_kwargs = mock_client.search.call_args.kwargs
+        aggs = call_kwargs["body"]["aggs"]["unique_studies"]["aggs"]
+
+        # expect per-value filters for the "all" list
+        assert "db_all_0" in aggs and "db_all_1" in aggs
+        # expect an "any" filter for names because the other list is "all"
+        assert "met_any" in aggs
+        # bucket selector should require all parts
+        selector = aggs["require_all"]["bucket_selector"]
+        script = selector["script"]
+        assert "params.db_all_0 > 0" in script
+        assert "params.db_all_1 > 0" in script
+        assert "params.met_any > 0" in script
 
     @pytest.mark.asyncio
     async def test_find_study_ids_with_metabolite_identifications(

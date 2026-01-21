@@ -113,20 +113,19 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         matching_study_ids = await self._assignment_gateway.find_study_ids_by_compounds(
             database_identifiers=req.database_identifiers,
             metabolite_identifications=req.metabolite_identifications,
+            database_identifiers_operator=req.database_identifiers_operator,
+            metabolite_identifications_operator=req.metabolite_identifications_operator,
         )
 
         if not matching_study_ids:
             # No studies match the chemical filters - return impossible filter
             # by setting study_ids to a non-existent ID to ensure zero results
-            return StudySearchInput(
-                query=req.query,
-                page=req.page,
-                sort=req.sort,
-                filters=req.filters,
-                facets=req.facets,
-                study_ids=["__NO_MATCHING_STUDIES__"],
-                database_identifiers=None,  # Already resolved
-                metabolite_identifications=None,  # Already resolved
+            return req.model_copy(
+                update={
+                    "study_ids": ["__NO_MATCHING_STUDIES__"],
+                    "database_identifiers": None,  # Already resolved
+                    "metabolite_identifications": None,  # Already resolved
+                }
             )
 
         # Combine with any existing study_ids filter (intersection)
@@ -140,15 +139,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         else:
             combined_study_ids = matching_study_ids
 
-        return StudySearchInput(
-            query=req.query,
-            page=req.page,
-            sort=req.sort,
-            filters=req.filters,
-            facets=req.facets,
-            study_ids=combined_study_ids,
-            database_identifiers=None,  # Already resolved
-            metabolite_identifications=None,  # Already resolved
+        return req.model_copy(
+            update={
+                "study_ids": combined_study_ids,
+                "database_identifiers": None,  # Already resolved
+                "metabolite_identifications": None,  # Already resolved
+            }
         )
 
     def _build_search_payload(self, req: StudySearchInput) -> Dict[str, Any]:

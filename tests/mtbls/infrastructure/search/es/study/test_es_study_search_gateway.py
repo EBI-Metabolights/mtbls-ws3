@@ -355,6 +355,8 @@ class TestResolveChemicalFilters:
         self, gateway, mock_assignment_gateway, base_request
     ):
         base_request.database_identifiers = ["HMDB0031111"]
+        base_request.database_identifiers_operator = "all"
+        base_request.metabolite_identifications_operator = "any"
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
             "MTBLS1",
             "MTBLS2",
@@ -365,6 +367,8 @@ class TestResolveChemicalFilters:
         mock_assignment_gateway.find_study_ids_by_compounds.assert_called_once_with(
             database_identifiers=["HMDB0031111"],
             metabolite_identifications=None,
+            database_identifiers_operator="all",
+            metabolite_identifications_operator="any",
         )
         assert result.study_ids == ["MTBLS1", "MTBLS2"]
         assert result.database_identifiers is None
@@ -375,6 +379,8 @@ class TestResolveChemicalFilters:
         self, gateway, mock_assignment_gateway, base_request
     ):
         base_request.metabolite_identifications = ["Aspirin", "Ibuprofen"]
+        base_request.database_identifiers_operator = "any"
+        base_request.metabolite_identifications_operator = "all"
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = ["MTBLS100"]
 
         result = await gateway._resolve_chemical_filters(base_request)

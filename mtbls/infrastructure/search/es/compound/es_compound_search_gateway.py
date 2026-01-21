@@ -121,8 +121,14 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
 
         # Add study_ids filter if we have any
         if effective_study_ids:
-            # ANY (union) - compounds appearing in any of the listed studies
-            filter_clauses.append({"terms": {"studyIds": effective_study_ids}})
+            # Respect study_ids_operator: "any" uses terms; "all" requires every ID
+            operator = req.study_ids_operator or "any"
+            if operator == "all":
+                filter_clauses.append(
+                    {"bool": {"must": [{"term": {"studyIds": sid}} for sid in effective_study_ids]}}
+                )
+            else:
+                filter_clauses.append({"terms": {"studyIds": effective_study_ids}})
 
         # --- Text/numeric query handling ---
         if effective_query:

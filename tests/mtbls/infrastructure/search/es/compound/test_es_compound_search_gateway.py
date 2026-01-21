@@ -104,6 +104,21 @@ class TestBuildSearchPayloadStudyIds:
         bool_query = payload["query"]["bool"]
         assert {"terms": {"studyIds": ["MTBLS1", "MTBLS2"]}} in bool_query["filter"]
 
+    def test_study_ids_operator_all_adds_must_terms(self, gateway, base_request):
+        base_request.study_ids = ["MTBLS1", "MTBLS2"]
+        base_request.study_ids_operator = "all"
+        payload = gateway._build_search_payload(base_request)
+
+        bool_query = payload["query"]["bool"]
+        assert {
+            "bool": {
+                "must": [
+                    {"term": {"studyIds": "MTBLS1"}},
+                    {"term": {"studyIds": "MTBLS2"}},
+                ]
+            }
+        } in bool_query["filter"]
+
     def test_explicit_study_ids_normalized_to_uppercase(self, gateway, base_request):
         base_request.study_ids = ["mtbls1", "Mtbls2"]
         payload = gateway._build_search_payload(base_request)

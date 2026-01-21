@@ -101,6 +101,20 @@ class StudySearchInput(IndexSearchInput):
             description="Filter studies by compound names (e.g., ['Lithocholic acid 3-O-glucuronide']). Returns studies containing these compounds.",
         ),
     ]
+    database_identifiers_operator: Annotated[
+        Optional[Literal["any", "all"]],
+        Field(
+            default="any",
+            description="Operator for database_identifiers filter: 'any' returns studies with ANY of the identifiers, 'all' requires all identifiers to be present somewhere in the study.",
+        ),
+    ]
+    metabolite_identifications_operator: Annotated[
+        Optional[Literal["any", "all"]],
+        Field(
+            default="any",
+            description="Operator for metabolite_identifications filter: 'any' returns studies with ANY of the names, 'all' requires all names to be present somewhere in the study.",
+        ),
+    ]
     study_ids: Annotated[
         Optional[List[str]],
         Field(
