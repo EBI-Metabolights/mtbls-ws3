@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 @inject
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
-    cache_service: CacheService = Provide["services.cache_service"],
+    # cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
     user_read_repository: UserReadRepository = Provide[
         "repositories.user_read_repository"
@@ -37,8 +37,8 @@ async def init_application(  # noqa: PLR0913
 ):
     if test_database_connection:
         await init_database_client(database_client)
-    if test_cache_service:
-        await init_cache_service(cache_service)
+    # if test_cache_service:
+    #     await init_cache_service(cache_service)
     if test_async_task_service:
         await init_async_task_service(async_task_service)
     if test_database_table:

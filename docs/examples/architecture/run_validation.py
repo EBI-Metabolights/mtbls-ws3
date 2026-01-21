@@ -42,7 +42,6 @@ def run_validation(  # noqa: PLR0913
                 resource_id,
                 study_metadata_service_factory=study_metadata_service_factory,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
             )
         else:
@@ -51,7 +50,6 @@ def run_validation(  # noqa: PLR0913
                 modifier_result=modifier_result,
                 study_metadata_service_factory=study_metadata_service_factory,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
             )
         return run_coroutine(coroutine)

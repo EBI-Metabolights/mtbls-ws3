@@ -18,9 +18,12 @@ dependencies = [
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
     "python-multipart>=0.0.9",
-    "metabolights-utils>=1.4.15",
+    "metabolights-utils>=1.4.16",
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
+    "elasticsearch>=9.2.1",
+    "mhd-model>=0.1.34",
+    "mtbls-mhd-integration",
 ]
 
 [project.optional-dependencies]
@@ -67,6 +70,9 @@ default-groups = [
     "dev",
     "test",
 ]
+
+[tool.uv.sources]
+mtbls-mhd-integration = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git" }
 
 [project.scripts]
 mtbls-tool = "mtbls.run.cli.main:mtbls_tool"
@@ -174,7 +180,8 @@ ignore_imports = [
   "mtbls.run.subscribe -> dependency_injector",
   "mtbls.run.rest_api.submission.base_container -> dependency_injector",
   "mtbls.run.cli.validation.container -> dependency_injector",
-  "mtbls.run.config_utils -> dependency_injector"
+  "mtbls.run.config_utils -> dependency_injector",
+  "mtbls.infrastructure.caching.redis.redis_impl -> dependency_injector"
 ]
 
 [[tool.importlinter.contracts]]

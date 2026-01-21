@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 import logging
 import pathlib
 import re
@@ -7,12 +8,19 @@ import shutil
 import subprocess
 import time
 import uuid
+from pathlib import Path
 from typing import Any, Dict, Union
 
 from cachetools import TTLCache
 from cachetools_async import cached
 from dependency_injector.wiring import Provide, inject
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
+from mhd_model.convertors.announcement.v0_1.legacy.mhd2announce import (
+    create_announcement_file,
+)
+from mhd_model.model.v0_1.dataset.validation.validator import validate_mhd_file
+from mtbls2mhd.config import Mtbls2MhdConfiguration
+from mtbls2mhd.convertor_factory import Mtbls2MhdConvertorFactory
 
 from mtbls.application.decorators.async_task import async_task
 from mtbls.application.remote_tasks.common.run_modifier import (
@@ -41,11 +49,18 @@ from mtbls.domain.entities.validation.validation_configuration import (
     FieldValueValidation,
     MetadataFileType,
     OntologyValidationType,
+    StudyCategoryStr,
     ValidationControls,
 )
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.modifier import StudyMetadataModifierResult, UpdateLog
-from mtbls.domain.shared.validator.policy import PolicyResult, PolicyResultList
+from mtbls.domain.shared.validator.policy import (
+    PolicyMessage,
+    PolicyResult,
+    PolicyResultList,
+)
 from mtbls.domain.shared.validator.run_configuration import (
+    DbConfiguration,
     ValidationRunConfiguration,
 )
 from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPhase
@@ -53,13 +68,18 @@ from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPha
 logger = logging.getLogger(__name__)
 
 
-async def create_validation_configuration(
+async def create_validation_run_configuration(
     resource_id: str,
     temp_folder: Union[None, str] = None,
     apply_modifiers: bool = True,
     metadata_files_object_repository: FileObjectWriteRepository = Provide[
         "repositories.metadata_files_object_repository"
     ],
+    mhd_config: MhdConfiguration = Provide["mhd_configuration"],
+    private_metadata_files_root_path: str = Provide[
+        "config.repositories.study_folders.mounted_paths.private_metadata_files_root_path"
+    ],
+    db_connection: dict = Provide["config.gateways.database.postgresql.connection"],
 ):
     if not temp_folder:
         temp_folder_path = pathlib.Path(f"/tmp/validation/{uuid.uuid4()}").resolve()
@@ -90,7 +110,10 @@ async def create_validation_configuration(
         if file_lines:
             total_result_file_lines = sum([x for x in file_lines.values()])
         validation_run_configuration = ValidationRunConfiguration(
-            apply_modifiers=apply_modifiers
+            apply_modifiers=apply_modifiers,
+            mhd_configuration=mhd_config,
+            metadata_files_root_path=private_metadata_files_root_path,
+            db_connection=DbConfiguration.model_validate(db_connection),
         )
         if total_result_file_lines > 2000:
             logger.warning(
@@ -108,7 +131,12 @@ async def create_validation_configuration(
             "Creating validation configuration for %s failed: %s", resource_id, ex
         )
         logger.exception(ex)
-        return ValidationRunConfiguration(apply_modifiers=apply_modifiers)
+        return ValidationRunConfiguration(
+            apply_modifiers=apply_modifiers,
+            mhd_configuration=mhd_config,
+            metadata_files_root_path=private_metadata_files_root_path,
+            db_connection=DbConfiguration.model_validate(db_connection),
+        )
     finally:
         if temp_folder_path and temp_folder_path.exists():
             try:
@@ -122,6 +150,8 @@ async def create_validation_configuration(
 
 
 def calculate_file_lines(file_paths: list[pathlib.Path]) -> dict[str, int]:
+    if not file_paths:
+        return {}
     files = [f for f in file_paths if f.is_file()]
     result = subprocess.check_output(["wc", "-l"] + files)
     return {
@@ -149,10 +179,13 @@ def run_validation(  # noqa: PLR0913
     metadata_files_object_repository: FileObjectWriteRepository = Provide[
         "repositories.metadata_files_object_repository"
     ],
+    internal_files_object_repository: FileObjectWriteRepository = Provide[
+        "repositories.internal_files_object_repository"
+    ],
     **kwargs,
 ) -> AsyncTaskResult:
     validation_run_configuration = asyncio.run(
-        create_validation_configuration(
+        create_validation_run_configuration(
             resource_id=resource_id,
             temp_folder=temp_folder,
             apply_modifiers=apply_modifiers,
@@ -166,6 +199,7 @@ def run_validation(  # noqa: PLR0913
             coroutine = run_validation_task_with_modifiers(
                 resource_id,
                 study_metadata_service_factory=study_metadata_service_factory,
+                internal_files_object_repository=internal_files_object_repository,
                 policy_service=policy_service,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
@@ -176,6 +210,7 @@ def run_validation(  # noqa: PLR0913
                 resource_id,
                 modifier_result=modifier_result,
                 study_metadata_service_factory=study_metadata_service_factory,
+                internal_files_object_repository=internal_files_object_repository,
                 policy_service=policy_service,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
@@ -194,6 +229,7 @@ def run_validation(  # noqa: PLR0913
 async def run_validation_task_with_modifiers(
     resource_id: str,
     study_metadata_service_factory: StudyMetadataServiceFactory,
+    internal_files_object_repository: FileObjectWriteRepository,
     policy_service: PolicyService,
     serialize_result: bool = True,
     ontology_search_service: None | OntologySearchService = None,
@@ -216,6 +252,7 @@ async def run_validation_task_with_modifiers(
         resource_id,
         modifier_result=modifier_result,
         study_metadata_service_factory=study_metadata_service_factory,
+        internal_files_object_repository=internal_files_object_repository,
         policy_service=policy_service,
         serialize_result=serialize_result,
         ontology_search_service=ontology_search_service,
@@ -226,6 +263,7 @@ async def run_validation_task_with_modifiers(
 async def run_validation_task(  # noqa: PLR0913
     resource_id: str,
     study_metadata_service_factory: StudyMetadataServiceFactory,
+    internal_files_object_repository: FileObjectWriteRepository,
     policy_service: PolicyService,
     modifier_result: Union[None, dict, StudyMetadataModifierResult] = None,
     serialize_result: bool = True,
@@ -246,7 +284,6 @@ async def run_validation_task(  # noqa: PLR0913
     if not validation_run_configuration:
         validation_run_configuration = ValidationRunConfiguration()
     phases = validation_run_configuration.validation_phases
-
     logger.debug(
         "Running %s validation for phases %s", resource_id, [str(x) for x in phases]
     )
@@ -266,6 +303,15 @@ async def run_validation_task(  # noqa: PLR0913
             policy_service,
             ontology_search_service,
         )
+        await process_mhd_study(
+            policy_result,
+            resource_id,
+            model,
+            policy_service,
+            internal_files_object_repository,
+            validation_run_configuration=validation_run_configuration,
+        )
+
         policy_result.phases = phases
         result_list.results.append(policy_result)
 
@@ -335,6 +381,164 @@ async def validate_by_policy_service(
         model, policy_result, policy_service, ontology_search_service
     )
     return policy_result
+
+
+async def process_mhd_study(
+    policy_result: PolicyResult,
+    resource_id: str,
+    model: MetabolightsStudyModel,
+    policy_service: PolicyService,
+    internal_files_object_repository: FileObjectWriteRepository,
+    validation_run_configuration: ValidationRunConfiguration,
+):
+    templates = await policy_service.get_templates()
+    template_version = model.study_db_metadata.template_version
+    category = model.study_db_metadata.study_category
+    category_label = category.name.lower().replace("_", "-")
+
+    category_str = StudyCategoryStr(category_label)
+    version_settings = templates.configuration.versions.get(template_version)
+
+    if category_str in version_settings.active_mhd_profiles:
+        mhd_file_path = None
+        announcement_file_path = None
+        mhd_model_version = model.study_db_metadata.mhd_model_version
+        mhd_accession = model.study_db_metadata.reserved_mhd_accession
+        profile_settings = version_settings.active_mhd_profiles.get(category_str)
+
+        if mhd_model_version in profile_settings.active_versions:
+            profile_info = templates.configuration.mhd_profiles.get(
+                profile_settings.profile_name, {}
+            ).get(mhd_model_version)
+            if profile_info:
+                schema_uri = profile_info.file_schema
+                profile_uri = profile_info.mhd_file_profile
+                announcement_file_schema_uri = profile_info.announcement_file_schema
+                announcement_file_profile_uri = profile_info.announcement_file_profile
+                config = validation_run_configuration
+                mtbls2mhd_config = Mtbls2MhdConfiguration(
+                    database_name=config.db_connection.database,
+                    database_user=config.db_connection.user,
+                    database_user_password=config.db_connection.password,
+                    database_host=config.db_connection.host,
+                    database_host_port=config.db_connection.port,
+                    mtbls_studies_root_path=config.metadata_files_root_path,
+                    selected_schema_uri=schema_uri,
+                    selected_profile_uri=profile_uri,
+                    public_http_base_url=config.mhd_configuration.public_study_base_url,
+                    public_ftp_base_url=config.mhd_configuration.public_ftp_base_url,
+                    study_http_base_url=config.mhd_configuration.study_http_base_url,
+                    default_dataset_licence_url=model.study_db_metadata.dataset_license_url,
+                )
+                mhd_file_path, announcement_file_path = await validate_mhd_study(
+                    policy_result,
+                    resource_id,
+                    mhd_accession,
+                    schema_uri,
+                    profile_uri,
+                    announcement_file_schema_uri,
+                    announcement_file_profile_uri,
+                    config=mtbls2mhd_config,
+                )
+            else:
+                logger.error(
+                    "MHD version %s is not supported for %s",
+                    mhd_model_version,
+                    resource_id,
+                )
+        else:
+            logger.error(
+                "MHD version %s is not supported for %s", mhd_model_version, resource_id
+            )
+
+        if mhd_file_path and Path(mhd_file_path).exists():
+            await internal_files_object_repository.put_object(
+                resource_id,
+                f"DATA_FILES/{resource_id}.mhd.json",
+                f"file://{mhd_file_path}",
+                override=True,
+            )
+        if announcement_file_path and Path(announcement_file_path).exists():
+            await internal_files_object_repository.put_object(
+                resource_id,
+                f"DATA_FILES/{resource_id}.announcement.json",
+                f"file://{announcement_file_path}",
+                override=True,
+            )
+    return True
+
+
+async def validate_mhd_study(
+    policy_result: PolicyResult,
+    resource_id: str,
+    mhd_accession: None | str,
+    schema_uri: str,
+    profile_uri: str,
+    announcement_file_schema_uri: str,
+    annoucement_file_profile_uri: str,
+    mhd_output_root_path: None | Path = None,
+    mhd_filename: None | str = None,
+    annoucement_filename: None | str = None,
+    config: None | Mtbls2MhdConfiguration = None,
+) -> str:
+    factory = Mtbls2MhdConvertorFactory()
+
+    convertor = factory.get_convertor(
+        target_mhd_model_schema_uri=schema_uri, target_mhd_model_profile_uri=profile_uri
+    )
+    if not mhd_output_root_path:
+        mhd_output_root_path = Path(f"/tmp/mhd-validation/{resource_id}")
+    mhd_output_root_path.mkdir(exist_ok=True, parents=True)
+    timestamp = int(datetime.datetime.now().timestamp())
+    mhd_accession_file_prefix = mhd_accession or resource_id or ""
+    if not mhd_filename:
+        mhd_filename = f"{mhd_accession_file_prefix}-{timestamp}.mhd.json"
+    if not annoucement_filename:
+        annoucement_filename = (
+            f"{mhd_accession_file_prefix}-{timestamp}.announcement.json"
+        )
+    annoucement_file_path = mhd_output_root_path / annoucement_filename
+    mhd_file_path = mhd_output_root_path / mhd_filename
+
+    convertor.convert(
+        repository_name="MetaboLights",
+        repository_identifier=resource_id,
+        mhd_identifier=mhd_accession or None,
+        mhd_output_folder_path=mhd_output_root_path,
+        mhd_output_filename=mhd_filename,
+        config=config,
+    )
+    if mhd_file_path.exists():
+        validation_errors = validate_mhd_file(str(mhd_file_path))
+
+        if validation_errors:
+            for key, error in validation_errors:
+                logger.info("%s %s %s", key, error.message)
+                policy_result.messages.violations.append(
+                    PolicyMessage(
+                        type=PolicyMessageType.ERROR,
+                        section="general",
+                        priority="CRITICAL",
+                        identifier="rule___500_100_001_01",
+                        title="MHD Validation Error",
+                        description="Current study does not comply with "
+                        "MetabolomicsHub requirements. "
+                        "Please contact MetaboLights team for help.",
+                        violation=f"{key}: {error}",
+                    )
+                )
+            if annoucement_file_path.exists():
+                annoucement_file_path.unlink()
+        else:
+            file_content = json.loads(Path(mhd_file_path).read_text())
+            create_announcement_file(
+                file_content,
+                f"{config.public_http_base_url}/{resource_id}/{mhd_filename}",
+                annoucement_file_path,
+                announcement_schema_name=announcement_file_schema_uri,
+                announcement_profile_uri=annoucement_file_profile_uri,
+            )
+    return mhd_file_path, annoucement_file_path
 
 
 def investigation_value_parser(value: str) -> tuple[None | str, None | str, None | str]:

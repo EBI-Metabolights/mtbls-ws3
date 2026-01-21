@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -43,7 +44,7 @@ async def lifespan(fast_api: FastAPI):
     yield
 
 
-def update_container(
+async def update_container(
     config_file_path: str,
     secrets_file_path: str,
     app_name: str = "default",
@@ -94,7 +95,7 @@ def update_container(
     return container
 
 
-def create_app(
+async def create_app(
     config_file_path: str,
     secrets_file_path: str,
     app_name="default",
@@ -104,7 +105,7 @@ def create_app(
 ):
     if not queue_names:
         queue_names = ["common"]
-    container = update_container(
+    container = await update_container(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
         app_name=app_name,
@@ -141,6 +142,7 @@ def create_app(
         request_tracker=get_request_tracker(),
         authorized_endpoints=container.config.run.submission.authorized_endpoints(),
     )
+
     auth_backend = AuthBackend(
         authentication_service=container.services.authentication_service(),
         user_read_repository=container.repositories.user_read_repository(),
@@ -166,7 +168,7 @@ def create_app(
     return app, container
 
 
-def get_app(
+async def get_app(
     config_file_path: None | str,
     secrets_file_path: None | str,
     container: Union[None, Ws3ApplicationContainer] = None,
@@ -176,7 +178,7 @@ def get_app(
 ):
     if not container:
         container = Ws3ApplicationContainer()
-    fast_app, _ = create_app(
+    fast_app, _ = await create_app(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
         app_name=app_name,
@@ -187,20 +189,20 @@ def get_app(
     return fast_app
 
 
-if __name__ == "__main__":
+async def start_server():
     app_container: Ws3ApplicationContainer = Ws3ApplicationContainer()
     config_file_path, secrets_file_path = get_application_config_files()
-    fast_app = get_app(
+    fast_app = await get_app(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
         container=app_container,
     )
+
+    log_config = app_container.config.run.submission.logging()
     server_configuration: ApiServerConfiguration = app_container.api_server_config()
     config = server_configuration.server_info
-    log_config = app_container.config.run.submission.logging()
-
     try:
-        uvicorn.run(
+        config = uvicorn.Config(
             fast_app,
             host="0.0.0.0",
             port=server_configuration.port,
@@ -208,7 +210,13 @@ if __name__ == "__main__":
             log_config=log_config,
             forwarded_allow_ips="*",
         )
+        server = uvicorn.Server(config)
+        await server.serve()
     except Exception as ex:
         raise ex
     finally:
         app_container.shutdown_resources()
+
+
+if __name__ == "__main__":
+    asyncio.run(start_server())

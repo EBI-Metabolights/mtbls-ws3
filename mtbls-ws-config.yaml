@@ -90,6 +90,10 @@ repositories:
       indices_cache_root_path: "{{ mounted_paths.indices_cache_root_path }}"
 run:
   submission:
+    mhd:
+      public_study_base_url: "http://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public"
+      api_key: "{{ mhd.api_key }}"
+      mhd_webservice_base_url: "https://www.metabolomicshub.org/api/submission/v0_1"
     default_dataset_license:
       name: "CC0 1.0 Universal"
       version: "1.0"
@@ -205,6 +209,11 @@ run:
         default_filter:
           (): "{{ run.submission.logging.default_filter_class }}"
   common_worker:
+    mhd:
+      public_study_base_url: "http://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public"
+      api_key: "{{ mhd.api_key }}"
+      mhd_webservice_base_url: "https://www.metabolomicshub.org/api/submission/v0_1"
+      mtbls_studies_root_path:
     module_config:
       loaded_sub_package_names: []
     logging:

@@ -33,6 +33,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.infrastructure.auth.keycloak.keycloak_authentication import (
     KeycloakAuthenticationService,
 )
@@ -45,7 +46,7 @@ from mtbls.infrastructure.auth.standalone.standalone_authentication_service impo
 from mtbls.infrastructure.auth.standalone.standalone_authorization_service import (
     AuthorizationServiceImpl,
 )
-from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
+from mtbls.infrastructure.caching.redis.redis_impl import RedisResource
 from mtbls.infrastructure.ontology_search.ols.ols_search_service import (
     OlsOntologySearchService,
 )
@@ -97,8 +98,8 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     gateways = providers.DependenciesContainer()
     cache_config = providers.Configuration()
 
-    cache_service: CacheService = providers.Factory(
-        RedisCacheImpl,
+    cache_service: CacheService = providers.Resource(
+        RedisResource,
         config=cache_config,
     )
     policy_service: PolicyService = providers.Singleton(
@@ -259,4 +260,9 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
 
     oauth2_endpoint = providers.Resource(
         set_oauth2_redirect_endpoint, api_server_config
+    )
+    mhd_configuration: MhdConfiguration = providers.Resource(
+        create_config_from_dict,
+        MhdConfiguration,
+        config.run.submission.mhd,
     )

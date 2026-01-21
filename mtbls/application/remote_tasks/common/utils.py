@@ -3,8 +3,10 @@ import asyncio
 
 def run_coroutine(coroutine):
     try:
-        loop = asyncio.get_running_loop()
-        if loop.is_running():
+        loop = asyncio.get_event_loop()
+        if not loop:
+            result = asyncio.run(coroutine)
+        elif loop.is_running():
             result = asyncio.ensure_future(coroutine)
         else:
             result = loop.run_until_complete(coroutine)

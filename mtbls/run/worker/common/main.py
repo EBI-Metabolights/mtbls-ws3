@@ -34,7 +34,7 @@ def config_loggers(
     dictConfig(config)
 
 
-def update_container(
+async def update_container(
     config_file_path: str,
     secrets_file_path: str,
     app_name="default",
@@ -72,7 +72,7 @@ def update_container(
     return container
 
 
-def get_worker_app(container: Ws3WorkerApplicationContainer):
+async def get_worker_app(container: Ws3WorkerApplicationContainer):
     async_task_registry = get_async_task_registry()
 
     rc = container.gateways.config.cache.redis.connection()
@@ -88,27 +88,27 @@ def get_worker_app(container: Ws3WorkerApplicationContainer):
     return manager.app
 
 
-def get_celery_worker_app(config_file_path: None | str, secrets_file_path: None | str):
+async def get_celery_worker_app(
+    config_file_path: None | str, secrets_file_path: None | str
+):
     container = Ws3WorkerApplicationContainer()
-    update_container(
+    await update_container(
         config_file_path=config_file_path,
         secrets_file_path=secrets_file_path,
         container=container,
         app_name="default",
         queue_names=["common"],
     )
-    asyncio.run(
-        initialization.init_application(
-            test_async_task_service=False, test_policy_service=True
-        )
+    initialization.init_application(
+        test_async_task_service=False, test_policy_service=True
     )
-    return get_worker_app(container)
+    return await get_worker_app(container)
 
 
-def main():
+async def main():
     config_file_path, secrets_file_path = get_application_config_files()
 
-    app = get_celery_worker_app(
+    app = await get_celery_worker_app(
         config_file_path=config_file_path, secrets_file_path=secrets_file_path
     )
     app.start(
@@ -123,4 +123,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
