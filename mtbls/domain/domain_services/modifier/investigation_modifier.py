@@ -95,7 +95,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         ontology_columns = {}
         for header in isa_table.table.headers:
             self.update_column_term_sources(isa_table, header, ontology_columns)
-
+        default_source_references = self.templates.ontology_source_reference_templates
         for column_name, term_source_column_name in ontology_columns.items():
             if (
                 column_name in isa_table.table.data
@@ -106,10 +106,8 @@ class InvestigationFileModifier(BaseIsaModifier):
                     if val and len(term_source_data) > idx:
                         if term_source_data[idx] and len(term_source_data[idx]) > 1:
                             source: str = term_source_data[idx]
-                            try:
-                                int(source)
-                            except Exception:
-                                ontology_sources.add(term_source_data[idx])
+                            if source in default_source_references:
+                                ontology_sources.add(source)
 
     def update_column_term_sources(
         self,

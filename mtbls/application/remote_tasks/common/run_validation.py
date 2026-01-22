@@ -18,6 +18,9 @@ from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from mhd_model.convertors.announcement.v0_1.legacy.mhd2announce import (
     create_announcement_file,
 )
+from mhd_model.model.v0_1.announcement.validation.validator import (
+    MhdAnnouncementFileValidator,
+)
 from mhd_model.model.v0_1.dataset.validation.validator import validate_mhd_file
 from mtbls2mhd.config import Mtbls2MhdConfiguration
 from mtbls2mhd.convertor_factory import Mtbls2MhdConvertorFactory
@@ -497,8 +500,12 @@ async def validate_mhd_study(
         annoucement_filename = (
             f"{mhd_accession_file_prefix}-{timestamp}.announcement.json"
         )
-    annoucement_file_path = mhd_output_root_path / annoucement_filename
+    announcement_file_path = mhd_output_root_path / annoucement_filename
     mhd_file_path = mhd_output_root_path / mhd_filename
+
+    for file in mhd_output_root_path.glob("*.json"):
+        if file.name.endswith(".mhd.json") or file.name.endswith(".announcement.json"):
+            file.unlink()
 
     convertor.convert(
         repository_name="MetaboLights",
@@ -512,33 +519,58 @@ async def validate_mhd_study(
         validation_errors = validate_mhd_file(str(mhd_file_path))
 
         if validation_errors:
+            errors = []
             for key, error in validation_errors:
-                logger.info("%s %s %s", key, error.message)
-                policy_result.messages.violations.append(
-                    PolicyMessage(
-                        type=PolicyMessageType.ERROR,
-                        section="general",
-                        priority="CRITICAL",
-                        identifier="rule___500_100_001_01",
-                        title="MHD Validation Error",
-                        description="Current study does not comply with "
-                        "MetabolomicsHub requirements. "
-                        "Please contact MetaboLights team for help.",
-                        violation=f"{key}: {error}",
-                    )
+                errors.append(f"{key}: {error}")
+
+            policy_result.messages.violations.append(
+                PolicyMessage(
+                    type=PolicyMessageType.ERROR,
+                    section="general",
+                    source_file="input",
+                    priority="CRITICAL",
+                    identifier="rule___500_100_001_01",
+                    title="MetabolomicsHub model validation error",
+                    description="Current study does not comply with "
+                    "MetabolomicsHub requirements. "
+                    "Please contact MetaboLights team for help.",
+                    violation="Study MHD model validation failed.",
+                    values=errors,
                 )
-            if annoucement_file_path.exists():
-                annoucement_file_path.unlink()
+            )
         else:
-            file_content = json.loads(Path(mhd_file_path).read_text())
+            file_content = json.loads(mhd_file_path.read_text())
             create_announcement_file(
                 file_content,
                 f"{config.public_http_base_url}/{resource_id}/{mhd_filename}",
-                annoucement_file_path,
+                str(announcement_file_path),
                 announcement_schema_name=announcement_file_schema_uri,
                 announcement_profile_uri=annoucement_file_profile_uri,
             )
-    return mhd_file_path, annoucement_file_path
+            if announcement_file_path.exists():
+                file_content = json.loads(announcement_file_path.read_text())
+                validator = MhdAnnouncementFileValidator()
+                errors = validator.validate(file_content)
+
+                if errors:
+                    policy_result.messages.violations.append(
+                        PolicyMessage(
+                            type=PolicyMessageType.ERROR,
+                            section="general",
+                            source_file="input",
+                            priority="CRITICAL",
+                            identifier="rule___500_100_002_01",
+                            title="MetabolomicsHub announcement file validation error",
+                            description="Current study does not comply with "
+                            "MetabolomicsHub requirements. "
+                            "Please contact MetaboLights team for help.",
+                            violation="Study MHD announcement file validation failed."
+                            + ", ".join(errors),
+                            values=errors,
+                        )
+                    )
+
+    return mhd_file_path, announcement_file_path
 
 
 def investigation_value_parser(value: str) -> tuple[None | str, None | str, None | str]:
