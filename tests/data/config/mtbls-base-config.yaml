@@ -43,6 +43,10 @@ repositories:
       indices_cache_root_path: tests/data/storages/rw/indices-cache
 run:
   submission:
+    mhd:
+      public_study_base_url: "http://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public"
+      api_key: "XYZ"
+      mhd_webservice_base_url: "https://www.metabolomicshub.org/api/submission/v0_1"
     default_dataset_license:
       name: "CC0 1.0 Universal"
       version: "1.0"

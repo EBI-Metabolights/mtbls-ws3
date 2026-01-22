@@ -32,6 +32,6 @@ class OntologyTerm(StudyBaseModel):
         str,
         Field(
             description="Source reference name of ontology term. "
-            "e.g., EFO, OBO, NCBITAXON."
+            "e.g., EFO, OBO, NCBITaxon."
         ),
     ]

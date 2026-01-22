@@ -119,11 +119,13 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
 def submission_api_client(
     submission_api_container, local_config_file, local_secrets_file
 ):
-    app, _ = create_app(
-        config_file_path=local_config_file,
-        secrets_file_path=local_secrets_file,
-        container=submission_api_container,
-        db_connection_pool_size=3,
+    app, _ = asyncio.run(
+        create_app(
+            config_file_path=local_config_file,
+            secrets_file_path=local_secrets_file,
+            container=submission_api_container,
+            db_connection_pool_size=3,
+        )
     )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
@@ -144,11 +146,13 @@ def submission_api_client(
 
 @pytest.fixture(scope="module")
 def public_api_client(submission_api_container, local_config_file, local_secrets_file):
-    app, _ = create_app(
-        config_file_path=local_config_file,
-        secrets_file_path=local_secrets_file,
-        container=submission_api_container,
-        db_connection_pool_size=3,
+    app, _ = asyncio.run(
+        create_app(
+            config_file_path=local_config_file,
+            secrets_file_path=local_secrets_file,
+            container=submission_api_container,
+            db_connection_pool_size=3,
+        )
     )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
