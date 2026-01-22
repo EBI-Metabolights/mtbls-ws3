@@ -44,6 +44,7 @@ ws3 = [
     "fastmcp>=2.14.3",
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
+    "elasticsearch[async]<8.5.1"
 ]
 
 [dependency-groups]
@@ -191,6 +192,7 @@ modules = [
    "mtbls.infrastructure.caching.redis_sentinel",
    "mtbls.infrastructure.pub_sub.celery",
    "mtbls.infrastructure.pub_sub.threading",
+   "mtbls.infrastructure.search.es"
 ]
 
 ignore_imports = [

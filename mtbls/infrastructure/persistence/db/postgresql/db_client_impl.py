@@ -16,7 +16,7 @@ class DatabaseClientImpl(DatabaseClient):
     def __init__(
         self,
         db_connection: Union[DatabaseConnection, dict[str, any]],
-        db_pool_size: Union[None, int] = 3,
+        db_pool_size: Union[None, int] = 10,
     ) -> None:
         self.db_connection = db_connection
         if isinstance(db_connection, dict):

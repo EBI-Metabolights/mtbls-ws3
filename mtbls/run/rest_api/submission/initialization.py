@@ -19,6 +19,7 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 )
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
+from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 logger = logging.getLogger(__name__)
 
@@ -217,3 +218,25 @@ async def init_database_client(database_client: DatabaseClient):
     database_client_name = get_service_name(database_client)
     logger.info("Database client initialized: %s", database_client_name)
     logger.info("Database connection: %s", await database_client.get_connection_repr())
+
+
+async def init_elasticsearch_client(elasticsearch_client: ElasticsearchClient) -> bool:
+    if not elasticsearch_client:
+        logger.info("Elasticsearch client is not initialized.")
+        return False
+    elasticsearch_client_name = get_service_name(elasticsearch_client)
+    try:
+        await elasticsearch_client.ensure_started()
+        logger.info("Elasticsearch client initialized: %s", elasticsearch_client_name)
+        logger.info(
+            "Elasticsearch connection: %s", await elasticsearch_client.get_info()
+        )
+        return True
+    except Exception as ex:
+        logger.error(
+            "Elasticsearch client initialization failed: %s. %s",
+            elasticsearch_client_name,
+            ex,
+        )
+        logger.error("Search functionality may fail until the connection is restored.")
+        return False
