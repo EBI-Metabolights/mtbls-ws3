@@ -1,5 +1,6 @@
 from typing import Any, Union
 
+from dependency_injector import resources
 from redis.asyncio import Redis
 
 from mtbls.application.services.interfaces.cache_service import CacheService
@@ -58,3 +59,19 @@ class RedisCacheImpl(CacheService):
 
     async def get_ttl_in_seconds(self, key: str) -> int:
         return await self.redis.ttl(key)
+
+    async def close_connection(self, key: str) -> int:
+        await self.redis.close()
+
+
+class RedisResource(resources.AsyncResource):
+    async def init(self, config: dict[str, Any]) -> RedisCacheImpl:
+        # Initialize the async client
+        client = RedisCacheImpl(config=config)
+        # Verify the connection is alive
+        await client.ping()
+        return client
+
+    async def shutdown(self, client: RedisCacheImpl) -> None:
+        # Ensure the connection pool is closed gracefully
+        await client.close_connection()

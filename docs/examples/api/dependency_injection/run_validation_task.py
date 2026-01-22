@@ -35,6 +35,9 @@ def run_validation(  # noqa: PLR0913
     study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
         "services.study_metadata_service_factory"
     ],
+    internal_files_object_repository: StudyMetadataServiceFactory = Provide[
+        "repositories.internal_files_object_repository"
+    ],
     policy_service: PolicyService = Provide["services.policy_service"],
     ontology_search_service: OntologySearchService = Provide[
         "services.ontology_search_service"
@@ -47,8 +50,8 @@ def run_validation(  # noqa: PLR0913
             coroutine = run_validation_task_with_modifiers(
                 resource_id,
                 study_metadata_service_factory=study_metadata_service_factory,
+                internal_files_object_repository=internal_files_object_repository,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
             )
@@ -57,8 +60,8 @@ def run_validation(  # noqa: PLR0913
                 resource_id,
                 modifier_result=modifier_result,
                 study_metadata_service_factory=study_metadata_service_factory,
+                internal_files_object_repository=internal_files_object_repository,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
             )

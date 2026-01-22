@@ -30,6 +30,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.infrastructure.auth.mtbls_ws2.mtbls_ws2_authentication_proxy import (
     MtblsWs2AuthenticationProxy,
 )
@@ -85,13 +86,13 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         RedisCacheImpl,
         config=cache_config,
     )
-    policy_service: PolicyService = providers.Singleton(
+    policy_service: PolicyService = providers.Factory(
         OpaPolicyService,
         http_client=gateways.http_client,
         config=config.policy_service.opa,
     )
 
-    ontology_search_service: OntologySearchService = providers.Singleton(
+    ontology_search_service: OntologySearchService = providers.Factory(
         OlsOntologySearchService,
         http_client=gateways.http_client,
         cache_service=cache_service,
@@ -178,4 +179,9 @@ class Ws3WorkerApplicationContainer(containers.DeclarativeContainer):
         create_config_from_dict,
         ModuleConfiguration,
         config.run.common_worker.module_config,
+    )
+    mhd_configuration: MhdConfiguration = providers.Resource(
+        create_config_from_dict,
+        MhdConfiguration,
+        config.run.common_worker.mhd,
     )

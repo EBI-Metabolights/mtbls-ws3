@@ -11,6 +11,7 @@ from metabolights_utils.models.isa.investigation_file import (
     IsaAbstractModel,
     OntologyAnnotation,
     OntologySourceReference,
+    ParameterDefinition,
     Person,
     Study,
 )
@@ -381,7 +382,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                         new_value="",
                     )
                 for item in missing_set:
-                    study_protocols[name].parameters.append(OntologyItem(term=item))
+                    study_protocols[name].parameters.append(
+                        ParameterDefinition(term=item)
+                    )
 
                 if missing_set:
                     msg = (
@@ -807,7 +810,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                             source=self.model.investigation_file_path,
                         )
                         for param in missing_params:
-                            protocol.parameters.append(OntologyItem(term=param))
+                            protocol.parameters.append(ParameterDefinition(term=param))
 
     def rule_i_100_360_004_01(self):
         investigation = self.model.investigation

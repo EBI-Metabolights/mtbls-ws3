@@ -33,6 +33,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.infrastructure.auth.keycloak.keycloak_authentication import (
     KeycloakAuthenticationService,
 )
@@ -259,4 +260,9 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
 
     oauth2_endpoint = providers.Resource(
         set_oauth2_redirect_endpoint, api_server_config
+    )
+    mhd_configuration: MhdConfiguration = providers.Resource(
+        create_config_from_dict,
+        MhdConfiguration,
+        config.run.submission.mhd,
     )
