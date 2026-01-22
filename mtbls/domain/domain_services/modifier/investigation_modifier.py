@@ -20,6 +20,10 @@ from pydantic import BaseModel
 
 from mtbls.domain.domain_services.modifier.base_isa_modifier import BaseIsaModifier
 from mtbls.domain.domain_services.modifier.base_modifier import OntologyItem
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import UpdateLog
 
 logger = logging.getLogger(__name__)
@@ -29,8 +33,8 @@ class InvestigationFileModifier(BaseIsaModifier):
     def __init__(
         self,
         model: MetabolightsStudyModel,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
     ):
         super().__init__(model, templates, control_lists, model.investigation_file_path)
 
@@ -99,8 +103,12 @@ class InvestigationFileModifier(BaseIsaModifier):
                 term_source_data = isa_table.table.data[term_source_column_name]
                 for idx, val in enumerate(isa_table.table.data[column_name]):
                     if val and len(term_source_data) > idx:
-                        if term_source_data[idx]:
-                            ontology_sources.add(term_source_data[idx])
+                        if term_source_data[idx] and len(term_source_data[idx]) > 1:
+                            source: str = term_source_data[idx]
+                            try:
+                                int(source)
+                            except Exception:
+                                ontology_sources.add(term_source_data[idx])
 
     def update_column_term_sources(
         self,
@@ -198,14 +206,7 @@ class InvestigationFileModifier(BaseIsaModifier):
     def update_ontology_sources_from_templates(
         self, current_ontology_source_references, references, missing_set, exist_set
     ):
-        templates = {}
-        if self.templates and "ontologySourceReferenceTemplates" in self.templates:
-            for item in self.templates["ontologySourceReferenceTemplates"]:
-                if "sourceName" in item:
-                    name = item["sourceName"]
-                    templates[name] = OntologySourceReference.model_validate(
-                        item, from_attributes=True
-                    )
+        templates = self.templates.ontology_source_reference_templates
 
         if exist_set:
             for ref in exist_set:
@@ -431,7 +432,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         label: str,
     ):
         if isinstance(item, OntologyAnnotation):
-            terms = self.get_control_list_terms("investigationFile", parameter=name)
+            terms = self.get_control_list_terms("investigation", parameter=name)
             key = item.term.lower().strip()
 
             if key in terms and terms[key]:
@@ -459,7 +460,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                     acc = item.term_accession_number
                     onto = self.get_term_by_accession_number(
                         acc,
-                        "investigationFile",
+                        "investigation",
                         parameter=name,
                     )
                     if onto:
@@ -726,7 +727,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             if study.study_publications and study.study_publications.publications:
                 control_name = "Study Publication Status"
                 terms = self.get_control_list_terms(
-                    "investigationFile",
+                    "investigation",
                     parameter=control_name,
                 )
                 ontologies = {}
@@ -812,9 +813,9 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             default_role = OntologyItem(
-                term="Author",
+                term="Investigator",
                 term_source_ref="NCIT",
-                term_accession_number="http://purl.obolibrary.org/obo/NCIT_C42781",
+                term_accession_number="http://purl.obolibrary.org/obo/NCIT_C25936",
             )
             if not investigation.studies[0].study_contacts.people:
                 investigation.studies[0].study_contacts.people.append(Person())
@@ -905,6 +906,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                                 source=self.model.investigation_file_path,
                             )
                             contact.email = submitter.user_name
+                            break
 
                 if len(contact.first_name) == 1 and contact.first_name.isupper():
                     new_val = f"{contact.first_name}."
@@ -945,7 +947,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
                 item: OntologyAnnotation = OntologyItem(
-                    term="metabolite profiling",
+                    term="metabolite profiling assay",
                     term_source_ref="OBI",
                     term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
                 )
@@ -962,7 +964,7 @@ class InvestigationFileModifier(BaseIsaModifier):
 
                     if main_technique == "MS":
                         ms_item: OntologyAnnotation = OntologyItem(
-                            term="mass spectrometry",
+                            term="mass spectrometry assay",
                             term_source_ref="OBI",
                             term_accession_number="http://purl.obolibrary.org/obo/OBI_0000470",
                         )
@@ -973,7 +975,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                         )
                     elif main_technique == "NMR":
                         nmr_item: OntologyAnnotation = OntologyItem(
-                            term="NMR spectroscopy",
+                            term="NMR spectroscopy assay",
                             term_source_ref="OBI",
                             term_accession_number="http://purl.obolibrary.org/obo/OBI_0000623",
                         )
@@ -1016,6 +1018,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         platform = assay.technology_platform
         if platform:
             new_val += f" - {platform}"
+        new_val = new_val.replace("  ", " ")
         self.modifier_update(
             action="Study Assay Technology Platform is updated.",
             old_value=assay.technology_platform,

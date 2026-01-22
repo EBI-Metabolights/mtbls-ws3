@@ -17,16 +17,26 @@ from mtbls.domain.domain_services.modifier.investigation_modifier import (
 )
 from mtbls.domain.domain_services.modifier.maf_modifier import MafFileModifier
 from mtbls.domain.domain_services.modifier.sample_modifier import SampleFileModifier
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import UpdateLog
+from mtbls.domain.shared.validator.run_configuration import (
+    ValidationRunConfiguration,
+)
 
 
 class MetabolightsStudyModelModifier(BaseIsaModifier):
     def __init__(
         self,
         model: MetabolightsStudyModel,
-        templates: dict,
-        control_lists: dict,
+        templates: FileTemplates,
+        control_lists: ValidationControls,
+        config: None | ValidationRunConfiguration = None,
     ):
+        if not config:
+            config = ValidationRunConfiguration()
         super().__init__(model, templates, control_lists, "")
         self.new_header_actions: dict[str, list[TsvAddColumnsAction]] = {}
         self.header_update_actions: dict[str, list[TsvUpdateColumnHeaderAction]] = {}
@@ -35,6 +45,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         )
         self.modifiers_map: dict[str, BaseIsaModifier] = {}
         self.modifiers_map[model.investigation_file_path] = self.investigation_modifier
+        self.config = config
 
     def modify(self) -> list[UpdateLog]:
         self.investigation_modifier.modify()
@@ -58,29 +69,41 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
             modifier.modify()
 
             assay_files.append(modifier)
+        if self.config.skip_result_file_modification:
+            for isa_table_file in self.model.metabolite_assignments.values():
+                self.update_logs.append(
+                    UpdateLog(
+                        source=isa_table_file.file_path,
+                        action="Modifier skipped this file.",
+                        old_value="",
+                        new_value="",
+                    )
+                )
+        else:
+            maf_files: list[MafFileModifier] = []
+            for isa_table_file in self.model.metabolite_assignments.values():
+                file_name = isa_table_file.file_path
+                modifier = MafFileModifier(
+                    self.model, isa_table_file, self.templates, self.control_lists
+                )
+                self.modifiers_map[file_name] = modifier
+                modifier.modify()
+                maf_files.append(modifier)
 
-        maf_files: list[MafFileModifier] = []
-        for isa_table_file in self.model.metabolite_assignments.values():
-            file_name = isa_table_file.file_path
-            modifier = MafFileModifier(
-                self.model, isa_table_file, self.templates, self.control_lists
-            )
-            self.modifiers_map[file_name] = modifier
-            modifier.modify()
-            maf_files.append(modifier)
+            for modifier in maf_files:
+                modifier.add_maf_sample_columns()
 
         for modifier in sample_files:
             modifier.add_factor_value_columns()
 
-        for modifier in maf_files:
-            modifier.add_maf_sample_columns()
-
         isa_table_files: dict[str, IsaTableFile] = {}
-        for files in (
+        isa_table_groups = [
             self.model.samples,
             self.model.assays,
-            self.model.metabolite_assignments,
-        ):
+        ]
+        if not self.config.skip_result_file_modification:
+            isa_table_groups.append(self.model.metabolite_assignments)
+        for files in isa_table_groups:
             isa_table_files.update(files)
         for _, modifier in self.modifiers_map.items():
             if isinstance(modifier, IsaTableModifier):

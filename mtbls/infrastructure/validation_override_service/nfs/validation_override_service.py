@@ -12,7 +12,7 @@ from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
 from mtbls.domain.entities.study_file import ResourceCategory
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.validation import (
     VersionedValidationsMap,
 )

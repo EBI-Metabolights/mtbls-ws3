@@ -89,7 +89,9 @@ def jwt_token(mock_submission_api_client: MockApiClient):
     auth_service.authenticate_with_token = mock_auth
     auth_service.authenticate_with_password = mock_auth
 
-    async def mock_validate_token(token_type: TokenType, token: str):
+    async def mock_validate_token(
+        token_type: TokenType, token: str, username: str = None
+    ):
         return return_value
 
     auth_service.validate_token = mock_validate_token

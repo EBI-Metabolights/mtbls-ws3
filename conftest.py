@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import json
 from pathlib import Path
 from typing import Any, Generator
@@ -10,6 +9,10 @@ from fastapi.testclient import TestClient
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.infrastructure.auth.standalone.standalone_authentication_config import (
     StandaloneAuthenticationConfiguration,
 )
@@ -167,13 +170,13 @@ def public_api_client(submission_api_container, local_config_file, local_secrets
 @pytest.fixture(scope="session")
 def templates_json() -> dict[str, Any]:
     with Path("tests/data/json/templates.json").open("r") as f:
-        return json.load(f)
+        return json.load(f)["result"]
 
 
 @pytest.fixture(scope="session")
 def control_lists_json() -> dict[str, Any]:
     with Path("tests/data/json/control_lists.json").open("r") as f:
-        return json.load(f)
+        return json.load(f)["result"]
 
 
 @pytest.fixture(scope="session")
@@ -225,10 +228,10 @@ def metabolights_model(metabolights_model_json: dict[str, Any]) -> dict[str, Any
 
 
 @pytest.fixture(scope="function")
-def control_lists(control_lists_json: dict[str, Any]) -> dict[str, Any]:
-    return copy.deepcopy(control_lists_json)
+def control_lists(control_lists_json: dict[str, Any]) -> ValidationControls:
+    return ValidationControls.model_validate(control_lists_json, by_alias=True)
 
 
 @pytest.fixture(scope="function")
-def templates(templates_json: dict[str, Any]) -> dict[str, Any]:
-    return copy.deepcopy(templates_json)
+def templates(templates_json: dict[str, Any]) -> FileTemplates:
+    return FileTemplates.model_validate(templates_json, by_alias=True)

@@ -45,11 +45,11 @@ class AuthenticationServiceImpl(AuthenticationService):
 
     @validate_inputs_outputs
     async def authenticate_with_token(
-        self, token_type: TokenType, token: TokenStr
+        self, token_type: TokenType, token: TokenStr, username: str = None
     ) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
-        user = await self.user_read_repository.get_user_by_api_token(token)
+        user = await self.user_read_repository.get_user_by_api_token(username, token)
         if not user:
             raise AuthenticationError(f"Invalid API token '{token[:3]}...{token[-3:]}'")
 
@@ -100,16 +100,20 @@ class AuthenticationServiceImpl(AuthenticationService):
             algorithm=self.config.access_token_hash_algorithm,
         )
 
-    async def revoke_jwt_token(self, jwt: str) -> bool:
+    async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
         # TODO: implement it
         raise NotImplementedError()
 
-    async def validate_token(self, token_type: TokenType, token: str) -> str:
+    async def validate_token(
+        self, token_type: TokenType, token: str, username: str = None
+    ) -> str:
         if token_type == TokenType.JWT_TOKEN:
             jwt_token = await self.validate_jwt_token(token)
             return jwt_token.sub
         if token_type == TokenType.API_TOKEN:
-            user = await self.user_read_repository.get_user_by_api_token(token)
+            user = await self.user_read_repository.get_user_by_api_token(
+                username, token
+            )
             if not user:
                 raise AuthenticationError("Invalid token")
             return user.username

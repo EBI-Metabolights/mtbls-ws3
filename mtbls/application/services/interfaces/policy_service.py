@@ -1,21 +1,29 @@
 import abc
-from typing import Any, Union
+from typing import Union
 
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.validator.policy import ValidationResult
 from mtbls.domain.shared.validator.validation import VersionedValidationsMap
 
 
 class PolicyService(abc.ABC):
-    async def get_templates(self) -> dict[str, Any]: ...
+    @abc.abstractmethod
+    async def get_templates(self) -> None | FileTemplates: ...
 
-    async def get_control_lists(self) -> dict[str, Any]: ...
+    @abc.abstractmethod
+    async def get_control_lists(self) -> None | ValidationControls: ...
 
+    @abc.abstractmethod
     async def get_rule_definitions(
         self, version: Union[None, str] = None
-    ) -> VersionedValidationsMap: ...
+    ) -> None | VersionedValidationsMap: ...
 
+    @abc.abstractmethod
     async def validate_study(
         self,
         resource_id: str,

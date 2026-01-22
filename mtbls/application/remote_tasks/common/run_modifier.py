@@ -16,7 +16,14 @@ from mtbls.application.services.interfaces.study_metadata_service_factory import
 from mtbls.domain.domain_services.modifier.metabolights_study_model_modifier import (
     MetabolightsStudyModelModifier,
 )
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 from mtbls.domain.shared.modifier import StudyMetadataModifierResult
+from mtbls.domain.shared.validator.run_configuration import (
+    ValidationRunConfiguration,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +59,19 @@ async def run_isa_metadata_modifier_task(
     study_metadata_service_factory: StudyMetadataServiceFactory,
     policy_service: PolicyService,
     serialize_result: bool = True,
+    validation_run_configuration: None | ValidationRunConfiguration = None,
 ) -> Dict[str, Any]:
     metadata_service = await study_metadata_service_factory.create_service(resource_id)
+    load_maf_files = True
+    if not validation_run_configuration:
+        validation_run_configuration = ValidationRunConfiguration()
+    if validation_run_configuration.skip_result_file_modification:
+        load_maf_files = False
     with metadata_service:
         modifier_model = await metadata_service.load_study_model(
             load_sample_file=True,
             load_assay_files=True,
-            load_maf_files=True,
+            load_maf_files=load_maf_files,
             load_folder_metadata=True,
             load_db_metadata=True,
         )
@@ -72,12 +85,14 @@ async def run_isa_metadata_modifier_task(
             raise Exception(
                 f"Study load error:  {folder_errors[0].short} {folder_errors[0].detail}"
             )
-        control_lists = await policy_service.get_control_lists()
-        templates = await policy_service.get_templates()
+        control_lists: ValidationControls = await policy_service.get_control_lists()
+        templates: FileTemplates = await policy_service.get_templates()
         modifier = MetabolightsStudyModelModifier(
-            model=modifier_model, templates=templates, control_lists=control_lists
+            model=modifier_model,
+            templates=templates,
+            control_lists=control_lists,
+            config=validation_run_configuration,
         )
-
         modifier.modify()
 
         result = StudyMetadataModifierResult(
@@ -93,7 +108,12 @@ async def run_isa_metadata_modifier_task(
             logger.info("Create metadata snapshot for %s", resource_id)
             await metadata_service.create_metadata_snapshot(suffix="VALIDATION")
             logger.info("Override %s metadata files", resource_id)
-            await metadata_service.save_study_model(modifier_model)
+            save_result_files = (
+                not validation_run_configuration.skip_result_file_modification
+            )
+            await metadata_service.save_study_model(
+                modifier_model, save_result_files=save_result_files
+            )
         else:
             logger.info("There is no modification for %s.", resource_id)
 

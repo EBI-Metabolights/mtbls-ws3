@@ -1,6 +1,6 @@
 import abc
 
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.validation import (
     VersionedValidationsMap,
 )

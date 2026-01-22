@@ -7,19 +7,21 @@ requires-python = ">=3.12,<4"
 readme = "README.md"
 license = "Apache-2.0"
 dependencies = [
+    "dependency-injector>=4.48.2,<5",
     "pydantic>=2.10.2,<3",
     "python-dateutil>=2.9.0.post0,<3",
     "pytz>=2025.2",
     "pyyaml>=6.0.2",
-    "dependency-injector>=4.48.2,<5",
     "jsonpath-ng>=1.7.0,<2",
     "ujson>=5.10.0,<6",
-    "aiocache>=0.12.2",
     "aiofiles>=23.2.1",
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
-    "metabolights-utils>=1.4.9,<2",
     "python-multipart>=0.0.9",
+    "metabolights-utils>=1.4.15",
+    "cachetools>=6.2.2",
+    "cachetools-async>=0.0.5",
+    "elasticsearch>=9.2.1",
 ]
 
 [project.optional-dependencies]
@@ -39,10 +41,10 @@ ws3 = [
     "pyjwt>=2.9.0",
     "asgi-correlation-id>=4.3.4,<5",
     "greenlet>=3.2.4",
-    "fastmcp>=2.12.4",
+    "fastmcp>=2.14.3",
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
-    "elasticsearch[async]<8.5.1"
+    "elasticsearch>=9.2.1",
 ]
 
 [dependency-groups]
@@ -51,13 +53,15 @@ dev = [
     "ruff>=0.14.0",
     "commitizen>=4.9.1",
     "pre-commit>=4.0.1,<5",
-    "mkdocs-material>=9.5.49,<10"
 ]
 test = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
     "aiosqlite>=0.21.0",
+]
+docs = [
+    "mkdocs-material>=9.5.49,<10",
 ]
 
 [tool.uv]

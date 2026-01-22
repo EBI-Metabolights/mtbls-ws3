@@ -10,7 +10,7 @@ from mtbls.application.services.interfaces.repositories.file_object.base import 
 from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     FileObjectObserver,
 )
-from mtbls.domain.entities.validation_report import ValidationReport
+from mtbls.domain.entities.validation.validation_report import ValidationReport
 
 
 class ValidationReportRepository(

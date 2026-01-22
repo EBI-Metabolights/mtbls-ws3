@@ -1,16 +1,18 @@
-from typing import Any
-
 import pytest
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from metabolights_utils.models.parser.common import ParserMessage
 
 from mtbls.domain.domain_services.modifier.sample_modifier import SampleFileModifier
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 
 
 @pytest.fixture(scope="function")
 def sample_modifier(
-    templates: dict[str, Any],
-    control_lists: dict[str, Any],
+    templates: FileTemplates,
+    control_lists: ValidationControls,
     metabolights_model: MetabolightsStudyModel,
 ) -> SampleFileModifier:
     sample_file_name = metabolights_model.investigation.studies[0].file_name
@@ -29,6 +31,7 @@ all_technique_names = [
     "GC-MS",
     "DI-MS",
     "NMR",
+    "MRImaging",
     "MSImaging",
     "CE-MS",
     "FIA-MS",
@@ -37,8 +40,6 @@ all_technique_names = [
     "LC-DAD",
     "MALDI-MS",
     "MS",
-    "SPE-IMS-MS",
-    "TD-GC-MS",
 ]
 
 
@@ -49,7 +50,7 @@ class TestGetProtocolTemplate:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_protocol_template(technique_name=technique)
-        assert len(template) > 0
+        assert template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -60,7 +61,7 @@ class TestGetProtocolTemplate:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_protocol_template(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
 
 class TestOrderedProtocolNames:
@@ -70,7 +71,7 @@ class TestOrderedProtocolNames:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) > 0
+        assert template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -81,7 +82,7 @@ class TestOrderedProtocolNames:
         self, sample_modifier: SampleFileModifier, technique: str
     ):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -93,7 +94,7 @@ class TestOrderedProtocolNames:
     ):
         sample_modifier.templates = {}
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
-        assert len(template) == 0
+        assert not template
 
 
 class TestGetProtocolParametersInAssay:

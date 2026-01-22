@@ -55,14 +55,16 @@ async def get_oauth2_token(
             logger.debug(str(ex))
             return JwtToken(message=f"Authentication failed for user '{username}'")
     elif client_secret:
-        if username or password:
+        if not username:
             return JwtToken(
                 message="If you want to authenticate with client secret, "
-                "user name/password pair must be empty."
+                "user name must be defined."
             )
         try:
             access_token = await authentication_service.authenticate_with_token(
-                token_type=TokenType.API_TOKEN, token=client_secret
+                token_type=TokenType.API_TOKEN,
+                token=client_secret,
+                username=username,
             )
         except Exception as ex:
             logger.error(

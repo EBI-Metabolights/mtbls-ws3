@@ -1,9 +1,7 @@
 import asyncio
 import logging
 
-from fastmcp import Client, settings
-
-settings.experimental.enable_new_openapi_parser = True
+from fastmcp import Client
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

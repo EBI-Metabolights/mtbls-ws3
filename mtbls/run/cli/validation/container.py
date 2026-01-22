@@ -11,6 +11,9 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
+    UserReadRepository,
+)
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -31,6 +34,9 @@ from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_mana
 )
 from mtbls.infrastructure.repositories.study.db.study_read_repository import (
     SqlDbStudyReadRepository,
+)
+from mtbls.infrastructure.repositories.user.db.user_read_repository import (
+    SqlDbUserReadRepository,
 )
 
 
@@ -71,6 +77,12 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         alias_generator=alias_generator,
         database_client=gateways.database_client,
     )
+    user_read_repository: UserReadRepository = providers.Singleton(
+        SqlDbUserReadRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
+    )
     folder_manager: StudyFolderManager = providers.Singleton(
         StudyFolderManager, config=config.repositories.study_folders
     )
@@ -91,7 +103,6 @@ class MtblsCliServicesContainer(containers.DeclarativeContainer):
         OpaPolicyService,
         http_client=gateways.http_client,
         config=config.policy_service.opa,
-        max_polling_in_seconds=60,
     )
 
     request_tracker: RequestTracker = providers.Singleton(RequestTracker)

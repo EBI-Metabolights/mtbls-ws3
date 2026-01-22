@@ -44,7 +44,7 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
 
     @validate_inputs_outputs
     async def authenticate_with_token(
-        self, token_type: TokenType, token: TokenStr
+        self, token_type: TokenType, token: TokenStr, username: str = None
     ) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
@@ -83,10 +83,12 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
             logger.warning("error: %s %s", url, str(ex))
             raise ex
 
-    async def revoke_jwt_token(self, jwt: str) -> bool:
+    async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
         raise NotImplementedError()
 
-    async def validate_token(self, token_type: TokenType, token: str) -> str:
+    async def validate_token(
+        self, token_type: TokenType, token: str, username: str = None
+    ) -> str:
         if token_type != TokenType.JWT_TOKEN:
             raise NotImplementedError("Only Jwt Tokens can be validated.")
         payload = None

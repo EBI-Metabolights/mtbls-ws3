@@ -1,7 +1,7 @@
 import abc
 from typing import Union
 
-from mtbls.domain.entities.validation_report import ValidationReport
+from mtbls.domain.entities.validation.validation_report import ValidationReport
 from mtbls.domain.shared.data_types import ZeroOrPositiveInt
 from mtbls.domain.shared.validator.policy import PolicySummaryResult
 

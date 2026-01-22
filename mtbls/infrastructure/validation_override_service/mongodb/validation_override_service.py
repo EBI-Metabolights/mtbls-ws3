@@ -11,7 +11,7 @@ from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
 from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
-from mtbls.domain.entities.validation_override import (
+from mtbls.domain.entities.validation.validation_override import (
     ValidationOverrideFileObject,
     ValidationOverrideList,
 )

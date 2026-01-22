@@ -40,13 +40,19 @@ gateways:
         request_timeout_in_seconds: 5.0
 services:
   authentication:
+    active_authentication_service: "standalone"
     mtbls_ws2:
       host: "{{ authentication.mtbls_ws2.host }}"
       port: "{{ authentication.mtbls_ws2.port }}"
       base_context_path: "{{ authentication.mtbls_ws2.base_context_path }}"
       scheme: "{{ authentication.mtbls_ws2.scheme }}"
     standalone:
-      application_secret_key: "{{ authentication.standaloneapplication_secret_key }}"
+      application_secret_key: "{{ authentication.standalone.application_secret_key }}"
+    keycloak:
+      host: "{{ authentication.keycloak.host }}"
+      realm_name: "{{ authentication.keycloak.realm_name }}"
+      client_id: "{{ authentication.keycloak.client_id }}"
+      client_secret: "{{ authentication.keycloak.client_secret }}"
   policy_service:
     opa:
       validate_schema: false
@@ -54,8 +60,12 @@ services:
       version_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/version"
       validation_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/report/complete_report?pretty=true"
       templates_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/templates"
-      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controlLists"
+      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controls"
       rule_definitions_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/rules"
+  ontology_search_service:
+    ols:
+      timeout_in_seconds: 10
+      default_search_result_size: 30
   system_health_check:
     remote:
       transfer_health_check:
@@ -101,6 +111,7 @@ run:
     - prefix: "/curation/"
       scopes:
       - curator
+      - submitter
     api_server_config:
       port: "{{ run.submission.port }}"
       api_groups:

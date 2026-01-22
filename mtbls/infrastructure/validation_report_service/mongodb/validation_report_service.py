@@ -7,7 +7,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
 from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
-from mtbls.domain.entities.validation_report import ValidationReport
+from mtbls.domain.entities.validation.validation_report import ValidationReport
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.data_types import ZeroOrPositiveInt
 from mtbls.domain.shared.repository.entity_filter import EntityFilter

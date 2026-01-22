@@ -2,6 +2,7 @@ import abc
 from io import BufferedWriter
 from typing import Any
 
+from mtbls.domain.entities.http_response import HttpResponse
 from mtbls.domain.enums.http_request_type import HttpRequestType
 
 
@@ -11,13 +12,13 @@ class HttpClient(abc.ABC):
         self,
         method: HttpRequestType,
         url: str,
-        headers: dict[str, str] = None,
-        params: dict[str, str] = None,
+        headers: None | dict[str, str] = None,
+        params: None | dict[str, str] = None,
         json: None | dict[str, Any] = None,
         timeout: None | int = None,
         follow_redirects: bool = False,
         raise_error_for_status: bool = True,
-    ) -> tuple[int, dict[str, Any]]: ...
+    ) -> HttpResponse: ...
 
     @abc.abstractmethod
     async def stream(
@@ -25,8 +26,8 @@ class HttpClient(abc.ABC):
         buffered_writer: BufferedWriter,
         method: HttpRequestType,
         url: str,
-        headers: dict[str, str] = None,
-        params: dict[str, str] = None,
+        headers: None | dict[str, str] = None,
+        params: None | dict[str, str] = None,
         json: None | dict[str, Any] = None,
         timeout: None | int = None,
         follow_redirects: bool = False,

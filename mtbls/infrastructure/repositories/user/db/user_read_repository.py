@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Union
 
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
@@ -107,11 +107,13 @@ class SqlDbUserReadRepository(
 
     async def get_user_by_api_token(
         self,
+        username: str,
         api_token: str,
         include_studies: bool = False,
     ) -> Union[None, UserOutput]:
         result = await self._get_users_by_filter(
-            lambda: User.apitoken == api_token, include_studies=include_studies
+            lambda: and_(User.apitoken == api_token, User.username == username),
+            include_studies=include_studies,
         )
         return result[0] if result else None
 

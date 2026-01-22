@@ -11,7 +11,7 @@ from mtbls.application.use_cases.validation.validation_overrides import (
     patch_validation_overrides,
 )
 from mtbls.domain.entities.user import UserOutput
-from mtbls.domain.entities.validation_override import ValidationOverrideList
+from mtbls.domain.entities.validation.validation_override import ValidationOverrideList
 from mtbls.domain.shared.validator.validation import (
     ValidationOverrideInput,
 )
@@ -56,12 +56,12 @@ async def patch_validation_overrides_endpoint(
         user.id_,
         [x.model_dump_json() for x in overrides],
     )
-    overrides = await patch_validation_overrides(
+    overrides_list = await patch_validation_overrides(
         resource_id=resource_id,
         validation_overrides=overrides,
         validation_override_service=validation_override_service,
     )
 
     return APIResponse[ValidationOverrideList](
-        content=overrides, success_message="Validation overrides are updated."
+        content=overrides_list, success_message="Validation overrides are updated."
     )
