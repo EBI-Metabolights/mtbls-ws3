@@ -1,13 +1,19 @@
 import asyncio
 
+from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
+
 
 def run_coroutine(coroutine):
     try:
-        loop = asyncio.get_running_loop()
-        if loop.is_running():
+        loop = get_worker_loop()
+        if not loop:
+            loop = asyncio.get_running_loop()
+        if loop and loop.is_running():
             result = asyncio.ensure_future(coroutine)
         else:
             result = loop.run_until_complete(coroutine)
     except RuntimeError:
-        result = asyncio.run(coroutine)
+        loop = asyncio.new_event_loop()
+        set_worker_loop(loop)
+        result = loop.run_until_complete(coroutine)
     return result

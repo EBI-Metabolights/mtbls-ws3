@@ -10,6 +10,9 @@ from mtbls.application.services.interfaces.async_task.async_task_service import 
     AsyncTaskService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
+from mtbls.application.services.interfaces.ontology_search_service import (
+    OntologySearchService,
+)
 from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
@@ -29,11 +32,15 @@ async def init_application(  # noqa: PLR0913
         "repositories.user_read_repository"
     ],
     policy_service: PolicyService = Provide["services.policy_service"],
+    ontology_search_service: OntologySearchService = Provide[
+        "services.ontology_search_service"
+    ],
     test_database_connection: bool = True,
     test_cache_service: bool = True,
     test_async_task_service: bool = True,
     test_database_table: bool = True,
     test_policy_service: bool = False,
+    test_ontology_search_service: bool = True,
 ):
     if test_database_connection:
         await init_database_client(database_client)
@@ -45,10 +52,32 @@ async def init_application(  # noqa: PLR0913
         await init_user_repository(user_read_repository)
     if test_policy_service:
         await init_policy_service(policy_service)
+    if test_ontology_search_service:
+        await init_ontology_search_service(ontology_search_service)
 
 
 def get_service_name(service) -> str:
     return f"{service.__module__}.{service.__class__.__name__}"
+
+
+async def init_ontology_search_service(
+    ontology_search_service: OntologySearchService,
+) -> bool:
+    if not ontology_search_service:
+        logger.info("Ontology search service is not initialized.")
+        return False
+    try:
+        search = await ontology_search_service.find_by_accession(
+            "http://purl.obolibrary.org/obo/NCIT_C49019", "NCIT"
+        )
+        if search and search.result:
+            logger.info("Ontology search service is ready.")
+            return True
+        return False
+    except Exception as ex:
+        logger.error("Ontology search service is not ready: %s", str(ex))
+        logger.critical("Ontology search tasks will fail.")
+        return False
 
 
 async def init_policy_service(policy_service: PolicyService) -> bool:
