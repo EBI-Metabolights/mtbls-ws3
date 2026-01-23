@@ -1734,8 +1734,8 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.1"
-source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git#f3bd397556983521ba9cb4522c2ba2dbb3c9f4b7" }
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
@@ -1745,6 +1745,10 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/c4/721fb22890e39350fff2ef8aeae2d4a50229ee2b683c7e85a8303994befc/mtbls_mhd_integration-0.0.2.tar.gz", hash = "sha256:c0851a21cbe6bbd181082421aed5c5dd9b5c73d88c861d84690e0fbf96a7f495", size = 27985, upload-time = "2026-01-23T08:52:18.585Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/6e/32d3c0ecc388a79709c1766b0716136d41965287188f8ba086a6049b6106/mtbls_mhd_integration-0.0.2-py3-none-any.whl", hash = "sha256:d646d43c8b3e1265ea54b440367cbb804f25fe72700579495b8aec1e42362e3b", size = 31874, upload-time = "2026-01-23T08:52:17.51Z" },
 ]
 
 [[package]]
@@ -1831,7 +1835,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.16" },
     { name = "mhd-model", specifier = ">=0.1.34" },
-    { name = "mtbls-mhd-integration", git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git" },
+    { name = "mtbls-mhd-integration", specifier = ">=0.0.2" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg2-binary", marker = "extra == 'ws3'", specifier = ">=2.9.9,<3" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },

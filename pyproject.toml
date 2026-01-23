@@ -23,7 +23,7 @@ dependencies = [
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",
     "mhd-model>=0.1.34",
-    "mtbls-mhd-integration",
+    "mtbls-mhd-integration>=0.0.2",
 ]
 
 [project.optional-dependencies]
@@ -70,9 +70,6 @@ default-groups = [
     "dev",
     "test",
 ]
-
-[tool.uv.sources]
-mtbls-mhd-integration = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git" }
 
 [project.scripts]
 mtbls-tool = "mtbls.run.cli.main:mtbls_tool"
