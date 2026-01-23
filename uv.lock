@@ -1734,21 +1734,21 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.2"
+version = "0.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
     { name = "mhd-model" },
-    { name = "psycopg2" },
+    { name = "psycopg2-binary" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f2/c4/721fb22890e39350fff2ef8aeae2d4a50229ee2b683c7e85a8303994befc/mtbls_mhd_integration-0.0.2.tar.gz", hash = "sha256:c0851a21cbe6bbd181082421aed5c5dd9b5c73d88c861d84690e0fbf96a7f495", size = 27985, upload-time = "2026-01-23T08:52:18.585Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/6a/dec21568b6b062af28e9857ccd107a3d80b4ae05c9e30eeb83cb9486b249/mtbls_mhd_integration-0.0.3.tar.gz", hash = "sha256:e87363308693aaa1e02a78692756389762f639d28287aa7604d3fee468889d99", size = 27980, upload-time = "2026-01-23T11:07:00.699Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/70/6e/32d3c0ecc388a79709c1766b0716136d41965287188f8ba086a6049b6106/mtbls_mhd_integration-0.0.2-py3-none-any.whl", hash = "sha256:d646d43c8b3e1265ea54b440367cbb804f25fe72700579495b8aec1e42362e3b", size = 31874, upload-time = "2026-01-23T08:52:17.51Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/2a/6a3d6b2af42854bfb84888f1d89a216e8840e2736cbfa9d4806580f1d092/mtbls_mhd_integration-0.0.3-py3-none-any.whl", hash = "sha256:75577ea93ac49b44f5f26bdcce17408911487636753e554b4a3c6d927a5233e6", size = 31876, upload-time = "2026-01-23T11:06:59.171Z" },
 ]
 
 [[package]]
@@ -1835,7 +1835,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.16" },
     { name = "mhd-model", specifier = ">=0.1.34" },
-    { name = "mtbls-mhd-integration", specifier = ">=0.0.2" },
+    { name = "mtbls-mhd-integration", specifier = ">=0.0.3" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg2-binary", marker = "extra == 'ws3'", specifier = ">=2.9.9,<3" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },
@@ -2179,17 +2179,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bb/6e/9d084c929dfe9e3bfe0c6a47e31f78a25c54627d64a66e884a8bf5474f1c/prompt_toolkit-3.0.51.tar.gz", hash = "sha256:931a162e3b27fc90c86f1b48bb1fb2c528c2761475e57c9c06de13311c7b54ed", size = 428940, upload-time = "2025-04-15T09:18:47.731Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ce/4f/5249960887b1fbe561d9ff265496d170b55a735b76724f10ef19f9e40716/prompt_toolkit-3.0.51-py3-none-any.whl", hash = "sha256:52742911fde84e2d423e2f9a4cf1de7d7ac4e51958f648d9540e0fb8db077b07", size = 387810, upload-time = "2025-04-15T09:18:44.753Z" },
-]
-
-[[package]]
-name = "psycopg2"
-version = "2.9.11"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/89/8d/9d12bc8677c24dad342ec777529bce705b3e785fa05d85122b5502b9ab55/psycopg2-2.9.11.tar.gz", hash = "sha256:964d31caf728e217c697ff77ea69c2ba0865fa41ec20bb00f0977e62fdcc52e3", size = 379598, upload-time = "2025-10-10T11:14:46.075Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/bf/635fbe5dd10ed200afbbfbe98f8602829252ca1cce81cc48fb25ed8dadc0/psycopg2-2.9.11-cp312-cp312-win_amd64.whl", hash = "sha256:e03e4a6dbe87ff81540b434f2e5dc2bddad10296db5eea7bdc995bf5f4162938", size = 2713969, upload-time = "2025-10-10T11:10:15.946Z" },
-    { url = "https://files.pythonhosted.org/packages/88/5a/18c8cb13fc6908dc41a483d2c14d927a7a3f29883748747e8cb625da6587/psycopg2-2.9.11-cp313-cp313-win_amd64.whl", hash = "sha256:8dc379166b5b7d5ea66dcebf433011dfc51a7bb8a5fc12367fa05668e5fc53c8", size = 2714048, upload-time = "2025-10-10T11:10:19.816Z" },
-    { url = "https://files.pythonhosted.org/packages/47/08/737aa39c78d705a7ce58248d00eeba0e9fc36be488f9b672b88736fbb1f7/psycopg2-2.9.11-cp314-cp314-win_amd64.whl", hash = "sha256:f10a48acba5fe6e312b891f290b4d2ca595fc9a06850fe53320beac353575578", size = 2803738, upload-time = "2025-10-10T11:10:23.196Z" },
 ]
 
 [[package]]
