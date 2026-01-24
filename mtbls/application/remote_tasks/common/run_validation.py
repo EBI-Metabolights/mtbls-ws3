@@ -453,6 +453,14 @@ async def process_mhd_study(
             logger.error(
                 "MHD version %s is not supported for %s", mhd_model_version, resource_id
             )
+        for x in await internal_files_object_repository.list(resource_id, "DATA_FILES"):
+            object_key = x.object_key or ""
+            if object_key.endswith(".mhd.json") or object_key.endswith(
+                ".announcement.json"
+            ):
+                await internal_files_object_repository.delete_object(
+                    resource_id, object_key
+                )
 
         if mhd_file_path and Path(mhd_file_path).exists():
             await internal_files_object_repository.put_object(
@@ -502,10 +510,6 @@ async def validate_mhd_study(
         )
     announcement_file_path = mhd_output_root_path / annoucement_filename
     mhd_file_path = mhd_output_root_path / mhd_filename
-
-    for file in mhd_output_root_path.glob("*.json"):
-        if file.name.endswith(".mhd.json") or file.name.endswith(".announcement.json"):
-            file.unlink()
 
     convertor.convert(
         repository_name="MetaboLights",

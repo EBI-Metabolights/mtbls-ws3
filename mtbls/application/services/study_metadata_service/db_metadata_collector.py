@@ -61,7 +61,17 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
         self, resource_id: str, connection
     ) -> tuple[model.StudyDBMetadata, list[ErrorMessage]]:
         try:
-            study = await self.study_read_repository.get_study_by_accession(resource_id)
+            study = await self.study_read_repository.get_study_by_accession(
+                resource_id, include_revisions=True, include_submitters=True
+            )
+
+            revisions = [
+                x
+                for x in study.revisions
+                if x.accession_number == resource_id
+                and study.revision_number == x.revision_number
+            ]
+            revision = revisions[0] if revisions else None
             metadata = model.StudyDBMetadata(
                 db_id=study.id_,
                 study_id=study.accession_number,
@@ -102,14 +112,12 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 revision_date=study.revision_datetime.isoformat()
                 if study.revision_datetime
                 else "",
+                revision_comment=revision.revision_comment
+                if revision and revision.revision_comment
+                else "",
                 created_at=study.created_at.isoformat() if study.created_at else "",
             )
-            submitters: list[
-                UserOutput
-            ] = await self.user_read_repository.get_study_submitters_by_accession(
-                resource_id
-            )
-
+            submitters: list[UserOutput] = study.submitters if study.submitters else []
             for submitter in submitters:
                 metadata.submitters.append(
                     model.Submitter(
