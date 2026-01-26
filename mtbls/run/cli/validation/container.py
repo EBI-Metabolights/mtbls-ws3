@@ -94,6 +94,13 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         http_client=gateways.http_client,
         observer=None,
     )
+    metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+        http_client=gateways.http_client,
+        observer=None,
+    )
 
 
 class MtblsCliServicesContainer(containers.DeclarativeContainer):
