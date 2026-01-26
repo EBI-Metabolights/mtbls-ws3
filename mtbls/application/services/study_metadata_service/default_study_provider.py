@@ -94,11 +94,13 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
         self,
         resource_id: str,
         internal_files_object_repository: FileObjectReadRepository,
+        metadata_files_object_repository: FileObjectReadRepository,
         data_file_index_file_key: str,
     ):
         self.resource_id = resource_id
         self.internal_files_object_repository = internal_files_object_repository
         self.data_file_index_file_key = data_file_index_file_key
+        self.metadata_files_object_repository = metadata_files_object_repository
 
     async def load_from_data_index_file(self) -> Dict[str, StudyFileDescriptor]:
         metadata: Dict[str, StudyFileDescriptor] = {}
@@ -158,6 +160,30 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
                 size_in_bytes=file_descriptor.file_size,
             )
             metadata[relative_path] = descriptor
+        metadata_files = await self.metadata_files_object_repository.list(
+            self.resource_id
+        )
+        for file in metadata_files:
+            if file.is_link:
+                continue
+            updated_at = 0
+            if file.updated_at and isinstance(file.updated_at, str):
+                updated_at = int(
+                    datetime.datetime.fromisoformat(file.updated_at).timestamp()
+                )
+            elif file.updated_at and isinstance(file.updated_at, datetime.datetime):
+                updated_at = int(file.updated_at.timestamp())
+
+            descriptor = StudyFileDescriptor(
+                file_path=file.basename,
+                base_name=file.basename,
+                parent_directory="",
+                extension=file.extension,
+                is_directory=file.is_directory,
+                modified_at=updated_at,
+                size_in_bytes=file.size_in_bytes,
+            )
+            metadata[file.basename] = descriptor
         return metadata
 
     async def get_folder_metadata(
@@ -194,6 +220,7 @@ class DataFileIndexMetabolightsStudyProvider(AsyncMetabolightsStudyProvider):
         study_read_repository: StudyReadRepository,
         user_read_repository: UserReadRepository,
         internal_files_object_repository: FileObjectReadRepository,
+        metadata_files_object_repository: FileObjectReadRepository,
         data_file_index_file_key: str,
     ) -> None:
         super().__init__(
@@ -202,6 +229,9 @@ class DataFileIndexMetabolightsStudyProvider(AsyncMetabolightsStudyProvider):
                 user_read_repository=user_read_repository,
             ),
             folder_metadata_collector=DataFileIndexMetadataCollector(
-                resource_id, internal_files_object_repository, data_file_index_file_key
+                resource_id,
+                internal_files_object_repository,
+                metadata_files_object_repository,
+                data_file_index_file_key,
             ),
         )

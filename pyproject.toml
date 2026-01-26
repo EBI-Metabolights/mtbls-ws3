@@ -46,6 +46,7 @@ ws3 = [
     "fastmcp>=2.14.3",
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
+    "elasticsearch>=9.2.1",
 ]
 
 [dependency-groups]
@@ -53,23 +54,20 @@ dev = [
     "import-linter>=2.5.2",
     "ruff>=0.14.14",
     "commitizen>=4.9.1",
-    "pre-commit>=4.0.1,<5",
+    "pre-commit>=4.0.1,<5"
 ]
 test = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
-    "aiosqlite>=0.21.0",
+    "aiosqlite>=0.21.0"
 ]
 docs = [
-    "mkdocs-material>=9.5.49,<10",
+    "mkdocs-material>=9.5.49,<10"
 ]
 
 [tool.uv]
-default-groups = [
-    "dev",
-    "test",
-]
+default-groups = []
 
 [project.scripts]
 mtbls-tool = "mtbls.run.cli.main:mtbls_tool"
@@ -194,6 +192,7 @@ modules = [
    "mtbls.infrastructure.caching.redis_sentinel",
    "mtbls.infrastructure.pub_sub.celery",
    "mtbls.infrastructure.pub_sub.threading",
+   "mtbls.infrastructure.search.es"
 ]
 
 ignore_imports = [

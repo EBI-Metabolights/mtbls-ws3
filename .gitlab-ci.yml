@@ -51,7 +51,7 @@ lint_and_test:
   - git status
   - ls -al
   - echo "install dependencies"
-  - uv sync --locked --extra ws3
+  - uv sync --locked --extra ws3 --group dev --group test
   - echo "Run pre-commit tools"
   - uv run ruff format
   - uv run ruff check
