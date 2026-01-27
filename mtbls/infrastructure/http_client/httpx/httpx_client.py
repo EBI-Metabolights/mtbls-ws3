@@ -34,23 +34,32 @@ class HttpxClient(HttpClient):
             else self.max_timeount_in_seconds
         )
         async with httpx.AsyncClient() as client:
-            response: httpx.Response = await client.request(
-                method.value,
-                url,
-                params=params,
-                headers=headers,
-                follow_redirects=follow_redirects,
-                timeout=timeout,
-                json=json,
-            )
-            if response.status_code == 404:
+            try:
+                response: httpx.Response = await client.request(
+                    method.value,
+                    url,
+                    params=params,
+                    headers=headers,
+                    follow_redirects=follow_redirects,
+                    timeout=timeout,
+                    json=json,
+                )
+                if response.status_code == 404:
+                    return HttpResponse(
+                        status_code=response.status_code,
+                        headers=dict(response.headers),
+                        json_data={},
+                    )
+                if raise_error_for_status:
+                    response.raise_for_status()
+            except Exception as ex:
+                logger.exception(ex)
                 return HttpResponse(
                     status_code=response.status_code,
                     headers=dict(response.headers),
-                    json_data={},
+                    error=True,
+                    error_message=str(ex),
                 )
-            if raise_error_for_status:
-                response.raise_for_status()
             try:
                 return HttpResponse(
                     status_code=response.status_code,
