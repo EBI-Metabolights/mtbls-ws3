@@ -56,6 +56,36 @@ class ElasticsearchClient:
                 f"API key '{api_key_name}' is not configured; "
                 f"available keys: {list(self._config.api_keys or {})}"
             )
+    async def start(self) -> None:
+        if self._es is not None:
+            return  # Already started
+        logger.info(
+            "Connecting to Elasticsearch hosts: %s (timeout=%s, verify_certs=%s)",
+            self._config.hosts,
+            self._config.request_timeout,
+            self._config.verify_certs,
+        )
+        self._es = AsyncElasticsearch(
+            hosts=self._config.hosts or None,
+            api_key=self._config.api_key,
+            request_timeout=self._config.request_timeout,
+            verify_certs=self._config.verify_certs,
+        )
+        try:
+            ok = await self._es.ping()
+            if not ok:
+                logger.exception(
+                    "Elasticsearch hosts %s reachable but ping returned False.",
+                    self._config.hosts,
+                )
+                raise ConnectionError("Elasticsearch ping failed")
+            logger.info("Elasticsearch connection established successfully.")
+        except ApiError as e:
+            logger.exception("Elasticsearch API error during startup: %s", e)
+            raise RuntimeError(f"Elasticsearch connection error: {e}") from e
+        except Exception as exc:
+            logger.exception("Unexpected Elasticsearch connection failure: %s", exc)
+            raise
 
         if self._config.api_keys:
             return next(iter(self._config.api_keys.values()))

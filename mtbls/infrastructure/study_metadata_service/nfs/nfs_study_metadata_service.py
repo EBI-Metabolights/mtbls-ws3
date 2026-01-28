@@ -384,6 +384,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             study_read_repository=self.study_read_repository,
             user_read_repository=self.user_read_repository,
             internal_files_object_repository=self.internal_files_object_repository,
+            metadata_files_object_repository=self.metadata_files_object_repository,
             data_file_index_file_key="DATA_FILES/data_file_index.json",
         )
 
@@ -408,6 +409,8 @@ class FileObjectStudyMetadataService(StudyMetadataService):
     async def save_study_model(
         self,
         model: MetabolightsStudyModel,
+        save_metadata_files: bool = True,
+        save_result_files: bool = True,
     ) -> bool:
         save_path_str = str(self.staging_path)
 
@@ -415,20 +418,24 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             model,
             output_dir=save_path_str,
             values_in_quotation_mark=False,
+            save_metadata_files=save_metadata_files,
+            save_result_files=save_result_files,
         )
         isa_table_file_path = self.staging_path / Path(model.investigation_file_path)
         isa_table_file_path_str = str(isa_table_file_path)
-        await self.metadata_files_object_repository.put_object(
-            resource_id=self.resource_id,
-            object_key=model.investigation_file_path,
-            source_uri=f"file://{isa_table_file_path_str}",
-            override=True,
-        )
-        for isa_table_files in (
-            model.samples,
-            model.assays,
-            model.metabolite_assignments,
-        ):
+        file_groups = []
+        if save_metadata_files:
+            await self.metadata_files_object_repository.put_object(
+                resource_id=self.resource_id,
+                object_key=model.investigation_file_path,
+                source_uri=f"file://{isa_table_file_path_str}",
+                override=True,
+            )
+            file_groups = [model.samples, model.assays]
+        if save_result_files:
+            file_groups.append(model.metabolite_assignments)
+
+        for isa_table_files in file_groups:
             for file_name in isa_table_files:
                 isa_table_file_path = self.staging_path / Path(file_name)
                 isa_table_file_path_str = str(isa_table_file_path)

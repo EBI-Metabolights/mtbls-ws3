@@ -18,9 +18,11 @@ router = APIRouter(tags=["Public"], prefix="/public/v2/public-study-index")
 @router.post(
     "/search",
     summary="MetaboLights Study Search from public study index.",
-    description="MetaboLights search results from public study index. "
+    description=(
+        "MetaboLights search results from public study index. "
     "Sanitised output format. Set include_all_ids=true to get all matching "
-    "study IDs alongside paginated results (only when query or filters are applied).",
+    "study IDs alongside paginated results (only when query or filters are applied)."
+    ),
     response_model=APIResponse[IndexSearchResult],  # IndexSearchResult or raw dict
 )
 @inject
@@ -51,8 +53,10 @@ async def search_study_index(
 @router.post(
     "/search/raw",
     summary="MetaboLights Study Search from public study index. (Raw ES Response)",
-    description="MetaboLights Statistics from public study index. "
-    "Raw Elasticsearch Response format for APIConnectors.",
+    description=(
+        "MetaboLights Statistics from public study index"
+        "Raw Elasticsearch Response format for APIConnectors."
+    ),
     response_model=APIResponse[Any],
 )
 @inject
