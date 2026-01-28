@@ -23,7 +23,7 @@ dependencies = [
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",
     "mhd-model>=0.1.40",
-    "mtbls-mhd-integration>=0.0.10",
+    "mtbls-mhd-integration>=0.0.11",
     "psycopg[binary,pool]>=3.3.2",
 ]
 
@@ -32,7 +32,7 @@ ws3 = [
     "flower>=2.0.1,<3",
     "pymongo>=4.10.1,<5",
     "gunicorn>=23.0.0",
-    "uvloop>=0.21.0,<0.22",
+    "uvloop>=0.21.0",
     "celery[redis]>=5.5.3",
     "httpx>=0.27.0",
     "sqlalchemy>=2.0.43",

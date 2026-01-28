@@ -1735,7 +1735,7 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.10"
+version = "0.0.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
@@ -1747,9 +1747,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/30/54ecef4cd1a744a61f1cb495bb1de7ac95118e19e79b642a989bf5509e5e/mtbls_mhd_integration-0.0.10.tar.gz", hash = "sha256:06279f640620086eac2a49864e1c2545b55c7bef68b2a37253beaf02d4436344", size = 28511, upload-time = "2026-01-28T06:52:43.917Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/a5/d496cfb4303871219e18ab464102e2f2ab3ee2b94cec4ab50cc468119280/mtbls_mhd_integration-0.0.11.tar.gz", hash = "sha256:3f2206727fb6eb54a9f7bc563f37b54f6f8ef49da44503b412989a40802e3558", size = 28506, upload-time = "2026-01-28T08:11:50.128Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/0f/54b592dfa9bdaf184d3fa11e4c55499f2b5e9fca2dbbb793dc1522370e4c/mtbls_mhd_integration-0.0.10-py3-none-any.whl", hash = "sha256:4e6a8558f67a15be04e4fb2ab53cad9f5d7dde4e1bbb2a2360324e87bc6da1c2", size = 32430, upload-time = "2026-01-28T06:52:43.049Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/3b/be77be47a72a9046f4cad5a90a47da4db7a2de8534795f055a0ebd0e185d/mtbls_mhd_integration-0.0.11-py3-none-any.whl", hash = "sha256:70859ed28833114d51b42bdb4f5f73ba81fb059f4cec551dbce0105095b278ae", size = 32430, upload-time = "2026-01-28T08:11:50.943Z" },
 ]
 
 [[package]]
@@ -1836,7 +1836,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.16" },
     { name = "mhd-model", specifier = ">=0.1.40" },
-    { name = "mtbls-mhd-integration", specifier = ">=0.0.10" },
+    { name = "mtbls-mhd-integration", specifier = ">=0.0.11" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },
@@ -1851,7 +1851,7 @@ requires-dist = [
     { name = "sqlalchemy", marker = "extra == 'ws3'", specifier = ">=2.0.43" },
     { name = "ujson", specifier = ">=5.10.0,<6" },
     { name = "uvicorn", marker = "extra == 'ws3'", specifier = ">0.29.0" },
-    { name = "uvloop", marker = "extra == 'ws3'", specifier = ">=0.21.0,<0.22" },
+    { name = "uvloop", marker = "extra == 'ws3'", specifier = ">=0.21.0" },
 ]
 provides-extras = ["ws3"]
 
