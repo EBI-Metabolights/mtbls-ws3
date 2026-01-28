@@ -54,6 +54,8 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
     async def save_study_model(
         self,
         model: MetabolightsStudyModel,
+        save_metadata_files: bool = True,
+        save_result_files: bool = True,
     ) -> bool: ...
 
     async def load_investigation_file(
@@ -165,6 +167,8 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         output_dir: str,
         values_in_quotation_mark: bool = False,
         investigation_module_name: Union[None, str] = None,
+        save_metadata_files: bool = True,
+        save_result_files: bool = True,
     ):
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         Writer.get_investigation_file_writer().write(
@@ -173,11 +177,13 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
             values_in_quotation_mark=values_in_quotation_mark,
             investigation_module_name=investigation_module_name,
         )
-        for isa_table_files in (
-            mtbls_model.samples,
-            mtbls_model.assays,
-            mtbls_model.metabolite_assignments,
-        ):
+        study_groups = []
+        if save_metadata_files:
+            study_groups.append(mtbls_model.samples)
+            study_groups.append(mtbls_model.assays)
+        if save_result_files:
+            study_groups.append(mtbls_model.metabolite_assignments)
+        for isa_table_files in study_groups:
             for isa_table_file in isa_table_files.values():
                 await cls.dump_isa_table(
                     isa_table_file,

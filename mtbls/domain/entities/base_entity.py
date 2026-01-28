@@ -1,3 +1,4 @@
+import datetime
 from typing import Annotated, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -32,6 +33,17 @@ class BaseStudy(BaseOutputEntity):
     model_config = ConfigDict(
         from_attributes=True, strict=True, entity_type=Entity.Study
     )
+
+
+class MtblsDataReuseOutput(BaseOutputEntity):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.MtblsDataReuse
+    )
+    id: int
+    content_name: str
+    content: str
+    data_format: str
+    updated_timestamp: datetime.datetime
 
 
 class BaseUserInput(BaseInputEntity):

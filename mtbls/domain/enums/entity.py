@@ -8,3 +8,4 @@ class Entity(enum.StrEnum):
     StudyFile = "study_file"
     Statistic = "statistic"
     Compound = "compound"
+    MtblsDataReuse = "mtbls_data_reuse"

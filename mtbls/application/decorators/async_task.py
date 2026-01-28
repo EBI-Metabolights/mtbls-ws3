@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from mtbls.application.context.async_task_registry import (
@@ -5,6 +6,7 @@ from mtbls.application.context.async_task_registry import (
     ASYNC_TASK_QUEUE,
     ASYNC_TASK_REGISTRY,
 )
+from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
 from mtbls.domain.shared.async_task.async_task_description import AsyncTaskDescription
 
 logger = logging.getLogger(__name__)
@@ -17,6 +19,23 @@ def async_task(
         task_name = task_method.__module__ + "." + task_method.__name__
 
         def wrapper(**kwargs):
+            worker_loop = None
+            try:
+                worker_loop = get_worker_loop()
+                _loop = asyncio.get_running_loop()
+                if worker_loop and worker_loop.is_running():
+                    if _loop != worker_loop:
+                        asyncio.set_event_loop(worker_loop)
+
+            except Exception as ex:
+                logger.error(ex)
+                if worker_loop:
+                    asyncio.set_event_loop(worker_loop)
+                else:
+                    _loop = asyncio.new_event_loop()
+                    set_worker_loop(_loop)
+                    asyncio.set_event_loop(_loop)
+
             return task_method(**kwargs)
 
         executor = AsyncTaskDescription(wrapper, task_name=task_name, queue=queue)

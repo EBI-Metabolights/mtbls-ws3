@@ -4,6 +4,7 @@ from mtbls.domain.entities.base_entity import BaseEntity
 from mtbls.domain.enums.entity import Entity
 from mtbls.infrastructure.persistence.db.model.study_models import (
     Base,
+    MtblsDataReuse,
     Statistic,
     Study,
     StudyFile,
@@ -19,6 +20,7 @@ class EntityMapper:
         Entity.User: User,
         Entity.Study: Study,
         Entity.Statistic: Statistic,
+        Entity.MtblsDataReuse: MtblsDataReuse,
         Entity.StudyFile: StudyFile,
         Entity.StudyRevision: StudyRevision,
     }

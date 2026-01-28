@@ -6,6 +6,9 @@ from mtbls.application.services.interfaces.repositories.compound.compound_read_r
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
+from mtbls.application.services.interfaces.repositories.mtbls_data_reuse.mtbls_data_reuse_read_repository import (  # noqa: E501
+    MtblsDataReuseReadRepository,
+)
 from mtbls.application.services.interfaces.repositories.statistic.statistic_read_repository import (  # noqa: E501
     StatisticReadRepository,
 )
@@ -47,6 +50,9 @@ from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write
 )
 from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (  # noqa: E501
     StudyFolderManager,
+)
+from mtbls.infrastructure.repositories.mtbls_data_reuse.sql_db.mtbls_data_reuse_repository import (  # noqa: E501
+    SqlDbMtblsDataReuseReadRepository,
 )
 from mtbls.infrastructure.repositories.statistic.sql_db.statistic_read_repository import (  # noqa: E501
     SqlDbStatisticReadRepository,
@@ -124,8 +130,8 @@ class GatewaysContainer(containers.DeclarativeContainer):
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
         client=elasticsearch_client,
-        config=None,  # rely on default gateway config; adjust
-        # if custom search settings are added
+        config=None,  # rely on default gateway config;
+        # adjust if custom search settings are added
     )
 
     mongodb_connection: MongoDbConnection = providers.Resource(
@@ -204,6 +210,15 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         #entity_mapper=entity_mapper,
         #alias_generator=alias_generator,
         database_client=gateways.document_database_client,
+    )
+
+    mtbls_data_reuse_read_repository: MtblsDataReuseReadRepository = (
+        providers.Singleton(
+            SqlDbMtblsDataReuseReadRepository,
+            entity_mapper=entity_mapper,
+            alias_generator=alias_generator,
+            database_client=gateways.database_client,
+        )
     )
 
     # study_file_repository: StudyFileRepository = providers.Singleton(

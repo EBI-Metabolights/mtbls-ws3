@@ -1,7 +1,12 @@
+import asyncio
 import datetime
 import logging
+import pathlib
 import re
+import shutil
+import subprocess
 import time
+import uuid
 from typing import Any, Dict, Union
 
 from cachetools import TTLCache
@@ -21,12 +26,16 @@ from mtbls.application.services.interfaces.ontology_search_service import (
     OntologySearchService,
 )
 from mtbls.application.services.interfaces.policy_service import PolicyService
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
+    FileObjectWriteRepository,
+)
 from mtbls.application.services.interfaces.study_metadata_service import (
     StudyMetadataService,
 )
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
+from mtbls.domain.entities.study_file import StudyFileOutput
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
     FieldValueValidation,
@@ -36,19 +45,92 @@ from mtbls.domain.entities.validation.validation_configuration import (
 )
 from mtbls.domain.shared.modifier import StudyMetadataModifierResult, UpdateLog
 from mtbls.domain.shared.validator.policy import PolicyResult, PolicyResultList
+from mtbls.domain.shared.validator.run_configuration import (
+    ValidationRunConfiguration,
+)
 from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPhase
 
 logger = logging.getLogger(__name__)
 
 
-all_validation_phases: list[ValidationPhase] = [
-    ValidationPhase.PHASE_1,
-    ValidationPhase.PHASE_2,
-    ValidationPhase.PHASE_3,
-    ValidationPhase.PHASE_4,
-]
+async def create_validation_configuration(
+    resource_id: str,
+    temp_folder: Union[None, str] = None,
+    apply_modifiers: bool = True,
+    metadata_files_object_repository: FileObjectWriteRepository = Provide[
+        "repositories.metadata_files_object_repository"
+    ],
+):
+    if not temp_folder:
+        temp_folder_path = pathlib.Path(f"/tmp/validation/{uuid.uuid4()}").resolve()
+    else:
+        temp_folder_path = pathlib.Path(temp_folder).resolve()
+    try:
+        repo = metadata_files_object_repository
+        files: list[StudyFileOutput] = await repo.list(resource_id)
+        result_files = [f for f in files if re.match(r"m_.+\.tsv$", f.basename)]
+        local_result_files = []
 
-validation_phase_names = {str(x.value) for x in all_validation_phases}
+        for result_file in result_files:
+            local_result_file_path = (
+                temp_folder_path
+                / pathlib.Path(resource_id)
+                / pathlib.Path(result_file.object_key)
+            )
+            local_result_files.append(local_result_file_path)
+            local_result_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            await repo.download(
+                resource_id,
+                result_file.object_key,
+                target_path=str(local_result_file_path),
+            )
+        file_lines: dict[str, int] = calculate_file_lines(local_result_files)
+        total_result_file_lines = 0
+        if file_lines:
+            total_result_file_lines = sum([x for x in file_lines.values()])
+        validation_run_configuration = ValidationRunConfiguration(
+            apply_modifiers=apply_modifiers
+        )
+        if total_result_file_lines > 2000:
+            logger.warning(
+                "Validation result MAF file lines exceed the limit: %d > 2000. "
+                "MAF file content validation PHASE3 will be skipped.",
+                total_result_file_lines,
+            )
+            validation_run_configuration.skip_result_file_modification = True
+            validation_run_configuration.validation_phases = [
+                x for x in ValidationPhase if x != ValidationPhase.PHASE_3
+            ]
+        return validation_run_configuration
+    except Exception as ex:
+        logger.error(
+            "Creating validation configuration for %s failed: %s", resource_id, ex
+        )
+        logger.exception(ex)
+        return ValidationRunConfiguration(apply_modifiers=apply_modifiers)
+    finally:
+        if temp_folder_path and temp_folder_path.exists():
+            try:
+                shutil.rmtree(temp_folder_path)
+            except Exception as ex:
+                logger.error(
+                    "Temporary folder %s removal failed: %s",
+                    str(temp_folder_path),
+                    ex,
+                )
+
+
+def calculate_file_lines(file_paths: list[pathlib.Path]) -> dict[str, int]:
+    if not file_paths:
+        return {}
+    files = [f for f in file_paths if f.is_file()]
+    result = subprocess.check_output(["wc", "-l"] + files)
+    return {
+        line.split(maxsplit=1)[1]: int(line.split(maxsplit=1)[0])
+        for line in result.decode().strip().split("\n")
+        if line and line.strip() and line.split(maxsplit=1)[1] != "total"
+    }
 
 
 @async_task(queue="common")
@@ -57,7 +139,6 @@ def run_validation(  # noqa: PLR0913
     *,
     resource_id: str,
     apply_modifiers: bool = True,
-    phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
     study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
         "services.study_metadata_service_factory"
@@ -66,8 +147,20 @@ def run_validation(  # noqa: PLR0913
     ontology_search_service: OntologySearchService = Provide[
         "services.ontology_search_service"
     ],
+    temp_folder: Union[None, str] = None,
+    metadata_files_object_repository: FileObjectWriteRepository = Provide[
+        "repositories.metadata_files_object_repository"
+    ],
     **kwargs,
 ) -> AsyncTaskResult:
+    validation_run_configuration = asyncio.run(
+        create_validation_configuration(
+            resource_id=resource_id,
+            temp_folder=temp_folder,
+            apply_modifiers=apply_modifiers,
+            metadata_files_object_repository=metadata_files_object_repository,
+        )
+    )
     try:
         modifier_result = None
         if apply_modifiers:
@@ -76,9 +169,9 @@ def run_validation(  # noqa: PLR0913
                 resource_id,
                 study_metadata_service_factory=study_metadata_service_factory,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
+                validation_run_configuration=validation_run_configuration,
             )
         else:
             coroutine = run_validation_task(
@@ -86,9 +179,9 @@ def run_validation(  # noqa: PLR0913
                 modifier_result=modifier_result,
                 study_metadata_service_factory=study_metadata_service_factory,
                 policy_service=policy_service,
-                phases=phases,
                 serialize_result=serialize_result,
                 ontology_search_service=ontology_search_service,
+                validation_run_configuration=validation_run_configuration,
             )
         return run_coroutine(coroutine)
 
@@ -104,9 +197,9 @@ async def run_validation_task_with_modifiers(
     resource_id: str,
     study_metadata_service_factory: StudyMetadataServiceFactory,
     policy_service: PolicyService,
-    phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
     ontology_search_service: None | OntologySearchService = None,
+    validation_run_configuration: None | ValidationRunConfiguration = None,
 ) -> Union[Dict[str, Any], PolicyResultList]:
     try:
         modifier_result = await run_isa_metadata_modifier_task(
@@ -114,6 +207,7 @@ async def run_validation_task_with_modifiers(
             study_metadata_service_factory=study_metadata_service_factory,
             policy_service=policy_service,
             serialize_result=False,
+            validation_run_configuration=validation_run_configuration,
         )
     except Exception as ex:
         logger.error("Error to modify %s: %s", resource_id, ex)
@@ -125,9 +219,9 @@ async def run_validation_task_with_modifiers(
         modifier_result=modifier_result,
         study_metadata_service_factory=study_metadata_service_factory,
         policy_service=policy_service,
-        phases=phases,
         serialize_result=serialize_result,
         ontology_search_service=ontology_search_service,
+        validation_run_configuration=validation_run_configuration,
     )
 
 
@@ -136,58 +230,45 @@ async def run_validation_task(  # noqa: PLR0913
     study_metadata_service_factory: StudyMetadataServiceFactory,
     policy_service: PolicyService,
     modifier_result: Union[None, dict, StudyMetadataModifierResult] = None,
-    phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
     ontology_search_service: None | OntologySearchService = None,
+    validation_run_configuration: None | ValidationRunConfiguration = None,
 ) -> Union[Dict[str, Any], PolicyResultList]:
     logger.info("Running validation for %s", resource_id)
     metadata_service = await study_metadata_service_factory.create_service(resource_id)
     result_list: PolicyResultList = PolicyResultList()
-    modifier_result_input: None | StudyMetadataModifierResult = None
-    if modifier_result:
-        if isinstance(modifier_result, dict):
-            modifier_result_input = StudyMetadataModifierResult.model_validate(
-                modifier_result
-            )
-        if modifier_result_input and modifier_result_input.has_error:
-            logger.error(
-                "Modifier failed for %s: %s.",
-                resource_id,
-                modifier_result_input.error_message or "",
-            )
-    if isinstance(phases, ValidationPhase):
-        input_phases: list[ValidationPhase] = [phases]
-    elif isinstance(phases, list):
-        input_phases: list[ValidationPhase] = [
-            ValidationPhase(x)
-            for x in phases
-            if isinstance(x, str) and x in validation_phase_names
-        ]
-    else:
-        input_phases = all_validation_phases
+    if modifier_result and isinstance(modifier_result, dict):
+        modifier_result = StudyMetadataModifierResult.model_validate(modifier_result)
+    if modifier_result and modifier_result.has_error:
+        logger.error(
+            "Modifier failed for %s: %s.",
+            resource_id,
+            modifier_result.error_message or "",
+        )
+    if not validation_run_configuration:
+        validation_run_configuration = ValidationRunConfiguration()
+    phases = validation_run_configuration.validation_phases
 
     logger.debug(
-        "Running %s validation for phases %s",
-        resource_id,
-        [str(x) for x in input_phases],
+        "Running %s validation for phases %s", resource_id, [str(x) for x in phases]
     )
 
-    if not resource_id or not input_phases:
+    if not resource_id or not phases:
         logger.error("Invalid resource id or phases for %s", resource_id)
-        raise ValueError("resource id or phases input is not valid")
+        raise ValueError(message="Inputs are not valid")
 
     try:
         logger.debug("Get MetaboLights validation input model.")
-        model = await get_input_data(metadata_service, input_phases)
+        model = await get_input_data(metadata_service, phases)
         logger.debug("Validate using policy service.")
         policy_result = await validate_by_policy_service(
             resource_id,
             model,
-            modifier_result_input,
+            modifier_result,
             policy_service,
             ontology_search_service,
         )
-        policy_result.phases = input_phases
+        policy_result.phases = phases
         result_list.results.append(policy_result)
 
     except Exception as ex:

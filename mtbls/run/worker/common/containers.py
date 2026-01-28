@@ -81,7 +81,7 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
     gateways = providers.DependenciesContainer()
     cache_config = providers.Configuration()
 
-    cache_service: CacheService = providers.Factory(
+    cache_service: CacheService = providers.Singleton(
         RedisCacheImpl,
         config=cache_config,
     )
