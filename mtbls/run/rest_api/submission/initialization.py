@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
     document_database_client: DocumentDatabaseClient = Provide["gateways.document_database_client"],
+    elasticsearch_client: ElasticsearchClient = Provide["gateways.elasticsearch_client"],
     cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
     user_read_repository: UserReadRepository = Provide[
