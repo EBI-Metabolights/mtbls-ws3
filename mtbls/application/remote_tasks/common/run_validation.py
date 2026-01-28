@@ -306,15 +306,39 @@ async def run_validation_task(  # noqa: PLR0913
             policy_service,
             ontology_search_service,
         )
-        await process_mhd_study(
-            policy_result,
-            resource_id,
-            model,
-            policy_service,
-            internal_files_object_repository,
-            validation_run_configuration=validation_run_configuration,
-        )
-
+        errors = [
+            x
+            for x in policy_result.messages.violations
+            if x.type == PolicyMessageType.ERROR
+        ]
+        try:
+            await process_mhd_study(
+                policy_result,
+                resource_id,
+                model,
+                policy_service,
+                internal_files_object_repository,
+                validation_run_configuration=validation_run_configuration,
+            )
+        except Exception as ex:
+            logger.exception(ex)
+            logger.error("Failed to convert and validate MHD study.")
+            if not errors:
+                policy_result.messages.violations.append(
+                    PolicyMessage(
+                        type=PolicyMessageType.WARNING,
+                        section="general",
+                        source_file="input",
+                        priority="CRITICAL",
+                        identifier="rule___500_100_001_01",
+                        title="MetabolomicsHub model validation error",
+                        description="Current study does not comply with "
+                        "MetabolomicsHub requirements now. "
+                        "contact MetaboLights team for help.",
+                        violation="Study MHD model validation failed.",
+                        values=[str(ex)],
+                    )
+                )
         policy_result.phases = phases
         result_list.results.append(policy_result)
 
@@ -453,6 +477,14 @@ async def process_mhd_study(
             logger.error(
                 "MHD version %s is not supported for %s", mhd_model_version, resource_id
             )
+        for x in await internal_files_object_repository.list(resource_id, "DATA_FILES"):
+            object_key = x.object_key or ""
+            if object_key.endswith(".mhd.json") or object_key.endswith(
+                ".announcement.json"
+            ):
+                await internal_files_object_repository.delete_object(
+                    resource_id, object_key
+                )
 
         if mhd_file_path and Path(mhd_file_path).exists():
             await internal_files_object_repository.put_object(
@@ -485,7 +517,11 @@ async def validate_mhd_study(
     config: None | Mtbls2MhdConfiguration = None,
 ) -> str:
     factory = Mtbls2MhdConvertorFactory()
-
+    current_errors = [
+        x
+        for x in policy_result.messages.violations
+        if x.type == PolicyMessageType.ERROR
+    ]
     convertor = factory.get_convertor(
         target_mhd_model_schema_uri=schema_uri, target_mhd_model_profile_uri=profile_uri
     )
@@ -503,10 +539,6 @@ async def validate_mhd_study(
     announcement_file_path = mhd_output_root_path / annoucement_filename
     mhd_file_path = mhd_output_root_path / mhd_filename
 
-    for file in mhd_output_root_path.glob("*.json"):
-        if file.name.endswith(".mhd.json") or file.name.endswith(".announcement.json"):
-            file.unlink()
-
     convertor.convert(
         repository_name="MetaboLights",
         repository_identifier=resource_id,
@@ -519,25 +551,26 @@ async def validate_mhd_study(
         validation_errors = validate_mhd_file(str(mhd_file_path))
 
         if validation_errors:
-            errors = []
-            for key, error in validation_errors:
-                errors.append(f"{key}: {error}")
+            if not current_errors:
+                errors = []
+                for key, error in validation_errors:
+                    errors.append(f"{key}: {error}")
 
-            policy_result.messages.violations.append(
-                PolicyMessage(
-                    type=PolicyMessageType.ERROR,
-                    section="general",
-                    source_file="input",
-                    priority="CRITICAL",
-                    identifier="rule___500_100_001_01",
-                    title="MetabolomicsHub model validation error",
-                    description="Current study does not comply with "
-                    "MetabolomicsHub requirements. "
-                    "Please contact MetaboLights team for help.",
-                    violation="Study MHD model validation failed.",
-                    values=errors,
+                policy_result.messages.violations.append(
+                    PolicyMessage(
+                        type=PolicyMessageType.ERROR,
+                        section="general",
+                        source_file="input",
+                        priority="CRITICAL",
+                        identifier="rule___500_100_001_01",
+                        title="MetabolomicsHub model validation error",
+                        description="Current study does not comply with "
+                        "MetabolomicsHub requirements. "
+                        "Please contact MetaboLights team for help.",
+                        violation="Study MHD model validation failed.",
+                        values=errors,
+                    )
                 )
-            )
         else:
             file_content = json.loads(mhd_file_path.read_text())
             create_announcement_file(
@@ -552,7 +585,7 @@ async def validate_mhd_study(
                 validator = MhdAnnouncementFileValidator()
                 errors = validator.validate(file_content)
 
-                if errors:
+                if errors and not current_errors:
                     policy_result.messages.violations.append(
                         PolicyMessage(
                             type=PolicyMessageType.ERROR,
