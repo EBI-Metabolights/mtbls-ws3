@@ -300,6 +300,65 @@ class TestHasChemicalFilters:
         assert gateway._has_chemical_filters(base_request) is False
 
 
+class TestOnlyHasChemicalFilters:
+    """Tests for _only_has_chemical_filters helper method."""
+
+    @pytest.fixture
+    def gateway(self):
+        mock_client = MagicMock()
+        return ElasticsearchStudyGateway(client=mock_client, config=None)
+
+    @pytest.fixture
+    def base_request(self) -> StudySearchInput:
+        return StudySearchInput(
+            query=None,
+            page=PageModel(current=1, size=25),
+            sort=None,
+            filters=[],
+            facets={},
+        )
+
+    def test_returns_true_for_only_database_identifiers(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        assert gateway._only_has_chemical_filters(base_request) is True
+
+    def test_returns_true_for_only_metabolite_identifications(self, gateway, base_request):
+        base_request.metabolite_identifications = ["Aspirin"]
+        assert gateway._only_has_chemical_filters(base_request) is True
+
+    def test_returns_false_when_text_query_present(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.query = "lipidomics"
+        assert gateway._only_has_chemical_filters(base_request) is False
+
+    def test_returns_false_when_facet_filters_present(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.filters = [
+            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
+        ]
+        assert gateway._only_has_chemical_filters(base_request) is False
+
+    def test_returns_false_when_study_ids_already_set(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.study_ids = ["MTBLS1"]  # Pre-existing study_ids filter
+        assert gateway._only_has_chemical_filters(base_request) is False
+
+    def test_returns_false_for_no_filters_at_all(self, gateway, base_request):
+        assert gateway._only_has_chemical_filters(base_request) is False
+
+    def test_returns_false_for_whitespace_query(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.query = "   "  # Whitespace only should be ignored
+        assert gateway._only_has_chemical_filters(base_request) is True
+
+    def test_returns_false_for_empty_facet_filters(self, gateway, base_request):
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.filters = [
+            FilterModel(field="organisms", values=[], operator="any")  # Empty values
+        ]
+        assert gateway._only_has_chemical_filters(base_request) is True
+
+
 class TestResolveChemicalFilters:
     """Tests for _resolve_chemical_filters method."""
 
@@ -536,11 +595,12 @@ class TestSearchWithChemicalFilters:
         mock_assignment_gateway.find_study_ids_by_compounds.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_search_with_chemical_filters_returns_all_study_ids_when_requested(
+    async def test_search_with_chemical_filters_and_text_query_fetches_all_ids_from_es(
         self, mock_client, mock_assignment_gateway, gateway, base_request
     ):
-        """Test that all_study_ids is populated when using chemical filters with include_all_ids=True."""
+        """Test that all_study_ids query runs when chemical filters are combined with text query."""
         base_request.database_identifiers = ["HMDB0031111"]
+        base_request.query = "lipidomics"  # Additional text query requires ES lookup
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
             "MTBLS1",
             "MTBLS2",
@@ -549,30 +609,29 @@ class TestSearchWithChemicalFilters:
         mock_client.search.side_effect = [
             # First call: main search
             {
-                "hits": {"hits": [{"_source": {"studyId": "MTBLS1"}}], "total": {"value": 3}},
+                "hits": {"hits": [{"_source": {"studyId": "MTBLS1"}}], "total": {"value": 2}},
                 "aggregations": {},
             },
-            # Second call: all IDs query
+            # Second call: all IDs query (needed because text query filters further)
             {
                 "hits": {"hits": [
                     {"_source": {"studyId": "MTBLS1"}},
                     {"_source": {"studyId": "MTBLS2"}},
-                    {"_source": {"studyId": "MTBLS3"}},
                 ]},
             },
         ]
 
         result = await gateway.search(base_request, include_all_ids=True)
 
-        # Should be called twice (main search + IDs query)
+        # Should be called twice (main search + IDs query) because text query may filter further
         assert mock_client.search.call_count == 2
-        assert result.all_study_ids == ["MTBLS1", "MTBLS2", "MTBLS3"]
+        assert result.all_study_ids == ["MTBLS1", "MTBLS2"]
 
     @pytest.mark.asyncio
-    async def test_search_with_only_chemical_filters_returns_all_study_ids(
+    async def test_search_with_only_chemical_filters_skips_all_ids_query(
         self, mock_client, mock_assignment_gateway, gateway, base_request
     ):
-        """Regression test: all_study_ids should be populated even when only chemical filters are used (no text query or facet filters)."""
+        """Optimization: when only chemical filters are used, reuse assignment lookup results for all_study_ids."""
         # Only chemical filters, no text query or filters
         base_request.database_identifiers = ["HMDB0031111"]
         base_request.query = None
@@ -582,26 +641,51 @@ class TestSearchWithChemicalFilters:
             "MTBLS10",
             "MTBLS20",
         ]
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 2}},
+            "aggregations": {},
+        }
+
+        result = await gateway.search(base_request, include_all_ids=True)
+
+        # Should only be called ONCE - the all_ids query is skipped
+        # because we can reuse the assignment lookup results
+        assert mock_client.search.call_count == 1
+        assert result.all_study_ids == ["MTBLS10", "MTBLS20"]
+
+    @pytest.mark.asyncio
+    async def test_search_with_chemical_filters_and_facets_fetches_all_ids_from_es(
+        self, mock_client, mock_assignment_gateway, gateway, base_request
+    ):
+        """Test that all_study_ids query runs when chemical filters are combined with facet filters."""
+        base_request.database_identifiers = ["HMDB0031111"]
+        base_request.filters = [
+            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
+        ]
+        mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
+            "MTBLS1",
+            "MTBLS2",
+            "MTBLS3",
+        ]
         mock_client.search.side_effect = [
             # First call: main search
             {
-                "hits": {"hits": [], "total": {"value": 2}},
+                "hits": {"hits": [], "total": {"value": 1}},
                 "aggregations": {},
             },
-            # Second call: all IDs query
+            # Second call: all IDs query (needed because facet filters further)
             {
                 "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS10"}},
-                    {"_source": {"studyId": "MTBLS20"}},
+                    {"_source": {"studyId": "MTBLS1"}},
                 ]},
             },
         ]
 
         result = await gateway.search(base_request, include_all_ids=True)
 
-        # Should be called twice because study_ids from chemical filter resolution counts as a meaningful filter
+        # Should be called twice because facet filter may reduce results further
         assert mock_client.search.call_count == 2
-        assert result.all_study_ids == ["MTBLS10", "MTBLS20"]
+        assert result.all_study_ids == ["MTBLS1"]
 
 
 class TestBuildSearchPayloadWithStudyIds:

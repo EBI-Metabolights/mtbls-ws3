@@ -1,9 +1,12 @@
+import logging
 from typing import Any
 
 from mtbls.infrastructure.search.es.assignment.es_assignment_configuration import (
     AssignmentElasticSearchConfiguration,
 )
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
+
+logger = logging.getLogger(__name__)
 
 
 class ElasticsearchAssignmentGateway:
@@ -47,6 +50,14 @@ class ElasticsearchAssignmentGateway:
         if not database_identifiers and not metabolite_identifications:
             return []
 
+        logger.debug(
+            "Assignment lookup starting (db_ids=%s, met_ids=%s, db_op=%s, met_op=%s)",
+            len(database_identifiers or []),
+            len(metabolite_identifications or []),
+            database_identifiers_operator or "any",
+            metabolite_identifications_operator or "any",
+        )
+
         dsl = self._build_query(
             database_identifiers=database_identifiers or [],
             metabolite_identifications=metabolite_identifications or [],
@@ -60,6 +71,7 @@ class ElasticsearchAssignmentGateway:
             api_key_name=self.config.api_key_name,
         )
 
+        logger.debug("Assignment lookup completed")
         return self._extract_study_ids(es_resp)
 
     def _build_query(

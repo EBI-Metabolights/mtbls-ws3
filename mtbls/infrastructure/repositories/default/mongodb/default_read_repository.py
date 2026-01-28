@@ -31,10 +31,8 @@ class MongoDbDefaultReadRepository(
     ):
         cn = connection
         self.connection = connection
-        self.url = (
-            f"{cn.url_scheme}://{cn.user}:{cn.password}" + f"@{cn.host}:{cn.port}"
-        )
-        self.url_repr = f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}"
+        self.url = cn.build_uri(mask_password=False)
+        self.url_repr = cn.build_uri(mask_password=True)
         self.client = pymongo.MongoClient(self.url)
         self.db = self.client[cn.database]
         self.collection = self.db[collection_name]

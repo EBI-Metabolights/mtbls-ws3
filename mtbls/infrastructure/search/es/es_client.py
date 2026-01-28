@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, Dict, List, Optional
 
 from elasticsearch import ApiError, AsyncElasticsearch
@@ -146,7 +147,25 @@ class ElasticsearchClient:
         self, index, body: Dict[str, Any], api_key_name: Optional[str] = None
     ) -> Dict[str, Any]:
         client = await self._get_started_client(api_key_name)
-        return await client.search(index=index, body=body)
+        started = time.monotonic()
+        try:
+            return await client.search(index=index, body=body)
+        finally:
+            elapsed_ms = int((time.monotonic() - started) * 1000)
+            effective_key = api_key_name or self._effective_api_key_name(api_key_name)
+            logger.debug(
+                "Elasticsearch search completed in %sms (index=%s, api_key=%s)",
+                elapsed_ms,
+                index,
+                effective_key,
+            )
+            if elapsed_ms > 2000:
+                logger.debug(
+                    "Slow Elasticsearch search (>2s) details: index=%s api_key=%s body=%s",
+                    index,
+                    effective_key,
+                    body,
+                )
 
     # no current usecase for multiple search, but adding for completeness / the future.
     async def msearch(

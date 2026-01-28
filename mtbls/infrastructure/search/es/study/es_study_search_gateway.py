@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import uuid4
 
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
 
 # Maximum number of study IDs to return in all_study_ids
 ALL_IDS_MAX_SIZE = 100
+logger = logging.getLogger(__name__)
 
 
 class ElasticsearchStudyGateway(BaseElasticSearchGateway):
@@ -56,15 +58,28 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         raw: bool = False,
         include_all_ids: bool = False,
     ) -> IndexSearchResult | Dict[str, Any]:
+        # Track if we can reuse chemical filter study_ids for all_study_ids response
+        # (optimization to skip redundant ES query when only chemical filters are used)
+        chemical_filter_study_ids: Optional[List[str]] = None
+        had_chemical_filters = self._has_chemical_filters(query)
+
         # Resolve chemical filters to study IDs if present
         resolved_query = await self._resolve_chemical_filters(query)
 
+        # Capture the resolved study_ids if chemical filters were applied
+        if had_chemical_filters and resolved_query.study_ids:
+            # Filter out the sentinel value used for "no matches"
+            if resolved_query.study_ids != ["__NO_MATCHING_STUDIES__"]:
+                chemical_filter_study_ids = resolved_query.study_ids
+
         dsl = self._build_search_payload(resolved_query)
+        logger.debug("Study search main query starting")
         es_resp = await self._client.search(
             index=self.config.index_name,
             body=dsl,
             api_key_name=self.config.api_key_name,
         )
+        logger.debug("Study search main query completed")
 
         if raw:
             return es_resp
@@ -76,7 +91,18 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         # Fetch all matching study IDs if requested and there's a meaningful query/filter
         all_study_ids: Optional[List[str]] = None
         if include_all_ids and self._has_query_or_filters(resolved_query):
-            all_study_ids = await self._fetch_all_matching_ids(resolved_query)
+            # Optimization: if ONLY chemical filters were used (no text query, no facet filters),
+            # we can reuse the study_ids from assignment lookup instead of querying ES again
+            if chemical_filter_study_ids and self._only_has_chemical_filters(query):
+                logger.debug(
+                    "Study search all_ids query skipped - reusing %d IDs from assignment lookup",
+                    len(chemical_filter_study_ids),
+                )
+                all_study_ids = chemical_filter_study_ids[:ALL_IDS_MAX_SIZE]
+            else:
+                logger.debug("Study search all_ids query starting")
+                all_study_ids = await self._fetch_all_matching_ids(resolved_query)
+                logger.debug("Study search all_ids query completed")
 
         return IndexSearchResult(
             results=results,
@@ -94,6 +120,31 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             return True
         return False
 
+    def _only_has_chemical_filters(self, req: StudySearchInput) -> bool:
+        """
+        Check if the request ONLY has chemical filters - no text query and no facet filters.
+
+        When this is true and chemical filters resolved to study_ids, we can skip
+        the all_study_ids ES query and reuse the assignment lookup results directly.
+        """
+        # Has text query? Then we need ES to filter further
+        if req.query and req.query.strip():
+            return False
+
+        # Has facet filters with values? Then we need ES to filter further
+        if req.filters:
+            for f in req.filters:
+                if f.values:
+                    return False
+
+        # Has explicit study_ids constraint (not from chemical filter resolution)?
+        # This would mean intersection is needed
+        if req.study_ids:
+            return False
+
+        # Only chemical filters remain
+        return self._has_chemical_filters(req)
+
     async def _resolve_chemical_filters(self, req: StudySearchInput) -> StudySearchInput:
         """
         If chemical filters are present, query the assignment gateway to get matching study IDs,
@@ -109,12 +160,17 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             # No assignment gateway configured - skip chemical filter resolution
             return req
 
+        logger.debug("Study search assignment lookup starting")
         # Query assignment index for study IDs matching the chemical filters
         matching_study_ids = await self._assignment_gateway.find_study_ids_by_compounds(
             database_identifiers=req.database_identifiers,
             metabolite_identifications=req.metabolite_identifications,
             database_identifiers_operator=req.database_identifiers_operator,
             metabolite_identifications_operator=req.metabolite_identifications_operator,
+        )
+        logger.debug(
+            "Study search assignment lookup completed (matches=%s)",
+            len(matching_study_ids) if matching_study_ids is not None else 0,
         )
 
         if not matching_study_ids:
@@ -181,6 +237,26 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         for f in req.filters:
             if not f.values:
                 continue
+            spec = self._find_facet_spec(f.field)
+            # Range facets need to be mapped back to range queries (buckets are keyed by name or range key)
+            if spec and spec.get("type") == "range":
+                ranges = spec.get("ranges") or []
+                target_field = spec.get("field") or f.field
+                range_queries: List[Dict[str, Any]] = []
+                for v in f.values:
+                    rq = self._range_query_from_value(target_field, ranges, v)
+                    if rq:
+                        range_queries.append(rq)
+                if not range_queries:
+                    continue
+                if f.operator == "none":
+                    must_not.extend(range_queries)
+                elif f.operator == "any":
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
+                else:  # "all"
+                    filter_clauses.extend(range_queries)
+                continue
+
             field, nested_path = self._resolve_filter_field(f.field)
             if not field:
                 continue
@@ -309,6 +385,25 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         for f in req.filters:
             if not f.values:
                 continue
+            spec = self._find_facet_spec(f.field)
+            if spec and spec.get("type") == "range":
+                ranges = spec.get("ranges") or []
+                target_field = spec.get("field") or f.field
+                range_queries: List[Dict[str, Any]] = []
+                for v in f.values:
+                    rq = self._range_query_from_value(target_field, ranges, v)
+                    if rq:
+                        range_queries.append(rq)
+                if not range_queries:
+                    continue
+                if f.operator == "none":
+                    must_not.extend(range_queries)
+                elif f.operator == "any":
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
+                else:
+                    filter_clauses.extend(range_queries)
+                continue
+
             field, nested_path = self._resolve_filter_field(f.field)
             if not field:
                 continue
@@ -371,17 +466,23 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """
         Given a UI filter field, resolve it to an ES field path and whether it is nested.
         """
-        if field in STUDY_FACET_CONFIG:
-            spec = STUDY_FACET_CONFIG[field] or {}
+        spec = self._find_facet_spec(field)
+        if spec:
             return spec.get("field") or field, spec.get("nested_path")
+        return field, None
 
-        for _, spec in STUDY_FACET_CONFIG.items():
+    @staticmethod
+    def _find_facet_spec(field: str, facet_config: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
+        """Return the facet spec for a given UI field or underlying field."""
+        config = facet_config or STUDY_FACET_CONFIG
+        if field in config:
+            return config[field] or {}
+        for _, spec in config.items():
             if not spec:
                 continue
             if spec.get("field") == field:
-                return field, spec.get("nested_path")
-
-        return field, None
+                return spec
+        return None
 
     def _build_filter_clause(
         self, field: str, values: List[Any], nested_path: str | None, operator: str
@@ -503,6 +604,18 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         if "to" in r and r["to"] is not None:
             q["range"][field]["lte"] = r["to"]
         return q
+
+    @staticmethod
+    def _range_query_from_value(field: str, ranges: List[Dict[str, Any]], value: Any) -> Dict[str, Any] | None:
+        """
+        Map a selected bucket name back to its range query.
+        Matches either the explicit 'name' or the derived _range_key form.
+        """
+        for r in ranges:
+            name = r.get("name")
+            if value == name or value == BaseElasticSearchGateway._range_key(r):
+                return BaseElasticSearchGateway._range_query(field, r)
+        return None
 
     def _map_aggs_to_searchui(self, aggs: Dict[str, Any], config: Dict[str, Any] | None = None) -> Dict[str, Any]:
         out: Dict[str, Any] = {}

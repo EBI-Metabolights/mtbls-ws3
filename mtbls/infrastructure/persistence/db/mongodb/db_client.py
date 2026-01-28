@@ -22,23 +22,8 @@ class MongoDatabaseClientImpl(DocumentDatabaseClient):
             self.db_connection = MongoDbConnection.model_validate(db_connection)
         cn = self.db_connection
 
-        auth_part = ""
-        auth_part_repr = ""
-        if cn.user and cn.password:
-            auth_part = f"{cn.user}:{cn.password}@"
-            auth_part_repr = f"{cn.user}:***@"
-
-        host_port = f"{cn.host}:{cn.port}" if cn.port and cn.port > 0 else cn.host
-        db_suffix = f"/{cn.database}" if cn.database else ""
-        query_params = []
-        if cn.auth_source:
-            query_params.append(f"authSource={cn.auth_source}")
-        query_suffix = f"?{'&'.join(query_params)}" if query_params else ""
-
-        self.db_url = f"{cn.url_scheme}://{auth_part}{host_port}{db_suffix}{query_suffix}"
-        self.db_url_repr = (
-            f"{cn.url_scheme}://{auth_part_repr}{host_port}{db_suffix}{query_suffix}"
-        )
+        self.db_url = cn.build_uri(mask_password=False)
+        self.db_url_repr = cn.build_uri(mask_password=True)
         self.database_name = cn.database
 
     async def get_connection_repr(self) -> str:
