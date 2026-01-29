@@ -465,6 +465,8 @@ async def process_mhd_study(
                     profile_uri,
                     announcement_file_schema_uri,
                     announcement_file_profile_uri,
+                    mhd_filename=f"{resource_id}.mhd.json",
+                    annoucement_filename=f"{resource_id}.announcement.json",
                     config=mtbls2mhd_config,
                 )
             else:
@@ -526,16 +528,14 @@ async def validate_mhd_study(
         target_mhd_model_schema_uri=schema_uri, target_mhd_model_profile_uri=profile_uri
     )
     if not mhd_output_root_path:
-        mhd_output_root_path = Path(f"/tmp/mhd-validation/{resource_id}")
+        timestamp = int(datetime.datetime.now().timestamp())
+        mhd_output_root_path = Path(f"/tmp/mhd-validation/{resource_id}/{timestamp}")
     mhd_output_root_path.mkdir(exist_ok=True, parents=True)
-    timestamp = int(datetime.datetime.now().timestamp())
-    mhd_accession_file_prefix = mhd_accession or resource_id or ""
+    mhd_accession_file_prefix = mhd_accession or resource_id
     if not mhd_filename:
-        mhd_filename = f"{mhd_accession_file_prefix}-{timestamp}.mhd.json"
+        mhd_filename = f"{mhd_accession_file_prefix}.mhd.json"
     if not annoucement_filename:
-        annoucement_filename = (
-            f"{mhd_accession_file_prefix}-{timestamp}.announcement.json"
-        )
+        annoucement_filename = f"{mhd_accession_file_prefix}.announcement.json"
     announcement_file_path = mhd_output_root_path / annoucement_filename
     mhd_file_path = mhd_output_root_path / mhd_filename
 
