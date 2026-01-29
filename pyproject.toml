@@ -22,8 +22,8 @@ dependencies = [
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",
-    "mhd-model>=0.1.40",
-    "mtbls-mhd-integration>=0.0.11",
+    "mhd-model>=0.1.41",
+    "mtbls-mhd-integration>=0.0.12",
     "psycopg[binary,pool]>=3.3.2",
 ]
 
@@ -66,10 +66,7 @@ docs = [
 ]
 
 [tool.uv]
-default-groups = [
-    "dev",
-    "test",
-]
+default-groups = []
 
 [project.scripts]
 mtbls-tool = "mtbls.run.cli.main:mtbls_tool"
