@@ -1,15 +1,17 @@
-from typing import Any
-
 import pytest
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.domain.domain_services.modifier.assay_modifier import AssayFileModifier
+from mtbls.domain.entities.validation.validation_configuration import (
+    FileTemplates,
+    ValidationControls,
+)
 
 
 @pytest.fixture(scope="function")
 def modifier(
-    templates: dict[str, Any],
-    control_lists: dict[str, Any],
+    templates: FileTemplates,
+    control_lists: ValidationControls,
     ms_metabolights_model: MetabolightsStudyModel,
 ) -> AssayFileModifier:
     assays = ms_metabolights_model.investigation.studies[0].study_assays.assays
