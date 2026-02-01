@@ -1,8 +1,10 @@
+import json
 from logging import getLogger
 from typing import Annotated, Any
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Depends, Query, Response, status
+from fastapi.responses import StreamingResponse
 
 from mtbls.domain.entities.search.index_search import (
     IndexSearchResult,
@@ -90,3 +92,42 @@ async def get_study_index_mapping(
 ):
     mapping = await elasticsearch_study_search_service.get_index_mapping()
     return APIResponse[Any](content=mapping)
+
+
+@router.post(
+    "/search/export",
+    summary="Export study search results as JSON.",
+    description=(
+        "Streams all matching study documents (up to 10,000) as a JSON array. "
+        "Uses the same query and filter logic as the search endpoint."
+    ),
+    responses={
+        200: {
+            "content": {"application/json": {}},
+            "description": "JSON file containing all matching study documents.",
+        }
+    },
+)
+@inject
+async def export_study_search(
+    q: Annotated[StudySearchInput, Body()],
+    elasticsearch_study_search_service=Depends(
+        Provide["gateways.elasticsearch_study_gateway"]
+    ),
+):
+    async def generate():
+        metadata = q.model_dump(exclude_none=True)
+        yield '{"metadata":' + json.dumps(metadata) + ',"results":['
+        first = True
+        async for item in elasticsearch_study_search_service.export_results(query=q):
+            if not first:
+                yield ","
+            yield json.dumps(item)
+            first = False
+        yield "]}"
+
+    return StreamingResponse(
+        generate(),
+        media_type="application/json",
+        headers={"Content-Disposition": 'attachment; filename="study-export.json"'},
+    )

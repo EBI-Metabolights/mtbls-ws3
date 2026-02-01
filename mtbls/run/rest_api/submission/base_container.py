@@ -74,6 +74,9 @@ from mtbls.infrastructure.repositories.user.db.user_write_repository import (
 from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
     ElasticsearchAssignmentGateway,
 )
+from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
+    ElasticsearchAssayGateway,
+)
 from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import ElasticsearchCompoundGateway
 from mtbls.infrastructure.search.es.es_client import (
     ElasticsearchClient,
@@ -138,12 +141,19 @@ class GatewaysContainer(containers.DeclarativeContainer):
         config=None,
     )
 
+    elasticsearch_assay_gateway = providers.Singleton(
+        ElasticsearchAssayGateway,
+        client=elasticsearch_client,
+        config=None,
+    )
+
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
         client=elasticsearch_client,
         config=None,  # rely on default gateway config; adjust
         # if custom search settings are added
         assignment_gateway=elasticsearch_assignment_gateway,
+        assay_gateway=elasticsearch_assay_gateway,
     )
 
     mongodb_connection: MongoDbConnection = providers.Resource(

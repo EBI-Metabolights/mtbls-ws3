@@ -233,3 +233,123 @@ class TestBuildSearchPayloadIntegration:
         # Check study filter
         bool_query = payload["query"]["bool"]
         assert {"terms": {"studyIds": ["MTBLS1", "MTBLS2", "MTBLS3"]}} in bool_query["filter"]
+
+
+class TestExportResults:
+    """Tests for the export_results async generator."""
+
+    @pytest.fixture
+    def mock_client(self):
+        client = MagicMock()
+        client.search = AsyncMock()
+        return client
+
+    @pytest.fixture
+    def gateway(self, mock_client):
+        return ElasticsearchCompoundGateway(client=mock_client, config=None)
+
+    @pytest.fixture
+    def base_request(self) -> CompoundSearchInput:
+        return CompoundSearchInput(
+            query=None,
+            page=PageModel(current=1, size=25),
+            sort=None,
+            filters=[],
+            facets={},
+        )
+
+    @pytest.mark.asyncio
+    async def test_export_yields_all_hits(self, mock_client, gateway, base_request):
+        mock_client.search.side_effect = [
+            {
+                "hits": {
+                    "hits": [
+                        {"_source": {"id": "MTBLC1", "name": "Aspirin"}, "sort": ["1"]},
+                        {"_source": {"id": "MTBLC2", "name": "Caffeine"}, "sort": ["2"]},
+                    ],
+                    "total": {"value": 2},
+                },
+            },
+            {
+                "hits": {"hits": [], "total": {"value": 2}},
+            },
+        ]
+
+        results = []
+        async for item in gateway.export_results(base_request):
+            results.append(item)
+
+        assert len(results) == 2
+        assert results[0]["name"] == "Aspirin"
+
+    @pytest.mark.asyncio
+    async def test_export_pages_with_search_after(self, mock_client, gateway, base_request):
+        mock_client.search.side_effect = [
+            {
+                "hits": {
+                    "hits": [{"_source": {"id": "MTBLC1"}, "sort": ["a"]}],
+                    "total": {"value": 2},
+                },
+            },
+            {
+                "hits": {
+                    "hits": [{"_source": {"id": "MTBLC2"}, "sort": ["b"]}],
+                    "total": {"value": 2},
+                },
+            },
+            {"hits": {"hits": [], "total": {"value": 2}}},
+        ]
+
+        results = []
+        async for item in gateway.export_results(base_request, batch_size=1):
+            results.append(item)
+
+        assert len(results) == 2
+        assert mock_client.search.call_count == 3
+
+    @pytest.mark.asyncio
+    async def test_export_respects_max_results(self, mock_client, gateway, base_request):
+        mock_client.search.return_value = {
+            "hits": {
+                "hits": [
+                    {"_source": {"id": f"MTBLC{i}"}, "sort": [str(i)]}
+                    for i in range(5)
+                ],
+                "total": {"value": 100},
+            },
+        }
+
+        results = []
+        async for item in gateway.export_results(base_request, max_results=3):
+            results.append(item)
+
+        assert len(results) == 3
+
+    @pytest.mark.asyncio
+    async def test_export_strips_aggs_and_pagination(self, mock_client, gateway, base_request):
+        base_request.query = "aspirin"
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 0}},
+        }
+
+        async for _ in gateway.export_results(base_request):
+            pass
+
+        call_body = mock_client.search.call_args.kwargs["body"]
+        assert "aggs" not in call_body
+        assert "from" not in call_body
+        assert call_body["sort"] == [{"_doc": "asc"}]
+        assert "_source" not in call_body
+
+    @pytest.mark.asyncio
+    async def test_export_stops_on_empty_hits(self, mock_client, gateway, base_request):
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 0}},
+        }
+
+        results = []
+        async for item in gateway.export_results(base_request):
+            results.append(item)
+
+        assert len(results) == 0
+        assert mock_client.search.call_count == 1

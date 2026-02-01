@@ -84,9 +84,49 @@ class CompoundSearchInput(IndexSearchInput):
     ]
 
 
+class MSFilters(BaseModel):
+    """Mass spectrometry assay filters for cross-index querying against the assay index."""
+
+    column_type: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter by column type values (e.g., ['reverse phase']).",
+        ),
+    ]
+    chromatography_instrument: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter by chromatography instrument (e.g., ['Waters ACQUITY UPLC system']).",
+        ),
+    ]
+    instrument: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter by instrument (e.g., ['Q Exactive']).",
+        ),
+    ]
+    operator: Annotated[
+        Optional[Literal["and", "or"]],
+        Field(
+            default="and",
+            description="Operator across filter fields: 'and' requires all fields to match, 'or' requires any.",
+        ),
+    ]
+
+
 class StudySearchInput(IndexSearchInput):
     """Search input for study search with study-specific filters."""
 
+    ms: Annotated[
+        Optional[MSFilters],
+        Field(
+            default=None,
+            description="Mass spectrometry assay filters. Queries the assay index to resolve matching study IDs.",
+        ),
+    ]
     database_identifiers: Annotated[
         Optional[List[str]],
         Field(

@@ -1,4 +1,6 @@
+import logging
 import re
+from collections.abc import AsyncIterator
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
@@ -9,6 +11,12 @@ from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 # Pattern to detect MetaboLights study IDs in query strings
 MTBLS_STUDY_ID_PATTERN = re.compile(r"^MTBLS\d+$", re.IGNORECASE)
+
+logger = logging.getLogger(__name__)
+
+# Export defaults
+EXPORT_MAX_RESULTS = 10_000
+EXPORT_BATCH_SIZE = 500
 
 
 
@@ -83,6 +91,53 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             requestId=str(uuid4()),  # useless currently
         )
 
+    async def export_results(
+        self,
+        query: CompoundSearchInput,
+        max_results: int = EXPORT_MAX_RESULTS,
+        batch_size: int = EXPORT_BATCH_SIZE,
+    ) -> AsyncIterator[Dict[str, Any]]:
+        """
+        Yield all matching compound documents using search_after pagination.
+        """
+        dsl = self._build_search_payload(query)
+        dsl.pop("aggs", None)
+        dsl.pop("from", None)
+        dsl.pop("_source", None)
+        dsl["size"] = min(batch_size, max_results)
+        dsl["sort"] = [{"_doc": "asc"}]
+        dsl["track_total_hits"] = True
+        dsl["timeout"] = "30s"
+
+        yielded = 0
+        search_after = None
+
+        while yielded < max_results:
+            if search_after is not None:
+                dsl["search_after"] = search_after
+
+            remaining = max_results - yielded
+            dsl["size"] = min(batch_size, remaining)
+
+            es_resp = await self._client.search(
+                index=self.config.index_name,
+                body=dsl,
+                api_key_name=self.config.api_key_name,
+            )
+
+            hits = es_resp.get("hits", {}).get("hits", [])
+            if not hits:
+                break
+
+            for hit in hits:
+                yield self._map_hit(hit)
+                yielded += 1
+                if yielded >= max_results:
+                    break
+
+            search_after = hits[-1].get("sort")
+            if not search_after:
+                break
 
     def _build_search_payload(self, req: CompoundSearchInput) -> Dict[str, Any]:
         """Builds the Elasticsearch DSL query payload.

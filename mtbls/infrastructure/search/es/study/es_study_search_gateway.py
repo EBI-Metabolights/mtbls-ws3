@@ -1,4 +1,5 @@
 import logging
+from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import uuid4
 
@@ -17,9 +18,16 @@ if TYPE_CHECKING:
     from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
         ElasticsearchAssignmentGateway,
     )
+    from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
+        ElasticsearchAssayGateway,
+    )
 
 # Maximum number of study IDs to return in all_study_ids
 ALL_IDS_MAX_SIZE = 100
+
+# Export defaults
+EXPORT_MAX_RESULTS = 10_000
+EXPORT_BATCH_SIZE = 500
 logger = logging.getLogger(__name__)
 
 
@@ -29,10 +37,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         client: ElasticsearchClient,
         config: None | StudyElasticSearchConfiguration | dict[str, Any],
         assignment_gateway: Optional["ElasticsearchAssignmentGateway"] = None,
+        assay_gateway: Optional["ElasticsearchAssayGateway"] = None,
     ):
         self._client = client
         self._config = config
         self._assignment_gateway = assignment_gateway
+        self._assay_gateway = assay_gateway
         if not self._config:
             self._config = StudyElasticSearchConfiguration()
         elif isinstance(self._config, dict):
@@ -58,16 +68,20 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         raw: bool = False,
         include_all_ids: bool = False,
     ) -> IndexSearchResult | Dict[str, Any]:
-        # Track if we can reuse chemical filter study_ids for all_study_ids response
-        # (optimization to skip redundant ES query when only chemical filters are used)
+        # Track if we can reuse cross-index filter study_ids for all_study_ids response
+        # (optimization to skip redundant ES query when only cross-index filters are used)
         chemical_filter_study_ids: Optional[List[str]] = None
         had_chemical_filters = self._has_chemical_filters(query)
+        had_assay_filters = self._has_assay_filters(query)
 
         # Resolve chemical filters to study IDs if present
         resolved_query = await self._resolve_chemical_filters(query)
 
-        # Capture the resolved study_ids if chemical filters were applied
-        if had_chemical_filters and resolved_query.study_ids:
+        # Resolve assay filters to study IDs if present
+        resolved_query = await self._resolve_assay_filters(resolved_query)
+
+        # Capture the resolved study_ids if cross-index filters were applied
+        if (had_chemical_filters or had_assay_filters) and resolved_query.study_ids:
             # Filter out the sentinel value used for "no matches"
             if resolved_query.study_ids != ["__NO_MATCHING_STUDIES__"]:
                 chemical_filter_study_ids = resolved_query.study_ids
@@ -93,7 +107,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         if include_all_ids and self._has_query_or_filters(resolved_query):
             # Optimization: if ONLY chemical filters were used (no text query, no facet filters),
             # we can reuse the study_ids from assignment lookup instead of querying ES again
-            if chemical_filter_study_ids and self._only_has_chemical_filters(query):
+            if chemical_filter_study_ids and self._only_has_cross_index_filters(query):
                 logger.debug(
                     "Study search all_ids query skipped - reusing %d IDs from assignment lookup",
                     len(chemical_filter_study_ids),
@@ -112,6 +126,61 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             all_study_ids=all_study_ids,
         )
 
+    async def export_results(
+        self,
+        query: StudySearchInput,
+        max_results: int = EXPORT_MAX_RESULTS,
+        batch_size: int = EXPORT_BATCH_SIZE,
+    ) -> AsyncIterator[Dict[str, Any]]:
+        """
+        Yield all matching study documents using search_after pagination.
+
+        Resolves cross-index filters (chemical, assay) first, then pages through
+        the study index in batches. Yields individual hit _source dicts.
+        """
+        resolved_query = await self._resolve_chemical_filters(query)
+        resolved_query = await self._resolve_assay_filters(resolved_query)
+
+        # Build the query/filter part from the normal search payload, then adapt
+        dsl = self._build_search_payload(resolved_query)
+        dsl.pop("aggs", None)
+        dsl.pop("from", None)
+        dsl.pop("_source", None)
+        dsl["size"] = min(batch_size, max_results)
+        dsl["sort"] = [{"_doc": "asc"}]
+        dsl["track_total_hits"] = True
+        dsl["timeout"] = "30s"
+
+        yielded = 0
+        search_after = None
+
+        while yielded < max_results:
+            if search_after is not None:
+                dsl["search_after"] = search_after
+
+            remaining = max_results - yielded
+            dsl["size"] = min(batch_size, remaining)
+
+            es_resp = await self._client.search(
+                index=self.config.index_name,
+                body=dsl,
+                api_key_name=self.config.api_key_name,
+            )
+
+            hits = es_resp.get("hits", {}).get("hits", [])
+            if not hits:
+                break
+
+            for hit in hits:
+                yield self._map_hit(hit)
+                yielded += 1
+                if yielded >= max_results:
+                    break
+
+            search_after = hits[-1].get("sort")
+            if not search_after:
+                break
+
     def _has_chemical_filters(self, req: StudySearchInput) -> bool:
         """Check if the request has chemical filters (database identifiers or metabolite identifications)."""
         if req.database_identifiers:
@@ -120,12 +189,13 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             return True
         return False
 
-    def _only_has_chemical_filters(self, req: StudySearchInput) -> bool:
+    def _only_has_cross_index_filters(self, req: StudySearchInput) -> bool:
         """
-        Check if the request ONLY has chemical filters - no text query and no facet filters.
+        Check if the request ONLY has cross-index filters (chemical and/or assay) -
+        no text query and no facet filters.
 
-        When this is true and chemical filters resolved to study_ids, we can skip
-        the all_study_ids ES query and reuse the assignment lookup results directly.
+        When this is true and cross-index filters resolved to study_ids, we can skip
+        the all_study_ids ES query and reuse the resolved results directly.
         """
         # Has text query? Then we need ES to filter further
         if req.query and req.query.strip():
@@ -137,13 +207,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 if f.values:
                     return False
 
-        # Has explicit study_ids constraint (not from chemical filter resolution)?
-        # This would mean intersection is needed
+        # Has explicit study_ids constraint (not from cross-index filter resolution)?
         if req.study_ids:
             return False
 
-        # Only chemical filters remain
-        return self._has_chemical_filters(req)
+        # Only cross-index filters remain
+        return self._has_chemical_filters(req) or self._has_assay_filters(req)
 
     async def _resolve_chemical_filters(self, req: StudySearchInput) -> StudySearchInput:
         """
@@ -200,6 +269,66 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 "study_ids": combined_study_ids,
                 "database_identifiers": None,  # Already resolved
                 "metabolite_identifications": None,  # Already resolved
+            }
+        )
+
+    def _has_assay_filters(self, req: StudySearchInput) -> bool:
+        """Check if the request has MS assay filters."""
+        if not req.ms:
+            return False
+        return bool(req.ms.column_type or req.ms.chromatography_instrument or req.ms.instrument)
+
+    async def _resolve_assay_filters(self, req: StudySearchInput) -> StudySearchInput:
+        """
+        If assay filters are present, query the assay gateway to get matching study IDs,
+        then intersect with any existing study_ids on the request.
+        """
+        if not self._has_assay_filters(req):
+            return req
+
+        if not self._assay_gateway:
+            return req
+
+        ms = req.ms
+        ms_filters: dict[str, list[str]] = {}
+        if ms.column_type:
+            ms_filters["column_type"] = ms.column_type
+        if ms.chromatography_instrument:
+            ms_filters["chromatography_instrument"] = ms.chromatography_instrument
+        if ms.instrument:
+            ms_filters["instrument"] = ms.instrument
+
+        logger.debug("Study search assay lookup starting")
+        matching_study_ids = await self._assay_gateway.find_study_ids_by_assay_filters(
+            ms_filters=ms_filters,
+            operator=ms.operator or "and",
+        )
+        logger.debug(
+            "Study search assay lookup completed (matches=%s)",
+            len(matching_study_ids) if matching_study_ids is not None else 0,
+        )
+
+        if not matching_study_ids:
+            return req.model_copy(
+                update={
+                    "study_ids": ["__NO_MATCHING_STUDIES__"],
+                    "ms": None,
+                }
+            )
+
+        # Combine with any existing study_ids (e.g. from chemical filter resolution)
+        if req.study_ids:
+            existing_set = set(req.study_ids)
+            combined = [sid for sid in matching_study_ids if sid in existing_set]
+            if not combined:
+                combined = ["__NO_MATCHING_STUDIES__"]
+        else:
+            combined = matching_study_ids
+
+        return req.model_copy(
+            update={
+                "study_ids": combined,
+                "ms": None,
             }
         )
 
