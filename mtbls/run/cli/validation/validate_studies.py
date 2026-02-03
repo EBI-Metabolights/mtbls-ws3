@@ -12,7 +12,10 @@ from mtbls.application.context.request_tracker import (
     RequestTrackerModel,
     get_request_tracker,
 )
+from mtbls.application.remote_tasks.common import run_validation
 from mtbls.application.remote_tasks.common.run_validation import (
+    create_validation_run_configuration,
+    process_mhd_study,
     validate_by_policy_service,
 )
 from mtbls.application.services.interfaces.policy_service import PolicyService
@@ -54,13 +57,13 @@ from mtbls.run.config_utils import set_application_configuration
 @click.option(
     "--config-file",
     "-c",
-    default="config.yaml",
+    default="mtbls-ws-config.yaml",
     help="Local config path.",
 )
 @click.option(
     "--secrets-file",
     "-s",
-    default="config-secrets.yaml",
+    default=".mtbls-ws-config-secrets/.secrets.yaml",
     help="config secrets file path.",
 )
 @click.option(
@@ -89,6 +92,7 @@ def run_validation_cli(
         click.echo("Configuration error")
         exit(1)
     container.init_resources()
+    container.wire(modules=[run_validation.__name__])
     policy_service: PolicyService = container.services.policy_service()
 
     study_read_repository: StudyReadRepository = (
@@ -96,6 +100,9 @@ def run_validation_cli(
     )
     internal_files_object_repository: FileObjectReadRepository = (
         container.repositories.internal_files_object_repository()
+    )
+    user_read_repository: UserReadRepository = (
+        container.repositories.user_read_repository()
     )
     Path(validation_reports_root_path).mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger(__name__)
@@ -119,6 +126,7 @@ def run_validation_cli(
             summary_file=Path(summary_file),
             policy_service=policy_service,
             study_read_repository=study_read_repository,
+            user_read_repository=user_read_repository,
             internal_files_object_repository=internal_files_object_repository,
         )
     )
@@ -218,7 +226,7 @@ async def run_validation_and_save_report(
     internal_files_object_repository: FileObjectReadRepository,
 ) -> PolicySummaryResult:
     logger = logging.getLogger(__name__)
-    resource_id = "MTBLS1"
+    resource_id = "REQ202602023000268"
     study = await study_read_repository.get_study_by_accession(resource_id)
     resource_ids = [(study.accession_number, study.release_date, study.status)]
     # resource_ids = await study_read_repository.select_fields(
@@ -311,6 +319,18 @@ async def run_validation_and_save_report(
                     policy_service=policy_service,
                 )
 
+                validation_run_configuration = (
+                    await create_validation_run_configuration(resource_id)
+                )
+
+                await process_mhd_study(
+                    result,
+                    resource_id=resource_id,
+                    model=updated_model,
+                    policy_service=policy_service,
+                    internal_files_object_repository=internal_files_object_repository,
+                    validation_run_configuration=validation_run_configuration,
+                )
                 result_list.results.append(result)
                 summary_result: PolicySummaryResult = await convert_to_summary_result(
                     resource_id=resource_id, result_list=result_list
@@ -431,6 +451,8 @@ async def modify_model(
 
 
 if __name__ == "__main__":
-    study_root_path = "/nfs/public/rw/metabolomics/prod/data/studies/metadata-files"
-    # run_validation_cli([study_root_path])
-    create_study_model_task([study_root_path, "MTBLS1", "model_MTBLS1_base.json"])
+    study_root_path = "/nfs/public/rw/metabolomics/test/data/studies/metadata-files"
+    run_validation_cli([study_root_path])
+    # create_study_model_task(
+    #     [study_root_path, "MTBLS1", "model_MTBLS1base.json"]
+    # )

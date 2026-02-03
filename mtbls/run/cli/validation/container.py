@@ -14,6 +14,8 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
+from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -94,6 +96,13 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         http_client=gateways.http_client,
         observer=None,
     )
+    metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+        http_client=gateways.http_client,
+        observer=None,
+    )
 
 
 class MtblsCliServicesContainer(containers.DeclarativeContainer):
@@ -126,4 +135,9 @@ class MtblsCliApplicationContainer(containers.DeclarativeContainer):
 
     repositories = providers.Container(
         RepositoriesContainer, config=config, gateways=gateways
+    )
+    mhd_configuration: MhdConfiguration = providers.Resource(
+        create_config_from_dict,
+        MhdConfiguration,
+        config.run.common_worker.mhd,
     )

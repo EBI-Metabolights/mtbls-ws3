@@ -71,6 +71,7 @@ from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPha
 logger = logging.getLogger(__name__)
 
 
+@inject
 async def create_validation_run_configuration(
     resource_id: str,
     temp_folder: Union[None, str] = None,
