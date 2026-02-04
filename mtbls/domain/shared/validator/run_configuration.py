@@ -26,3 +26,4 @@ class ValidationRunConfiguration(BaseModel):
     mhd_configuration: MhdConfiguration = MhdConfiguration()
     metadata_files_root_path: None | str = None
     db_connection: None | DbConfiguration = None
+    assignmet_sheet_limit: None | int = None

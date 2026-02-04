@@ -119,16 +119,17 @@ async def create_validation_run_configuration(
             metadata_files_root_path=private_metadata_files_root_path,
             db_connection=DbConfiguration.model_validate(db_connection),
         )
-        if total_result_file_lines > 2000:
+        if total_result_file_lines > 4000:
             logger.warning(
-                "Validation result MAF file lines exceed the limit: %d > 2000. "
+                "Validation result MAF file lines exceed the limit: %d > 4000. "
                 "MAF file content validation PHASE3 will be skipped.",
                 total_result_file_lines,
             )
             validation_run_configuration.skip_result_file_modification = True
             validation_run_configuration.validation_phases = [
-                x for x in ValidationPhase if x != ValidationPhase.PHASE_3
+                x for x in ValidationPhase
             ]
+            validation_run_configuration.assignmet_sheet_limit = 100
         return validation_run_configuration
     except Exception as ex:
         logger.error(
@@ -298,7 +299,11 @@ async def run_validation_task(  # noqa: PLR0913
 
     try:
         logger.debug("Get MetaboLights validation input model.")
-        model = await get_input_data(metadata_service, phases)
+        model = await get_input_data(
+            metadata_service,
+            phases,
+            assignment_sheet_limit=validation_run_configuration.assignmet_sheet_limit,
+        )
         logger.debug("Validate using policy service.")
         policy_result = await validate_by_policy_service(
             resource_id,
@@ -911,6 +916,7 @@ def is_exceptional_term(
 async def get_input_data(
     metadata_service: StudyMetadataService,
     phases: list[ValidationPhase],
+    assignment_sheet_limit: None | int = None,
 ) -> MetabolightsStudyModel:
     phases.sort(key=lambda x: x.value)
     load_sample_file = False
@@ -933,4 +939,5 @@ async def get_input_data(
         load_maf_files=load_maf_files,
         load_folder_metadata=load_folder_metadata,
         load_db_metadata=load_db_metadata,
+        assignment_sheet_limit=assignment_sheet_limit,
     )

@@ -384,6 +384,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             study_read_repository=self.study_read_repository,
             user_read_repository=self.user_read_repository,
             internal_files_object_repository=self.internal_files_object_repository,
+            metadata_files_object_repository=self.metadata_files_object_repository,
             data_file_index_file_key="DATA_FILES/data_file_index.json",
         )
 

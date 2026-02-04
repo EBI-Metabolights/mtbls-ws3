@@ -104,6 +104,9 @@ def run_validation_cli(
     user_read_repository: UserReadRepository = (
         container.repositories.user_read_repository()
     )
+    metadata_files_object_repository: FileObjectReadRepository = (
+        container.repositories.metadata_files_object_repository()
+    )
     Path(validation_reports_root_path).mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger(__name__)
     logger.info("CLI container started")
@@ -128,6 +131,7 @@ def run_validation_cli(
             study_read_repository=study_read_repository,
             user_read_repository=user_read_repository,
             internal_files_object_repository=internal_files_object_repository,
+            metadata_files_object_repository=metadata_files_object_repository,
         )
     )
 
@@ -157,6 +161,9 @@ def create_study_model_task(
     internal_files_object_repository: FileObjectReadRepository = (
         container.repositories.internal_files_object_repository()
     )
+    metadata_files_object_repository: FileObjectReadRepository = (
+        container.repositories.metadata_files_object_repository()
+    )
     user_read_repository: UserReadRepository = (
         container.repositories.user_read_repository()
     )
@@ -181,6 +188,7 @@ def create_study_model_task(
             target_path=Path(target_path),
             study_read_repository=study_read_repository,
             internal_files_object_repository=internal_files_object_repository,
+            metadata_files_object_repository=metadata_files_object_repository,
             user_read_repository=user_read_repository,
         )
     )
@@ -193,11 +201,13 @@ async def create_model(
     study_read_repository: StudyReadRepository,
     user_read_repository: UserReadRepository,
     internal_files_object_repository: FileObjectReadRepository,
+    metadata_files_object_repository: FileObjectReadRepository,
 ):
     provider = DataFileIndexMetabolightsStudyProvider(
         resource_id=resource_id,
         data_file_index_file_key="DATA_FILES/data_file_index.json",
         internal_files_object_repository=internal_files_object_repository,
+        metadata_files_object_repository=metadata_files_object_repository,
         study_read_repository=study_read_repository,
         user_read_repository=user_read_repository,
     )
@@ -224,6 +234,7 @@ async def run_validation_and_save_report(
     study_read_repository: StudyReadRepository,
     user_read_repository: UserReadRepository,
     internal_files_object_repository: FileObjectReadRepository,
+    metadata_files_object_repository: FileObjectReadRepository,
 ) -> PolicySummaryResult:
     logger = logging.getLogger(__name__)
     resource_id = "REQ202602023000268"
@@ -241,6 +252,7 @@ async def run_validation_and_save_report(
         resource_id=resource_id,
         data_file_index_file_key="DATA_FILES/data_file_index.json",
         internal_files_object_repository=internal_files_object_repository,
+        metadata_files_object_repository=metadata_files_object_repository,
         study_read_repository=study_read_repository,
         user_read_repository=user_read_repository,
     )
