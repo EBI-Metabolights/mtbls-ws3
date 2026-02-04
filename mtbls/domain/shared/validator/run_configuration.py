@@ -14,3 +14,4 @@ class ValidationRunConfiguration(BaseModel):
     apply_modifiers: bool = True
     skip_result_file_modification: bool = False
     validation_phases: list[ValidationPhase] | None = ALL_VALIDATION_PHASES
+    assignmet_sheet_limit: None | int = None
