@@ -317,7 +317,7 @@ async def run_validation_and_save_report(
                     phases=[
                         ValidationPhase.PHASE_1,
                         ValidationPhase.PHASE_2,
-                        # ValidationPhase.PHASE_3,
+                        ValidationPhase.PHASE_3,
                         ValidationPhase.PHASE_4,
                     ],
                     connection=provider,
