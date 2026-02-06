@@ -1007,6 +1007,212 @@ class TestSearchWithAssayFilters:
         assert result.all_study_ids == ["MTBLS106", "MTBLS200"]
 
 
+class TestHasSampleFilters:
+    """Tests for _has_sample_filters helper method."""
+
+    @pytest.fixture
+    def gateway(self):
+        mock_client = MagicMock()
+        return ElasticsearchStudyGateway(client=mock_client, config=None)
+
+    @pytest.fixture
+    def base_request(self) -> StudySearchInput:
+        return StudySearchInput(
+            query=None,
+            page=PageModel(current=1, size=25),
+            sort=None,
+            filters=[],
+            facets={},
+        )
+
+    def test_returns_false_when_no_factor_header_names(self, gateway, base_request):
+        assert gateway._has_sample_filters(base_request) is False
+
+    def test_returns_false_when_empty_list(self, gateway, base_request):
+        base_request.factor_header_names = []
+        assert gateway._has_sample_filters(base_request) is False
+
+    def test_returns_true_when_factor_header_names_present(self, gateway, base_request):
+        base_request.factor_header_names = ["Batch"]
+        assert gateway._has_sample_filters(base_request) is True
+
+
+class TestResolveSampleFilters:
+    """Tests for _resolve_sample_filters method."""
+
+    @pytest.fixture
+    def mock_client(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def mock_sample_gateway(self):
+        gw = MagicMock()
+        gw.find_study_ids_by_factor_headers = AsyncMock()
+        return gw
+
+    @pytest.fixture
+    def gateway(self, mock_client, mock_sample_gateway):
+        return ElasticsearchStudyGateway(
+            client=mock_client, config=None, sample_gateway=mock_sample_gateway,
+        )
+
+    @pytest.fixture
+    def base_request(self) -> StudySearchInput:
+        return StudySearchInput(
+            query=None,
+            page=PageModel(current=1, size=25),
+            sort=None,
+            filters=[],
+            facets={},
+        )
+
+    @pytest.mark.asyncio
+    async def test_no_filters_returns_unchanged(self, gateway, mock_sample_gateway, base_request):
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result is base_request
+        mock_sample_gateway.find_study_ids_by_factor_headers.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_resolves_to_study_ids(self, gateway, mock_sample_gateway, base_request):
+        base_request.factor_header_names = ["Batch"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79", "MTBLS100"]
+
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result.study_ids == ["MTBLS79", "MTBLS100"]
+        assert result.factor_header_names is None
+
+    @pytest.mark.asyncio
+    async def test_no_matches_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
+        base_request.factor_header_names = ["NONEXISTENT"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = []
+
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
+
+    @pytest.mark.asyncio
+    async def test_intersects_with_existing_study_ids(self, gateway, mock_sample_gateway, base_request):
+        base_request.factor_header_names = ["Batch"]
+        base_request.study_ids = ["MTBLS79", "MTBLS200"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79", "MTBLS100"]
+
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result.study_ids == ["MTBLS79"]
+
+    @pytest.mark.asyncio
+    async def test_empty_intersection_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
+        base_request.factor_header_names = ["Batch"]
+        base_request.study_ids = ["MTBLS999"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79"]
+
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
+
+    @pytest.mark.asyncio
+    async def test_passes_operator_to_sample_gateway(self, gateway, mock_sample_gateway, base_request):
+        base_request.factor_header_names = ["Batch", "Gender"]
+        base_request.factor_header_names_operator = "or"
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS1"]
+
+        await gateway._resolve_sample_filters(base_request)
+
+        mock_sample_gateway.find_study_ids_by_factor_headers.assert_called_once_with(
+            values=["Batch", "Gender"],
+            operator="or",
+        )
+
+    @pytest.mark.asyncio
+    async def test_no_sample_gateway_returns_unchanged(self, mock_client, base_request):
+        gateway = ElasticsearchStudyGateway(client=mock_client, config=None)
+        base_request.factor_header_names = ["Batch"]
+
+        result = await gateway._resolve_sample_filters(base_request)
+
+        assert result is base_request
+
+
+class TestSearchWithSampleFilters:
+    """Integration tests for search with sample filters."""
+
+    @pytest.fixture
+    def mock_client(self):
+        client = MagicMock()
+        client.search = AsyncMock()
+        return client
+
+    @pytest.fixture
+    def mock_sample_gateway(self):
+        gw = MagicMock()
+        gw.find_study_ids_by_factor_headers = AsyncMock()
+        return gw
+
+    @pytest.fixture
+    def gateway(self, mock_client, mock_sample_gateway):
+        return ElasticsearchStudyGateway(
+            client=mock_client, config=None, sample_gateway=mock_sample_gateway,
+        )
+
+    @pytest.fixture
+    def base_request(self) -> StudySearchInput:
+        return StudySearchInput(
+            query=None,
+            page=PageModel(current=1, size=25),
+            sort=None,
+            filters=[],
+            facets={},
+        )
+
+    @pytest.mark.asyncio
+    async def test_search_with_factor_filters_calls_sample_gateway(
+        self, mock_client, mock_sample_gateway, gateway, base_request
+    ):
+        base_request.factor_header_names = ["Batch"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79"]
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 0}},
+            "aggregations": {},
+        }
+
+        await gateway.search(base_request)
+
+        mock_sample_gateway.find_study_ids_by_factor_headers.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_search_without_factor_filters_does_not_call_sample_gateway(
+        self, mock_client, mock_sample_gateway, gateway, base_request
+    ):
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 0}},
+            "aggregations": {},
+        }
+
+        await gateway.search(base_request)
+
+        mock_sample_gateway.find_study_ids_by_factor_headers.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_search_with_only_sample_filters_skips_all_ids_query(
+        self, mock_client, mock_sample_gateway, gateway, base_request
+    ):
+        base_request.factor_header_names = ["Batch"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
+            "MTBLS79", "MTBLS100",
+        ]
+        mock_client.search.return_value = {
+            "hits": {"hits": [], "total": {"value": 2}},
+            "aggregations": {},
+        }
+
+        result = await gateway.search(base_request, include_all_ids=True)
+
+        assert mock_client.search.call_count == 1
+        assert result.all_study_ids == ["MTBLS79", "MTBLS100"]
+
+
 class TestExportResults:
     """Tests for the export_results async generator."""
 

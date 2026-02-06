@@ -132,6 +132,11 @@ class TestFindStudyIdsByCompounds:
 
     @pytest.mark.asyncio
     async def test_all_operator_builds_bucket_selector(self, gateway, mock_client):
+        mock_client.search.return_value = {
+            "aggregations": {
+                "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
+            }
+        }
         await gateway.find_study_ids_by_compounds(
             database_identifiers=["HMDB1", "HMDB2"],
             metabolite_identifications=["Aspirin"],
@@ -231,7 +236,9 @@ class TestBuildQuery:
     def test_query_structure_database_identifiers_only(self, gateway):
         query = gateway._build_query(
             database_identifiers=["HMDB0031111", "HMDB0000001"],
-            metabolite_identifications=None,
+            metabolite_identifications=[],
+            database_identifiers_operator="any",
+            metabolite_identifications_operator="any",
         )
 
         assert query["size"] == 0
@@ -244,7 +251,7 @@ class TestBuildQuery:
         assert len(bool_query["should"]) == 1
         assert bool_query["should"][0] == {
             "terms": {
-                "fields.databaseIdentifier.value.keyword": ["HMDB0031111", "HMDB0000001"]
+                "fields.database_identifier.value.keyword": ["HMDB0031111", "HMDB0000001"]
             }
         }
 
@@ -254,15 +261,17 @@ class TestBuildQuery:
 
     def test_query_structure_metabolite_identifications_only(self, gateway):
         query = gateway._build_query(
-            database_identifiers=None,
+            database_identifiers=[],
             metabolite_identifications=["Lithocholic acid 3-O-glucuronide", "Aspirin"],
+            database_identifiers_operator="any",
+            metabolite_identifications_operator="any",
         )
 
         bool_query = query["query"]["bool"]
         assert len(bool_query["should"]) == 1
         assert bool_query["should"][0] == {
             "terms": {
-                "fields.metaboliteIdentification.value.keyword": [
+                "fields.metabolite_identification.value.keyword": [
                     "Lithocholic acid 3-O-glucuronide",
                     "Aspirin",
                 ]
@@ -273,6 +282,8 @@ class TestBuildQuery:
         query = gateway._build_query(
             database_identifiers=["HMDB0031111"],
             metabolite_identifications=["Aspirin"],
+            database_identifiers_operator="any",
+            metabolite_identifications_operator="any",
         )
 
         bool_query = query["query"]["bool"]
@@ -282,10 +293,10 @@ class TestBuildQuery:
         # Order may vary, so check both are present
         should_clauses = bool_query["should"]
         db_clause = {
-            "terms": {"fields.databaseIdentifier.value.keyword": ["HMDB0031111"]}
+            "terms": {"fields.database_identifier.value.keyword": ["HMDB0031111"]}
         }
         met_clause = {
-            "terms": {"fields.metaboliteIdentification.value.keyword": ["Aspirin"]}
+            "terms": {"fields.metabolite_identification.value.keyword": ["Aspirin"]}
         }
         assert db_clause in should_clauses
         assert met_clause in should_clauses
@@ -297,7 +308,9 @@ class TestBuildQuery:
 
         query = gateway._build_query(
             database_identifiers=["HMDB0031111"],
-            metabolite_identifications=None,
+            metabolite_identifications=[],
+            database_identifiers_operator="any",
+            metabolite_identifications_operator="any",
         )
 
         assert query["aggs"]["unique_studies"]["terms"]["size"] == 500

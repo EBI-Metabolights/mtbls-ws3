@@ -77,6 +77,9 @@ from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway impo
 from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
     ElasticsearchAssayGateway,
 )
+from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
+    ElasticsearchSampleGateway,
+)
 from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import ElasticsearchCompoundGateway
 from mtbls.infrastructure.search.es.es_client import (
     ElasticsearchClient,
@@ -147,6 +150,12 @@ class GatewaysContainer(containers.DeclarativeContainer):
         config=None,
     )
 
+    elasticsearch_sample_gateway = providers.Singleton(
+        ElasticsearchSampleGateway,
+        client=elasticsearch_client,
+        config=None,
+    )
+
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
         client=elasticsearch_client,
@@ -154,6 +163,7 @@ class GatewaysContainer(containers.DeclarativeContainer):
         # if custom search settings are added
         assignment_gateway=elasticsearch_assignment_gateway,
         assay_gateway=elasticsearch_assay_gateway,
+        sample_gateway=elasticsearch_sample_gateway,
     )
 
     mongodb_connection: MongoDbConnection = providers.Resource(

@@ -155,6 +155,20 @@ class StudySearchInput(IndexSearchInput):
             description="Operator for metabolite_identifications filter: 'any' returns studies with ANY of the names, 'all' requires all names to be present somewhere in the study.",
         ),
     ]
+    factor_header_names: Annotated[
+        Optional[List[str]],
+        Field(
+            default=None,
+            description="Filter studies by sample factor header names (e.g., ['Batch', 'Gender']). Queries the sample index against both factorHeaderNames and modifiedFactorHeaderNames.",
+        ),
+    ]
+    factor_header_names_operator: Annotated[
+        Optional[Literal["and", "or"]],
+        Field(
+            default="and",
+            description="Operator for factor_header_names filter: 'and' requires all values to match, 'or' requires any.",
+        ),
+    ]
     study_ids: Annotated[
         Optional[List[str]],
         Field(

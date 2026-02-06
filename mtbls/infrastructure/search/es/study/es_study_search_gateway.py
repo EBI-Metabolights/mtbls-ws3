@@ -21,6 +21,9 @@ if TYPE_CHECKING:
     from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
         ElasticsearchAssayGateway,
     )
+    from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
+        ElasticsearchSampleGateway,
+    )
 
 # Maximum number of study IDs to return in all_study_ids
 ALL_IDS_MAX_SIZE = 100
@@ -38,11 +41,13 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         config: None | StudyElasticSearchConfiguration | dict[str, Any],
         assignment_gateway: Optional["ElasticsearchAssignmentGateway"] = None,
         assay_gateway: Optional["ElasticsearchAssayGateway"] = None,
+        sample_gateway: Optional["ElasticsearchSampleGateway"] = None,
     ):
         self._client = client
         self._config = config
         self._assignment_gateway = assignment_gateway
         self._assay_gateway = assay_gateway
+        self._sample_gateway = sample_gateway
         if not self._config:
             self._config = StudyElasticSearchConfiguration()
         elif isinstance(self._config, dict):
@@ -73,6 +78,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         chemical_filter_study_ids: Optional[List[str]] = None
         had_chemical_filters = self._has_chemical_filters(query)
         had_assay_filters = self._has_assay_filters(query)
+        had_sample_filters = self._has_sample_filters(query)
 
         # Resolve chemical filters to study IDs if present
         resolved_query = await self._resolve_chemical_filters(query)
@@ -80,8 +86,11 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         # Resolve assay filters to study IDs if present
         resolved_query = await self._resolve_assay_filters(resolved_query)
 
+        # Resolve sample filters to study IDs if present
+        resolved_query = await self._resolve_sample_filters(resolved_query)
+
         # Capture the resolved study_ids if cross-index filters were applied
-        if (had_chemical_filters or had_assay_filters) and resolved_query.study_ids:
+        if (had_chemical_filters or had_assay_filters or had_sample_filters) and resolved_query.study_ids:
             # Filter out the sentinel value used for "no matches"
             if resolved_query.study_ids != ["__NO_MATCHING_STUDIES__"]:
                 chemical_filter_study_ids = resolved_query.study_ids
@@ -140,6 +149,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """
         resolved_query = await self._resolve_chemical_filters(query)
         resolved_query = await self._resolve_assay_filters(resolved_query)
+        resolved_query = await self._resolve_sample_filters(resolved_query)
 
         # Build the query/filter part from the normal search payload, then adapt
         dsl = self._build_search_payload(resolved_query)
@@ -212,7 +222,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             return False
 
         # Only cross-index filters remain
-        return self._has_chemical_filters(req) or self._has_assay_filters(req)
+        return self._has_chemical_filters(req) or self._has_assay_filters(req) or self._has_sample_filters(req)
 
     async def _resolve_chemical_filters(self, req: StudySearchInput) -> StudySearchInput:
         """
@@ -329,6 +339,55 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             update={
                 "study_ids": combined,
                 "ms": None,
+            }
+        )
+
+    def _has_sample_filters(self, req: StudySearchInput) -> bool:
+        """Check if the request has sample factor header name filters."""
+        return bool(req.factor_header_names)
+
+    async def _resolve_sample_filters(self, req: StudySearchInput) -> StudySearchInput:
+        """
+        If factor_header_names filters are present, query the sample gateway to get matching
+        study IDs, then intersect with any existing study_ids on the request.
+        """
+        if not self._has_sample_filters(req):
+            return req
+
+        if not self._sample_gateway:
+            return req
+
+        logger.debug("Study search sample lookup starting")
+        matching_study_ids = await self._sample_gateway.find_study_ids_by_factor_headers(
+            values=req.factor_header_names,
+            operator=req.factor_header_names_operator or "and",
+        )
+        logger.debug(
+            "Study search sample lookup completed (matches=%s)",
+            len(matching_study_ids) if matching_study_ids is not None else 0,
+        )
+
+        if not matching_study_ids:
+            return req.model_copy(
+                update={
+                    "study_ids": ["__NO_MATCHING_STUDIES__"],
+                    "factor_header_names": None,
+                }
+            )
+
+        # Combine with any existing study_ids (e.g. from chemical/assay filter resolution)
+        if req.study_ids:
+            existing_set = set(req.study_ids)
+            combined = [sid for sid in matching_study_ids if sid in existing_set]
+            if not combined:
+                combined = ["__NO_MATCHING_STUDIES__"]
+        else:
+            combined = matching_study_ids
+
+        return req.model_copy(
+            update={
+                "study_ids": combined,
+                "factor_header_names": None,
             }
         )
 
