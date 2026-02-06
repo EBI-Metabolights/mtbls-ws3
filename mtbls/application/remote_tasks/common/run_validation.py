@@ -332,7 +332,7 @@ async def run_validation_task(  # noqa: PLR0913
             if not errors:
                 policy_result.messages.violations.append(
                     PolicyMessage(
-                        type=PolicyMessageType.WARNING,
+                        type=PolicyMessageType.ERROR,
                         section="general",
                         source_file="input",
                         priority="CRITICAL",
