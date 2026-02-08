@@ -554,6 +554,7 @@ async def validate_mhd_study(
         config=config,
     )
     if mhd_file_path.exists():
+        logger.info("mhd common model file is created on %s", mhd_file_path)
         validation_errors = validate_mhd_file(str(mhd_file_path))
 
         if validation_errors:
@@ -793,6 +794,7 @@ async def post_process_validation_messages(
         for value in violation.values:
             term, source, accession = parser(value)
             if is_exceptional_term(selected_rule, term, source, accession):
+                deleted_values.append(value)
                 continue
 
             if is_child_rule and rule and term:
