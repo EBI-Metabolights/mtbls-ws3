@@ -1622,7 +1622,7 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.19"
+version = "0.0.20"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
@@ -1634,9 +1634,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/03/8c/3bde01c6bc9871c1d846224a797210c3bdcdeb1d72c97a9781a0c3098ce5/mtbls_mhd_integration-0.0.19.tar.gz", hash = "sha256:cd1135400c8c06061051bd3a1265ca48e5a89928d96ca810ad177b292391e935", size = 29894, upload-time = "2026-02-08T17:37:22.359Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/36/1d/c9274ed2f587ca481479a4a57e1e5594ab2a904794c7d7e20df5213e4b54/mtbls_mhd_integration-0.0.20.tar.gz", hash = "sha256:abb5126b2b32169d820a3bbc33c423ac418ce3d7954b2c45d985e209b4be687c", size = 29898, upload-time = "2026-02-08T20:40:34.677Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/47/6fcc96e6030938d4b7ae128094a15f9e1615a7e3d414d739e0c5bbf18732/mtbls_mhd_integration-0.0.19-py3-none-any.whl", hash = "sha256:3012990f5dfca872b4f2529aa55b9073bbddf62bd3f56a1e0181ed532ebc4228", size = 33973, upload-time = "2026-02-08T17:37:21.1Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/2e/d22f122d97e155de199136b904cc3ff73ddf1d459d09ee347984a776c6e1/mtbls_mhd_integration-0.0.20-py3-none-any.whl", hash = "sha256:52e18574ae6916cbb24f7faca3d6c61dc142d91f1e23b238f1164038bf5a0db8", size = 33971, upload-time = "2026-02-08T20:40:33.299Z" },
 ]
 
 [[package]]
@@ -1733,7 +1733,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.18" },
     { name = "mhd-model", specifier = ">=0.1.50" },
-    { name = "mtbls-mhd-integration", specifier = ">=0.0.19" },
+    { name = "mtbls-mhd-integration", specifier = ">=0.0.20" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },
