@@ -947,16 +947,16 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
-                item: OntologyAnnotation = OntologyItem(
-                    term="metabolite profiling assay",
-                    term_source_ref="OBI",
-                    term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
-                )
-                self.override_ontology_term(
-                    source=item,
-                    target=assay.measurement_type,
-                    source_label=f"Study Assay [{idx + 1}] Measurement Type",
-                )
+                # item: OntologyAnnotation = OntologyItem(
+                #     term="metabolite profiling assay",
+                #     term_source_ref="OBI",
+                #     term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
+                # )
+                # self.override_ontology_term(
+                #     source=item,
+                #     target=assay.measurement_type,
+                #     source_label=f"Study Assay [{idx + 1}] Measurement Type",
+                # )
 
                 if assay.file_name in self.model.assays:
                     main_technique = self.model.assays[
