@@ -22,11 +22,11 @@ dependencies = [
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",
-    "mhd-model>=0.1.49",
     "mtbls-mhd-integration>=0.0.19",
     "psycopg[binary,pool]>=3.3.2",
     "fastapi>=0.128.0",
     "jinja2>=3.1.6",
+    "mhd-model>=0.1.50",
 ]
 
 [project.optional-dependencies]
