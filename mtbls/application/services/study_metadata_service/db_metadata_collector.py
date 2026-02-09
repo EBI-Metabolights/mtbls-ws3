@@ -114,14 +114,16 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 metadata.submitters.append(
                     model.Submitter(
                         db_id=submitter.id_,
-                        orcid=submitter.orcid,
-                        address=submitter.address,
-                        join_date=submitter.join_date.isoformat(),
-                        user_name=submitter.username,
-                        first_name=submitter.first_name,
-                        last_name=submitter.last_name,
-                        affiliation=submitter.affiliation,
-                        affiliation_url=submitter.affiliation_url,
+                        orcid=submitter.orcid or "",
+                        address=submitter.address or "",
+                        join_date=submitter.join_date.isoformat()
+                        if submitter.join_date
+                        else "",
+                        user_name=submitter.username or "",
+                        first_name=submitter.first_name or "",
+                        last_name=submitter.last_name or "",
+                        affiliation=submitter.affiliation or "",
+                        affiliation_url=submitter.affiliation_url or "",
                         status=USER_STATUS_MAP[submitter.status],
                         submitter_role=USER_ROLE_MAP[submitter.role],
                     )
