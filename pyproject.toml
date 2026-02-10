@@ -45,9 +45,8 @@ ws3 = [
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
     "numpy<2",
-    "elasticsearch[async]<8.5.1",
     "rdkit>=2024.3.1",
-    "elasticsearch>=9.2.1",
+    "elasticsearch[async]>=9.2.1",
 ]
 
 [dependency-groups]
