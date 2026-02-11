@@ -19,6 +19,12 @@ class ElasticsearchClientConfig(BaseModel):
         default=None,
         description="Named API keys for Elasticsearch authentication",
     )
+    username: Optional[str] = Field(
+        default=None, description="Username for basic authentication"
+    )
+    password: Optional[str] = Field(
+        default=None, description="Password for basic authentication"
+    )
     request_timeout: Optional[float] = Field(
         5.0, description="Request timeout in seconds"
     )

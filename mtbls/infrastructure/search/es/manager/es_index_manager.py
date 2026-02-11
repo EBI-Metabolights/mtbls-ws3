@@ -21,9 +21,15 @@ class ElasticsearchIndexManagementGateway(SearchIndexManagementGateway):
         elif isinstance(self._config, dict):
             self._config = ElasticsearchClientConfig.model_validate(config)
 
+        # Determine auth method: basic_auth (username/password) takes precedence over api_key
+        basic_auth = None
+        if self._config.username and self._config.password:
+            basic_auth = (self._config.username, self._config.password)
+
         self.es = AsyncElasticsearch(
             hosts=self._config.hosts or None,
-            api_key=self._config.api_key,
+            basic_auth=basic_auth,
+            api_key=self._config.api_key if not basic_auth else None,
             request_timeout=self._config.request_timeout,
             verify_certs=self._config.verify_certs,
         )
@@ -44,12 +50,13 @@ class ElasticsearchIndexManagementGateway(SearchIndexManagementGateway):
         delete_before: bool = False,
         mappings_file_path: None | pathlib.Path = None,
     ) -> bool:
+        mappings = None
         if delete_before:
             await self.es.options(
                 ignore_status=404, request_timeout=30, retry_on_timeout=True
             ).indices.delete(index=index)
-            if mappings_file_path:
-                mappings = await self.load_file(mappings_file_path)
+        if mappings_file_path:
+            mappings = await self.load_file(mappings_file_path)
         await self.es.options(
             ignore_status=400, request_timeout=30, retry_on_timeout=True
         ).indices.create(index=index, body=mappings)

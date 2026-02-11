@@ -125,7 +125,17 @@ async def sync_search_index(
                 object_key=target_path.name,
                 target_path=target_path,
             )
-            file_content = json.loads(target_path.read_text())
+            try:
+                raw_text = target_path.read_text()
+                if not raw_text.strip():
+                    logger.warning("Empty cache JSON for %s at %s", resource_id, target_path)
+                    continue
+                file_content = json.loads(raw_text)
+            except json.JSONDecodeError as ex:
+                logger.warning(
+                    "Invalid cache JSON for %s at %s: %s", resource_id, target_path, ex
+                )
+                continue
             model = PublicStudyLiteIndexModel.model_validate(file_content)
             if debug:
                 for name, f in type(model).model_fields.items():
