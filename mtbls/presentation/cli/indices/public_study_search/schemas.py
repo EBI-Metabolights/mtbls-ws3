@@ -305,7 +305,7 @@ class AssayModel(APIBaseModel):
             description="Relative paths of metabolite assignment files "
             "referenced in the assay file."
         ),
-    ] = set()
+    ] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
 

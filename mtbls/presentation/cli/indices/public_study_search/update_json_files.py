@@ -64,6 +64,11 @@ class StudyQueryResult(BaseModel):
     submitters: Dict[str, Dict[str, str]] = {}
 
 
+def append_unique(target: List, value) -> None:
+    if value not in target:
+        target.append(value)
+
+
 async def get_public_studies(
     read_study_repository: StudyReadRepository,
 ) -> Dict[str, StudyQueryResult]:
@@ -114,7 +119,7 @@ async def update_study_metadata_json_files(
     reindex_all: bool = True,
 ):
     if not temp_folder:
-        temp_folder_path = pathlib.Path(".temp/indexed-data").resolve()
+        temp_folder_path = pathlib.Path(".temp2/indexed-data").resolve()
     else:
         temp_folder_path = pathlib.Path(temp_folder).resolve()
 
@@ -392,30 +397,46 @@ async def update_study_metadata_json_files(
                         )
                     except Exception as sub_exc:
                         logger.warning(str(sub_exc))
-                study_index_model.factors = factors_set
-                study_index_model.design_descriptors = design_descriptors_set
+                study_index_model.factors = sorted(list(factors_set))
+                study_index_model.design_descriptors = sorted(
+                    list(design_descriptors_set)
+                )
                 if "Characteristics[Organism]" in sample_file_ontology_column_values:
-                    study_index_model.organisms = sample_file_ontology_column_values[
-                        "Characteristics[Organism]"
-                    ]
+                    study_index_model.organisms = sorted(
+                        list(
+                            sample_file_ontology_column_values[
+                                "Characteristics[Organism]"
+                            ]
+                        )
+                    )
                 if (
                     "Characteristics[Organism part]"
                     in sample_file_ontology_column_values
                 ):
-                    study_index_model.organism_parts = (
-                        sample_file_ontology_column_values[
-                            "Characteristics[Organism part]"
-                        ]
+                    study_index_model.organism_parts = sorted(
+                        list(
+                            sample_file_ontology_column_values[
+                                "Characteristics[Organism part]"
+                            ]
+                        )
                     )
                 if "Characteristics[Sample type]" in sample_file_ontology_column_values:
-                    study_index_model.sample_types = sample_file_ontology_column_values[
-                        "Characteristics[Sample type]"
-                    ]
+                    study_index_model.sample_types = sorted(
+                        list(
+                            sample_file_ontology_column_values[
+                                "Characteristics[Sample type]"
+                            ]
+                        )
+                    )
 
                 if "Characteristics[Variant]" in sample_file_ontology_column_values:
-                    study_index_model.variants = sample_file_ontology_column_values[
-                        "Characteristics[Variant]"
-                    ]
+                    study_index_model.variants = sorted(
+                        list(
+                            sample_file_ontology_column_values[
+                                "Characteristics[Variant]"
+                            ]
+                        )
+                    )
 
                 study_index_model.size_in_bytes = study_map[study_id].study_size
                 study_index_model.size_in_text = get_size_in_str(
@@ -433,12 +454,12 @@ async def update_study_metadata_json_files(
                     contact_model = schemas.ContactModel.model_validate(contact)
                     if len(orcid_ids) > contact_index:
                         contact_model.orcid = orcid_ids[contact_index]
-                    study_index_model.contacts.add(contact_model)
+                    append_unique(study_index_model.contacts, contact_model)
                     contact_index += 1
 
                 for protocol in study.study_protocols.protocols:
                     item = schemas.StudyProtocolModel.model_validate(protocol)
-                    study_index_model.protocols.add(item)
+                    append_unique(study_index_model.protocols, item)
                     lookup.protocol_names.add(item.protocol_type)
 
                 for publication in study.study_publications.publications:
@@ -446,8 +467,9 @@ async def update_study_metadata_json_files(
                     publication.doi = publication.doi.strip('"')
                     publication.pub_med_id = publication.pub_med_id.strip('"')
                     publication.title = publication.title.strip('"')
-                    study_index_model.publications.add(
-                        schemas.StudyPublicationModel.model_validate(publication)
+                    append_unique(
+                        study_index_model.publications,
+                        schemas.StudyPublicationModel.model_validate(publication),
                     )
 
                 funding_comments: Dict[str, List[str]] = {}
@@ -491,9 +513,9 @@ async def update_study_metadata_json_files(
                                     fund_ref_id=model.fund_ref_id,
                                     grant_identifier=grant_id.strip(),
                                 )
-                                study_index_model.fundings.add(model)
+                                append_unique(study_index_model.fundings, model)
                     else:
-                        study_index_model.fundings.add(model)
+                        append_unique(study_index_model.fundings, model)
 
                 assignment_files_set: Set[str] = set()
                 for assay in result.investigation.studies[0].study_assays.assays:
@@ -524,9 +546,11 @@ async def update_study_metadata_json_files(
                     model.technique = schemas.AssayTechniqueModel.model_validate(
                         technique
                     )
-                    study_index_model.assays.add(model)
-                    study_index_model.assay_techniques.add(model.technique)
-                    study_index_model.technology_types.add(model.technology_type)
+                    append_unique(study_index_model.assays, model)
+                    append_unique(study_index_model.assay_techniques, model.technique)
+                    append_unique(
+                        study_index_model.technology_types, model.technology_type
+                    )
                     assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(
                         results_per_page=100000
                     )
@@ -547,7 +571,7 @@ async def update_study_metadata_json_files(
                         assignment_files_set.update(data)
                         assignment_files_set.discard(None)
                         assignment_files_set.discard("")
-                        model.assignment_files = assignment_files_set
+                        model.assignment_files = sorted(list(assignment_files_set))
                     except Exception:
                         logger.error(
                             "%s does not have Metabolite Assignment File column",

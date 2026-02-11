@@ -82,6 +82,9 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/mtbls/run/cli/es/index_studies.py",
+      "args": [
+        "--build-metadata-jsons"
+      ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "env": {

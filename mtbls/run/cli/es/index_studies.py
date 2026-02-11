@@ -45,9 +45,16 @@ from mtbls.run.config_utils import set_application_configuration
     default=".mtbls-ws-config-secrets/.secrets.yaml",
     help="config secrets file path.",
 )
+@click.option(
+    "--build-metadata-jsons/--no-build-metadata-jsons",
+    default=True,
+    show_default=True,
+    help="Build cached metadata JSON files before syncing the Elasticsearch index.",
+)
 def run_es_cli(
     config_file: Union[None, str] = None,
     secrets_file: Union[None, str] = None,
+    build_metadata_jsons: bool = True,
 ):
     container: EsCliApplicationContainer = EsCliApplicationContainer()
 
@@ -99,8 +106,7 @@ def run_es_cli(
         #"resources/es/mappings/public_study_search_index_mapping.json"
         "resources/es/mappings/complete_study_search_index_mapping.json"
     )
-    enable_later = True
-    if not enable_later:
+    if build_metadata_jsons:
         asyncio.run(
             update_study_metadata_json_files(
                 study_read_repository,
@@ -110,7 +116,6 @@ def run_es_cli(
                 reindex_all=True,
             )
         )
-
     asyncio.run(
         sync_search_index(
             index_name=index_name,
