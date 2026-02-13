@@ -83,13 +83,12 @@ async def sync_search_index(
     indexed_documents_set = {x for x in indexed_documents_dict.keys()}
     db_studies_set = {x for x in db_studies_dict.keys()}
     all_studies_in_scope = indexed_documents_set.union(db_studies_set)
-    cache_resource_id = "indexed-data"
     cached_documents = set()
     uncached_documents = set()
     for resource_id in all_studies_in_scope:
         filename = f"{resource_id}.json"
         if await index_cache_files_object_repository.exists(
-            resource_id=cache_resource_id, object_key=filename
+            resource_id=resource_id, object_key=filename
         ):
             cached_documents.add(resource_id)
         else:
@@ -121,7 +120,7 @@ async def sync_search_index(
         target_path = target_path.resolve()
         if resource_id in cached_documents:
             await index_cache_files_object_repository.download(
-                resource_id=cache_resource_id,
+                resource_id=resource_id,
                 object_key=target_path.name,
                 target_path=target_path,
             )

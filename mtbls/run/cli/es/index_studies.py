@@ -42,7 +42,7 @@ from mtbls.run.config_utils import set_application_configuration
 @click.option(
     "--secrets-file",
     "-s",
-    default=".mtbls-ws-config-secrets/.secrets.yaml",
+    default=".secrets/ws3-secrets.yaml",
     help="config secrets file path.",
 )
 @click.option(
