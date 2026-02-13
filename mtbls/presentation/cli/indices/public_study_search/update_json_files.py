@@ -69,6 +69,29 @@ def append_unique(target: List, value) -> None:
         target.append(value)
 
 
+def to_ontology_model(
+    value: Union[schemas.OntologyModel, str, None],
+) -> Union[schemas.OntologyModel, None]:
+    if isinstance(value, schemas.OntologyModel):
+        return value
+    if isinstance(value, str):
+        term = rm_quotations(value)
+        if term:
+            return schemas.OntologyModel(term=term)
+    return None
+
+
+def normalize_ontology_model_list(
+    values: List[Union[schemas.OntologyModel, str]],
+) -> List[schemas.OntologyModel]:
+    normalized: Set[schemas.OntologyModel] = set()
+    for value in values:
+        model = to_ontology_model(value)
+        if model:
+            normalized.add(model)
+    return sorted(list(normalized))
+
+
 async def get_public_studies(
     read_study_repository: StudyReadRepository,
 ) -> Dict[str, StudyQueryResult]:
@@ -579,6 +602,27 @@ async def update_study_metadata_json_files(
                         )
 
                 lookup.source_references.update(source_references_set)
+                study_index_model.organisms = normalize_ontology_model_list(
+                    study_index_model.organisms
+                )
+                study_index_model.organism_parts = normalize_ontology_model_list(
+                    study_index_model.organism_parts
+                )
+                study_index_model.variants = normalize_ontology_model_list(
+                    study_index_model.variants
+                )
+                study_index_model.sample_types = normalize_ontology_model_list(
+                    study_index_model.sample_types
+                )
+                study_index_model.factors = normalize_ontology_model_list(
+                    study_index_model.factors
+                )
+                study_index_model.design_descriptors = normalize_ontology_model_list(
+                    study_index_model.design_descriptors
+                )
+                study_index_model.technology_types = normalize_ontology_model_list(
+                    study_index_model.technology_types
+                )
                 lookup.organisms.update(study_index_model.organisms)
                 lookup.organism_parts.update(study_index_model.organism_parts)
                 lookup.variants.update(study_index_model.variants)
@@ -882,11 +926,12 @@ def create_study_item(
     add_annotation(item, "assay.technique.sub", assay_sub_techniques)
     all_categories = set()
     for organism in model.organisms:
-        if isinstance(organism, str):
-            organism = schemas.OntologyModel(term=organism)
+        ontology = to_ontology_model(organism)
+        if not ontology:
+            continue
         categories = find_organism_categories(
-            organism.term_source_ref,
-            organism.term_accession_number,
+            ontology.term_source_ref,
+            ontology.term_accession_number,
             ontology_categories,
             ncbi_taxonomy_df,
             filtered_columns,
