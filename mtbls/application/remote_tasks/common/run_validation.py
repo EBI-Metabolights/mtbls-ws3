@@ -556,10 +556,10 @@ async def validate_mhd_study(
         mhd_filename = f"{mhd_accession_file_prefix}.mhd.json"
     if not annoucement_filename:
         annoucement_filename = f"{mhd_accession_file_prefix}.announcement.json"
-    announcement_file_path = mhd_output_root_path / annoucement_filename
-    mhd_file_path = mhd_output_root_path / mhd_filename
-    mhd_validation_file_path = (
-        mhd_output_root_path / f"{mhd_accession_file_prefix}.mhd.validation.json"
+    announcement_file_path = mhd_output_root_path / Path(annoucement_filename)
+    mhd_file_path = mhd_output_root_path / Path(mhd_filename)
+    mhd_validation_file_path = mhd_output_root_path / Path(
+        f"{mhd_accession_file_prefix}.mhd.validation.json"
     )
     mhd_validation_errors: OrderedDict[str, OrderedDict[str, str]] = OrderedDict()
     convertor.convert(
@@ -575,6 +575,11 @@ async def validate_mhd_study(
         validation_errors = validate_mhd_file(str(mhd_file_path))
 
         if validation_errors:
+            logger.info(
+                "MHD model validation errors found for %s: %s",
+                resource_id,
+                validation_errors,
+            )
             mhd_validation_errors["mhd_model_errors"] = OrderedDict()
 
             for key, error in validation_errors:
@@ -645,10 +650,10 @@ async def validate_mhd_study(
             "MHD model file creation failed."
         )
     if mhd_validation_errors:
-        with Path(mhd_validation_file_path).open("w") as f:
-            json.dump(mhd_validation_errors, f, indent=4)
         logger.info("MHD validation errors are saved on %s", mhd_validation_file_path)
 
+    with mhd_validation_file_path.open("w") as f:
+        json.dump(mhd_validation_errors, f, indent=4)
     return mhd_file_path, announcement_file_path, mhd_validation_file_path
 
 
