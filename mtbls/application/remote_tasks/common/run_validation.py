@@ -55,6 +55,7 @@ from mtbls.domain.entities.validation.validation_configuration import (
     StudyCategoryStr,
     ValidationControls,
 )
+from mtbls.domain.enums.study_category import StudyCategory
 from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.modifier import StudyMetadataModifierResult, UpdateLog
 from mtbls.domain.shared.validator.policy import (
@@ -869,6 +870,8 @@ async def post_process_validation_messages(
                     + ", ".join([escape(x) for x in new_values])
                 )
             violation.values = new_values
+            if study_category in (StudyCategory.MS_MHD_ENABLED,):
+                violation.type = PolicyMessageType.ERROR
             new_violations.append(violation)
         else:
             logger.debug(

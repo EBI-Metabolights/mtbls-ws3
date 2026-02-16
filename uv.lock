@@ -1509,7 +1509,7 @@ wheels = [
 [[package]]
 name = "mhd-model"
 version = "0.1.50"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#3a627d0b4f1e322d6fa880acc3ff2968a35a8726" }
 dependencies = [
     { name = "bioregistry" },
     { name = "charset-normalizer" },
@@ -1524,10 +1524,6 @@ dependencies = [
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "reachable" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/76/c7/fddd9426c43c8deb8e17ca24bf1c8f32d8075d4d8a29965caf51acba412a/mhd_model-0.1.50.tar.gz", hash = "sha256:9bd5d68a82f958323fc32a618249cbdd8872dae0466ba211eccdc188c576268e", size = 106094, upload-time = "2026-02-08T20:29:05.245Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/18/b651e7c6bd020ed173971c7ade7cf36aea1345a19004e5a8bd4791e3c73a/mhd_model-0.1.50-py3-none-any.whl", hash = "sha256:cd9726ae2a7c4ced1d55e50448fa737a2c92cd9f5dedcb84327fb75eb316ef76", size = 137400, upload-time = "2026-02-08T20:29:06.317Z" },
 ]
 
 [[package]]
@@ -1623,7 +1619,7 @@ wheels = [
 [[package]]
 name = "mtbls-mhd-integration"
 version = "0.0.20"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#9fef6552b30d1cc114d12350af745f30be62e0d9" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
@@ -1633,10 +1629,6 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "sqlalchemy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/36/1d/c9274ed2f587ca481479a4a57e1e5594ab2a904794c7d7e20df5213e4b54/mtbls_mhd_integration-0.0.20.tar.gz", hash = "sha256:abb5126b2b32169d820a3bbc33c423ac418ce3d7954b2c45d985e209b4be687c", size = 29898, upload-time = "2026-02-08T20:40:34.677Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/2e/d22f122d97e155de199136b904cc3ff73ddf1d459d09ee347984a776c6e1/mtbls_mhd_integration-0.0.20-py3-none-any.whl", hash = "sha256:52e18574ae6916cbb24f7faca3d6c61dc142d91f1e23b238f1164038bf5a0db8", size = 33971, upload-time = "2026-02-08T20:40:33.299Z" },
 ]
 
 [[package]]
@@ -1732,8 +1724,8 @@ requires-dist = [
     { name = "jsonpath-ng", specifier = ">=1.7.0,<2" },
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.18" },
-    { name = "mhd-model", specifier = ">=0.1.50" },
-    { name = "mtbls-mhd-integration", specifier = ">=0.0.20" },
+    { name = "mhd-model", git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev" },
+    { name = "mtbls-mhd-integration", git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },

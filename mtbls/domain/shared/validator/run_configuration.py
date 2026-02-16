@@ -27,3 +27,4 @@ class ValidationRunConfiguration(BaseModel):
     metadata_files_root_path: None | str = None
     db_connection: None | DbConfiguration = None
     assignmet_sheet_limit: None | int = None
+    validate_cv_terms: None | bool = None

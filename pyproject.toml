@@ -22,11 +22,11 @@ dependencies = [
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",
-    "mtbls-mhd-integration>=0.0.20",
     "psycopg[binary,pool]>=3.3.2",
     "fastapi>=0.128.0",
     "jinja2>=3.1.6",
-    "mhd-model>=0.1.50",
+    "mhd-model",
+    "mtbls-mhd-integration",
 ]
 
 [project.optional-dependencies]
@@ -72,6 +72,10 @@ docs = [
 
 [tool.uv]
 default-groups = []
+
+[tool.uv.sources]
+mhd-model = { git = "https://github.com/MetabolomicsHub/mhd-model.git", rev = "dev" }
+mtbls-mhd-integration = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git", rev = "dev" }
 
 [project.scripts]
 mtbls-tool = "mtbls.run.cli.main:mtbls_tool"
