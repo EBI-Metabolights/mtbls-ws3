@@ -9,7 +9,7 @@ import subprocess
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, OrderedDict, Union
 
 from cachetools import TTLCache
 from cachetools_async import cached
@@ -464,7 +464,11 @@ async def process_mhd_study(
                     study_http_base_url=config.mhd_configuration.study_http_base_url,
                     default_dataset_licence_url=model.study_db_metadata.dataset_license_url,
                 )
-                mhd_file_path, announcement_file_path = await validate_mhd_study(
+                (
+                    mhd_file_path,
+                    announcement_file_path,
+                    mhd_validation_file_path,
+                ) = await validate_mhd_study(
                     policy_result,
                     resource_id,
                     mhd_accession,
@@ -488,8 +492,10 @@ async def process_mhd_study(
             )
         for x in await internal_files_object_repository.list(resource_id, "DATA_FILES"):
             object_key = x.object_key or ""
-            if object_key.endswith(".mhd.json") or object_key.endswith(
-                ".announcement.json"
+            if (
+                object_key.endswith(".mhd.json")
+                or object_key.endswith(".announcement.json")
+                or object_key.endswith(".mhd.validation.json")
             ):
                 await internal_files_object_repository.delete_object(
                     resource_id, object_key
@@ -507,6 +513,13 @@ async def process_mhd_study(
                 resource_id,
                 f"DATA_FILES/{resource_id}.announcement.json",
                 f"file://{announcement_file_path}",
+                override=True,
+            )
+        if mhd_validation_file_path and Path(mhd_validation_file_path).exists():
+            await internal_files_object_repository.put_object(
+                resource_id,
+                f"DATA_FILES/{resource_id}.mhd.validation.json",
+                f"file://{mhd_validation_file_path}",
                 override=True,
             )
     return True
@@ -545,7 +558,10 @@ async def validate_mhd_study(
         annoucement_filename = f"{mhd_accession_file_prefix}.announcement.json"
     announcement_file_path = mhd_output_root_path / annoucement_filename
     mhd_file_path = mhd_output_root_path / mhd_filename
-
+    mhd_validation_file_path = (
+        mhd_output_root_path / f"{mhd_accession_file_prefix}.mhd.validation.json"
+    )
+    mhd_validation_errors: OrderedDict[str, OrderedDict[str, str]] = OrderedDict()
     convertor.convert(
         repository_name="MetaboLights",
         repository_identifier=resource_id,
@@ -559,6 +575,10 @@ async def validate_mhd_study(
         validation_errors = validate_mhd_file(str(mhd_file_path))
 
         if validation_errors:
+            mhd_validation_errors["mhd_model_errors"] = OrderedDict()
+
+            for key, error in validation_errors:
+                mhd_validation_errors["mhd_model_errors"][key] = error
             if not current_errors:
                 errors = []
                 for key, error in validation_errors:
@@ -592,6 +612,10 @@ async def validate_mhd_study(
                 file_content = json.loads(announcement_file_path.read_text())
                 validator = MhdAnnouncementFileValidator()
                 errors = validator.validate(file_content)
+                if errors:
+                    mhd_validation_errors["mhd_announcement_errors"] = OrderedDict()
+                    for key, error in errors:
+                        mhd_validation_errors["mhd_announcement_errors"][key] = error
 
                 if errors and not current_errors:
                     policy_result.messages.violations.append(
@@ -610,8 +634,22 @@ async def validate_mhd_study(
                             values=errors,
                         )
                     )
+            else:
+                mhd_validation_errors["mhd_announcement_errors"] = OrderedDict()
+                mhd_validation_errors["mhd_announcement_errors"]["file"] = (
+                    "MHD announcement file creation failed."
+                )
+    else:
+        mhd_validation_errors["mhd_model_errors"] = OrderedDict()
+        mhd_validation_errors["mhd_model_errors"]["file"] = (
+            "MHD model file creation failed."
+        )
+    if mhd_validation_errors:
+        with Path(mhd_validation_file_path).open("w") as f:
+            json.dump(mhd_validation_errors, f, indent=4)
+        logger.info("MHD validation errors are saved on %s", mhd_validation_file_path)
 
-    return mhd_file_path, announcement_file_path
+    return mhd_file_path, announcement_file_path, mhd_validation_file_path
 
 
 def investigation_value_parser(value: str) -> tuple[None | str, None | str, None | str]:
