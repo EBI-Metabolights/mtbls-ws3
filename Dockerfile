@@ -3,7 +3,9 @@ ARG CONTAINER_REGISTRY_PREFIX=docker.io/
 FROM ${CONTAINER_REGISTRY_PREFIX}astral/uv:0.9-python3.13-trixie-slim AS builder
 
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
-
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app-root
 COPY . .
 RUN uv sync --locked --extra ws3
