@@ -583,7 +583,7 @@ async def validate_mhd_study(
             mhd_validation_errors["mhd_model_errors"] = OrderedDict()
 
             for key, error in validation_errors:
-                mhd_validation_errors["mhd_model_errors"][key] = error
+                mhd_validation_errors["mhd_model_errors"][key] = str(error)
             if not current_errors:
                 errors = []
                 for key, error in validation_errors:
@@ -620,7 +620,9 @@ async def validate_mhd_study(
                 if errors:
                     mhd_validation_errors["mhd_announcement_errors"] = OrderedDict()
                     for key, error in errors:
-                        mhd_validation_errors["mhd_announcement_errors"][key] = error
+                        mhd_validation_errors["mhd_announcement_errors"][key] = str(
+                            error
+                        )
 
                 if errors and not current_errors:
                     policy_result.messages.violations.append(

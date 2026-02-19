@@ -57,6 +57,15 @@ class MongoDbValidationReportRepository(
         self.parent_object_key = str(Path(validation_history_object_key).parent)
         if self.parent_object_key == ".":
             self.parent_object_key = ""
+        cn = connection
+        self.db_url_repr = (
+            f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}/{cn.database}"
+        )
+        logger.info(
+            "MongoDB Validation Report Repository initialized with collection %s at %s",
+            collection_name,
+            self.db_url_repr,
+        )
 
     async def find_all(self, resource_id: str) -> list[ValidationResultFile]:
         filters = {"resourceId": resource_id}

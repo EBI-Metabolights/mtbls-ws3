@@ -21,14 +21,14 @@ gateways:
         password: "{{ postgresql.password }}"
         database: "{{ postgresql.database }}"
         url_scheme: postgresql+asyncpg
-    # mongodb:
-    #   connection:
-    #     url_scheme: mongodb
-    #     host: "{{ mongodb.host }}"
-    #     port: {{ mongodb.port }}
-    #     user: "{{ mongodb.user }}"
-    #     password: "{{ mongodb.password }}"
-    #     database: "{{ mongodb.database }}"
+    mongodb:
+      connection:
+        host: "{{ mongodb.host }}"
+        port: "{{ mongodb.port }}"
+        user: "{{ mongodb.user }}"
+        password: "{{ mongodb.password }}"
+        database: "{{ mongodb.database }}"
+        url_scheme: mongodb
     elasticsearch:
       connection:
         hosts: "{{ elasticsearch.host}}"
@@ -76,6 +76,10 @@ services:
         test: "{{ system_health_check.standalone.transfer_health_check.test }}"
         test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
 repositories:
+  active_target_repository:
+    validation_overrides: nfs
+    validation_reports: nfs
+    study_metadata: nfs
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"

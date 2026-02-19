@@ -43,3 +43,16 @@ class MongoDbValidationOverrideRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
+        cn = connection
+        self.db_url_repr = (
+            f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}/{cn.database}"
+        )
+        logger.info(
+            "MongoDB Validation Override Repository initialized "
+            "with collection %s at %s",
+            collection_name,
+            self.db_url_repr,
+        )
+
+    def get_connection_repr(self) -> str:
+        return self.db_url_repr

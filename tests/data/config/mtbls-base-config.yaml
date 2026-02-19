@@ -4,14 +4,14 @@ gateways:
       connection:
         file_path: .test-temp/sqlite_test.db
         url_scheme: sqlite+aiosqlite
-    # mongodb:
-    #   connection:
-    #     url_scheme: mongodb
-    #     host: hh-rke-wp-webadmin-33-worker-4.caas.ebi.ac.uk
-    #     port: 32068
-    #     user: root
-    #     password: example
-    #     database: test
+    mongodb:
+      connection:
+        url_scheme: mongodb
+        host: "localhost"
+        port: 32068
+        user: root
+        password: example
+        database: test
 services:
   authentication:
     standalone:
@@ -29,6 +29,10 @@ services:
         test: true
         test_response: true
 repositories:
+  active_target_repository:
+    validation_overrides: nfs
+    validation_reports: nfs
+    study_metadata: nfs
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: tests/data/storages/rw/studies/metadata-files

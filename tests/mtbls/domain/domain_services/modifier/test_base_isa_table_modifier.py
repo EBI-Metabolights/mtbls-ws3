@@ -40,19 +40,29 @@ class TestUpdateSingleColumn:
         category = "assay"
         file_name = modifier.isa_table_file.file_path
         table_file = modifier.model.assays[file_name]
-        column_header = "Parameter Value[Scan polarity]"
+        column_header = "Parameter Value[Column model]"
         header = None
         for item in table_file.table.headers:
             if item.column_header == column_header:
                 header = item
                 break
-        table_file.table.data[header.column_name][0] = "POSITIVE"
-        table_file.table.data[header.column_name][1] = "NEGATIVE"
+        table_file.table.data[header.column_name][0] = (
+            "ACQUITY uplc HSS T3 (1.8 µm, 1 mm x 100 mm; Waters)"
+        )
+        table_file.table.data[header.column_name][1] = (
+            "ACQUITY uplc hss t3 (1.8 µm, 1 mm x 100 mm; Waters)"
+        )
         modifier.update_single_column(
             template_type=technique, file_type=category, header=header
         )
-        assert table_file.table.data[header.column_name][0] == "positive"
-        assert table_file.table.data[header.column_name][1] == "negative"
+        assert (
+            table_file.table.data[header.column_name][0]
+            == "ACQUITY UPLC HSS T3 (1.8 µm, 1 mm x 100 mm; Waters)"
+        )
+        assert (
+            table_file.table.data[header.column_name][1]
+            == "ACQUITY UPLC HSS T3 (1.8 µm, 1 mm x 100 mm; Waters)"
+        )
         assert len(modifier.update_logs) == 1
 
 

@@ -48,7 +48,7 @@ class AssayFileModifier(IsaTableModifier):
 
         self.rule_f_400_090_001_02()
         self.rule_a_200_090_004_01()
-        self.update_scan_polarity()
+        # self.update_scan_polarity()
         self.update_protocol_ref_columns()
         return self.update_logs
 
@@ -219,46 +219,46 @@ class AssayFileModifier(IsaTableModifier):
                 files_columns[header.column_name] = header
         return files_columns
 
-    def update_scan_polarity(self):
-        assay_file: AssayFile = self.isa_table_file
+    # def update_scan_polarity(self):
+    #     assay_file: AssayFile = self.isa_table_file
 
-        if assay_file.table.data:
-            scan_polarity_name = "Parameter Value[Scan polarity]"
+    #     if assay_file.table.data:
+    #         scan_polarity_name = "Parameter Value[Scan polarity]"
 
-            data = assay_file.table.data
-            if scan_polarity_name in data:
-                old_values: set[str] = set()
-                updates: list[str] = []
-                for idx, val in enumerate(data[scan_polarity_name]):
-                    if (
-                        val
-                        and val.lower().strip()
-                        and val.lower().strip()
-                        not in {"positive", "negative", "alternating"}
-                    ):
-                        new_val = ""
-                        if val.strip().lower().startswith("neg"):
-                            new_val = "negative"
-                        elif val.strip().lower().startswith("pos"):
-                            new_val = "positive"
-                        elif val.strip().lower().startswith("alt"):
-                            new_val = "alternating"
-                        old_values.add(val)
-                        updates.append(f"Row {idx + 1}: '{val}' -> '{new_val}'")
-                if updates:
-                    old_values_str = self.get_list_string(
-                        list(old_values), self.max_row_number_limit
-                    )
-                    updates_str = self.get_list_string(
-                        updates, self.max_row_number_limit
-                    )
+    #         data = assay_file.table.data
+    #         if scan_polarity_name in data:
+    #             old_values: set[str] = set()
+    #             updates: list[str] = []
+    #             for idx, val in enumerate(data[scan_polarity_name]):
+    #                 if (
+    #                     val
+    #                     and val.lower().strip()
+    #                     and val.lower().strip()
+    #                     not in {"positive", "negative", "alternating"}
+    #                 ):
+    #                     new_val = ""
+    #                     if val.strip().lower().startswith("neg"):
+    #                         new_val = "negative"
+    #                     elif val.strip().lower().startswith("pos"):
+    #                         new_val = "positive"
+    #                     elif val.strip().lower().startswith("alt"):
+    #                         new_val = "alternating"
+    #                     old_values.add(val)
+    #                     updates.append(f"Row {idx + 1}: '{val}' -> '{new_val}'")
+    #             if updates:
+    #                 old_values_str = self.get_list_string(
+    #                     list(old_values), self.max_row_number_limit
+    #                 )
+    #                 updates_str = self.get_list_string(
+    #                     updates, self.max_row_number_limit
+    #                 )
 
-                    self.modifier_update(
-                        source=assay_file.file_path,
-                        action=f"{scan_polarity_name} column values are updated.",
-                        old_value=old_values_str,
-                        new_value=updates_str,
-                    )
+    #                 self.modifier_update(
+    #                     source=assay_file.file_path,
+    #                     action=f"{scan_polarity_name} column values are updated.",
+    #                     old_value=old_values_str,
+    #                     new_value=updates_str,
+    #                 )
 
     def rule_a_200_090_004_01(self):
         for file in self.model.assays:

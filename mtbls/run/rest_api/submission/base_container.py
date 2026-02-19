@@ -5,6 +5,17 @@ from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
+from mtbls.application.services.interfaces.repositories.file_object.study_metadata.metadata_repository import (  # noqa: E501
+    InvestigationObjectRepository,
+    IsaTableObjectRepository,
+    IsaTableRowObjectRepository,
+)
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_override_repository import (  # noqa: E501
+    ValidationOverrideRepository,
+)
+from mtbls.application.services.interfaces.repositories.file_object.validation.validation_report_repository import (  # noqa: E501
+    ValidationReportRepository,
+)
 from mtbls.application.services.interfaces.repositories.mtbls_data_reuse.mtbls_data_reuse_read_repository import (  # noqa: E501
     MtblsDataReuseReadRepository,
 )
@@ -24,6 +35,7 @@ from mtbls.application.services.interfaces.repositories.user.user_write_reposito
     UserWriteRepository,
 )
 from mtbls.application.services.interfaces.search_port import SearchPort
+from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -36,6 +48,7 @@ from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
 # from mtbls.infrastructure.persistence.db.mongodb.config import (
 #     MongoDbConnection,
 # )
+from mtbls.infrastructure.persistence.db.mongodb.config import MongoDbConnection
 from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
     DatabaseClientImpl,
 )
@@ -45,6 +58,21 @@ from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write
 )
 from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_manager import (  # noqa: E501
     StudyFolderManager,
+)
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.investigation_file_repository import (  # noqa: E501
+    MongoDbInvestigationObjectRepository,
+)
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_repository import (  # noqa: E501
+    MongoDbIsaTableObjectRepository,
+)
+from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_row_repository import (  # noqa: E501
+    MongoDbIsaTableRowObjectRepository,
+)
+from mtbls.infrastructure.repositories.file_object.validation.overrides.mongodb.validation_override_repository import (  # noqa: E501
+    MongoDbValidationOverrideRepository,
+)
+from mtbls.infrastructure.repositories.file_object.validation.reports.mongodb.validation_override_repository import (  # noqa: E501
+    MongoDbValidationReportRepository,
 )
 from mtbls.infrastructure.repositories.mtbls_data_reuse.sql_db.mtbls_data_reuse_repository import (  # noqa: E501
     SqlDbMtblsDataReuseReadRepository,
@@ -127,11 +155,11 @@ class GatewaysContainer(containers.DeclarativeContainer):
         # adjust if custom search settings are added
     )
 
-    # mongodb_connection: MongoDbConnection = providers.Resource(
-    #     create_config_from_dict,
-    #     MongoDbConnection,
-    #     config.database.mongodb.connection,
-    # )
+    mongodb_connection: MongoDbConnection = providers.Resource(
+        create_config_from_dict,
+        MongoDbConnection,
+        config.database.mongodb.connection,
+    )
 
     pub_sub_broker: PubSubConnection = providers.Singleton(
         RedisConnectionProvider,
@@ -235,40 +263,40 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         http_client=gateways.http_client,
         observer=None,
     )
-
-    # investigation_object_repository: InvestigationObjectRepository = ( # noqa: E501
-    #     providers.Singleton(
-    #         MongoDbInvestigationObjectRepository,
-    #         connection=gateways.mongodb_connection,
-    #         collection_name="investigation_files",
-    #         study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
-    #         observer=study_file_repository,
-    #     )
-    # )
-    # isa_table_object_repository: IsaTableObjectRepository = providers.Singleton( # noqa: E501
-    #     MongoDbIsaTableObjectRepository,
-    #     connection=gateways.mongodb_connection,
-    #     collection_name="isa_table_files",
-    #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
-    #     observer=study_file_repository,
-    # )
-    # isa_table_row_object_repository: IsaTableRowObjectRepository = providers.Singleton( # noqa: E501
-    #     MongoDbIsaTableRowObjectRepository,
-    #     connection=gateways.mongodb_connection,
-    #     collection_name="isa_table_rows",
-    #     study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
-    # )
-    # validation_override_repository: ValidationOverrideRepository = providers.Singleton( # noqa: E501
-    #     MongoDbValidationOverrideRepository,
-    #     connection=gateways.mongodb_connection,
-    #     collection_name="validation_overrides",
-    #     observer=study_file_repository,
-    # )
-    # validation_report_repository: ValidationReportRepository = providers.Singleton( # noqa: E501
-    #     MongoDbValidationReportRepository,
-    #     connection=gateways.mongodb_connection,
-    #     study_bucket=StudyBucket.INTERNAL_FILES,
-    #     collection_name="validation_reports",
-    #     validation_history_object_key="validation-history",
-    #     observer=study_file_repository,
-    # )
+    investigation_object_repository: InvestigationObjectRepository = (
+        providers.Singleton(
+            MongoDbInvestigationObjectRepository,
+            connection=gateways.mongodb_connection,
+            collection_name="investigation_files",
+            study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+            observer=None,
+        ),
+    )
+    isa_table_object_repository: IsaTableObjectRepository = providers.Singleton(  # noqa: E501
+        MongoDbIsaTableObjectRepository,
+        connection=gateways.mongodb_connection,
+        collection_name="isa_table_files",
+        study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+        observer=None,
+    )
+    isa_table_row_object_repository: IsaTableRowObjectRepository = providers.Singleton(  # noqa: E501
+        MongoDbIsaTableRowObjectRepository,
+        connection=gateways.mongodb_connection,
+        collection_name="isa_table_rows",
+        study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
+    )
+    validation_override_repository: ValidationOverrideRepository = providers.Singleton(  # noqa: E501
+        MongoDbValidationOverrideRepository,
+        connection=gateways.mongodb_connection,
+        study_bucket=StudyBucket.INTERNAL_FILES,
+        collection_name="validation_overrides",
+        observer=None,
+    )
+    validation_report_repository: ValidationReportRepository = providers.Singleton(  # noqa: E501
+        MongoDbValidationReportRepository,
+        connection=gateways.mongodb_connection,
+        study_bucket=StudyBucket.INTERNAL_FILES,
+        collection_name="validation_reports",
+        validation_history_object_key="validation-history",
+        observer=None,
+    )

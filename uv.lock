@@ -1509,7 +1509,7 @@ wheels = [
 [[package]]
 name = "mhd-model"
 version = "0.1.50"
-source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#3a627d0b4f1e322d6fa880acc3ff2968a35a8726" }
+source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#2cbced298ec0cd6fd7faf75e2a8b8448c0abf88a" }
 dependencies = [
     { name = "bioregistry" },
     { name = "charset-normalizer" },
@@ -1619,7 +1619,7 @@ wheels = [
 [[package]]
 name = "mtbls-mhd-integration"
 version = "0.0.20"
-source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#9fef6552b30d1cc114d12350af745f30be62e0d9" }
+source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#7cf16699abf5ebf8b54a7437619f97b459e4019b" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
@@ -1647,7 +1647,6 @@ dependencies = [
     { name = "jsonpath-ng" },
     { name = "jsonschema" },
     { name = "metabolights-utils" },
-    { name = "mhd-model" },
     { name = "mtbls-mhd-integration" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "pydantic" },
@@ -1724,7 +1723,6 @@ requires-dist = [
     { name = "jsonpath-ng", specifier = ">=1.7.0,<2" },
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.18" },
-    { name = "mhd-model", git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev" },
     { name = "mtbls-mhd-integration", git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
@@ -2338,7 +2336,7 @@ wheels = [
 
 [[package]]
 name = "pystow"
-version = "0.7.23"
+version = "0.7.28"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -2346,9 +2344,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/97/7b99406d23c5ff8d5ca2886ce81899963dc7111438e21f900dd32c744a7f/pystow-0.7.23.tar.gz", hash = "sha256:d240007167b76622bd6c25eac01d11599023893f6174862eb260338b80eabc68", size = 49684, upload-time = "2026-02-06T12:54:32.457Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ac/0d/b107972e085ec13c71d0beb3fa39103e2fe48f5f310acf3dffd9a0ba851b/pystow-0.7.28.tar.gz", hash = "sha256:7c043bda2e4d6d8de8ae8e3944d2caeef5dd370e81df31e2e74557eaa574946a", size = 50905, upload-time = "2026-02-19T13:23:31.523Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/b0/0e6bcdf5ff9837b95b7a3abd74b4a0bb01353ee8f0854dcdd6aa3fce4ce3/pystow-0.7.23-py3-none-any.whl", hash = "sha256:af548a856de6f48f65e2928c0dfefec0a92782bbe599d7e0084dfbbc053a2c99", size = 56651, upload-time = "2026-02-06T12:54:34.08Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/3a/8dfc7e10341d6331dc2ccc09afb8d25501565112798adbd90cf35528c9ab/pystow-0.7.28-py3-none-any.whl", hash = "sha256:aa73dec0f6dea8bfc844f3abd3d985d6d3594291ebd234d9ec05b16884b13336", size = 57950, upload-time = "2026-02-19T13:23:33.182Z" },
 ]
 
 [[package]]

@@ -17,6 +17,9 @@ from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
+from mtbls.application.services.interfaces.validation_report_service import (
+    ValidationReportService,
+)
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
@@ -27,8 +30,11 @@ logger = logging.getLogger(__name__)
 @inject
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
-    # cache_service: CacheService = Provide["services.cache_service"],
+    cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
+    validation_report_service: ValidationReportService = Provide[
+        "services.validation_report_service"
+    ],
     user_read_repository: UserReadRepository = Provide[
         "repositories.user_read_repository"
     ],
@@ -42,11 +48,12 @@ async def init_application(  # noqa: PLR0913
     test_database_table: bool = True,
     test_policy_service: bool = False,
     test_ontology_search_service: bool = True,
+    test_validation_report_service: bool = True,
 ):
     if test_database_connection:
         await init_database_client(database_client)
-    # if test_cache_service:
-    #     await init_cache_service(cache_service)
+    if test_cache_service:
+        await init_cache_service(cache_service)
     if test_async_task_service:
         await init_async_task_service(async_task_service)
     if test_database_table:
@@ -55,10 +62,32 @@ async def init_application(  # noqa: PLR0913
         await init_policy_service(policy_service)
     if test_ontology_search_service:
         await init_ontology_search_service(ontology_search_service)
+    if test_validation_report_service:
+        await init_validation_report_service(validation_report_service)
+
+    logger.info("Application is initialized.")
 
 
 def get_service_name(service) -> str:
     return f"{service.__module__}.{service.__class__.__name__}"
+
+
+async def init_validation_report_service(
+    validation_report_service: ValidationReportService,
+) -> bool:
+    if not validation_report_service:
+        logger.info("Validation report service is not initialized.")
+        return False
+    try:
+        await validation_report_service.find_all(
+            resource_id="MTBLS1", offset=0, limit=10
+        )
+        logger.info("Validation report service is ready.")
+        return True
+    except Exception as ex:
+        logger.error("Validation report service is not ready: %s", str(ex))
+        logger.critical("Validation report service tasks will fail.")
+        return False
 
 
 async def init_ontology_search_service(
