@@ -7,10 +7,10 @@ from metabolights_utils.models.metabolights.model import (
 )
 from metabolights_utils.provider.study_provider import AbstractFolderMetadataCollector
 
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.domain.shared.repository.sort_option import SortOption
@@ -21,9 +21,9 @@ class RepositoryInfoCollector(AbstractFolderMetadataCollector):
     def __init__(
         self,
         resource_id: str,
-        study_file_repository: StudyFileRepository,
+        study_data_file_repository: StudyDataFileRepository,
     ):
-        self.study_file_repository = study_file_repository
+        self.study_data_file_repository = study_data_file_repository
         self.resource_id = resource_id
 
     async def get_folder_metadata(
@@ -53,7 +53,7 @@ class RepositoryInfoCollector(AbstractFolderMetadataCollector):
         return study_files_metadata, messages
 
     def convert_to_file_descriptor(
-        self, source: StudyFileOutput, subfolder: str = ""
+        self, source: StudyDataFileOutput, subfolder: str = ""
     ) -> StudyFileDescriptor:
         parent_directory = (
             f"{subfolder}/{source.parent_object_key}"
@@ -83,7 +83,7 @@ class RepositoryInfoCollector(AbstractFolderMetadataCollector):
         messages: List[GenericMessage],
         subfolder: str = "",
     ):
-        content = await self.study_file_repository.find(
+        content = await self.study_data_file_repository.find(
             query_options=QueryOptions(
                 filters=[
                     EntityFilter(key="resourceId", value=resource_id),

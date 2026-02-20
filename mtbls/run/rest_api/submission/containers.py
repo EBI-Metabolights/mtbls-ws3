@@ -175,17 +175,17 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         selector=repository_config.active_target_repository.study_metadata,
         mongodb=providers.Singleton(
             MongoDbStudyMetadataServiceFactory,
-            study_file_repository=repositories.study_file_repository,
+            study_read_repository=repositories.study_read_repository,
+            user_read_repository=repositories.user_read_repository,
+            study_data_file_repository=None,
             investigation_object_repository=repositories.investigation_object_repository,
             isa_table_object_repository=repositories.isa_table_object_repository,
             isa_table_row_object_repository=repositories.isa_table_row_object_repository,
-            study_read_repository=repositories.study_read_repository,
-            user_read_repository=repositories.user_read_repository,
             temp_path="/tmp/study-metadata-service",
         ),
         nfs=providers.Singleton(
             FileObjectStudyMetadataServiceFactory,
-            study_file_repository=None,
+            study_data_file_repository=None,
             metadata_files_object_repository=repositories.metadata_files_object_repository,
             audit_files_object_repository=repositories.audit_files_object_repository,
             internal_files_object_repository=repositories.internal_files_object_repository,
@@ -240,9 +240,7 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
     )
 
     repositories = providers.Container(
-        RepositoriesContainer,
-        config=config,
-        gateways=gateways,
+        RepositoriesContainer, config=config, gateways=gateways
     )
 
     services = providers.Container(

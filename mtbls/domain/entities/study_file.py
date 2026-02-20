@@ -4,7 +4,7 @@ from typing import Union
 from metabolights_utils.common import CamelCaseModel
 from pydantic import field_validator
 
-from mtbls.domain.entities.base_entity import BaseStudyFile, BaseStudyFileInput
+from mtbls.domain.entities.base_entity import BaseStudyDataFile, BaseStudyDataFileInput
 from mtbls.domain.shared.data_types import Integer, UtcDatetime
 
 
@@ -25,10 +25,9 @@ class HashAlgorithm(enum.StrEnum):
     MD5 = "md5"
 
 
-class StudyFileInput(CamelCaseModel, BaseStudyFileInput):
+class StudyDataFileInput(CamelCaseModel, BaseStudyDataFileInput):
     bucket_name: Union[None, str] = None
     resource_id: Union[None, str] = None
-    numeric_resource_id: Union[None, int] = None
     basename: Union[None, str] = None
     object_key: Union[None, str] = None
     parent_object_key: Union[None, str] = None
@@ -41,6 +40,7 @@ class StudyFileInput(CamelCaseModel, BaseStudyFileInput):
     hashes: dict[HashAlgorithm, str] = {}
     permission_in_oct: Union[None, str] = None
     extension: str = ""
+    accessibility: str = "private"
     category: ResourceCategory = ResourceCategory.UNKNOWN_RESOURCE
     tags: dict[str, Union[str, int, float, bool, UtcDatetime]] = {}
 
@@ -55,4 +55,4 @@ class StudyFileInput(CamelCaseModel, BaseStudyFileInput):
         return ResourceCategory.UNKNOWN_RESOURCE
 
 
-class StudyFileOutput(StudyFileInput, BaseStudyFile): ...
+class StudyDataFileOutput(StudyDataFileInput, BaseStudyDataFile): ...

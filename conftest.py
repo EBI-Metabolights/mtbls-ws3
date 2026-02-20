@@ -107,8 +107,8 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
             user_read_repository=container.repositories.user_read_repository(),
         )
     )
-    # container.repositories.study_file_repository.override(
-    #     FileSystemStudyFileRepository()
+    # container.repositories.study_data_file_repository.override(
+    #     FileSystemStudyDataFileRepository()
     # )
     container.services.policy_service.override(MockPolicyService())
 

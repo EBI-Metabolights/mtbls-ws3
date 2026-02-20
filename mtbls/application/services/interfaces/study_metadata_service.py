@@ -18,7 +18,7 @@ from mtbls.domain.entities.isa_table import (
     IsaTableFileObject,
     IsaTableRow,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.shared.data_types import JsonPathOperation
 
 
@@ -94,7 +94,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
 
     async def list_isa_files(
         self,
-    ) -> list[StudyFileOutput]: ...
+    ) -> list[StudyDataFileOutput]: ...
 
     async def get_isa_table_rows(
         self,

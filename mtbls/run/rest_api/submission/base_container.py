@@ -28,6 +28,9 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
+)
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
@@ -79,12 +82,18 @@ from mtbls.infrastructure.repositories.mtbls_data_reuse.sql_db.mtbls_data_reuse_
 )
 from mtbls.infrastructure.repositories.statistic.sql_db.statistic_read_repository import (  # noqa: E501
     SqlDbStatisticReadRepository,
-)  # noqa: E501
+)
 from mtbls.infrastructure.repositories.study.db.study_read_repository import (
     SqlDbStudyReadRepository,
 )
 from mtbls.infrastructure.repositories.study.db.study_write_repository import (
     SqlDbStudyWriteRepository,
+)
+from mtbls.infrastructure.repositories.study_data_file.mongodb.study_data_file_repository import (  # noqa: E501
+    MongoDbStudyDataFileRepository,
+)
+from mtbls.infrastructure.repositories.study_data_file.sql_db.study_file_repository import (  # noqa: E501
+    SqlDbStudyDataFileRepository,
 )
 from mtbls.infrastructure.repositories.user.db.user_read_repository import (
     SqlDbUserReadRepository,
@@ -225,18 +234,20 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         )
     )
 
-    # study_file_repository: StudyFileRepository = providers.Singleton(
-    #     MongoDbStudyFileRepository,
-    #     connection=gateways.mongodb_connection,
-    #     study_objects_collection_name="study_files",
-    # )
-
-    # study_file_repository: StudyFileRepository = providers.Singleton(
-    #     SqlDbStudyFileRepository,
-    #     entity_mapper=entity_mapper,
-    #     alias_generator=alias_generator,
-    #     database_client=gateways.database_client,
-    # )
+    study_data_file_repository: StudyDataFileRepository = providers.Selector(
+        selector=config.repositories.active_target_repository.study_data_files,
+        mongodb=providers.Singleton(
+            MongoDbStudyDataFileRepository,
+            connection=gateways.mongodb_connection,
+            study_objects_collection_name="study_data_files",
+        ),
+        sql_db=providers.Singleton(
+            SqlDbStudyDataFileRepository,
+            entity_mapper=entity_mapper,
+            alias_generator=alias_generator,
+            database_client=gateways.database_client,
+        ),
+    )
 
     folder_manager = providers.Singleton(
         StudyFolderManager, config=config.repositories.study_folders
@@ -270,8 +281,9 @@ class RepositoriesContainer(containers.DeclarativeContainer):
             collection_name="investigation_files",
             study_bucket=StudyBucket.PRIVATE_METADATA_FILES,
             observer=None,
-        ),
+        )
     )
+
     isa_table_object_repository: IsaTableObjectRepository = providers.Singleton(  # noqa: E501
         MongoDbIsaTableObjectRepository,
         connection=gateways.mongodb_connection,

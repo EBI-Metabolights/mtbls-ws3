@@ -10,7 +10,7 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
 from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
-from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
+from mtbls.domain.entities.study_file import ResourceCategory, StudyDataFileOutput
 from mtbls.domain.entities.validation.validation_override import (
     ValidationOverrideFileObject,
     ValidationOverrideList,
@@ -72,9 +72,6 @@ class MongoDbValidationOverrideService(ValidationOverrideService):
             overrides = ValidationOverrideFileObject(
                 bucket_name=self.study_bucket.value,
                 resource_id=resource_id,
-                numeric_resource_id=int(
-                    resource_id.removeprefix("REQ").removeprefix("MTBLS")
-                ),
                 object_key=self.validation_overrides_object_key,
                 created_at=now,
                 data=ValidationOverrideList(resource_id=resource_id, version=version),
@@ -116,17 +113,14 @@ class MongoDbValidationOverrideService(ValidationOverrideService):
         created_at: Union[None, datetime.datetime] = None,
         updated_at: Union[None, datetime.datetime] = None,
         tags: dict[str, Union[None, str, int, float, bool, UtcDatetime]] = None,
-    ) -> StudyFileOutput:
-        return StudyFileOutput(
+    ) -> StudyDataFileOutput:
+        return StudyDataFileOutput(
             id_=id_,
             bucket_name=self.study_bucket.value,
             object_key=self.validation_overrides_object_key,
             parent_object_key=self.parent_object_key,
             resource_id=resource_id,
             basename=self.validation_overrides_path.name,
-            numeric_resource_id=int(
-                resource_id.removeprefix("REQ").removeprefix("MTBLS")
-            ),
             extension=self.validation_overrides_path.suffix,
             category=ResourceCategory.INTERNAL_RESOURCE,
             created_at=created_at,

@@ -18,7 +18,7 @@ from mtbls.domain.entities.base_entity import BaseEntity
 from mtbls.domain.entities.base_file_object import BaseFileObject
 from mtbls.domain.entities.study_file import (
     ResourceCategory,
-    StudyFileOutput,
+    StudyDataFileOutput,
 )
 from mtbls.domain.exceptions.repository import (
     StudyObjectNotFoundError,
@@ -61,13 +61,13 @@ class MongoDbFileObjectReadRepository(
 
     async def list(
         self, resource_id: str, object_key: Union[None, str] = None
-    ) -> list[StudyFileOutput]:
+    ) -> list[StudyDataFileOutput]:
         result = await self.collection.find(
             {"resourceId": resource_id, "parentObjectId": object_key},
             {"_id": 0, "data": 0},
         )
 
-        resources = [StudyFileOutput.model_validate(x) for x in result]
+        resources = [StudyDataFileOutput.model_validate(x) for x in result]
 
         return resources
 
@@ -84,13 +84,13 @@ class MongoDbFileObjectReadRepository(
         )
         return True if result else False
 
-    async def get_info(self, resource_id: str, object_key: str) -> StudyFileOutput:
+    async def get_info(self, resource_id: str, object_key: str) -> StudyDataFileOutput:
         result = await self.collection.find_one(
             {"resourceId": resource_id, "parentObjectId": object_key},
             {"_id": 0, "data": 0},
         )
 
-        return StudyFileOutput.model_validate(result) if result else None
+        return StudyDataFileOutput.model_validate(result) if result else None
 
     async def get_uri(self, resource_id: str, object_key: str) -> str:
         cn = self.connection
@@ -99,7 +99,7 @@ class MongoDbFileObjectReadRepository(
 
     async def download(
         self, resource_id: str, object_key: str, target_path: str
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         result = await self.collection.find_one(
             {"resourceId": resource_id, "objectId": object_key},
             {"_id": 1},
@@ -109,7 +109,7 @@ class MongoDbFileObjectReadRepository(
             target.parent.mkdir(parents=True, exist_ok=True)
             with target.open("w") as f:
                 json.dump(result["data"], f)
-            return StudyFileOutput.model_validate(result)
+            return StudyDataFileOutput.model_validate(result)
         raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, object_key)
 
     async def get_study_object(
@@ -120,7 +120,7 @@ class MongoDbFileObjectReadRepository(
         resource_category: ResourceCategory = ResourceCategory.UNKNOWN_RESOURCE,
         tags: Union[None, dict[str, Any]] = None,
         max_suffix_length: int = 6,
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         # Get file or directory metadata
         parent_object_key = ""
         if object_key:
@@ -144,11 +144,9 @@ class MongoDbFileObjectReadRepository(
                 suffix = object_path.suffix if object_path.suffix else ""
 
         permission_in_oct = None
-        numeric_resource_id = int(resource_id.removeprefix("MTBLS").removeprefix("REQ"))
-        return StudyFileOutput(
+        return StudyDataFileOutput(
             bucket_name=self.study_bucket.value(),
             resource_id=resource_id,
-            numeric_resource_id=numeric_resource_id,
             object_key=object_key,
             parent_object_key=parent_object_key,
             created_at=created_at,

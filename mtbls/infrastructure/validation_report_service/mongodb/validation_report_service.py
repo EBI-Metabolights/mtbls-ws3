@@ -6,7 +6,7 @@ from typing import Any, Union
 from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
-from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
+from mtbls.domain.entities.study_file import ResourceCategory, StudyDataFileOutput
 from mtbls.domain.entities.validation.validation_report import ValidationReport
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.data_types import ZeroOrPositiveInt
@@ -128,12 +128,8 @@ class MongoDbValidationReportService(ValidationReportService):
 
         else:
             object_key_path = Path(object_key)
-            numeric_resource_id = int(
-                resource_id.removeprefix("REQ").removeprefix("MTBLS")
-            )
             report = ValidationReport(
                 resource_id=resource_id,
-                numeric_resource_id=numeric_resource_id,
                 bucket_name=self.study_bucket.value,
                 basename=object_key_path.name,
                 object_key=object_key,
@@ -146,7 +142,9 @@ class MongoDbValidationReportService(ValidationReportService):
             )
             await self.write_repository.create(report)
 
-        study_object = StudyFileOutput.model_validate(report.model_dump(exclude="data"))
+        study_object = StudyDataFileOutput.model_validate(
+            report.model_dump(exclude="data")
+        )
         if result:
             await self.validation_report_repository.object_updated(
                 study_object=study_object

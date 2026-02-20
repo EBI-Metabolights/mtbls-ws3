@@ -4,12 +4,12 @@ from pydantic import field_serializer, field_validator
 
 from mtbls.domain.entities.study_file import (
     HashAlgorithm,
-    StudyFileInput,
-    StudyFileOutput,
+    StudyDataFileInput,
+    StudyDataFileOutput,
 )
 
 
-class SqlDbStudyFileInput(StudyFileInput):
+class SqlDbStudyDataFileInput(StudyDataFileInput):
     @field_serializer("hashes", "tags")
     @classmethod
     def hashes_serializer(cls, value):
@@ -49,4 +49,4 @@ class SqlDbStudyFileInput(StudyFileInput):
         return {}
 
 
-class SqlDbStudyFileOutput(SqlDbStudyFileInput, StudyFileOutput): ...
+class SqlDbStudyDataFileOutput(SqlDbStudyDataFileInput, StudyDataFileOutput): ...

@@ -10,7 +10,7 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
     ValidationReportRepository,
 )
 from mtbls.domain.entities.base_entity import BaseEntity
-from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
+from mtbls.domain.entities.study_file import ResourceCategory, StudyDataFileOutput
 from mtbls.domain.entities.validation.validation_report import ValidationReport
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
@@ -131,11 +131,9 @@ class MongoDbValidationReportRepository(
 
         now = datetime.datetime.now(datetime.timezone.utc)
         object_key_path = Path(object_key)
-        numeric_resource_id = (resource_id.removeprefix("REQ").removeprefix("MTBLS"),)
-        study_object = StudyFileOutput(
+        study_object = StudyDataFileOutput(
             id_=report.id_,
             resource_id=resource_id,
-            numeric_resource_id=numeric_resource_id,
             bucket_name=self.study_bucket.value,
             basename=object_key_path.name,
             object_key=object_key,

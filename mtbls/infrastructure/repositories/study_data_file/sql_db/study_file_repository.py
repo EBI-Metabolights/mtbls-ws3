@@ -5,10 +5,10 @@ from typing import OrderedDict, Union
 from mtbls.application.services.interfaces.repositories.file_object.file_object_observer import (  # noqa: E501
     DefaultFileObjectObserver,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
-from mtbls.domain.entities.study_file import StudyFileInput, StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileInput, StudyDataFileOutput
 from mtbls.domain.enums.entity import Entity
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.paginated_output import PaginatedOutput
@@ -24,18 +24,18 @@ from mtbls.infrastructure.repositories.default.db.default_read_repository import
 from mtbls.infrastructure.repositories.default.db.default_write_repository import (
     SqlDbDefaultWriteRepository,
 )
-from mtbls.infrastructure.repositories.study_file.sql_db.models import (
-    SqlDbStudyFileInput,
-    SqlDbStudyFileOutput,
+from mtbls.infrastructure.repositories.study_data_file.sql_db.models import (
+    SqlDbStudyDataFileInput,
+    SqlDbStudyDataFileOutput,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class SqlDbStudyFileRepository(
-    SqlDbDefaultWriteRepository[SqlDbStudyFileInput, SqlDbStudyFileOutput, int],
-    SqlDbDefaultReadRepository[SqlDbStudyFileOutput, int],
-    StudyFileRepository,
+class SqlDbStudyDataFileRepository(
+    SqlDbDefaultWriteRepository[SqlDbStudyDataFileInput, SqlDbStudyDataFileOutput, int],
+    SqlDbDefaultReadRepository[SqlDbStudyDataFileOutput, int],
+    StudyDataFileRepository,
     DefaultFileObjectObserver,
 ):
     def __init__(
@@ -48,23 +48,25 @@ class SqlDbStudyFileRepository(
 
         self.registered_repositories = set()
         self.user_type_alias_dict = OrderedDict()
-        for field in SqlDbStudyFileOutput.model_fields:
-            entity_type: Entity = SqlDbStudyFileOutput.model_config.get("entity_type")
+        for field in SqlDbStudyDataFileOutput.model_fields:
+            entity_type: Entity = SqlDbStudyDataFileOutput.model_config.get(
+                "entity_type"
+            )
             value = alias_generator.get_alias(entity_type, field)
             self.user_type_alias_dict[field] = value
 
-    async def object_updated(self, study_object: StudyFileOutput):
+    async def object_updated(self, study_object: StudyDataFileOutput):
         await self.update_object(study_object)
 
-    async def object_deleted(self, study_object: StudyFileOutput):
+    async def object_deleted(self, study_object: StudyDataFileOutput):
         await self.delete_object(study_object)
 
-    async def object_created(self, study_object: StudyFileInput):
+    async def object_created(self, study_object: StudyDataFileInput):
         await self.update_object(study_object)
 
     async def get_children(
         self, resource_id: str, bucket_name: str, parent_object_key: str
-    ) -> PaginatedOutput[StudyFileOutput]:
+    ) -> PaginatedOutput[StudyDataFileOutput]:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(
@@ -84,14 +86,14 @@ class SqlDbStudyFileRepository(
         )
         result = await self.find(query_options=query_options)
         updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
+            SqlDbStudyDataFileOutput.model_validate(x, from_attributes=True)
             for x in result.data
         ]
         return PaginatedOutput(data=updated_data)
 
     async def get_root_object(
         self, resource_id: str, bucket_name: str
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(
@@ -111,27 +113,27 @@ class SqlDbStudyFileRepository(
         )
         result = await self.find(query_options=query_options)
         updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
+            SqlDbStudyDataFileOutput.model_validate(x, from_attributes=True)
             for x in result.data
         ]
         if updated_data:
             return updated_data[0]
 
-    async def create_objects(self, entities: list[StudyFileInput]) -> list[str]:
+    async def create_objects(self, entities: list[StudyDataFileInput]) -> list[str]:
         db_entities = []
         for entity in entities:
-            value = SqlDbStudyFileInput.model_validate(entity, from_attributes=True)
+            value = SqlDbStudyDataFileInput.model_validate(entity, from_attributes=True)
             values = value.model_dump(by_alias=False)
-            db_entities.append(db_models.StudyFile(**values))
+            db_entities.append(db_models.StudyDataFile(**values))
         results = await self.create_many(db_entities)
         return [str(x.id_ for x in results)]
 
     async def update_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
-        value = SqlDbStudyFileOutput.model_validate(entity, from_attributes=True)
+        self, entity: StudyDataFileOutput
+    ) -> Union[None, StudyDataFileOutput]:
+        value = StudyDataFileOutput.model_validate(entity, from_attributes=True)
         # values = value.model_dump(by_alias=False)
-        # db_entity = db_models.StudyFile(**values)
+        # db_entity = db_models.StudyDataFile(**values)
         current = await self.find_one(
             resource_id=entity.resource_id,
             bucket_name=entity.bucket_name,
@@ -144,11 +146,11 @@ class SqlDbStudyFileRepository(
             value.id_ = None
             value.created_at = datetime.datetime.now(datetime.timezone.utc)
             result = await self.create(value)
-        return SqlDbStudyFileOutput.model_validate(result, from_attributes=True)
+        return SqlDbStudyDataFileOutput.model_validate(result, from_attributes=True)
 
     async def delete_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
+        self, entity: StudyDataFileOutput
+    ) -> Union[None, StudyDataFileOutput]:
         await self.delete(entity.id_)
 
     async def find_one(self, resource_id: str, bucket_name: str, object_key: str):
@@ -172,7 +174,7 @@ class SqlDbStudyFileRepository(
         result = await self.find(query_options=query_options)
 
         updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
+            SqlDbStudyDataFileOutput.model_validate(x, from_attributes=True)
             for x in result.data
         ]
         if updated_data:

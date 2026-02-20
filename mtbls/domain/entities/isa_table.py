@@ -84,12 +84,12 @@ class IndexedData(CamelCaseModel):
     ] = ""
     bucket_name: Union[None, str] = None
     resource_id: Union[None, str] = None
-    numeric_resource_id: Union[None, int] = None
     object_key: Union[None, str] = None
 
 
 class IsaTableRow(CamelCaseModel):
     row_index: Union[None, int] = None
+    row_id: Union[None, str] = None
     data: Annotated[
         dict[str, str], Field(description="Row data with column names")
     ] = {}
@@ -98,8 +98,12 @@ class IsaTableRow(CamelCaseModel):
 class IsaTableFileObject(BaseEntity, IndexedData):
     data_type: Literal["sample", "assay", "maf"]
     columns: Annotated[
-        list[ColumnInfo],
+        Union[list[ColumnDefinition], list[ColumnInfo]],
         Field(description="Column information. e.g. column order, name"),
+    ] = []
+    row_orders: Annotated[
+        Union[dict[str, int], None],
+        Field(description="Row orders with row ids. e.g. {'row_001': 0 }"),
     ] = []
 
 
@@ -114,7 +118,7 @@ class IsaTableData(CamelCaseModel):
         Union[list[ColumnDefinition], list[ColumnInfo]],
         Field(description="Column information. e.g. column order, name"),
     ] = []
-    rows: list[IsaTableRowObject] = []
+    rows: list[IsaTableRowObject] | list[IsaTableRow] = []
     offset: int = 0
     limit: Union[None, int] = None
 

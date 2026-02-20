@@ -62,7 +62,7 @@ if __name__ == "__main__":
     #     MongoDbIsaTableRowObjectRepository(mongodb_connection)
     # )
     # container.repositories.file_registry.override(
-    #     MongoDbStudyFileRepository(
+    #     MongoDbStudyDataFileRepository(
     #         connection=mongodb_connection,
     #     )
     # )

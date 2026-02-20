@@ -46,7 +46,7 @@ from mtbls.application.services.interfaces.study_metadata_service import (
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
     FieldValueValidation,
@@ -92,7 +92,7 @@ async def create_validation_run_configuration(
         temp_folder_path = pathlib.Path(temp_folder).resolve()
     try:
         repo = metadata_files_object_repository
-        files: list[StudyFileOutput] = await repo.list(resource_id)
+        files: list[StudyDataFileOutput] = await repo.list(resource_id)
         result_files = [f for f in files if re.match(r"m_.+\.tsv$", f.basename)]
         local_result_files = []
 

@@ -12,7 +12,7 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 )
 from mtbls.domain.entities.study_file import (
     ResourceCategory,
-    StudyFileOutput,
+    StudyDataFileOutput,
 )
 from mtbls.domain.enums.http_request_type import HttpRequestType
 from mtbls.domain.exceptions.repository import (
@@ -112,7 +112,7 @@ class FileSystemObjectWriteRepository(
         object_path: pathlib.Path,
         resource_id: str,
         max_suffix_length: int = 6,
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         # Get file or directory metadata
         object_key = str(object_path).replace(str(study_path), "", 1).lstrip("/")
         return self.get_study_object(
@@ -209,7 +209,7 @@ class FileSystemObjectWriteRepository(
             ignore_not_exist=ignore_not_exist,
         )
 
-        study_object = StudyFileOutput(
+        study_object = StudyDataFileOutput(
             bucket_name=self.study_bucket.value,
             resource_id=resource_id,
             object_key=object_key,

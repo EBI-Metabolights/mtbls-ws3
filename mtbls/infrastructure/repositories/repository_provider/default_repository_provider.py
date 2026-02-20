@@ -17,8 +17,8 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
 from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
 from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
@@ -29,7 +29,7 @@ from mtbls.application.services.interfaces.repository_provider import Repository
 class DefaultRepositoryProvider(RepositoryProvider):
     def __init__(
         self,
-        study_file_repository: StudyFileRepository,
+        study_data_file_repository: StudyDataFileRepository,
         study_repository: StudyWriteRepository,
         user_repository: UserWriteRepository,
         validation_override_repository: ValidationOverrideRepository,
@@ -39,7 +39,7 @@ class DefaultRepositoryProvider(RepositoryProvider):
         isa_table_row_object_repository: IsaTableObjectRepository,
         file_object_repositories: dict[str, FileObjectWriteRepository],
     ):
-        self.study_file_repository = study_file_repository
+        self.study_data_file_repository = study_data_file_repository
         self.study_repository = study_repository
         self.user_repository = user_repository
         self.validation_override_repository = validation_override_repository
@@ -49,8 +49,8 @@ class DefaultRepositoryProvider(RepositoryProvider):
         self.isa_table_row_object_repository = isa_table_row_object_repository
         self.file_object_repositories = file_object_repositories
 
-    async def get_study_file_repository(self) -> StudyFileRepository:
-        return self.study_file_repository
+    async def get_study_data_file_repository(self) -> StudyDataFileRepository:
+        return self.study_data_file_repository
 
     async def get_study_repository(self) -> StudyWriteRepository:
         return self.study_repository

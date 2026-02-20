@@ -77,9 +77,10 @@ services:
         test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
 repositories:
   active_target_repository:
-    validation_overrides: nfs
-    validation_reports: nfs
-    study_metadata: nfs
+    validation_overrides: mongodb
+    validation_reports: mongodb
+    study_metadata: mongodb
+    study_data_files: mongodb
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
@@ -107,6 +108,9 @@ run:
       - mtbls.presentation.rest_api.groups.auth.v1
       - mtbls.presentation.rest_api.groups.public.v1
       - mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks
+      - mtbls.presentation.rest_api.groups.submission.v1.routers.metadata_files
+      - mtbls.presentation.rest_api.groups.submission.v1.routers.isa_table_files
+      - mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files
       - mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license
       - mtbls.presentation.rest_api.groups.curation.v1
       - mtbls.presentation.rest_api.groups.system.v1
@@ -131,6 +135,9 @@ run:
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/submission/v1/routers/validation_tasks
+        - mtbls/presentation/rest_api/groups/submission/v1/routers/metadata_files
+        - mtbls/presentation/rest_api/groups/submission/v1/routers/isa_table_files
+        - mtbls/presentation/rest_api/groups/submission/v1/routers/investigation_files
         - mtbls/presentation/rest_api/groups/submission/v1/routers/dataset_license
       - config_name: "curation"
         enabled: true

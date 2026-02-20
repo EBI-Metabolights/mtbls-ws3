@@ -23,8 +23,8 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
@@ -39,6 +39,13 @@ from mtbls.application.services.study_metadata_service.default_study_provider im
     DataFileIndexMetabolightsStudyProvider,
 )
 from mtbls.domain.entities.investigation import InvestigationItem
+from mtbls.domain.entities.isa_table import (
+    ColumnDefinition,
+    IsaTableData,
+    IsaTableFileObject,
+    IsaTableRow,
+)
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.exceptions.repository import (
     StudyResourceError,
     StudyResourceNotFoundError,
@@ -53,7 +60,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
     def __init__(
         self,
         resource_id: str,
-        study_file_repository: StudyFileRepository,
+        study_data_file_repository: StudyDataFileRepository,
         metadata_files_object_repository: FileObjectWriteRepository,
         audit_files_object_repository: FileObjectWriteRepository,
         internal_files_object_repository: FileObjectWriteRepository,
@@ -68,7 +75,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         self.user_read_repository = user_read_repository
         self.study_read_repository = study_read_repository
         self.resource_id = resource_id
-        self.study_file_repository = study_file_repository
+        self.study_data_file_repository = study_data_file_repository
         self.metadata_files_object_repository = metadata_files_object_repository
         self.audit_files_object_repository = audit_files_object_repository
         self.internal_files_object_repository = internal_files_object_repository
@@ -406,6 +413,11 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             calculate_metadata_size=calculate_metadata_size,
         )
 
+    async def list_isa_files(self) -> list[StudyDataFileOutput]:
+        return await self.metadata_files_object_repository.list(
+            resource_id=self.resource_id
+        )
+
     async def save_study_model(
         self,
         model: MetabolightsStudyModel,
@@ -579,12 +591,45 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         )
         return parent_object_key
 
+    async def get_isa_table_rows(
+        self,
+        object_key: str,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
+    ) -> list[IsaTableRow]:
+        result = await self.load_isa_table_file(
+            object_key=object_key, offset=offset, limit=limit
+        )
+        return result.rows if result else []
+
+    async def get_isa_table_data_columns(
+        self,
+        object_key: str,
+    ) -> IsaTableFileObject:
+        result = await self.load_isa_table_file(
+            object_key=object_key, offset=0, limit=0
+        )
+        if not result:
+            raise StudyResourceNotFoundError(
+                self.resource_id,
+                StudyBucket.PRIVATE_METADATA_FILES.value,
+                object_key,
+                "ISA table file not found",
+            )
+        return IsaTableFileObject(
+            columns=result.columns,
+            data_type=result.data_type,
+            bucket_name=self.metadata_files_object_repository.study_bucket,
+            object_key=object_key,
+            resource_id=self.resource_id,
+        )
+
     async def load_isa_table_file(
         self,
         object_key: str,
         offset: Union[int, None] = None,
         limit: Union[int, None] = None,
-    ) -> IsaTableFile:
+    ) -> IsaTableData:
         object_path = Path(object_key)
         target_file_path = self.staging_path / object_path
         if not target_file_path.exists():
@@ -593,12 +638,16 @@ class FileObjectStudyMetadataService(StudyMetadataService):
                 object_key=object_key,
                 target_path=str(target_file_path),
             )
+        data_type = None
         if object_path.name.startswith("s_"):
             reader = Reader.get_sample_file_reader(results_per_page=100000)
+            data_type = "sample"
         elif object_path.name.startswith("a_"):
             reader = Reader.get_assay_file_reader(results_per_page=100000)
+            data_type = "assay"
         elif object_path.name.startswith("m_"):
             reader = Reader.get_assignment_file_reader(results_per_page=100000)
+            data_type = "maf"
         else:
             raise ValueError(f"Invalid isa table file {object_key}")
 
@@ -607,8 +656,31 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             offset=offset,
             limit=limit,
         )
-
-        return result.isa_table_file
+        rows: list[IsaTableRow] = []
+        if result and result.isa_table_file and result.isa_table_file.table.data:
+            first_column = result.isa_table_file.table.columns[0]
+            for idx in range(len(result.isa_table_file.table.data[first_column])):
+                row = {
+                    col: result.isa_table_file.table.data[col][idx]
+                    for col in result.isa_table_file.table.data
+                }
+                row_index = idx if offset is None else idx + offset
+                rows.append(IsaTableRow(row_index=row_index, data=row))
+        columns = [
+            ColumnDefinition(
+                column_index=x.column_index,
+                column_name=x.column_name,
+                column_header=x.column_header,
+            )
+            for x in result.isa_table_file.table.headers
+        ]
+        return IsaTableData(
+            data_type=data_type,
+            columns=columns,
+            offset=offset if offset else 0,
+            limit=limit,
+            rows=rows,
+        )
 
     async def save_isa_table_file(
         self, resource_id: str, isa_table_file: IsaTableFile, object_key: str
