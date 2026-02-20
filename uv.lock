@@ -1536,7 +1536,7 @@ wheels = [
 [[package]]
 name = "mhd-model"
 version = "0.1.50"
-source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#2cbced298ec0cd6fd7faf75e2a8b8448c0abf88a" }
+source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#3022eac06ccd0d7023218b61034d5d922a77af4c" }
 dependencies = [
     { name = "bioregistry" },
     { name = "charset-normalizer" },
@@ -1646,7 +1646,7 @@ wheels = [
 [[package]]
 name = "mtbls-mhd-integration"
 version = "0.0.20"
-source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#888b540a3fcb05a90c2e753b9651f219b06360eb" }
+source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#32c9e6d76e10bb134a635223443f26b8e2307b3b" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
