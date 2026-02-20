@@ -627,24 +627,26 @@ async def validate_mhd_study(
                 mhd_validation_errors["mhd_announcement_errors"] = OrderedDict()
                 message = "MHD announcement file creation failed."
                 mhd_validation_errors["mhd_announcement_errors"]["file"] = message
-                policy_result.messages.violations.append(
-                    create_mhd_error_message(
-                        "rule___500_100_002_01",
-                        "MetabolomicsHub announcement file",
-                        [message],
+                if not current_errors:
+                    policy_result.messages.violations.append(
+                        create_mhd_error_message(
+                            "rule___500_100_002_01",
+                            "MetabolomicsHub announcement file",
+                            [message],
+                        )
                     )
-                )
     else:
         mhd_validation_errors["mhd_model_errors"] = OrderedDict()
         message = "MHD common model file creation failed."
         mhd_validation_errors["mhd_model_errors"]["file"] = message
-        policy_result.messages.violations.append(
-            create_mhd_error_message(
-                "rule___500_100_001_01",
-                "MetabolomicsHub common model file",
-                [message],
+        if not current_errors:
+            policy_result.messages.violations.append(
+                create_mhd_error_message(
+                    "rule___500_100_001_01",
+                    "MetabolomicsHub common model file",
+                    [message],
+                )
             )
-        )
     if mhd_validation_errors:
         logger.info("MHD validation errors are saved on %s", mhd_validation_file_path)
         mhd_validation_errors["status"] = "failed"
@@ -667,7 +669,7 @@ def create_mhd_error_message(identifier: str, mhd_file_type: str, errors: list[s
         description="Current study does not comply with "
         "MetabolomicsHub requirements. "
         "Please contact MetaboLights team for help.",
-        violation=f"{mhd_file_type} validation failed." + ", ".join(errors),
+        violation=f"{mhd_file_type} validation failed. " + ", ".join(errors),
         values=errors,
     )
 

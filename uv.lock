@@ -1646,7 +1646,7 @@ wheels = [
 [[package]]
 name = "mtbls-mhd-integration"
 version = "0.0.20"
-source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#32c9e6d76e10bb134a635223443f26b8e2307b3b" }
+source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#1433e59f1480ea0b3588f7852e5b9880c9e7751f" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
