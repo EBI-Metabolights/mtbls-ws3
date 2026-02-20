@@ -265,13 +265,14 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
             column_names = [
                 column_order_map[idx] for idx in range(len(column_order_map))
             ]
-            for row_idx in range(len(data[column_names[0]])):
-                row = [data[column_name][row_idx] for column_name in column_names]
-                for idx, cell in enumerate(row):
-                    cell_value = cell if cell is not None else ""
-                    if values_in_quotation_mark:
-                        cell_value = f'"{cell_value}"'
-                    else:
-                        cell_value = cell.strip('"')
-                    row[idx] = cell_value
-                f.write("\t".join(row) + "\n")
+            if column_names:
+                for row_idx in range(len(data[column_names[0]])):
+                    row = [data[column_name][row_idx] for column_name in column_names]
+                    for idx, cell in enumerate(row):
+                        cell_value = cell if cell is not None else ""
+                        if values_in_quotation_mark:
+                            cell_value = f'"{cell_value}"'
+                        else:
+                            cell_value = cell.strip('"')
+                        row[idx] = cell_value
+                    f.write("\t".join(row) + "\n")

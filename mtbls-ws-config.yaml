@@ -80,6 +80,7 @@ repositories:
     validation_overrides: nfs
     validation_reports: nfs
     study_metadata: nfs
+    study_data_files: nfs
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
