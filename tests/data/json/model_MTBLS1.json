@@ -33,7 +33,7 @@
         {
           "sourceName": "CHEBI",
           "sourceFile": "http://purl.obolibrary.org/obo/chebi.owl",
-          "sourceVersion": "248",
+          "sourceVersion": "249",
           "sourceDescription": "Chemical Entities of Biological Interest"
         },
         {
@@ -45,7 +45,7 @@
         {
           "sourceName": "EFO",
           "sourceFile": "http://www.ebi.ac.uk/efo/efo.owl",
-          "sourceVersion": "3.86.0",
+          "sourceVersion": "3.87.0",
           "sourceDescription": "Experimental Factor Ontology"
         },
         {

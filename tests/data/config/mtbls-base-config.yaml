@@ -12,6 +12,21 @@ gateways:
         user: root
         password: example
         database: test
+    elasticsearch:
+      connection:
+        hosts: "localhost"
+        port: 27017
+        username: elastic
+        password: change_me
+        verify_certs: false
+        api_key: not_
+        api_keys:
+          study: changeme
+          compound: changeme
+          assignment: changeme
+          assay: changeme
+          sample: changeme
+        request_timeout_in_seconds: 15.0
 services:
   authentication:
     standalone:
