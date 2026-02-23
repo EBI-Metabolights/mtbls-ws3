@@ -1,7 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
-from mtbls.domain.entities.compound import Compound
+import pytest
+
 from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import (
     MongoCompoundReadRepository,
 )

@@ -357,8 +357,8 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         """
         for r in ranges:
             name = r.get("name")
-            if value == name or value == BaseElasticSearchGateway._range_key(r):
-                return BaseElasticSearchGateway._range_query(field, r)
+            if value == name or value == BaseElasticSearchGateway._range_key(r):  # noqa: SLF001
+                return BaseElasticSearchGateway._range_query(field, r)  # noqa: SLF001
         return None
 
     @staticmethod

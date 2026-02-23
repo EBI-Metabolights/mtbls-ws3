@@ -17,11 +17,11 @@ from mtbls.infrastructure.search.es.es_configuration import (
 )
 
 if TYPE_CHECKING:
-    from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
-        ElasticsearchAssignmentGateway,
-    )
     from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
         ElasticsearchAssayGateway,
+    )
+    from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
+        ElasticsearchAssignmentGateway,
     )
     from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
         ElasticsearchSampleGateway,
@@ -843,8 +843,8 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """
         for r in ranges:
             name = r.get("name")
-            if value == name or value == BaseElasticSearchGateway._range_key(r):
-                return BaseElasticSearchGateway._range_query(field, r)
+            if value == name or value == BaseElasticSearchGateway._range_key(r):  # noqa: SLF001
+                return BaseElasticSearchGateway._range_query(field, r)  # noqa: SLF001
         return None
 
     def _map_aggs_to_searchui(

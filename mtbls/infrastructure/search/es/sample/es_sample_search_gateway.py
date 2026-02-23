@@ -1,10 +1,10 @@
 import logging
 from typing import Any
 
+from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 from mtbls.infrastructure.search.es.sample.es_sample_configuration import (
     SampleElasticSearchConfiguration,
 )
-from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 logger = logging.getLogger(__name__)
 

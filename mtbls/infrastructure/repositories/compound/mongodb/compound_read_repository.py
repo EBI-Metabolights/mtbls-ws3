@@ -67,7 +67,7 @@ class MongoCompoundReadRepository(CompoundReadRepository):
                 found_compounds.append(compound)
                 found_ids.add(doc.get("id", ""))
             except Exception as ex:
-                logger.exception(f"Failed to parse compound document: {ex}")
+                logger.exception("Failed to parse compound document: %s", ex)
 
         # Determine which IDs were not found
         missing_ids = [id_ for id_ in ids if id_ not in found_ids]

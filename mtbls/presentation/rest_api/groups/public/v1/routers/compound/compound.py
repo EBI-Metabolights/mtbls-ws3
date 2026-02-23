@@ -106,7 +106,7 @@ async def get_compound_by_id(
                 compound_id
             )
         except ValueError as e:
-            logger.warning(f"Could not find similar compounds for {compound_id}: {e}")
+            logger.warning("Could not find similar compounds for %s: %s", compound_id, e)
             similar_compounds = []
 
     result = CompoundWithSimilar(compound=compound, similar_compounds=similar_compounds)
@@ -145,7 +145,7 @@ async def get_similar_compounds(
         response.content = result
         return response
     except ValueError as e:
-        logger.error(f"Similarity search failed for {compound_id}: {e}")
+        logger.error("Similarity search failed for %s: %s", compound_id, e)
         response = APIResponse[SimilarCompoundsResult]()
         response.content = SimilarCompoundsResult(
             query_compound_id=compound_id,

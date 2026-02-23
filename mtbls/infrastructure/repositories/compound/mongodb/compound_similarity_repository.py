@@ -59,7 +59,8 @@ def _compute_fingerprint(
         raise ImportError("RDKit is required for fingerprint computation")
 
     from rdkit import Chem
-    from rdkit.Chem import AllChem, inchi as rdkit_inchi
+    from rdkit.Chem import AllChem
+    from rdkit.Chem import inchi as rdkit_inchi
 
     mol = None
 
@@ -371,12 +372,12 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
             exclude_id=exclude_id,
         )
 
-        logger.debug(f"Executing similarity pipeline with {len(pipeline)} stages")
+        logger.debug("Executing similarity pipeline with %s stages", len(pipeline))
 
         results = list(collection.aggregate(pipeline))
 
         logger.debug(
-            f"Found {len(results)} similar compounds with Tanimoto >= {threshold}"
+            "Found %s similar compounds with Tanimoto >= %s", len(results), threshold
         )
 
         return [
