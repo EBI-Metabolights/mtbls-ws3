@@ -37,7 +37,13 @@ gateways:
         password: "{{ elasticsearch.password }}"
         verify_certs: "{{ elasticsearch.verify_certs }}"
         api_key: "{{ elasticsearch.api_key }}"
-        request_timeout_in_seconds: 5.0
+        api_keys:
+          study: "{{ elasticsearch.api_keys.study }}"
+          compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
+          assay: "{{ elasticsearch.api_keys.assay }}"
+          sample: "{{ elasticsearch.api_keys.sample }}"
+        request_timeout_in_seconds: 15.0
 services:
   authentication:
     active_authentication_service: "standalone"
@@ -77,10 +83,10 @@ services:
         test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
 repositories:
   active_target_repository:
-    validation_overrides: mongodb
-    validation_reports: mongodb
-    study_metadata: mongodb
-    study_data_files: mongodb
+    validation_overrides: nfs
+    validation_reports: nfs
+    study_metadata: nfs
+    study_data_files: nfs
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
@@ -274,7 +280,7 @@ run:
         json_formatter:
           format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(client)s %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"

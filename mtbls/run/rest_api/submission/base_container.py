@@ -110,30 +110,6 @@ from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
 )
 
 
-def _append_port_to_hosts(hosts, port):
-    if not hosts or port in (None, "", 0):
-        return hosts
-
-    try:
-        port_str = str(int(port))
-    except (TypeError, ValueError):
-        return hosts
-
-    def _format(host: str) -> str:
-        if not host:
-            return host
-        host_str = str(host)
-        scheme_split = host_str.split("://", 1)
-        host_body = scheme_split[-1]
-        if ":" in host_body:
-            return host_str  # already has a port
-        return f"{host_str}:{port_str}"
-
-    if isinstance(hosts, (list, tuple)):
-        return [_format(h) for h in hosts]
-    return _format(hosts)
-
-
 class GatewaysContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     runtime_config = providers.Configuration()
@@ -142,20 +118,13 @@ class GatewaysContainer(containers.DeclarativeContainer):
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
     )
-
+    elastic_config: ElasticsearchClientConfig = providers.Resource(
+        create_config_from_dict,
+        ElasticsearchClientConfig,
+        config.database.elasticsearch.connection,
+    )
     elasticsearch_client: ElasticsearchClient = providers.Singleton(
-        ElasticsearchClient,
-        config=providers.Factory(
-            ElasticsearchClientConfig,
-            hosts=providers.Callable(
-                _append_port_to_hosts,
-                config.database.elasticsearch.connection.hosts,
-                config.database.elasticsearch.connection.port,
-            ),
-            api_key=config.database.elasticsearch.connection.api_key,
-            request_timeout=config.database.elasticsearch.connection.request_timeout_in_seconds.as_float(),
-            verify_certs=config.database.elasticsearch.connection.verify_certs,
-        ),
+        ElasticsearchClient, config=elastic_config
     )
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,

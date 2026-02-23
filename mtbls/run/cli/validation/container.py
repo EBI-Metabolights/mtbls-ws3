@@ -14,6 +14,9 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
+from mtbls.application.services.interfaces.study_metadata_service_factory import (
+    StudyMetadataServiceFactory,
+)
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
@@ -39,6 +42,12 @@ from mtbls.infrastructure.repositories.study.db.study_read_repository import (
 )
 from mtbls.infrastructure.repositories.user.db.user_read_repository import (
     SqlDbUserReadRepository,
+)
+from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_service_factory import (  # noqa: E501
+    MongoDbStudyMetadataServiceFactory,
+)
+from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
+    FileObjectStudyMetadataServiceFactory,
 )
 
 
@@ -107,7 +116,9 @@ class RepositoriesContainer(containers.DeclarativeContainer):
 
 class MtblsCliServicesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
+    repository_config = providers.Configuration()
     gateways = providers.DependenciesContainer()
+    repositories = providers.DependenciesContainer()
     policy_service: PolicyService = providers.Singleton(
         OpaPolicyService,
         http_client=gateways.http_client,
@@ -115,6 +126,30 @@ class MtblsCliServicesContainer(containers.DeclarativeContainer):
     )
 
     request_tracker: RequestTracker = providers.Singleton(RequestTracker)
+
+    study_metadata_service_factory: StudyMetadataServiceFactory = providers.Selector(
+        selector=repository_config.active_target_repository.study_metadata,
+        mongodb=providers.Singleton(
+            MongoDbStudyMetadataServiceFactory,
+            study_file_repository=repositories.study_file_repository,
+            investigation_object_repository=repositories.investigation_object_repository,
+            isa_table_object_repository=repositories.isa_table_object_repository,
+            isa_table_row_object_repository=repositories.isa_table_row_object_repository,
+            study_read_repository=repositories.study_read_repository,
+            user_read_repository=repositories.user_read_repository,
+            temp_path="/tmp/study-metadata-service",
+        ),
+        nfs=providers.Singleton(
+            FileObjectStudyMetadataServiceFactory,
+            study_file_repository=None,
+            metadata_files_object_repository=repositories.metadata_files_object_repository,
+            audit_files_object_repository=repositories.audit_files_object_repository,
+            internal_files_object_repository=repositories.internal_files_object_repository,
+            study_read_repository=repositories.study_read_repository,
+            user_read_repository=repositories.user_read_repository,
+            temp_path="/tmp/study-metadata-service",
+        ),
+    )
 
 
 class MtblsCliApplicationContainer(containers.DeclarativeContainer):
@@ -129,13 +164,18 @@ class MtblsCliApplicationContainer(containers.DeclarativeContainer):
         GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 0}
     )
 
-    services = providers.Container(
-        MtblsCliServicesContainer, config=config.services, gateways=gateways
-    )
-
     repositories = providers.Container(
         RepositoriesContainer, config=config, gateways=gateways
     )
+
+    services = providers.Container(
+        MtblsCliServicesContainer,
+        config=config.services,
+        gateways=gateways,
+        repositories=repositories,
+        repository_config=config.repositories,
+    )
+
     mhd_configuration: MhdConfiguration = providers.Resource(
         create_config_from_dict,
         MhdConfiguration,

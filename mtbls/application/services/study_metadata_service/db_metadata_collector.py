@@ -95,6 +95,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                     study.study_category.value
                 ),
                 sample_template=study.sample_type or "",
+                study_template=study.study_template or "",
                 template_version=study.template_version or "",
                 reserved_mhd_accession=study.mhd_accession or "",
                 reserved_accession=study.reserved_accession or "",
@@ -122,14 +123,14 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 metadata.submitters.append(
                     model.Submitter(
                         db_id=submitter.id_,
-                        orcid=submitter.orcid,
-                        address=submitter.address,
+                        orcid=submitter.orcid or "",
+                        address=submitter.address or "",
                         join_date=submitter.join_date.isoformat(),
-                        user_name=submitter.username,
-                        first_name=submitter.first_name,
-                        last_name=submitter.last_name,
-                        affiliation=submitter.affiliation,
-                        affiliation_url=submitter.affiliation_url,
+                        user_name=submitter.username or "",
+                        first_name=submitter.first_name or "",
+                        last_name=submitter.last_name or "",
+                        affiliation=submitter.affiliation or "",
+                        affiliation_url=submitter.affiliation_url or "",
                         status=USER_STATUS_MAP[submitter.status],
                         submitter_role=USER_ROLE_MAP[submitter.role],
                     )

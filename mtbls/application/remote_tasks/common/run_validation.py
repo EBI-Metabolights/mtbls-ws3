@@ -588,20 +588,11 @@ async def validate_mhd_study(
                 errors = []
                 for key, error in validation_errors:
                     errors.append(f"{key}: {error}")
-
                 policy_result.messages.violations.append(
-                    PolicyMessage(
-                        type=PolicyMessageType.ERROR,
-                        section="general",
-                        source_file="input",
-                        priority="CRITICAL",
-                        identifier="rule___500_100_001_01",
-                        title="MetabolomicsHub model validation error",
-                        description="Current study does not comply with "
-                        "MetabolomicsHub requirements. "
-                        "Please contact MetaboLights team for help.",
-                        violation="Study MHD model validation failed.",
-                        values=errors,
+                    create_mhd_error_message(
+                        "rule___500_100_001_02",
+                        "MetabolomicsHub common model file",
+                        errors,
                     )
                 )
         else:
@@ -626,37 +617,61 @@ async def validate_mhd_study(
 
                 if errors and not current_errors:
                     policy_result.messages.violations.append(
-                        PolicyMessage(
-                            type=PolicyMessageType.ERROR,
-                            section="general",
-                            source_file="input",
-                            priority="CRITICAL",
-                            identifier="rule___500_100_002_01",
-                            title="MetabolomicsHub announcement file validation error",
-                            description="Current study does not comply with "
-                            "MetabolomicsHub requirements. "
-                            "Please contact MetaboLights team for help.",
-                            violation="Study MHD announcement file validation failed."
-                            + ", ".join(errors),
-                            values=errors,
+                        create_mhd_error_message(
+                            "rule___500_100_002_02",
+                            "MetabolomicsHub announcement file",
+                            errors,
                         )
                     )
             else:
                 mhd_validation_errors["mhd_announcement_errors"] = OrderedDict()
-                mhd_validation_errors["mhd_announcement_errors"]["file"] = (
-                    "MHD announcement file creation failed."
-                )
+                message = "MHD announcement file creation failed."
+                mhd_validation_errors["mhd_announcement_errors"]["file"] = message
+                if not current_errors:
+                    policy_result.messages.violations.append(
+                        create_mhd_error_message(
+                            "rule___500_100_002_01",
+                            "MetabolomicsHub announcement file",
+                            [message],
+                        )
+                    )
     else:
         mhd_validation_errors["mhd_model_errors"] = OrderedDict()
-        mhd_validation_errors["mhd_model_errors"]["file"] = (
-            "MHD model file creation failed."
-        )
+        message = "MHD common model file creation failed."
+        mhd_validation_errors["mhd_model_errors"]["file"] = message
+        if not current_errors:
+            policy_result.messages.violations.append(
+                create_mhd_error_message(
+                    "rule___500_100_001_01",
+                    "MetabolomicsHub common model file",
+                    [message],
+                )
+            )
     if mhd_validation_errors:
         logger.info("MHD validation errors are saved on %s", mhd_validation_file_path)
-
+        mhd_validation_errors["status"] = "failed"
+    else:
+        logger.debug("%s MHD file creation and validation is successfull.", resource_id)
+        mhd_validation_errors["status"] = "success"
     with mhd_validation_file_path.open("w") as f:
         json.dump(mhd_validation_errors, f, indent=4)
     return mhd_file_path, announcement_file_path, mhd_validation_file_path
+
+
+def create_mhd_error_message(identifier: str, mhd_file_type: str, errors: list[str]):
+    return PolicyMessage(
+        type=PolicyMessageType.ERROR,
+        section="general",
+        source_file="input",
+        priority="CRITICAL",
+        identifier=identifier,
+        title=f"{mhd_file_type} validation error",
+        description="Current study does not comply with "
+        "MetabolomicsHub requirements. "
+        "Please contact MetaboLights team for help.",
+        violation=f"{mhd_file_type} validation failed. " + ", ".join(errors),
+        values=errors,
+    )
 
 
 def investigation_value_parser(value: str) -> tuple[None | str, None | str, None | str]:

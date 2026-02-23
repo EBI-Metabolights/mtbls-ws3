@@ -2,7 +2,7 @@ import pytest
 from click.testing import CliRunner
 
 from mtbls import __version__
-from mtbls.run.cli.main import mtbls_tool
+from mtbls.run.cli.main import mtbls_cli
 
 
 @pytest.fixture()
@@ -11,12 +11,12 @@ def runner():
 
 
 def test_mtbls_tool_version(runner):
-    result = runner.invoke(mtbls_tool, ["--version"])
+    result = runner.invoke(mtbls_cli, ["--version"])
     assert result.exit_code == 0
     assert __version__ in result.output.strip()
 
 
 def test_mtbls_tool_help_01(runner):
-    result = runner.invoke(mtbls_tool, ["--help"])
+    result = runner.invoke(mtbls_cli, ["--help"])
     assert result.exit_code == 0
     assert "validation" in result.output.strip()

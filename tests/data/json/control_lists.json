@@ -92,9 +92,329 @@
           ]
         }
       ],
+      "Protocol REF": [
+        {
+          "ruleName": "Assay Protocol REF-01",
+          "fieldName": "Assay Protocol REF",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "LC-MS",
+              "GC-MS",
+              "GCxGC-MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Extraction",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Chromatography",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Mass spectrometry",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Data transformation",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Metabolite identification",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Assay Protocol REF-02",
+          "fieldName": "Assay Protocol REF",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "DI-MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Extraction",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Direct infusion",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Mass spectrometry",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Data transformation",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Metabolite identification",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Assay Protocol REF-03",
+          "fieldName": "Assay Protocol REF",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "CE-MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Extraction",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Capillary Electrophoresis",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Mass spectrometry",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Data transformation",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Metabolite identification",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Assay Protocol REF-04",
+          "fieldName": "Assay Protocol REF",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "FIA-MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Extraction",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Flow Injection Analysis",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Mass spectrometry",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Data transformation",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Metabolite identification",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Assay Protocol REF-05",
+          "fieldName": "Assay Protocol REF",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "MALDI-MS",
+              "MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Extraction",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Mass spectrometry",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Data transformation",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            },
+            {
+              "term": "Metabolite identification",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
       "Sample Name": [
         {
-          "ruleName": "Sample Name-01",
+          "ruleName": "Assay-Sample Name-01",
           "fieldName": "Sample Name",
           "ontologies": [],
           "allowedParentOntologyTerms": null,
@@ -131,7 +451,7 @@
           "ruleName": "Parameter Value[Scan polarity]-01",
           "fieldName": "Parameter Value[Scan polarity]",
           "ontologies": [
-            "AFO"
+            "MS"
           ],
           "allowedParentOntologyTerms": null,
           "description": "",
@@ -158,22 +478,44 @@
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
-          "allowedPlaceholders": [],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000076",
+              "termSourceRef": "MS"
+            },
+            {
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000077",
+              "termSourceRef": "MS"
+            },
+            {
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002833",
+              "termSourceRef": "MS"
+            },
+            {
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003774",
+              "termSourceRef": "MS"
+            }
+          ],
           "terms": [
             {
-              "term": "negative ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000150",
-              "termSourceRef": "AFO"
+              "term": "negative polarity acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000076",
+              "termSourceRef": "MS"
             },
             {
-              "term": "positive ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000151",
-              "termSourceRef": "AFO"
+              "term": "positive polarity acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000077",
+              "termSourceRef": "MS"
             },
             {
-              "term": "alternating ionization polarity",
-              "termAccessionNumber": "http://purl.allotrope.org/ontologies/quality#AFQ_0000152",
-              "termSourceRef": "AFO"
+              "term": "alternating polarity acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002833",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "mixed polarity acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003774",
+              "termSourceRef": "MS"
             }
           ],
           "unexpectedTerms": []
@@ -182,7 +524,6 @@
           "ruleName": "Parameter Value[Scan polarity]-02",
           "fieldName": "Parameter Value[Scan polarity]",
           "ontologies": [
-            "AFO",
             "MS"
           ],
           "allowedParentOntologyTerms": null,
@@ -3610,6 +3951,184 @@
           "ruleName": "Parameter Value[Column type]-01",
           "fieldName": "Parameter Value[Column type]",
           "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [],
+            "excludeByAccession": [],
+            "parents": [
+              {
+                "term": "liquid chromatography separation",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002271",
+                "termSourceRef": "MS"
+              }
+            ]
+          },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "LC-MS"
+            ],
+            "linkedFieldAndValueFilter": []
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "reversed phase chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003582",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "normal phase chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003583",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "hydrophilic interaction liquid chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003584",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "hydrophobic interaction chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003587",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "chiral separation liquid chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003585",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "affinity chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003581",
+              "termSourceRef": "MS"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Column type]-02",
+          "fieldName": "Parameter Value[Column type]",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [],
+            "excludeByAccession": [],
+            "parents": [
+              {
+                "term": "gas chromatography separation",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002272",
+                "termSourceRef": "MS"
+              }
+            ]
+          },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "assay",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "GC-MS",
+              "GCxGC-MS"
+            ],
+            "linkedFieldAndValueFilter": []
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "capillary column gas chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003714",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "fast gas chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003712",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "high-resolution gas chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003715",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "packed column gas chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003713",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "pyrolysis-gas chromatography",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003716",
+              "termSourceRef": "MS"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Parameter Value[Column type]-03",
+          "fieldName": "Parameter Value[Column type]",
+          "ontologies": [
             "MS",
             "MTBLS"
           ],
@@ -3627,7 +4146,7 @@
             "linkedFieldAndValueFilter": []
           },
           "termEnforcementLevel": "required",
-          "unexpectedTermEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "recommended",
           "validationType": "selected-ontology-term",
           "constraints": {},
           "defaultValue": null,
@@ -3672,8 +4191,8 @@
           "unexpectedTerms": []
         },
         {
-          "ruleName": "Parameter Value[Column model]-02",
-          "fieldName": "Parameter Value[Column model]",
+          "ruleName": "Parameter Value[Column type]-04",
+          "fieldName": "Parameter Value[Column type]",
           "ontologies": [
             "MS",
             "MTBLS"
@@ -3692,7 +4211,7 @@
             ],
             "linkedFieldAndValueFilter": []
           },
-          "termEnforcementLevel": "required",
+          "termEnforcementLevel": "recommended",
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
           "constraints": {},
@@ -5111,7 +5630,7 @@
       ],
       "Unit": [
         {
-          "ruleName": "Unit-01",
+          "ruleName": "Assay-Unit-01",
           "fieldName": "Unit",
           "ontologies": [],
           "allowedParentOntologyTerms": {
@@ -5172,7 +5691,58 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "kelvin",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000012",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "tesla",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000228",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "micrometer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000017",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "millimolar",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000063",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "kilogram",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000009",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "milligram per day",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0004419",
+              "termSourceRef": "EFO"
+            },
+            {
+              "term": "day",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000033",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "hour",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000032",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Fahrenheit",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000195",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Celsius",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000027",
+              "termSourceRef": "UO"
+            }
+          ],
           "unexpectedTerms": []
         }
       ],
@@ -7104,65 +7674,11 @@
           ]
         }
       ],
-      "Factor Value[Disease]": [
+      "Protocol REF": [
         {
-          "ruleName": "Factor Value[Disease]-01",
-          "fieldName": "Factor Value[Disease]",
-          "ontologies": [
-            "MONDO",
-            "MP",
-            "SNOMED"
-          ],
-          "allowedParentOntologyTerms": null,
-          "description": "",
-          "selectionCriteria": {
-            "isaFileType": "sample",
-            "studyCreatedAtOrAfter": "2026-01-01T00:00:00",
-            "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": null,
-            "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Sample Name",
-                "value": null
-              }
-            ]
-          },
-          "termEnforcementLevel": "required",
-          "unexpectedTermEnforcementLevel": "required",
-          "validationType": "ontology-term-in-selected-ontologies",
-          "constraints": {},
-          "defaultValue": null,
-          "allowedMissingOntologyTerms": [
-            {
-              "term": "Not Applicable",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
-              "termSourceRef": "NCIT"
-            }
-          ],
-          "allowedOtherSources": [
-            {
-              "sourceLabel": "wikidata",
-              "accessionPrefix": "https://www.wikidata.org/wiki/"
-            },
-            {
-              "sourceLabel": "ILX",
-              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
-            }
-          ],
-          "allowedPlaceholders": [],
-          "terms": [],
-          "unexpectedTerms": []
-        },
-        {
-          "ruleName": "Factor Value[Disease]-02",
-          "fieldName": "Factor Value[Disease]",
-          "ontologies": [
-            "MONDO",
-            "MP",
-            "SNOMED"
-          ],
+          "ruleName": "Sample Protocol REF-01",
+          "fieldName": "Sample Protocol REF",
+          "ontologies": [],
           "allowedParentOntologyTerms": null,
           "description": "",
           "selectionCriteria": {
@@ -7174,11 +7690,70 @@
             "isaFileTemplateNameFilter": null,
             "linkedFieldAndValueFilter": null
           },
-          "termEnforcementLevel": "recommended",
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
+          "defaultValue": {
+            "term": "Sample collection",
+            "termAccessionNumber": "",
+            "termSourceRef": ""
+          },
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            }
+          ],
+          "terms": [
+            {
+              "term": "Sample collection",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Factor Value[Disease]": [
+        {
+          "ruleName": "Factor Value[Disease]-01",
+          "fieldName": "Factor Value[Disease]",
+          "ontologies": [
+            "MONDO",
+            "MP",
+            "SNOMED",
+            "PATO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
           "constraints": {},
-          "defaultValue": null,
+          "defaultValue": {
+            "term": "Not Applicable",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+            "termSourceRef": "NCIT"
+          },
           "allowedMissingOntologyTerms": [
             {
               "term": "Not Applicable",
@@ -7197,7 +7772,161 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "breast cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0007254",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "colorectal cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005575",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Alzheimer disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0004975",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Parkinson disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005180",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "COVID-19",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0100096",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "type 2 diabetes mellitus",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005148",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "ischemia reperfusion injury",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005203",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "chronic kidney disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005300",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "metabolic dysfunction-associated steatotic liver disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0013209",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "normal",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/PATO_0000461",
+              "termSourceRef": "PATO"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Factor Value[Disease]-02",
+          "fieldName": "Factor Value[Disease]",
+          "ontologies": [
+            "MONDO",
+            "MP",
+            "SNOMED",
+            "PATO"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": [
+              "1.0"
+            ],
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": {
+            "term": "Not Applicable",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+            "termSourceRef": "NCIT"
+          },
+          "allowedMissingOntologyTerms": [
+            {
+              "term": "Not Applicable",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
+              "termSourceRef": "NCIT"
+            }
+          ],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [],
+          "terms": [
+            {
+              "term": "breast cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0007254",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "colorectal cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005575",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Alzheimer disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0004975",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Parkinson disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005180",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "COVID-19",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0100096",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "type 2 diabetes mellitus",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005148",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "ischemia reperfusion injury",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005203",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "chronic kidney disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005300",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "metabolic dysfunction-associated steatotic liver disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0013209",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "normal",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/PATO_0000461",
+              "termSourceRef": "PATO"
+            }
+          ],
           "unexpectedTerms": []
         }
       ],
@@ -7258,6 +7987,11 @@
             {
               "term": "reference compound mix",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000024",
+              "termSourceRef": "MSIO"
+            },
+            {
+              "term": "long term reference",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000019",
               "termSourceRef": "MSIO"
             }
           ],
@@ -7373,7 +8107,8 @@
           "ontologies": [
             "MONDO",
             "MP",
-            "SNOMED"
+            "SNOMED",
+            "PATO"
           ],
           "allowedParentOntologyTerms": null,
           "description": "",
@@ -7381,21 +8116,12 @@
             "isaFileType": "sample",
             "studyCreatedAtOrAfter": null,
             "studyCreatedBefore": null,
-            "studyCategoryFilter": null,
-            "templateVersionFilter": [
-              "2.0"
+            "studyCategoryFilter": [
+              "ms-mhd-enabled"
             ],
+            "templateVersionFilter": null,
             "isaFileTemplateNameFilter": null,
-            "linkedFieldAndValueFilter": [
-              {
-                "name": "Source Name",
-                "value": null
-              },
-              {
-                "name": "Sample Name",
-                "value": null
-              }
-            ]
+            "linkedFieldAndValueFilter": null
           },
           "termEnforcementLevel": "required",
           "unexpectedTermEnforcementLevel": "required",
@@ -7411,6 +8137,11 @@
               "term": "Not Applicable",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
               "termSourceRef": "NCIT"
+            },
+            {
+              "term": "",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
             }
           ],
           "allowedOtherSources": [
@@ -7424,16 +8155,68 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "breast cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0007254",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "colorectal cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005575",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Alzheimer disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0004975",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Parkinson disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005180",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "COVID-19",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0100096",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "type 2 diabetes mellitus",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005148",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "ischemia reperfusion injury",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005203",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "chronic kidney disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005300",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "metabolic dysfunction-associated steatotic liver disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0013209",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "normal",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/PATO_0000461",
+              "termSourceRef": "PATO"
+            }
+          ],
           "unexpectedTerms": []
         },
         {
-          "ruleName": "Characteristics[Disease]-01",
+          "ruleName": "Characteristics[Disease]-02",
           "fieldName": "Characteristics[Disease]",
           "ontologies": [
             "MONDO",
             "MP",
-            "SNOMED"
+            "SNOMED",
+            "PATO"
           ],
           "allowedParentOntologyTerms": null,
           "description": "",
@@ -7472,6 +8255,91 @@
               "accessionPrefix": "http://uri.interlex.org/base/ilx_"
             }
           ],
+          "allowedPlaceholders": [],
+          "terms": [
+            {
+              "term": "breast cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0007254",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "colorectal cancer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005575",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Alzheimer disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0004975",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "Parkinson disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005180",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "COVID-19",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0100096",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "type 2 diabetes mellitus",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005148",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "ischemia reperfusion injury",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005203",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "chronic kidney disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0005300",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "metabolic dysfunction-associated steatotic liver disease",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MONDO_0013209",
+              "termSourceRef": "MONDO"
+            },
+            {
+              "term": "normal",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/PATO_0000461",
+              "termSourceRef": "PATO"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Characteristics[Collection date]": [
+        {
+          "ruleName": "Characteristics[Collection date]-01",
+          "fieldName": "Characteristics[Collection date]",
+          "ontologies": [],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "sample",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "not-applicable",
+          "unexpectedTermEnforcementLevel": "required",
+          "validationType": "check-only-constraints",
+          "constraints": {
+            "pattern": {
+              "constraint": "^[0-9]{4}[0-9]{4}-$",
+              "errorMessage": "Value must be YYYY-mm-dd format",
+              "enforcementLevel": "recommended"
+            }
+          },
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [],
           "unexpectedTerms": []
@@ -7521,6 +8389,11 @@
               "term": "Not Applicable",
               "termAccessionNumber": "http://purl.obolibrary.org/obo/NCIT_C48660",
               "termSourceRef": "NCIT"
+            },
+            {
+              "term": "",
+              "termAccessionNumber": "",
+              "termSourceRef": ""
             }
           ],
           "allowedOtherSources": [
@@ -7534,11 +8407,62 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "regulatory T cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000815",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "plasma cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000786",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "endothelial cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000115",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "smooth muscle cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000192",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "fibroblast",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000057",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "erythrocyte",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000232",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "microglial cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000129",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "hepatocyte",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000182",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "alveolar macrophage",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000583",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "hematopoietic stem cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000037",
+              "termSourceRef": "CL"
+            }
+          ],
           "unexpectedTerms": []
         },
         {
-          "ruleName": "Characteristics[Cell type]-01",
+          "ruleName": "Characteristics[Cell type]-02",
           "fieldName": "Characteristics[Cell type]",
           "ontologies": [
             "CL",
@@ -7582,7 +8506,58 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "regulatory T cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000815",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "plasma cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000786",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "endothelial cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000115",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "smooth muscle cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000192",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "fibroblast",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000057",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "erythrocyte",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000232",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "microglial cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000129",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "hepatocyte",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000182",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "alveolar macrophage",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000583",
+              "termSourceRef": "CL"
+            },
+            {
+              "term": "hematopoietic stem cell",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CL_0000037",
+              "termSourceRef": "CL"
+            }
+          ],
           "unexpectedTerms": []
         }
       ],
@@ -7851,7 +8826,7 @@
       ],
       "Unit": [
         {
-          "ruleName": "Unit-01",
+          "ruleName": "Sample-Unit-01",
           "fieldName": "Unit",
           "ontologies": [],
           "allowedParentOntologyTerms": {
@@ -7910,7 +8885,58 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "kelvin",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000012",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "tesla",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000228",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "micrometer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000017",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "millimolar",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000063",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "kilogram",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000009",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "milligram per day",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0004419",
+              "termSourceRef": "EFO"
+            },
+            {
+              "term": "day",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000033",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "hour",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000032",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Fahrenheit",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000195",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Celsius",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000027",
+              "termSourceRef": "UO"
+            }
+          ],
           "unexpectedTerms": []
         }
       ],
@@ -8266,7 +9292,7 @@
       ],
       "Unit": [
         {
-          "ruleName": "Unit-01",
+          "ruleName": "MAF-Unit-01",
           "fieldName": "Unit",
           "ontologies": [],
           "allowedParentOntologyTerms": {
@@ -8327,7 +9353,58 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "kelvin",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000012",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "tesla",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000228",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "micrometer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000017",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "millimolar",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000063",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "kilogram",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000009",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "milligram per day",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0004419",
+              "termSourceRef": "EFO"
+            },
+            {
+              "term": "day",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000033",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "hour",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000032",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Fahrenheit",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000195",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Celsius",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000027",
+              "termSourceRef": "UO"
+            }
+          ],
           "unexpectedTerms": []
         }
       ]
@@ -8644,6 +9721,231 @@
           "unexpectedTerms": []
         }
       ],
+      "Assay Descriptor": [
+        {
+          "ruleName": "Assay Design Descriptor-01",
+          "fieldName": "Assay Design Descriptor",
+          "ontologies": [
+            "MS",
+            "EFO",
+            "MSIO",
+            "CHMO",
+            "NCIT",
+            "MTBLS",
+            "CHEBI",
+            "MONDO",
+            "GO",
+            "MESH",
+            "EDAM"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "LC-MS",
+              "GC-MS",
+              "GCxGC-MS",
+              "MALDI-MS",
+              "FIA-MS",
+              "DI-MS",
+              "CE-MS",
+              "MS"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "any-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [
+            {
+              "term": "data-independent acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003215",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "data-dependent acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003221",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "selected reaction monitoring",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000206",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "ion mobility separation",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003219",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "profile spectrum",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000128",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "centroid spectrum",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000127",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "collision-induced dissociation",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000133",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "electron activated dissociation",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003294",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "ultra-performance liquid chromatography-mass spectrometry",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0000715",
+              "termSourceRef": "CHMO"
+            },
+            {
+              "term": "matrix-assisted laser desorption ionization",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000075",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "infusion",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000060",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "flow injection analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000058",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "mzML format",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000584",
+              "termSourceRef": "MS"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Assay Design Descriptor-02",
+          "fieldName": "Assay Design Descriptor",
+          "ontologies": [
+            "CHMO",
+            "MSIO",
+            "MS",
+            "EFO",
+            "NCIT",
+            "MTBLS",
+            "CHEBI",
+            "MONDO",
+            "GO",
+            "MESH",
+            "EDAM"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": [
+              "NMR"
+            ],
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "any-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [
+            {
+              "term": "1H nuclear magnetic resonance spectroscopy",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0000593",
+              "termSourceRef": "CHMO"
+            },
+            {
+              "term": "13C nuclear magnetic resonance spectroscopy",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0000595",
+              "termSourceRef": "CHMO"
+            },
+            {
+              "term": "1H\u20131H correlation spectroscopy",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0001150",
+              "termSourceRef": "CHMO"
+            },
+            {
+              "term": "13C\u201313C correlation spectroscopy",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0002301",
+              "termSourceRef": "CHMO"
+            },
+            {
+              "term": "correlation spectroscopy",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/CHMO_0000599",
+              "termSourceRef": "CHMO"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
       "Study Person Roles": [
         {
           "ruleName": "Study Person Roles-01",
@@ -8708,7 +10010,9 @@
         {
           "ruleName": "Study Assay Measurement Type-01",
           "fieldName": "Study Assay Measurement Type",
-          "ontologies": [],
+          "ontologies": [
+            "MS"
+          ],
           "allowedParentOntologyTerms": null,
           "description": "",
           "selectionCriteria": {
@@ -8726,20 +10030,80 @@
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
           "constraints": {},
+          "defaultValue": {
+            "term": "untargeted analysis",
+            "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003904",
+            "termSourceRef": "MS"
+          },
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [],
+          "allowedPlaceholders": [],
+          "terms": [
+            {
+              "term": "untargeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003904",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003905",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "semi-targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003906",
+              "termSourceRef": "MS"
+            }
+          ],
+          "unexpectedTerms": []
+        },
+        {
+          "ruleName": "Study Assay Measurement Type-02",
+          "fieldName": "Study Assay Measurement Type",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "other"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "required",
+          "unexpectedTermEnforcementLevel": "not-applicable",
+          "validationType": "selected-ontology-term",
+          "constraints": {},
           "defaultValue": null,
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [
             {
-              "term": "targeted metabolite profiling",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000100",
-              "termSourceRef": "MSIO"
+              "term": "untargeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003904",
+              "termSourceRef": "MS"
             },
             {
-              "term": "untargeted metabolite profiling",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000101",
-              "termSourceRef": "MSIO"
+              "term": "targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003905",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "semi-targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003906",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "metabolite profiling assay",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0000366",
+              "termSourceRef": "OBI"
             }
           ],
           "unexpectedTerms": []
@@ -8748,8 +10112,7 @@
           "ruleName": "Study Assay Measurement Type-03",
           "fieldName": "Study Assay Measurement Type",
           "ontologies": [
-            "MSIO",
-            "OBI"
+            "MS"
           ],
           "allowedParentOntologyTerms": null,
           "description": "",
@@ -8772,19 +10135,19 @@
           "allowedPlaceholders": [],
           "terms": [
             {
-              "term": "metabolite profiling assay",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0000366",
-              "termSourceRef": "OBI"
+              "term": "untargeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003904",
+              "termSourceRef": "MS"
             },
             {
-              "term": "targeted metabolite profiling",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000100",
-              "termSourceRef": "MSIO"
+              "term": "targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003905",
+              "termSourceRef": "MS"
             },
             {
-              "term": "untargeted metabolite profiling",
-              "termAccessionNumber": "http://purl.obolibrary.org/obo/MSIO_0000101",
-              "termSourceRef": "MSIO"
+              "term": "semi-targeted analysis",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003906",
+              "termSourceRef": "MS"
             }
           ],
           "unexpectedTerms": []
@@ -9612,7 +10975,11 @@
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
           "constraints": {},
-          "defaultValue": null,
+          "defaultValue": {
+            "term": "Metabolomics",
+            "termAccessionNumber": "http://edamontology.org/topic_3172",
+            "termSourceRef": "EDAM"
+          },
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
@@ -9659,7 +11026,11 @@
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
           "constraints": {},
-          "defaultValue": null,
+          "defaultValue": {
+            "term": "Metabolomics",
+            "termAccessionNumber": "http://edamontology.org/topic_3172",
+            "termSourceRef": "EDAM"
+          },
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
@@ -9688,6 +11059,58 @@
           "unexpectedTerms": []
         }
       ],
+      "Organization": [
+        {
+          "ruleName": "Organization-01",
+          "fieldName": "Organization",
+          "ontologies": [
+            "ROR"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "ontology-term-in-selected-ontologies",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [],
+          "unexpectedTerms": []
+        }
+      ],
       "Study Publication Status": [
         {
           "ruleName": "Study Publication Status-01",
@@ -9708,14 +11131,18 @@
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "selected-ontology-term",
           "constraints": {},
-          "defaultValue": null,
+          "defaultValue": {
+            "term": "in preparation",
+            "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
+            "termSourceRef": "EFO"
+          },
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [],
           "terms": [
             {
-              "term": "published",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001796",
+              "term": "in preparation",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
               "termSourceRef": "EFO"
             },
             {
@@ -9724,13 +11151,13 @@
               "termSourceRef": "EFO"
             },
             {
-              "term": "in preparation",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
+              "term": "preprint",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0010558",
               "termSourceRef": "EFO"
             },
             {
-              "term": "preprint",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0010558",
+              "term": "published",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001796",
               "termSourceRef": "EFO"
             },
             {
@@ -9763,7 +11190,11 @@
           "unexpectedTermEnforcementLevel": "required",
           "validationType": "ontology-term-in-selected-ontologies",
           "constraints": {},
-          "defaultValue": null,
+          "defaultValue": {
+            "term": "in preparation",
+            "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
+            "termSourceRef": "EFO"
+          },
           "allowedMissingOntologyTerms": [],
           "allowedOtherSources": [],
           "allowedPlaceholders": [
@@ -9774,8 +11205,8 @@
           ],
           "terms": [
             {
-              "term": "published",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001796",
+              "term": "in preparation",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
               "termSourceRef": "EFO"
             },
             {
@@ -9784,13 +11215,13 @@
               "termSourceRef": "EFO"
             },
             {
-              "term": "in preparation",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001795",
+              "term": "preprint",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0010558",
               "termSourceRef": "EFO"
             },
             {
-              "term": "preprint",
-              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0010558",
+              "term": "published",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0001796",
               "termSourceRef": "EFO"
             },
             {
@@ -9804,7 +11235,7 @@
       ],
       "Unit": [
         {
-          "ruleName": "Unit-01",
+          "ruleName": "Investigation-Unit-01",
           "fieldName": "Unit",
           "ontologies": [],
           "allowedParentOntologyTerms": {
@@ -9865,7 +11296,207 @@
             }
           ],
           "allowedPlaceholders": [],
-          "terms": [],
+          "terms": [
+            {
+              "term": "kelvin",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000012",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "tesla",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000228",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "micrometer",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000017",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "millimolar",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000063",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "kilogram",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000009",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "milligram per day",
+              "termAccessionNumber": "http://www.ebi.ac.uk/efo/EFO_0004419",
+              "termSourceRef": "EFO"
+            },
+            {
+              "term": "day",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000033",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "hour",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000032",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Fahrenheit",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000195",
+              "termSourceRef": "UO"
+            },
+            {
+              "term": "degree Celsius",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/UO_0000027",
+              "termSourceRef": "UO"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Assay Acquisition Method": [
+        {
+          "ruleName": "Assay Acquisition Method-01",
+          "fieldName": "Assay Acquisition Method",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": null,
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": [
+              "ms-mhd-enabled",
+              "ms-mhd-legacy"
+            ],
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "any-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [
+            {
+              "term": "data-independent acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003215",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "data-dependent acquisition",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003221",
+              "termSourceRef": "MS"
+            }
+          ],
+          "unexpectedTerms": []
+        }
+      ],
+      "Software": [
+        {
+          "ruleName": "Software-01",
+          "fieldName": "Software",
+          "ontologies": [
+            "MS"
+          ],
+          "allowedParentOntologyTerms": {
+            "excludeByLabelPattern": [],
+            "excludeByAccession": [],
+            "parents": [
+              {
+                "term": "software",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1000531",
+                "termSourceRef": "MS"
+              }
+            ]
+          },
+          "description": "",
+          "selectionCriteria": {
+            "isaFileType": "investigation",
+            "studyCreatedAtOrAfter": null,
+            "studyCreatedBefore": null,
+            "studyCategoryFilter": null,
+            "templateVersionFilter": null,
+            "isaFileTemplateNameFilter": null,
+            "linkedFieldAndValueFilter": null
+          },
+          "termEnforcementLevel": "recommended",
+          "unexpectedTermEnforcementLevel": "recommended",
+          "validationType": "child-ontology-term",
+          "constraints": {},
+          "defaultValue": null,
+          "allowedMissingOntologyTerms": [],
+          "allowedOtherSources": [
+            {
+              "sourceLabel": "MTBLS",
+              "accessionPrefix": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_"
+            },
+            {
+              "sourceLabel": "wikidata",
+              "accessionPrefix": "https://www.wikidata.org/wiki/"
+            },
+            {
+              "sourceLabel": "ILX",
+              "accessionPrefix": "http://uri.interlex.org/base/ilx_"
+            }
+          ],
+          "allowedPlaceholders": [
+            {
+              "termAccessionNumber": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+              "termSourceRef": "MTBLS"
+            },
+            {
+              "termAccessionNumber": "",
+              "termSourceRef": ""
+            }
+          ],
+          "terms": [
+            {
+              "term": "ProteoWizard msconvert",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002205",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "ProteoWizard msaccess",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002208",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "mzmine",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1002342",
+              "termSourceRef": "MS"
+            },
+            {
+              "term": "OpenMS",
+              "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003430",
+              "termSourceRef": "MS"
+            }
+          ],
           "unexpectedTerms": []
         }
       ]
