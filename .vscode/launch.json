@@ -76,6 +76,23 @@
         "PYTHONPATH": "${cwd}"
       },
       "justMyCode": false
+    },
+    {
+      "name": "Python: Run ES CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mtbls/run/cli/es/index_studies.py",
+      "args": [
+        "--build-metadata-jsons"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}",
+        "SEARCH_VISIBILITY": "public",
+        "SEARCH_INDEX_NAME": "public-study-search-index"
+      },
+      "justMyCode": false
     }
   ]
 }

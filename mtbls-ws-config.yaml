@@ -21,14 +21,15 @@ gateways:
         password: "{{ postgresql.password }}"
         database: "{{ postgresql.database }}"
         url_scheme: postgresql+asyncpg
-    # mongodb:
-    #   connection:
-    #     url_scheme: mongodb
-    #     host: "{{ mongodb.host }}"
-    #     port: {{ mongodb.port }}
-    #     user: "{{ mongodb.user }}"
-    #     password: "{{ mongodb.password }}"
-    #     database: "{{ mongodb.database }}"
+    mongodb:
+      connection:
+        url_scheme: mongodb
+        hosts: "{{ mongodb.hosts | split(',') }}"
+        port: -1
+        user: "{{ mongodb.user }}"
+        password: "{{ mongodb.password }}"
+        database: "{{ mongodb.database }}"
+        replica_set: "{{ mongodb.replica_set }}"
     elasticsearch:
       connection:
         hosts: "{{ elasticsearch.host}}"
@@ -36,8 +37,14 @@ gateways:
         username: "{{ elasticsearch.username }}"
         password: "{{ elasticsearch.password }}"
         verify_certs: "{{ elasticsearch.verify_certs }}"
-        api_key: "{{ elasticsearch.api_key }}"
-        request_timeout_in_seconds: 5.0
+        api_key: null
+        api_keys:
+          study: "{{ elasticsearch.api_keys.study }}"
+          compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
+          assay: "{{ elasticsearch.api_keys.assay }}"
+          sample: "{{ elasticsearch.api_keys.sample }}"
+        request_timeout_in_seconds: 15.0
 services:
   authentication:
     active_authentication_service: "standalone"
