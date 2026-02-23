@@ -1,5 +1,5 @@
-
 from typing import Optional, Tuple
+
 from mtbls.infrastructure.search.es.es_configuration import ElasticsearchConfiguration
 
 
@@ -9,16 +9,16 @@ class CompoundElasticSearchConfiguration(ElasticsearchConfiguration):
 
     # Fields searched by the main query, with rough boosting
     search_fields: Tuple[str, ...] = (
-        "id^10",             # exact IDs should win hard
-        "name^5",            # primary compound name
-        "synonyms^3",        # alternative names, still important
-        "iupacNames^3",      # scientific names
-        "definition^2",      # descriptive text
-        "formula^2",         # useful for text searches on formula strings
+        "id^10",  # exact IDs should win hard
+        "name^5",  # primary compound name
+        "synonyms^3",  # alternative names, still important
+        "iupacNames^3",  # scientific names
+        "definition^2",  # descriptive text
+        "formula^2",  # useful for text searches on formula strings
         "inchiKey^2",
         "smiles",
         "inchi",
-        "species_hits.species",   # allow species name search
+        "species_hits.species",  # allow species name search
     )
 
     facet_size: int = 25

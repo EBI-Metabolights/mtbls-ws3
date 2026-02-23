@@ -103,7 +103,7 @@ def run_es_cli(
         )
         study_statuses = [StudyStatus.PUBLIC]
     mappings_file_path = Path(
-        #"resources/es/mappings/public_study_search_index_mapping.json"
+        # "resources/es/mappings/public_study_search_index_mapping.json"
         "resources/es/mappings/complete_study_search_index_mapping.json"
     )
     if build_metadata_jsons:

@@ -1,12 +1,13 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
-    ElasticsearchSampleGateway,
-    FACTOR_HEADER_FIELDS,
-)
+import pytest
+
 from mtbls.infrastructure.search.es.sample.es_sample_configuration import (
     SampleElasticSearchConfiguration,
+)
+from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
+    FACTOR_HEADER_FIELDS,
+    ElasticsearchSampleGateway,
 )
 
 
@@ -90,9 +91,7 @@ class TestFindStudyIdsByFactorHeaders:
     async def test_multiple_values_with_and_operator(self, gateway, mock_client):
         mock_client.search.return_value = {
             "aggregations": {
-                "unique_studies": {
-                    "buckets": [{"key": "MTBLS1", "doc_count": 10}]
-                }
+                "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 10}]}
             }
         }
 
@@ -203,7 +202,10 @@ class TestExtractStudyIds:
                 }
             }
         }
-        assert ElasticsearchSampleGateway._extract_study_ids(es_resp) == ["MTBLS1", "MTBLS2"]
+        assert ElasticsearchSampleGateway._extract_study_ids(es_resp) == [
+            "MTBLS1",
+            "MTBLS2",
+        ]
 
     def test_extract_empty_buckets(self):
         es_resp = {"aggregations": {"unique_studies": {"buckets": []}}}
@@ -219,13 +221,13 @@ class TestSearchCallParameters:
     @pytest.fixture
     def mock_client(self):
         client = MagicMock()
-        client.search = AsyncMock(return_value={
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": [{"key": "MTBLS1", "doc_count": 1}]
+        client.search = AsyncMock(
+            return_value={
+                "aggregations": {
+                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
                 }
             }
-        })
+        )
         return client
 
     @pytest.mark.asyncio

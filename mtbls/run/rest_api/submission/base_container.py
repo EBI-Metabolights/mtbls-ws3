@@ -2,8 +2,12 @@ from dependency_injector import containers, providers
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
 from mtbls.application.services.interfaces.http_client import HttpClient
-from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import CompoundReadRepository
-from mtbls.application.services.interfaces.repositories.compound.compound_similarity_repository import CompoundSimilarityRepository
+from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import (
+    CompoundReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.compound.compound_similarity_repository import (
+    CompoundSimilarityRepository,
+)
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
@@ -40,13 +44,19 @@ from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
 #     MongoDbConnection,
 # )
 from mtbls.infrastructure.persistence.db.mongodb.config import MongoDbConnection
-from mtbls.infrastructure.persistence.db.mongodb.db_client import MongoDatabaseClientImpl
+from mtbls.infrastructure.persistence.db.mongodb.db_client import (
+    MongoDatabaseClientImpl,
+)
 from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
     DatabaseClientImpl,
 )
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
-from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import MongoCompoundReadRepository
-from mtbls.infrastructure.repositories.compound.mongodb.compound_similarity_repository import MongoCompoundSimilarityRepository
+from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import (
+    MongoCompoundReadRepository,
+)
+from mtbls.infrastructure.repositories.compound.mongodb.compound_similarity_repository import (
+    MongoCompoundSimilarityRepository,
+)
 from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
@@ -71,19 +81,21 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
-from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
-    ElasticsearchAssignmentGateway,
-)
 from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
     ElasticsearchAssayGateway,
 )
-from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
-    ElasticsearchSampleGateway,
+from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
+    ElasticsearchAssignmentGateway,
 )
-from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import ElasticsearchCompoundGateway
+from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import (
+    ElasticsearchCompoundGateway,
+)
 from mtbls.infrastructure.search.es.es_client import (
     ElasticsearchClient,
     ElasticsearchClientConfig,
+)
+from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
+    ElasticsearchSampleGateway,
 )
 from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
     ElasticsearchStudyGateway,
@@ -167,10 +179,10 @@ class GatewaysContainer(containers.DeclarativeContainer):
     )
 
     mongodb_connection: MongoDbConnection = providers.Resource(
-         create_config_from_dict,
-         MongoDbConnection,
-         config.database.mongodb.connection,
-     )
+        create_config_from_dict,
+        MongoDbConnection,
+        config.database.mongodb.connection,
+    )
     document_database_client = providers.Singleton(
         MongoDatabaseClientImpl,
         db_connection=mongodb_connection,
@@ -236,11 +248,11 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         alias_generator=alias_generator,
         database_client=gateways.database_client,
     )
-    
+
     compound_read_repository: CompoundReadRepository = providers.Singleton(
         MongoCompoundReadRepository,
-        #entity_mapper=entity_mapper,
-        #alias_generator=alias_generator,
+        # entity_mapper=entity_mapper,
+        # alias_generator=alias_generator,
         database_client=gateways.document_database_client,
     )
 

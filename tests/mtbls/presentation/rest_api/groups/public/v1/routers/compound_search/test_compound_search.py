@@ -27,7 +27,9 @@ def test_compound_search_with_basic_query(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(
+        mock_gateway
+    )
 
     response = public_api_client.post(url, json=query)
 
@@ -45,7 +47,9 @@ def test_get_compound_index_mapping(
 
     mock_gateway = AsyncMock()
     mock_gateway.get_index_mapping.return_value = mock_mapping
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(
+        mock_gateway
+    )
 
     response = public_api_client.get(url)
 
@@ -79,7 +83,9 @@ def test_compound_search_with_study_ids_filter(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(
+        mock_gateway
+    )
 
     response = public_api_client.post(url, json=query)
 
@@ -110,7 +116,9 @@ def test_compound_search_with_study_id_pattern_in_query(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(
+        mock_gateway
+    )
 
     response = public_api_client.post(url, json=query)
 

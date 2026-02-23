@@ -62,7 +62,8 @@ class ElasticsearchAssignmentGateway:
             database_identifiers=database_identifiers or [],
             metabolite_identifications=metabolite_identifications or [],
             database_identifiers_operator=database_identifiers_operator or "any",
-            metabolite_identifications_operator=metabolite_identifications_operator or "any",
+            metabolite_identifications_operator=metabolite_identifications_operator
+            or "any",
         )
 
         es_resp = await self._client.search(
@@ -86,12 +87,20 @@ class ElasticsearchAssignmentGateway:
 
         if database_identifiers:
             should_clauses.append(
-                {"terms": {"fields.database_identifier.value.keyword": database_identifiers}}
+                {
+                    "terms": {
+                        "fields.database_identifier.value.keyword": database_identifiers
+                    }
+                }
             )
 
         if metabolite_identifications:
             should_clauses.append(
-                {"terms": {"fields.metabolite_identification.value.keyword": metabolite_identifications}}
+                {
+                    "terms": {
+                        "fields.metabolite_identification.value.keyword": metabolite_identifications
+                    }
+                }
             )
 
         query: dict[str, Any] = {"match_all": {}}
@@ -118,19 +127,22 @@ class ElasticsearchAssignmentGateway:
                     agg_name = f"db_all_{idx}"
                     aggs["unique_studies"]["aggs"][agg_name] = {
                         "filter": {
-                            "term": {
-                                "fields.database_identifier.value.keyword": value
-                            }
+                            "term": {"fields.database_identifier.value.keyword": value}
                         }
                     }
                     buckets_path[agg_name] = f"{agg_name}>_count"
                     script_parts.append(f"params.{agg_name} > 0")
             else:
                 # Only enforce "any" if this is the sole list or the other list uses "all".
-                if not metabolite_identifications or metabolite_identifications_operator == "all":
+                if (
+                    not metabolite_identifications
+                    or metabolite_identifications_operator == "all"
+                ):
                     aggs["unique_studies"]["aggs"]["db_any"] = {
                         "filter": {
-                            "terms": {"fields.database_identifier.value.keyword": database_identifiers}
+                            "terms": {
+                                "fields.database_identifier.value.keyword": database_identifiers
+                            }
                         }
                     }
                     buckets_path["db_any"] = "db_any>_count"

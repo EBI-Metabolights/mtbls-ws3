@@ -62,6 +62,7 @@ class ElasticsearchClient:
                 f"API key '{api_key_name}' is not configured; "
                 f"available keys: {list(self._config.api_keys or {})}"
             )
+
     async def start(self) -> None:
         if self._es is not None:
             return  # Already started
@@ -148,9 +149,7 @@ class ElasticsearchClient:
                 raise RuntimeError(f"Elasticsearch connection error: {e}") from e
             except Exception as exc:
                 await es.close()
-                logger.exception(
-                    "Unexpected Elasticsearch connection failure: %s", exc
-                )
+                logger.exception("Unexpected Elasticsearch connection failure: %s", exc)
                 raise
 
     async def ensure_started(self, api_key_name: Optional[str] = None) -> None:

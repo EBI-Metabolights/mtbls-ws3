@@ -1,17 +1,16 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
 from mtbls.domain.entities.search.index_search import (
-    StudySearchInput,
-    PageModel,
     FilterModel,
     MSFilters,
+    PageModel,
+    StudySearchInput,
 )
 from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
-    ElasticsearchStudyGateway,
     ALL_IDS_MAX_SIZE,
-    EXPORT_MAX_RESULTS,
-    EXPORT_BATCH_SIZE,
+    ElasticsearchStudyGateway,
 )
 
 
@@ -56,7 +55,9 @@ class TestHasQueryOrFilters:
         ]
         assert gateway._has_query_or_filters(base_request) is False
 
-    def test_returns_true_for_multiple_filters_one_with_values(self, gateway, base_request):
+    def test_returns_true_for_multiple_filters_one_with_values(
+        self, gateway, base_request
+    ):
         base_request.filters = [
             FilterModel(field="organisms", values=[], operator="any"),
             FilterModel(field="technology", values=["NMR"], operator="any"),
@@ -159,7 +160,9 @@ class TestSearchWithIncludeAllIds:
         )
 
     @pytest.mark.asyncio
-    async def test_no_second_query_when_include_all_ids_false(self, mock_client, gateway, base_request):
+    async def test_no_second_query_when_include_all_ids_false(
+        self, mock_client, gateway, base_request
+    ):
         base_request.query = "cancer"
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},
@@ -173,7 +176,9 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids is None
 
     @pytest.mark.asyncio
-    async def test_no_second_query_when_no_query_or_filters(self, mock_client, gateway, base_request):
+    async def test_no_second_query_when_no_query_or_filters(
+        self, mock_client, gateway, base_request
+    ):
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},
             "aggregations": {},
@@ -186,23 +191,30 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids is None
 
     @pytest.mark.asyncio
-    async def test_second_query_when_include_all_ids_true_with_query(self, mock_client, gateway, base_request):
+    async def test_second_query_when_include_all_ids_true_with_query(
+        self, mock_client, gateway, base_request
+    ):
         base_request.query = "cancer"
         mock_client.search.side_effect = [
             # First call: main search
             {
-                "hits": {"hits": [{"_source": {"studyId": "MTBLS1"}}], "total": {"value": 5}},
+                "hits": {
+                    "hits": [{"_source": {"studyId": "MTBLS1"}}],
+                    "total": {"value": 5},
+                },
                 "aggregations": {},
             },
             # Second call: all IDs query
             {
-                "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS1"}},
-                    {"_source": {"studyId": "MTBLS2"}},
-                    {"_source": {"studyId": "MTBLS3"}},
-                    {"_source": {"studyId": "MTBLS4"}},
-                    {"_source": {"studyId": "MTBLS5"}},
-                ]},
+                "hits": {
+                    "hits": [
+                        {"_source": {"studyId": "MTBLS1"}},
+                        {"_source": {"studyId": "MTBLS2"}},
+                        {"_source": {"studyId": "MTBLS3"}},
+                        {"_source": {"studyId": "MTBLS4"}},
+                        {"_source": {"studyId": "MTBLS5"}},
+                    ]
+                },
             },
         ]
 
@@ -210,10 +222,18 @@ class TestSearchWithIncludeAllIds:
 
         # Should be called twice
         assert mock_client.search.call_count == 2
-        assert result.all_study_ids == ["MTBLS1", "MTBLS2", "MTBLS3", "MTBLS4", "MTBLS5"]
+        assert result.all_study_ids == [
+            "MTBLS1",
+            "MTBLS2",
+            "MTBLS3",
+            "MTBLS4",
+            "MTBLS5",
+        ]
 
     @pytest.mark.asyncio
-    async def test_second_query_when_include_all_ids_true_with_filters(self, mock_client, gateway, base_request):
+    async def test_second_query_when_include_all_ids_true_with_filters(
+        self, mock_client, gateway, base_request
+    ):
         base_request.filters = [
             FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
         ]
@@ -225,10 +245,12 @@ class TestSearchWithIncludeAllIds:
             },
             # Second call: all IDs query
             {
-                "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS10"}},
-                    {"_source": {"studyId": "MTBLS20"}},
-                ]},
+                "hits": {
+                    "hits": [
+                        {"_source": {"studyId": "MTBLS10"}},
+                        {"_source": {"studyId": "MTBLS20"}},
+                    ]
+                },
             },
         ]
 
@@ -239,7 +261,9 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids == ["MTBLS10", "MTBLS20"]
 
     @pytest.mark.asyncio
-    async def test_all_study_ids_handles_missing_study_id_in_source(self, mock_client, gateway, base_request):
+    async def test_all_study_ids_handles_missing_study_id_in_source(
+        self, mock_client, gateway, base_request
+    ):
         base_request.query = "cancer"
         mock_client.search.side_effect = [
             # First call: main search
@@ -249,11 +273,13 @@ class TestSearchWithIncludeAllIds:
             },
             # Second call: all IDs query with some docs missing studyId
             {
-                "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS1"}},
-                    {"_source": {}},  # Missing studyId
-                    {"_source": {"studyId": "MTBLS3"}},
-                ]},
+                "hits": {
+                    "hits": [
+                        {"_source": {"studyId": "MTBLS1"}},
+                        {"_source": {}},  # Missing studyId
+                        {"_source": {"studyId": "MTBLS3"}},
+                    ]
+                },
             },
         ]
 
@@ -325,7 +351,9 @@ class TestOnlyHasCrossIndexFilters:
         base_request.database_identifiers = ["HMDB0031111"]
         assert gateway._only_has_cross_index_filters(base_request) is True
 
-    def test_returns_true_for_only_metabolite_identifications(self, gateway, base_request):
+    def test_returns_true_for_only_metabolite_identifications(
+        self, gateway, base_request
+    ):
         base_request.metabolite_identifications = ["Aspirin"]
         assert gateway._only_has_cross_index_filters(base_request) is True
 
@@ -409,7 +437,9 @@ class TestResolveChemicalFilters:
         self, gateway_without_assignment, base_request
     ):
         base_request.database_identifiers = ["HMDB0031111"]
-        result = await gateway_without_assignment._resolve_chemical_filters(base_request)
+        result = await gateway_without_assignment._resolve_chemical_filters(
+            base_request
+        )
         assert result is base_request
 
     @pytest.mark.asyncio
@@ -612,15 +642,20 @@ class TestSearchWithChemicalFilters:
         mock_client.search.side_effect = [
             # First call: main search
             {
-                "hits": {"hits": [{"_source": {"studyId": "MTBLS1"}}], "total": {"value": 2}},
+                "hits": {
+                    "hits": [{"_source": {"studyId": "MTBLS1"}}],
+                    "total": {"value": 2},
+                },
                 "aggregations": {},
             },
             # Second call: all IDs query (needed because text query filters further)
             {
-                "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS1"}},
-                    {"_source": {"studyId": "MTBLS2"}},
-                ]},
+                "hits": {
+                    "hits": [
+                        {"_source": {"studyId": "MTBLS1"}},
+                        {"_source": {"studyId": "MTBLS2"}},
+                    ]
+                },
             },
         ]
 
@@ -678,9 +713,11 @@ class TestSearchWithChemicalFilters:
             },
             # Second call: all IDs query (needed because facet filters further)
             {
-                "hits": {"hits": [
-                    {"_source": {"studyId": "MTBLS1"}},
-                ]},
+                "hits": {
+                    "hits": [
+                        {"_source": {"studyId": "MTBLS1"}},
+                    ]
+                },
             },
         ]
 
@@ -771,7 +808,9 @@ class TestHasAssayFilters:
         assert gateway._has_assay_filters(base_request) is True
 
     def test_returns_true_for_chromatography_instrument(self, gateway, base_request):
-        base_request.ms = MSFilters(chromatography_instrument=["Waters ACQUITY UPLC system"])
+        base_request.ms = MSFilters(
+            chromatography_instrument=["Waters ACQUITY UPLC system"]
+        )
         assert gateway._has_assay_filters(base_request) is True
 
 
@@ -818,7 +857,9 @@ class TestResolveAssayFilters:
         assert result is base_request
 
     @pytest.mark.asyncio
-    async def test_no_assay_gateway_returns_unchanged(self, gateway_without_assay, base_request):
+    async def test_no_assay_gateway_returns_unchanged(
+        self, gateway_without_assay, base_request
+    ):
         base_request.ms = MSFilters(column_type=["reverse phase"])
         result = await gateway_without_assay._resolve_assay_filters(base_request)
         assert result is base_request
@@ -948,18 +989,26 @@ class TestSearchWithAssayFilters:
 
     @pytest.mark.asyncio
     async def test_search_with_both_chemical_and_assay_filters_intersects(
-        self, mock_client, mock_assignment_gateway, mock_assay_gateway, gateway, base_request
+        self,
+        mock_client,
+        mock_assignment_gateway,
+        mock_assay_gateway,
+        gateway,
+        base_request,
     ):
         base_request.database_identifiers = ["HMDB0031111"]
         base_request.ms = MSFilters(instrument=["Q Exactive"])
 
         # Chemical filters resolve to MTBLS1, MTBLS2, MTBLS106
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
-            "MTBLS1", "MTBLS2", "MTBLS106",
+            "MTBLS1",
+            "MTBLS2",
+            "MTBLS106",
         ]
         # Assay filters resolve to MTBLS106, MTBLS300
         mock_assay_gateway.find_study_ids_by_assay_filters.return_value = [
-            "MTBLS106", "MTBLS300",
+            "MTBLS106",
+            "MTBLS300",
         ]
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},
@@ -993,7 +1042,8 @@ class TestSearchWithAssayFilters:
     ):
         base_request.ms = MSFilters(instrument=["Q Exactive"])
         mock_assay_gateway.find_study_ids_by_assay_filters.return_value = [
-            "MTBLS106", "MTBLS200",
+            "MTBLS106",
+            "MTBLS200",
         ]
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 2}},
@@ -1053,7 +1103,9 @@ class TestResolveSampleFilters:
     @pytest.fixture
     def gateway(self, mock_client, mock_sample_gateway):
         return ElasticsearchStudyGateway(
-            client=mock_client, config=None, sample_gateway=mock_sample_gateway,
+            client=mock_client,
+            config=None,
+            sample_gateway=mock_sample_gateway,
         )
 
     @pytest.fixture
@@ -1067,16 +1119,23 @@ class TestResolveSampleFilters:
         )
 
     @pytest.mark.asyncio
-    async def test_no_filters_returns_unchanged(self, gateway, mock_sample_gateway, base_request):
+    async def test_no_filters_returns_unchanged(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         result = await gateway._resolve_sample_filters(base_request)
 
         assert result is base_request
         mock_sample_gateway.find_study_ids_by_factor_headers.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_resolves_to_study_ids(self, gateway, mock_sample_gateway, base_request):
+    async def test_resolves_to_study_ids(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         base_request.factor_header_names = ["Batch"]
-        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79", "MTBLS100"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
+            "MTBLS79",
+            "MTBLS100",
+        ]
 
         result = await gateway._resolve_sample_filters(base_request)
 
@@ -1084,7 +1143,9 @@ class TestResolveSampleFilters:
         assert result.factor_header_names is None
 
     @pytest.mark.asyncio
-    async def test_no_matches_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
+    async def test_no_matches_returns_sentinel(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         base_request.factor_header_names = ["NONEXISTENT"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = []
 
@@ -1093,17 +1154,24 @@ class TestResolveSampleFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_intersects_with_existing_study_ids(self, gateway, mock_sample_gateway, base_request):
+    async def test_intersects_with_existing_study_ids(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         base_request.factor_header_names = ["Batch"]
         base_request.study_ids = ["MTBLS79", "MTBLS200"]
-        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79", "MTBLS100"]
+        mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
+            "MTBLS79",
+            "MTBLS100",
+        ]
 
         result = await gateway._resolve_sample_filters(base_request)
 
         assert result.study_ids == ["MTBLS79"]
 
     @pytest.mark.asyncio
-    async def test_empty_intersection_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
+    async def test_empty_intersection_returns_sentinel(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         base_request.factor_header_names = ["Batch"]
         base_request.study_ids = ["MTBLS999"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79"]
@@ -1113,7 +1181,9 @@ class TestResolveSampleFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_passes_operator_to_sample_gateway(self, gateway, mock_sample_gateway, base_request):
+    async def test_passes_operator_to_sample_gateway(
+        self, gateway, mock_sample_gateway, base_request
+    ):
         base_request.factor_header_names = ["Batch", "Gender"]
         base_request.factor_header_names_operator = "or"
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS1"]
@@ -1153,7 +1223,9 @@ class TestSearchWithSampleFilters:
     @pytest.fixture
     def gateway(self, mock_client, mock_sample_gateway):
         return ElasticsearchStudyGateway(
-            client=mock_client, config=None, sample_gateway=mock_sample_gateway,
+            client=mock_client,
+            config=None,
+            sample_gateway=mock_sample_gateway,
         )
 
     @pytest.fixture
@@ -1200,7 +1272,8 @@ class TestSearchWithSampleFilters:
     ):
         base_request.factor_header_names = ["Batch"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
-            "MTBLS79", "MTBLS100",
+            "MTBLS79",
+            "MTBLS100",
         ]
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 2}},
@@ -1262,7 +1335,9 @@ class TestExportResults:
         assert results[1]["studyId"] == "MTBLS2"
 
     @pytest.mark.asyncio
-    async def test_export_pages_with_search_after(self, mock_client, gateway, base_request):
+    async def test_export_pages_with_search_after(
+        self, mock_client, gateway, base_request
+    ):
         mock_client.search.side_effect = [
             {
                 "hits": {
@@ -1294,7 +1369,9 @@ class TestExportResults:
         assert mock_client.search.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_export_respects_max_results(self, mock_client, gateway, base_request):
+    async def test_export_respects_max_results(
+        self, mock_client, gateway, base_request
+    ):
         mock_client.search.return_value = {
             "hits": {
                 "hits": [
@@ -1312,7 +1389,9 @@ class TestExportResults:
         assert len(results) == 3
 
     @pytest.mark.asyncio
-    async def test_export_strips_aggs_and_pagination(self, mock_client, gateway, base_request):
+    async def test_export_strips_aggs_and_pagination(
+        self, mock_client, gateway, base_request
+    ):
         base_request.query = "cancer"
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},

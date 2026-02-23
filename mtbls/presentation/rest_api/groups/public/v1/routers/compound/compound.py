@@ -1,8 +1,8 @@
 from logging import getLogger
 from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Body, Depends, Query
 from pydantic import BaseModel, Field
 
 from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import (
@@ -12,9 +12,11 @@ from mtbls.application.services.interfaces.repositories.compound.compound_simila
     CompoundSimilarityRepository,
 )
 from mtbls.domain.entities.compound import Compound
-from mtbls.domain.entities.similar_compound import SimilarCompound, SimilarCompoundsResult
+from mtbls.domain.entities.similar_compound import (
+    SimilarCompound,
+    SimilarCompoundsResult,
+)
 from mtbls.presentation.rest_api.core.responses import APIResponse
-
 
 logger = getLogger(__name__)
 
@@ -137,7 +139,9 @@ async def get_similar_compounds(
             threshold=0.7,  # TODO: get from config
             total_found=len(similar_compounds),
         )
-        response: APIResponse[SimilarCompoundsResult] = APIResponse[SimilarCompoundsResult]()
+        response: APIResponse[SimilarCompoundsResult] = APIResponse[
+            SimilarCompoundsResult
+        ]()
         response.content = result
         return response
     except ValueError as e:
@@ -180,7 +184,9 @@ async def get_compounds_batch(
     # Deduplicate IDs while preserving order
     unique_ids = list(dict.fromkeys(request.compound_ids))
 
-    compounds, missing_ids = await compound_read_repository.get_compounds_by_ids(unique_ids)
+    compounds, missing_ids = await compound_read_repository.get_compounds_by_ids(
+        unique_ids
+    )
 
     # Strip raw field if not requested
     if not include_raw:

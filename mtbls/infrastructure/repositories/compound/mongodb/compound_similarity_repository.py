@@ -95,7 +95,9 @@ def _compute_fingerprint(
         return (None, None)
 
 
-def _select_screening_bits(fingerprint_bits: List[int], max_bits: int = 20) -> List[int]:
+def _select_screening_bits(
+    fingerprint_bits: List[int], max_bits: int = 20
+) -> List[int]:
     """
     Select a subset of bits for the screening stage.
 
@@ -128,7 +130,9 @@ def _build_similarity_pipeline(
     # Bit count range for pruning rule:
     # T * query_count <= candidate_count <= query_count / T
     min_bit_count = int(threshold * query_bit_count)
-    max_bit_count = int(query_bit_count / threshold) if threshold > 0 else fingerprint_nbits
+    max_bit_count = (
+        int(query_bit_count / threshold) if threshold > 0 else fingerprint_nbits
+    )
 
     pipeline: List[Dict[str, Any]] = []
 
@@ -174,7 +178,12 @@ def _build_similarity_pipeline(
                         "$_intersection",
                         {
                             "$subtract": [
-                                {"$add": ["$fingerprint_bit_count", "$_query_bit_count"]},
+                                {
+                                    "$add": [
+                                        "$fingerprint_bit_count",
+                                        "$_query_bit_count",
+                                    ]
+                                },
                                 "$_intersection",
                             ]
                         },
@@ -239,7 +248,13 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
 
             # Fetch the reference compound's structure/smiles
             ref = collection.find_one(
-                {"id": compound_id}, {"structure": 1, "smiles": 1, "fingerprint_bits": 1, "fingerprint_bit_count": 1}
+                {"id": compound_id},
+                {
+                    "structure": 1,
+                    "smiles": 1,
+                    "fingerprint_bits": 1,
+                    "fingerprint_bit_count": 1,
+                },
             )
 
             if not ref:
@@ -342,7 +357,9 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
         exclude_id: Optional[str] = None,
     ) -> List[SimilarCompound]:
         """Execute the similarity search aggregation pipeline."""
-        screening_bits = _select_screening_bits(query_bits, self.config.max_screening_bits)
+        screening_bits = _select_screening_bits(
+            query_bits, self.config.max_screening_bits
+        )
 
         pipeline = _build_similarity_pipeline(
             query_bits=query_bits,
@@ -358,7 +375,9 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
 
         results = list(collection.aggregate(pipeline))
 
-        logger.debug(f"Found {len(results)} similar compounds with Tanimoto >= {threshold}")
+        logger.debug(
+            f"Found {len(results)} similar compounds with Tanimoto >= {threshold}"
+        )
 
         return [
             SimilarCompound(

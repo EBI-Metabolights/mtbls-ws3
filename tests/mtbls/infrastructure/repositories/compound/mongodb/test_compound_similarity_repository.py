@@ -1,12 +1,13 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
 
 from mtbls.domain.entities.similar_compound import SimilarCompound
 from mtbls.infrastructure.repositories.compound.mongodb.compound_similarity_repository import (
     MongoCompoundSimilarityRepository,
+    _build_similarity_pipeline,
     _compute_fingerprint,
     _select_screening_bits,
-    _build_similarity_pipeline,
 )
 from mtbls.infrastructure.repositories.compound.similarity_config import (
     CompoundSimilarityConfig,
@@ -107,12 +108,15 @@ class TestComputeFingerprint:
             return_value=True,
         ):
             # Patch at the point of import inside the function
-            with patch.dict("sys.modules", {
-                "rdkit": MagicMock(),
-                "rdkit.Chem": MagicMock(),
-                "rdkit.Chem.AllChem": MagicMock(),
-                "rdkit.Chem.inchi": MagicMock(),
-            }):
+            with patch.dict(
+                "sys.modules",
+                {
+                    "rdkit": MagicMock(),
+                    "rdkit.Chem": MagicMock(),
+                    "rdkit.Chem.AllChem": MagicMock(),
+                    "rdkit.Chem.inchi": MagicMock(),
+                },
+            ):
                 # Since all molecule parsing will return None for empty input
                 # we need to reimport or call the function
                 # Actually, let's just test the logic without deep RDKit mocking

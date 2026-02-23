@@ -3,10 +3,20 @@ import re
 from collections.abc import AsyncIterator
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
-from mtbls.application.services.interfaces.search_port import BaseElasticSearchGateway, SearchPort
-from mtbls.domain.entities.search.compound.facet_configuration import COMPOUND_FACET_CONFIG
-from mtbls.domain.entities.search.index_search import CompoundSearchInput, IndexSearchResult
-from mtbls.infrastructure.search.es.compound.es_compound_configuration import CompoundElasticSearchConfiguration
+
+from mtbls.application.services.interfaces.search_port import (
+    BaseElasticSearchGateway,
+)
+from mtbls.domain.entities.search.compound.facet_configuration import (
+    COMPOUND_FACET_CONFIG,
+)
+from mtbls.domain.entities.search.index_search import (
+    CompoundSearchInput,
+    IndexSearchResult,
+)
+from mtbls.infrastructure.search.es.compound.es_compound_configuration import (
+    CompoundElasticSearchConfiguration,
+)
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 # Pattern to detect MetaboLights study IDs in query strings
@@ -17,7 +27,6 @@ logger = logging.getLogger(__name__)
 # Export defaults
 EXPORT_MAX_RESULTS = 10_000
 EXPORT_BATCH_SIZE = 500
-
 
 
 class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
@@ -33,13 +42,15 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         elif isinstance(self._config, dict):
             self._config = CompoundElasticSearchConfiguration.model_validate(config)
         super().__init__()
-    
+
     @property
     def config(self) -> CompoundElasticSearchConfiguration:
         return self._config
 
     @staticmethod
-    def _extract_study_ids_from_query(query: Optional[str]) -> Tuple[Optional[List[str]], Optional[str]]:
+    def _extract_study_ids_from_query(
+        query: Optional[str],
+    ) -> Tuple[Optional[List[str]], Optional[str]]:
         """
         Detect if query is a MetaboLights study ID pattern.
 
@@ -64,7 +75,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             self.config.index_name, api_key_name=self.config.api_key_name
         )
         return mapping.get(self.config.index_name, mapping)
-    
+
     async def search(
         self,
         query: CompoundSearchInput,
@@ -169,7 +180,9 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             effective_study_ids = [sid.upper() for sid in req.study_ids]
         else:
             # Check if query looks like a study ID
-            detected_ids, remaining_query = self._extract_study_ids_from_query(req.query)
+            detected_ids, remaining_query = self._extract_study_ids_from_query(
+                req.query
+            )
             if detected_ids:
                 effective_study_ids = detected_ids
                 effective_query = remaining_query  # None if query was just a study ID
@@ -180,7 +193,14 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             operator = req.study_ids_operator or "any"
             if operator == "all":
                 filter_clauses.append(
-                    {"bool": {"must": [{"term": {"studyIds": sid}} for sid in effective_study_ids]}}
+                    {
+                        "bool": {
+                            "must": [
+                                {"term": {"studyIds": sid}}
+                                for sid in effective_study_ids
+                            ]
+                        }
+                    }
                 )
             else:
                 filter_clauses.append({"terms": {"studyIds": effective_study_ids}})
@@ -224,7 +244,9 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                 ranges = spec.get("ranges") or []
                 range_queries: List[Dict[str, Any]] = []
                 for v in f.values:
-                    rq = self._range_query_from_value(spec.get("field") or f.field, ranges, v)
+                    rq = self._range_query_from_value(
+                        spec.get("field") or f.field, ranges, v
+                    )
                     if rq:
                         range_queries.append(rq)
                 if not range_queries:
@@ -232,7 +254,9 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                 if f.operator == "none":
                     must_not.extend(range_queries)
                 elif f.operator == "any":
-                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
+                    filter_clauses.append(
+                        {"bool": {"should": range_queries, "minimum_should_match": 1}}
+                    )
                 else:  # "all"
                     filter_clauses.extend(range_queries)
             else:
@@ -324,7 +348,9 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         return base_query
 
     @staticmethod
-    def _range_query_from_value(field: str, ranges: List[Dict[str, Any]], value: Any) -> Dict[str, Any] | None:
+    def _range_query_from_value(
+        field: str, ranges: List[Dict[str, Any]], value: Any
+    ) -> Dict[str, Any] | None:
         """
         Map a selected bucket name back to its range query.
         Matches either the explicit 'name' or the derived _range_key form.
@@ -354,9 +380,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             if v in ("0", "false", "no", "n"):
                 return False
         return value
-    
-    
-    
+
     def _build_aggs(self) -> Dict[str, Any]:
         """
         Supports server-side facet config:
@@ -432,8 +456,6 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
 
         return aggs
 
-    
-    
     def _map_aggs_to_searchui(self, aggs: Dict[str, Any]) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
 

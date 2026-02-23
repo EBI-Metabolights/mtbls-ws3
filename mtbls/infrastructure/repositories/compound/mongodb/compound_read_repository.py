@@ -1,4 +1,3 @@
-
 import logging
 from typing import List, Optional, Tuple
 
@@ -62,7 +61,9 @@ class MongoCompoundReadRepository(CompoundReadRepository):
 
         for doc in docs:
             try:
-                compound = Compound.from_mongo_with_raw(doc, include_raw=self.include_raw)
+                compound = Compound.from_mongo_with_raw(
+                    doc, include_raw=self.include_raw
+                )
                 found_compounds.append(compound)
                 found_ids.add(doc.get("id", ""))
             except Exception as ex:

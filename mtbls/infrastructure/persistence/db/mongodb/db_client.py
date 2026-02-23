@@ -1,4 +1,3 @@
-import abc
 import logging
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Union
@@ -6,8 +5,10 @@ from typing import Any, AsyncGenerator, Union
 from pymongo import MongoClient
 from pymongo.database import Database
 
+from mtbls.infrastructure.persistence.db.document_db_client import (
+    DocumentDatabaseClient,
+)
 from mtbls.infrastructure.persistence.db.mongodb.config import MongoDbConnection
-from mtbls.infrastructure.persistence.db.document_db_client import DocumentDatabaseClient
 
 logger = logging.getLogger(__name__)
 

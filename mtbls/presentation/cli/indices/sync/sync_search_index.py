@@ -43,7 +43,6 @@ async def sync_search_index(
         index=index_name,
         delete_before=recreate_index,
         mappings_file_path=mappings_file_path,
-    
     )
     indexed_documents = await index_management_gateway.get_document_ids(
         index=index_name, update_field_name="updatedTime"
@@ -127,7 +126,9 @@ async def sync_search_index(
             try:
                 raw_text = target_path.read_text()
                 if not raw_text.strip():
-                    logger.warning("Empty cache JSON for %s at %s", resource_id, target_path)
+                    logger.warning(
+                        "Empty cache JSON for %s at %s", resource_id, target_path
+                    )
                     continue
                 file_content = json.loads(raw_text)
             except json.JSONDecodeError as ex:
@@ -145,7 +146,7 @@ async def sync_search_index(
                         model.model_dump(by_alias=True, include={name})
                     except Exception as e:
                         print("Dump fails on field:", name, "->", e)
-                    
+
             try:
                 body = model.model_dump(by_alias=True)
             except Exception as ex:

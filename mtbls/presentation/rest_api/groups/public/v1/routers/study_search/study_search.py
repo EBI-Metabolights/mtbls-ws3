@@ -22,8 +22,8 @@ router = APIRouter(tags=["Public"], prefix="/public/v2/public-study-index")
     summary="MetaboLights Study Search from public study index.",
     description=(
         "MetaboLights search results from public study index. "
-    "Sanitised output format. Set include_all_ids=true to get all matching "
-    "study IDs alongside paginated results (only when query or filters are applied)."
+        "Sanitised output format. Set include_all_ids=true to get all matching "
+        "study IDs alongside paginated results (only when query or filters are applied)."
     ),
     response_model=APIResponse[IndexSearchResult],  # IndexSearchResult or raw dict
 )

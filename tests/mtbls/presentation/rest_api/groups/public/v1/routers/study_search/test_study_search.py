@@ -2,8 +2,10 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
+from mtbls.domain.entities.search.study.index_search import (  # pyright: ignore[reportMissingImports]
+    IndexSearchResult,  # type: ignore
+)
 
-from mtbls.domain.entities.search.study.index_search import IndexSearchResult
 from mtbls.presentation.rest_api.core.responses import APIResponse
 
 

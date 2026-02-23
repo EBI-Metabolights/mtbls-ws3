@@ -24,12 +24,15 @@ def coerce_ontology_item(v: Any) -> OntologyModel:
         # allow both snake_case and camelCase keys if your cache varies
         return OntologyModel(
             term=v.get("term", ""),
-            term_source_ref=v.get("termSourceRef") or v.get("term_source_ref", "") or "",
+            term_source_ref=v.get("termSourceRef")
+            or v.get("term_source_ref", "")
+            or "",
             term_accession_number=v.get("termAccessionNumber")
             or v.get("term_accession_number", "")
             or "",
         )
     raise TypeError(f"Unsupported ontology item type: {type(v)}")
+
 
 class OntologySourceReferenceModel(APIBaseModel):
     """
@@ -493,8 +496,7 @@ class PublicStudyLiteIndexBaseModel(APIBaseModel):
             "or both for MetaboLights repository."
         ),
     ] = []
-    
-    
+
     @field_validator(
         "organisms",
         "organism_parts",
@@ -510,7 +512,7 @@ class PublicStudyLiteIndexBaseModel(APIBaseModel):
         if v is None:
             return []
         if not isinstance(v, list):
-            v = list(v) # in case a set sneaks in
+            v = list(v)  # in case a set sneaks in
         return [coerce_ontology_item(x) for x in v]
 
     model_config = ConfigDict(from_attributes=True)

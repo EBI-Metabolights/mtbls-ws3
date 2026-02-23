@@ -1,6 +1,5 @@
 from typing import Any, Dict
 
-
 COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
     #
     # ---- FLAG FACETS (booleans) ----
@@ -36,7 +35,6 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
         "field": "flags.hasMS",
         "only_true": True,
     },
-
     #
     # ---- OTHER VALUE FACETS ----
     #
@@ -48,7 +46,6 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
         "type": "value",
         "field": "organisms",
     },
-
     # If you don’t want to deal with nested aggs yet, you can still facet on species like this.
     # (It will count documents, not individual species_hits rows, but it’s usually fine.)
     "species": {
@@ -59,7 +56,6 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
         "type": "value",
         "field": "organismParts",
     },
-
     #
     # ---- RANGE FACETS ----
     #

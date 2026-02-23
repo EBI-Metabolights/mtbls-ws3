@@ -19,7 +19,9 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 )
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
-from mtbls.infrastructure.persistence.db.document_db_client import DocumentDatabaseClient
+from mtbls.infrastructure.persistence.db.document_db_client import (
+    DocumentDatabaseClient,
+)
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 logger = logging.getLogger(__name__)
@@ -28,8 +30,12 @@ logger = logging.getLogger(__name__)
 @inject
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
-    document_database_client: DocumentDatabaseClient = Provide["gateways.document_database_client"],
-    elasticsearch_client: ElasticsearchClient = Provide["gateways.elasticsearch_client"],
+    document_database_client: DocumentDatabaseClient = Provide[
+        "gateways.document_database_client"
+    ],
+    elasticsearch_client: ElasticsearchClient = Provide[
+        "gateways.elasticsearch_client"
+    ],
     cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
     user_read_repository: UserReadRepository = Provide[

@@ -1,12 +1,13 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
-    ElasticsearchAssayGateway,
-    MS_FIELD_MAP,
-)
+import pytest
+
 from mtbls.infrastructure.search.es.assay.es_assay_configuration import (
     AssayElasticSearchConfiguration,
+)
+from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
+    MS_FIELD_MAP,
+    ElasticsearchAssayGateway,
 )
 
 
@@ -69,7 +70,9 @@ class TestFindStudyIdsByAssayFilters:
         mock_client.search.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_filters_with_empty_values_returns_empty_list(self, gateway, mock_client):
+    async def test_filters_with_empty_values_returns_empty_list(
+        self, gateway, mock_client
+    ):
         result = await gateway.find_study_ids_by_assay_filters(
             ms_filters={"column_type": [], "instrument": []}
         )
@@ -107,7 +110,9 @@ class TestFindStudyIdsByAssayFilters:
         mock_client.search.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_find_study_ids_with_multiple_filters_and_operator(self, gateway, mock_client):
+    async def test_find_study_ids_with_multiple_filters_and_operator(
+        self, gateway, mock_client
+    ):
         mock_client.search.return_value = {
             "aggregations": {
                 "unique_studies": {
@@ -131,11 +136,7 @@ class TestFindStudyIdsByAssayFilters:
     @pytest.mark.asyncio
     async def test_no_matches_returns_empty_list(self, gateway, mock_client):
         mock_client.search.return_value = {
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": []
-                }
-            }
+            "aggregations": {"unique_studies": {"buckets": []}}
         }
 
         result = await gateway.find_study_ids_by_assay_filters(
@@ -218,7 +219,10 @@ class TestExtractStudyIds:
                 }
             }
         }
-        assert ElasticsearchAssayGateway._extract_study_ids(es_resp) == ["MTBLS1", "MTBLS2"]
+        assert ElasticsearchAssayGateway._extract_study_ids(es_resp) == [
+            "MTBLS1",
+            "MTBLS2",
+        ]
 
     def test_extract_empty_buckets(self):
         es_resp = {"aggregations": {"unique_studies": {"buckets": []}}}
@@ -234,13 +238,13 @@ class TestSearchCallParameters:
     @pytest.fixture
     def mock_client(self):
         client = MagicMock()
-        client.search = AsyncMock(return_value={
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": [{"key": "MTBLS1", "doc_count": 1}]
+        client.search = AsyncMock(
+            return_value={
+                "aggregations": {
+                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
                 }
             }
-        })
+        )
         return client
 
     @pytest.mark.asyncio

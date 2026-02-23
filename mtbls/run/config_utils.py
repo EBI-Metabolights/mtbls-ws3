@@ -33,6 +33,7 @@ def render_config_secrets(
         logger.warning("Secrets dictionary is empty. Skiping config rendering")
         return config
     env = Environment()
+
     def _split(value: Any, sep: str = ",") -> list[str]:
         if isinstance(value, (list, tuple)):
             return [str(part).strip() for part in value if str(part).strip()]

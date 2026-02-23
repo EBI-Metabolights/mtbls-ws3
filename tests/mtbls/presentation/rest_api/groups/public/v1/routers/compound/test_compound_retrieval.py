@@ -5,14 +5,12 @@ from fastapi.testclient import TestClient
 from mtbls.domain.entities.compound import Compound
 from mtbls.presentation.rest_api.core.responses import APIResponse
 from mtbls.presentation.rest_api.groups.public.v1.routers.compound.compound import (
-    BatchCompoundResult,
     BATCH_SIZE_LIMIT,
+    BatchCompoundResult,
 )
 
 
-def test_get_compound_by_id(
-    public_api_client: TestClient, submission_api_container
-):
+def test_get_compound_by_id(public_api_client: TestClient, submission_api_container):
     url = "/public/v2/compound/MTBLC123"
     mock_compound = Compound(
         id="MTBLC123",
@@ -44,7 +42,9 @@ class TestBatchCompoundRetrieval:
         ]
         mock_repo = AsyncMock()
         mock_repo.get_compounds_by_ids.return_value = (mock_compounds, [])
-        submission_api_container.repositories.compound_read_repository.override(mock_repo)
+        submission_api_container.repositories.compound_read_repository.override(
+            mock_repo
+        )
 
         response = public_api_client.post(
             url, json={"compound_ids": ["MTBLC1", "MTBLC2"]}
@@ -66,7 +66,9 @@ class TestBatchCompoundRetrieval:
         ]
         mock_repo = AsyncMock()
         mock_repo.get_compounds_by_ids.return_value = (mock_compounds, ["MTBLC999"])
-        submission_api_container.repositories.compound_read_repository.override(mock_repo)
+        submission_api_container.repositories.compound_read_repository.override(
+            mock_repo
+        )
 
         response = public_api_client.post(
             url, json={"compound_ids": ["MTBLC1", "MTBLC999"]}
@@ -88,7 +90,9 @@ class TestBatchCompoundRetrieval:
         ]
         mock_repo = AsyncMock()
         mock_repo.get_compounds_by_ids.return_value = (mock_compounds, [])
-        submission_api_container.repositories.compound_read_repository.override(mock_repo)
+        submission_api_container.repositories.compound_read_repository.override(
+            mock_repo
+        )
 
         response = public_api_client.post(
             url, json={"compound_ids": ["MTBLC1", "MTBLC1", "MTBLC1"]}
@@ -126,7 +130,9 @@ class TestBatchCompoundRetrieval:
         url = "/public/v2/compound/batch"
         mock_repo = AsyncMock()
         mock_repo.get_compounds_by_ids.return_value = ([], ["MTBLC999", "MTBLC888"])
-        submission_api_container.repositories.compound_read_repository.override(mock_repo)
+        submission_api_container.repositories.compound_read_repository.override(
+            mock_repo
+        )
 
         response = public_api_client.post(
             url, json={"compound_ids": ["MTBLC999", "MTBLC888"]}

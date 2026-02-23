@@ -1,20 +1,19 @@
-
-
-
 import json
 from typing import Annotated, Any
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Response, status
 from fastapi.params import Depends
 from fastapi.responses import StreamingResponse
 
-from dependency_injector.wiring import Provide, inject
-
-from mtbls.domain.entities.search.index_search import CompoundSearchInput, IndexSearchResult
+from mtbls.domain.entities.search.index_search import (
+    CompoundSearchInput,
+    IndexSearchResult,
+)
 from mtbls.presentation.rest_api.core.responses import APIErrorResponse, APIResponse
 
-
 router = APIRouter(tags=["Public"], prefix="/public/v2/public-compound-index")
+
 
 @router.post(
     "/search",
@@ -45,7 +44,7 @@ async def search_compound_index(
     "/mapping",
     summary="Get the Elasticsearch mapping for the public compound index.",
     description="Retrieve the Elasticsearch mapping for the configured public compound index.",
-    response_model=APIResponse[dict[str, Any]], 
+    response_model=APIResponse[dict[str, Any]],
 )
 @inject
 async def get_compound_index_mapping(
@@ -54,9 +53,7 @@ async def get_compound_index_mapping(
     ),
 ):
     mapping = await elasticsearch_compound_search_service.get_index_mapping()
-    response: APIResponse[dict[str, Any]] = APIResponse[dict[str, Any]](
-        content=mapping
-    )
+    response: APIResponse[dict[str, Any]] = APIResponse[dict[str, Any]](content=mapping)
     return response
 
 

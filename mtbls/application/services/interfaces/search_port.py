@@ -14,6 +14,7 @@ class SearchPort(abc.ABC):
     @abc.abstractmethod
     async def search(self, query: BaseSearchInput) -> BaseSearchResult: ...
 
+
 class BaseElasticSearchGateway(SearchPort):
     async def search(
         self,
@@ -59,21 +60,20 @@ class BaseElasticSearchGateway(SearchPort):
         # your current must/filter/must_not logic here
         ...
 
-    def _build_pagination(self, req: IndexSearchInput) -> Dict[str, Any]:
-        ...
+    def _build_pagination(self, req: IndexSearchInput) -> Dict[str, Any]: ...
 
-    def _build_sort(self, req: IndexSearchInput) -> List[Any]:
-        ...
+    def _build_sort(self, req: IndexSearchInput) -> List[Any]: ...
 
-    def _build_aggs(self) -> Dict[str, Any]:
-        ...
+    def _build_aggs(self) -> Dict[str, Any]: ...
 
     def _build_source(self) -> Dict[str, Any]:
         if self.config.source_includes:
             return {"_source": {"includes": list(self.config.source_includes)}}
         return {}
-    
-    def _map_aggs_to_searchui(self, aggs: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
+
+    def _map_aggs_to_searchui(
+        self, aggs: Dict[str, Any], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
 
         for facet_name, spec in config.items():

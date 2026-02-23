@@ -1,5 +1,3 @@
-
-
 import abc
 from typing import List, Tuple, Union
 
@@ -7,11 +5,8 @@ from mtbls.domain.entities.compound import Compound
 
 
 class CompoundReadRepository:
-
     @abc.abstractmethod
-    async def get_compound_by_id(
-        self, id_: str
-    ) -> Union[None, Compound]: ...
+    async def get_compound_by_id(self, id_: str) -> Union[None, Compound]: ...
 
     @abc.abstractmethod
     async def get_compounds_by_ids(

@@ -1,11 +1,12 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
-    ElasticsearchAssignmentGateway,
-)
+import pytest
+
 from mtbls.infrastructure.search.es.assignment.es_assignment_configuration import (
     AssignmentElasticSearchConfiguration,
+)
+from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
+    ElasticsearchAssignmentGateway,
 )
 
 
@@ -201,11 +202,7 @@ class TestFindStudyIdsByCompounds:
     @pytest.mark.asyncio
     async def test_no_matches_returns_empty_list(self, gateway, mock_client):
         mock_client.search.return_value = {
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": []
-                }
-            }
+            "aggregations": {"unique_studies": {"buckets": []}}
         }
 
         result = await gateway.find_study_ids_by_compounds(
@@ -251,7 +248,10 @@ class TestBuildQuery:
         assert len(bool_query["should"]) == 1
         assert bool_query["should"][0] == {
             "terms": {
-                "fields.database_identifier.value.keyword": ["HMDB0031111", "HMDB0000001"]
+                "fields.database_identifier.value.keyword": [
+                    "HMDB0031111",
+                    "HMDB0000001",
+                ]
             }
         }
 
@@ -337,13 +337,7 @@ class TestExtractStudyIds:
         assert result == ["MTBLS1", "MTBLS2", "MTBLS3"]
 
     def test_extract_study_ids_empty_buckets(self):
-        es_resp = {
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": []
-                }
-            }
-        }
+        es_resp = {"aggregations": {"unique_studies": {"buckets": []}}}
 
         result = ElasticsearchAssignmentGateway._extract_study_ids(es_resp)
 
@@ -357,9 +351,7 @@ class TestExtractStudyIds:
         assert result == []
 
     def test_extract_study_ids_missing_unique_studies(self):
-        es_resp = {
-            "aggregations": {}
-        }
+        es_resp = {"aggregations": {}}
 
         result = ElasticsearchAssignmentGateway._extract_study_ids(es_resp)
 
@@ -372,13 +364,13 @@ class TestSearchCallParameters:
     @pytest.fixture
     def mock_client(self):
         client = MagicMock()
-        client.search = AsyncMock(return_value={
-            "aggregations": {
-                "unique_studies": {
-                    "buckets": [{"key": "MTBLS1", "doc_count": 1}]
+        client.search = AsyncMock(
+            return_value={
+                "aggregations": {
+                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
                 }
             }
-        })
+        )
         return client
 
     @pytest.mark.asyncio
