@@ -74,8 +74,8 @@ docs = [
 default-groups = []
 
 [tool.uv.sources]
-mhd-model = { git = "https://github.com/MetabolomicsHub/mhd-model.git", rev = "dev" }
 mtbls-mhd-integration = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git", rev = "dev" }
+mhd-model = { git = "https://github.com/MetabolomicsHub/mhd-model.git", rev = "dev" }
 
 [project.scripts]
 mtbls-cli = "mtbls.run.cli.main:mtbls_cli"

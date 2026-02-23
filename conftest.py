@@ -174,13 +174,13 @@ def public_api_client(submission_api_container, local_config_file, local_secrets
 @pytest.fixture(scope="session")
 def templates_json() -> dict[str, Any]:
     with Path("tests/data/json/templates.json").open("r") as f:
-        return json.load(f)["result"]
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")
 def control_lists_json() -> dict[str, Any]:
     with Path("tests/data/json/control_lists.json").open("r") as f:
-        return json.load(f)["result"]
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")

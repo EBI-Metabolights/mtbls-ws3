@@ -72,19 +72,14 @@ from mtbls.domain.shared.validator.types import PolicyMessageType, ValidationPha
 logger = logging.getLogger(__name__)
 
 
-@inject
 async def create_validation_run_configuration(
     resource_id: str,
+    metadata_files_object_repository: FileObjectWriteRepository,
+    mhd_config: MhdConfiguration,
+    private_metadata_files_root_path: str,
+    db_connection: dict,
     temp_folder: Union[None, str] = None,
     apply_modifiers: bool = True,
-    metadata_files_object_repository: FileObjectWriteRepository = Provide[
-        "repositories.metadata_files_object_repository"
-    ],
-    mhd_config: MhdConfiguration = Provide["mhd_configuration"],
-    private_metadata_files_root_path: str = Provide[
-        "config.repositories.study_folders.mounted_paths.private_metadata_files_root_path"
-    ],
-    db_connection: dict = Provide["config.gateways.database.postgresql.connection"],
 ):
     if not temp_folder:
         temp_folder_path = pathlib.Path(f"/tmp/validation/{uuid.uuid4()}").resolve()
@@ -188,6 +183,11 @@ def run_validation(  # noqa: PLR0913
     internal_files_object_repository: FileObjectWriteRepository = Provide[
         "repositories.internal_files_object_repository"
     ],
+    mhd_config: MhdConfiguration = Provide["mhd_configuration"],
+    private_metadata_files_root_path: str = Provide[
+        "config.repositories.study_folders.mounted_paths.private_metadata_files_root_path"
+    ],
+    db_connection: dict = Provide["config.gateways.database.postgresql.connection"],
     **kwargs,
 ) -> AsyncTaskResult:
     validation_run_configuration = asyncio.run(
@@ -196,6 +196,9 @@ def run_validation(  # noqa: PLR0913
             temp_folder=temp_folder,
             apply_modifiers=apply_modifiers,
             metadata_files_object_repository=metadata_files_object_repository,
+            mhd_config=mhd_config,
+            private_metadata_files_root_path=private_metadata_files_root_path,
+            db_connection=db_connection,
         )
     )
     try:

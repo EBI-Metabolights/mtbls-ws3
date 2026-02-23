@@ -51,61 +51,6 @@ def maintain_cli(config_file: str, secrets_file: str):
     except Exception as ex:
         click.echo(f"Error {ex}")
 
-    # logger.info("CLI container started")
-    # request_tracker = get_request_tracker()
-    # request_tracker.update_request_tracker(
-    #     RequestTrackerModel(
-    #         user_id=0,
-    #         route_path="cli/index-public-studies",
-    #         resource_id="",
-    #         client="local",
-    #         request_id=str(uuid.uuid4()),
-    #         task_id="",
-    #     )
-    # )
-    # if subcommand == "update-metadata-json-files":
-    #     asyncio.run(
-    #         update_study_metadata_json_files(
-    #             study_read_repository,
-    #             http_client=http_client,
-    #             index_cache_files_object_repository=index_cache_files_object_repository,
-    #             metadata_files_object_repository=metadata_files_object_repository,
-    #             reindex_all=True,
-    #         )
-    #     )
-    # elif subcommand == "maintain-indices":
-    #     data_index_configuration = DataIndexConfiguration()
-    #     asyncio.run(
-    #         maintain_indices(
-    #             data_index_client=data_index_client,
-    #             study_metadata_service_factory=study_metadata_service_factory,
-    #             study_read_repository=study_read_repository,
-    #             data_index_configuration=data_index_configuration,
-    #         )
-    #     )
-    # elif subcommand == "reindex-selected-studies":
-    #     data_index_configuration = DataIndexConfiguration()
-    #     # selected_studies = [f"MTBLS{x}" for x in range(1, 1000)]
-
-    #     selected_studies = [
-    #         "MTBLS134",
-    #         "MTBLS378",
-    #         "MTBLS519",
-    #         "MTBLS553",
-    #         "MTBLS640",
-    #         "MTBLS700",
-    #         "MTBLS719",
-    #     ]
-    #     asyncio.run(
-    #         reindex_selected_studies(
-    #             selected_studies=selected_studies,
-    #             data_index_client=data_index_client,
-    #             study_metadata_service_factory=study_metadata_service_factory,
-    #             study_read_repository=study_read_repository,
-    #             data_index_configuration=data_index_configuration,
-    #         )
-    #     )
-
 
 if __name__ == "__main__":
     maintain_cli()
