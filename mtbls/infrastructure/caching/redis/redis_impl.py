@@ -19,9 +19,7 @@ class RedisCacheImpl(CacheService):
             socket_connect_timeout=self.connection.socket_timeout,
         )
         rc = self.connection
-        self.url_repr: str = (
-            f"redis://:***@{rc.redis_service.host}:{rc.redis_service.port}/{rc.db}"
-        )
+        self.url_repr: str = f"redis://:***@{rc.redis_service.host}:{rc.redis_service.port}/{rc.db}"
 
     async def get_connection_repr(self) -> str:
         return self.url_repr
@@ -41,14 +39,10 @@ class RedisCacheImpl(CacheService):
             return value
         return None
 
-    async def set_value_with_expiration_time(
-        self, key: str, value: Any, expiration_timestamp: int
-    ):
+    async def set_value_with_expiration_time(self, key: str, value: Any, expiration_timestamp: int):
         return await self.redis.setex(key, expiration_timestamp, value)
 
-    async def set_value(
-        self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None
-    ) -> bool:
+    async def set_value(self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None) -> bool:
         if expiration_time_in_seconds:
             return await self.redis.setex(key, expiration_time_in_seconds, value)
         return await self.redis.set(key, value)

@@ -51,9 +51,7 @@ class MongoDbDefaultWriteRepository(
 
     async def update(self, entity: INPUT_TYPE) -> OUTPUT_TYPE:
         input_json = entity.model_dump(by_alias=True, exclude="id_")
-        result: UpdateResult = self.collection.update_one(
-            {"_id": ObjectId(entity.id_)}, {"$set": input_json}
-        )
+        result: UpdateResult = self.collection.update_one({"_id": ObjectId(entity.id_)}, {"$set": input_json})
         if result.modified_count > 0:
             result = self.collection.find_one({"_id": ObjectId(entity.id_)})
             return self.output_entity_class.model_validate(result)

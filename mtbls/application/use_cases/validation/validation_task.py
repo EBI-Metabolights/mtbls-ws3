@@ -80,9 +80,7 @@ async def start_study_validation_task(  # noqa: PLR0913
         try:
             task = await async_task_service.get_async_task_result(task_id)
         except Exception as exc:
-            message = (
-                f"Task {task_id} is not fetched from executor. Starting new task..."
-            )
+            message = f"Task {task_id} is not fetched from executor. Starting new task..."
             logger.warning(message)
             logger.exception(exc)
             await cache_service.delete_key(key)
@@ -198,9 +196,7 @@ async def get_study_validation_result(  # noqa: PLR0913
     if not task_id:
         task_id = await cache_service.get_value(key)
         cached_checked = True
-    task_status, task_result = await get_result_from_repository(
-        validation_report_service, resource_id, task_id
-    )
+    task_status, task_result = await get_result_from_repository(validation_report_service, resource_id, task_id)
 
     if not task_result:
         if not cached_checked:
@@ -212,22 +208,16 @@ async def get_study_validation_result(  # noqa: PLR0913
                 )
 
         try:
-            task: AsyncTaskResult = await async_task_service.get_async_task_result(
-                task_id=task_id
-            )
+            task: AsyncTaskResult = await async_task_service.get_async_task_result(task_id=task_id)
             if not task:
-                raise AsyncTaskNotFoundError(
-                    resource_id, task_id, f"Task result is not valid for task {task_id}"
-                )
+                raise AsyncTaskNotFoundError(resource_id, task_id, f"Task result is not valid for task {task_id}")
         except Exception as ex:
             logger.debug(
                 "Task id %s is not found on study validation history for study %s",
                 task_id,
                 resource_id,
             )
-            raise AsyncTaskCheckStatusFailure(
-                resource_id, f"Validation task fetch error: {str(ex)}"
-            ) from ex
+            raise AsyncTaskCheckStatusFailure(resource_id, f"Validation task fetch error: {str(ex)}") from ex
 
     if not task_result:
         task_status = AsyncTaskStatus(
@@ -242,9 +232,7 @@ async def get_study_validation_result(  # noqa: PLR0913
                     report_content = task.get()
                     result_list = PolicyResultList.model_validate(report_content)
 
-                    task_result = await convert_to_summary_result(
-                        resource_id, result_list
-                    )
+                    task_result = await convert_to_summary_result(resource_id, result_list)
                     task_result.task_id = task_id
                     task_result = await override_and_save_validation_report(
                         resource_id=resource_id,
@@ -258,12 +246,8 @@ async def get_study_validation_result(  # noqa: PLR0913
                         task.get()
 
                     except Exception as ex:
-                        raise AsyncTaskRemoteFailure(
-                            resource_id, task_id, f"Remote task failed: {str(ex)}"
-                        ) from ex
-                    raise AsyncTaskRemoteFailure(
-                        resource_id, task_id, "Remote task failed."
-                    )
+                        raise AsyncTaskRemoteFailure(resource_id, task_id, f"Remote task failed: {str(ex)}") from ex
+                    raise AsyncTaskRemoteFailure(resource_id, task_id, "Remote task failed.")
             finally:
                 await cache_service.delete_key(key)
                 task.revoke()
@@ -287,9 +271,7 @@ async def get_study_validation_report(  # noqa: PLR0913
     include_overrides: bool = True,
     delimiter: str = "\t",
 ) -> tuple[AsyncTaskSummary, str]:
-    task_summary: AsyncTaskSummary[
-        PolicySummaryResult
-    ] = await get_study_validation_result(
+    task_summary: AsyncTaskSummary[PolicySummaryResult] = await get_study_validation_result(
         resource_id=resource_id,
         async_task_service=async_task_service,
         cache_service=cache_service,
@@ -309,9 +291,7 @@ async def get_study_validation_report(  # noqa: PLR0913
             delimiter=delimiter,
         )
         return task_summary, summary_report
-    raise AsyncTaskNotReadyError(
-        resource_id, "Task is not ready", task_summary.task.task_status
-    )
+    raise AsyncTaskNotReadyError(resource_id, "Task is not ready", task_summary.task.task_status)
 
 
 async def get_report_content_from_summary_report(
@@ -451,9 +431,7 @@ async def get_result_from_repository(
     task_id: str,
 ):
     if not task_id:
-        raise AsyncTaskNotFoundError(
-            resource_id, f"No validation task found for resource_id: {resource_id}"
-        )
+        raise AsyncTaskNotFoundError(resource_id, f"No validation task found for resource_id: {resource_id}")
     task_status: Union[AsyncTaskStatus, None] = None
     task_result: Union[PolicySummaryResult, None] = None
     try:
@@ -472,8 +450,7 @@ async def get_result_from_repository(
         )
     except StudyObjectNotFoundError:
         logger.debug(
-            "Task id %s is not found on study validation history for study %s. "
-            "Checking running tasks...",
+            "Task id %s is not found on study validation history for study %s. Checking running tasks...",
             task_id,
             resource_id,
         )
@@ -509,9 +486,7 @@ async def delete_validation_task(
     task_id_in_cache = value == task_id
     await cache_service.delete_key(key)
     try:
-        result: AsyncTaskResult = await async_task_service.get_async_task_result(
-            task_id=task_id
-        )
+        result: AsyncTaskResult = await async_task_service.get_async_task_result(task_id=task_id)
         if not result or result.get_id() != task_id:
             raise AsyncTaskNotFoundError(resource_id, task_id)
     except Exception as ex:
@@ -525,8 +500,7 @@ async def delete_validation_task(
             result.revoke(terminate=True)
         else:
             logger.warning(
-                "Remote task is not fetched. If task %s is still running, "
-                "it may cause resource consumption.",
+                "Remote task is not fetched. If task %s is still running, it may cause resource consumption.",
                 task_id,
             )
     except Exception as ex:
@@ -553,9 +527,7 @@ async def convert_to_summary_result(resource_id: str, result_list: PolicyResultL
             try:
                 result_start_time = start_time
                 if isinstance(policy_result.start_time, str):
-                    result_start_time = datetime.datetime.fromisoformat(
-                        policy_result.start_time
-                    ).timestamp()
+                    result_start_time = datetime.datetime.fromisoformat(policy_result.start_time).timestamp()
                 elif isinstance(policy_result.start_time, datetime.datetime):
                     result_start_time = policy_result.start_time.timestamp()
                 start_time = result_start_time
@@ -565,9 +537,7 @@ async def convert_to_summary_result(resource_id: str, result_list: PolicyResultL
             try:
                 result_completion_time = completion_time
                 if isinstance(policy_result.completion_time, str):
-                    result_completion_time = datetime.datetime.fromisoformat(
-                        policy_result.completion_time
-                    ).timestamp()
+                    result_completion_time = datetime.datetime.fromisoformat(policy_result.completion_time).timestamp()
                 elif isinstance(policy_result.completion_time, datetime.datetime):
                     result_completion_time = policy_result.completion_time.timestamp()
                 completion_time = result_completion_time
@@ -576,9 +546,7 @@ async def convert_to_summary_result(resource_id: str, result_list: PolicyResultL
         summary_result.messages.violations.extend(policy_result.messages.violations)
         summary_result.messages.summary.extend(policy_result.messages.summary)
 
-    summary_result.messages.summary.sort(
-        key=lambda x: x.source_file + x.identifier + x.source_column_header
-    )
+    summary_result.messages.summary.sort(key=lambda x: x.source_file + x.identifier + x.source_column_header)
     summary_result.start_time = datetime.datetime.fromtimestamp(start_time)
     summary_result.completion_time = datetime.datetime.fromtimestamp(completion_time)
     summary_result.duration_in_seconds = completion_time - start_time

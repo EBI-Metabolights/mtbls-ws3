@@ -44,20 +44,14 @@ class TestHasQueryOrFilters:
         assert gateway._has_query_or_filters(base_request) is True
 
     def test_returns_true_for_filter_with_values(self, gateway, base_request):
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         assert gateway._has_query_or_filters(base_request) is True
 
     def test_returns_false_for_filter_with_empty_values(self, gateway, base_request):
-        base_request.filters = [
-            FilterModel(field="organisms", values=[], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=[], operator="any")]
         assert gateway._has_query_or_filters(base_request) is False
 
-    def test_returns_true_for_multiple_filters_one_with_values(
-        self, gateway, base_request
-    ):
+    def test_returns_true_for_multiple_filters_one_with_values(self, gateway, base_request):
         base_request.filters = [
             FilterModel(field="organisms", values=[], operator="any"),
             FilterModel(field="technology", values=["NMR"], operator="any"),
@@ -126,9 +120,7 @@ class TestBuildIdsOnlyPayload:
         assert "should" in must_clause["bool"]
 
     def test_payload_includes_filters(self, gateway, base_request):
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         payload = gateway._build_ids_only_payload(base_request)
 
         bool_query = payload["query"]["bool"]
@@ -160,9 +152,7 @@ class TestSearchWithIncludeAllIds:
         )
 
     @pytest.mark.asyncio
-    async def test_no_second_query_when_include_all_ids_false(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_no_second_query_when_include_all_ids_false(self, mock_client, gateway, base_request):
         base_request.query = "cancer"
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},
@@ -176,9 +166,7 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids is None
 
     @pytest.mark.asyncio
-    async def test_no_second_query_when_no_query_or_filters(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_no_second_query_when_no_query_or_filters(self, mock_client, gateway, base_request):
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},
             "aggregations": {},
@@ -191,9 +179,7 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids is None
 
     @pytest.mark.asyncio
-    async def test_second_query_when_include_all_ids_true_with_query(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_second_query_when_include_all_ids_true_with_query(self, mock_client, gateway, base_request):
         base_request.query = "cancer"
         mock_client.search.side_effect = [
             # First call: main search
@@ -231,12 +217,8 @@ class TestSearchWithIncludeAllIds:
         ]
 
     @pytest.mark.asyncio
-    async def test_second_query_when_include_all_ids_true_with_filters(
-        self, mock_client, gateway, base_request
-    ):
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+    async def test_second_query_when_include_all_ids_true_with_filters(self, mock_client, gateway, base_request):
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         mock_client.search.side_effect = [
             # First call: main search
             {
@@ -261,9 +243,7 @@ class TestSearchWithIncludeAllIds:
         assert result.all_study_ids == ["MTBLS10", "MTBLS20"]
 
     @pytest.mark.asyncio
-    async def test_all_study_ids_handles_missing_study_id_in_source(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_all_study_ids_handles_missing_study_id_in_source(self, mock_client, gateway, base_request):
         base_request.query = "cancer"
         mock_client.search.side_effect = [
             # First call: main search
@@ -351,9 +331,7 @@ class TestOnlyHasCrossIndexFilters:
         base_request.database_identifiers = ["HMDB0031111"]
         assert gateway._only_has_cross_index_filters(base_request) is True
 
-    def test_returns_true_for_only_metabolite_identifications(
-        self, gateway, base_request
-    ):
+    def test_returns_true_for_only_metabolite_identifications(self, gateway, base_request):
         base_request.metabolite_identifications = ["Aspirin"]
         assert gateway._only_has_cross_index_filters(base_request) is True
 
@@ -364,9 +342,7 @@ class TestOnlyHasCrossIndexFilters:
 
     def test_returns_false_when_facet_filters_present(self, gateway, base_request):
         base_request.database_identifiers = ["HMDB0031111"]
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         assert gateway._only_has_cross_index_filters(base_request) is False
 
     def test_returns_false_when_study_ids_already_set(self, gateway, base_request):
@@ -433,19 +409,13 @@ class TestResolveChemicalFilters:
         assert result is base_request
 
     @pytest.mark.asyncio
-    async def test_no_assignment_gateway_returns_unchanged(
-        self, gateway_without_assignment, base_request
-    ):
+    async def test_no_assignment_gateway_returns_unchanged(self, gateway_without_assignment, base_request):
         base_request.database_identifiers = ["HMDB0031111"]
-        result = await gateway_without_assignment._resolve_chemical_filters(
-            base_request
-        )
+        result = await gateway_without_assignment._resolve_chemical_filters(base_request)
         assert result is base_request
 
     @pytest.mark.asyncio
-    async def test_resolves_database_identifiers_to_study_ids(
-        self, gateway, mock_assignment_gateway, base_request
-    ):
+    async def test_resolves_database_identifiers_to_study_ids(self, gateway, mock_assignment_gateway, base_request):
         base_request.database_identifiers = ["HMDB0031111"]
         base_request.database_identifiers_operator = "all"
         base_request.metabolite_identifications_operator = "any"
@@ -481,9 +451,7 @@ class TestResolveChemicalFilters:
         assert result.metabolite_identifications is None
 
     @pytest.mark.asyncio
-    async def test_no_matching_studies_returns_impossible_filter(
-        self, gateway, mock_assignment_gateway, base_request
-    ):
+    async def test_no_matching_studies_returns_impossible_filter(self, gateway, mock_assignment_gateway, base_request):
         base_request.database_identifiers = ["NONEXISTENT"]
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = []
 
@@ -492,9 +460,7 @@ class TestResolveChemicalFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_intersects_with_existing_study_ids(
-        self, gateway, mock_assignment_gateway, base_request
-    ):
+    async def test_intersects_with_existing_study_ids(self, gateway, mock_assignment_gateway, base_request):
         base_request.database_identifiers = ["HMDB0031111"]
         base_request.study_ids = ["MTBLS1", "MTBLS3", "MTBLS5"]
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
@@ -509,9 +475,7 @@ class TestResolveChemicalFilters:
         assert set(result.study_ids) == {"MTBLS1", "MTBLS3"}
 
     @pytest.mark.asyncio
-    async def test_empty_intersection_returns_impossible_filter(
-        self, gateway, mock_assignment_gateway, base_request
-    ):
+    async def test_empty_intersection_returns_impossible_filter(self, gateway, mock_assignment_gateway, base_request):
         base_request.database_identifiers = ["HMDB0031111"]
         base_request.study_ids = ["MTBLS100", "MTBLS200"]
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
@@ -524,14 +488,10 @@ class TestResolveChemicalFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_preserves_other_request_fields(
-        self, gateway, mock_assignment_gateway, base_request
-    ):
+    async def test_preserves_other_request_fields(self, gateway, mock_assignment_gateway, base_request):
         base_request.query = "lipidomics"
         base_request.database_identifiers = ["HMDB0031111"]
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = ["MTBLS1"]
 
         result = await gateway._resolve_chemical_filters(base_request)
@@ -697,9 +657,7 @@ class TestSearchWithChemicalFilters:
     ):
         """Test that all_study_ids query runs when chemical filters are combined with facet filters."""
         base_request.database_identifiers = ["HMDB0031111"]
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         mock_assignment_gateway.find_study_ids_by_compounds.return_value = [
             "MTBLS1",
             "MTBLS2",
@@ -763,9 +721,7 @@ class TestBuildSearchPayloadWithStudyIds:
 
     def test_study_ids_combined_with_other_filters(self, gateway, base_request):
         base_request.study_ids = ["MTBLS1"]
-        base_request.filters = [
-            FilterModel(field="organisms", values=["Homo sapiens"], operator="any")
-        ]
+        base_request.filters = [FilterModel(field="organisms", values=["Homo sapiens"], operator="any")]
         payload = gateway._build_search_payload(base_request)
 
         bool_query = payload["query"]["bool"]
@@ -808,9 +764,7 @@ class TestHasAssayFilters:
         assert gateway._has_assay_filters(base_request) is True
 
     def test_returns_true_for_chromatography_instrument(self, gateway, base_request):
-        base_request.ms = MSFilters(
-            chromatography_instrument=["Waters ACQUITY UPLC system"]
-        )
+        base_request.ms = MSFilters(chromatography_instrument=["Waters ACQUITY UPLC system"])
         assert gateway._has_assay_filters(base_request) is True
 
 
@@ -857,17 +811,13 @@ class TestResolveAssayFilters:
         assert result is base_request
 
     @pytest.mark.asyncio
-    async def test_no_assay_gateway_returns_unchanged(
-        self, gateway_without_assay, base_request
-    ):
+    async def test_no_assay_gateway_returns_unchanged(self, gateway_without_assay, base_request):
         base_request.ms = MSFilters(column_type=["reverse phase"])
         result = await gateway_without_assay._resolve_assay_filters(base_request)
         assert result is base_request
 
     @pytest.mark.asyncio
-    async def test_resolves_assay_filters_to_study_ids(
-        self, gateway, mock_assay_gateway, base_request
-    ):
+    async def test_resolves_assay_filters_to_study_ids(self, gateway, mock_assay_gateway, base_request):
         base_request.ms = MSFilters(
             column_type=["reverse phase"],
             instrument=["Q Exactive"],
@@ -891,9 +841,7 @@ class TestResolveAssayFilters:
         assert result.ms is None
 
     @pytest.mark.asyncio
-    async def test_no_matches_returns_impossible_filter(
-        self, gateway, mock_assay_gateway, base_request
-    ):
+    async def test_no_matches_returns_impossible_filter(self, gateway, mock_assay_gateway, base_request):
         base_request.ms = MSFilters(instrument=["NONEXISTENT"])
         mock_assay_gateway.find_study_ids_by_assay_filters.return_value = []
 
@@ -903,9 +851,7 @@ class TestResolveAssayFilters:
         assert result.ms is None
 
     @pytest.mark.asyncio
-    async def test_intersects_with_existing_study_ids(
-        self, gateway, mock_assay_gateway, base_request
-    ):
+    async def test_intersects_with_existing_study_ids(self, gateway, mock_assay_gateway, base_request):
         base_request.ms = MSFilters(column_type=["reverse phase"])
         base_request.study_ids = ["MTBLS1", "MTBLS106", "MTBLS200"]
         mock_assay_gateway.find_study_ids_by_assay_filters.return_value = [
@@ -918,9 +864,7 @@ class TestResolveAssayFilters:
         assert result.study_ids == ["MTBLS106"]
 
     @pytest.mark.asyncio
-    async def test_empty_intersection_returns_impossible_filter(
-        self, gateway, mock_assay_gateway, base_request
-    ):
+    async def test_empty_intersection_returns_impossible_filter(self, gateway, mock_assay_gateway, base_request):
         base_request.ms = MSFilters(column_type=["reverse phase"])
         base_request.study_ids = ["MTBLS999"]
         mock_assay_gateway.find_study_ids_by_assay_filters.return_value = [
@@ -1119,18 +1063,14 @@ class TestResolveSampleFilters:
         )
 
     @pytest.mark.asyncio
-    async def test_no_filters_returns_unchanged(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_no_filters_returns_unchanged(self, gateway, mock_sample_gateway, base_request):
         result = await gateway._resolve_sample_filters(base_request)
 
         assert result is base_request
         mock_sample_gateway.find_study_ids_by_factor_headers.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_resolves_to_study_ids(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_resolves_to_study_ids(self, gateway, mock_sample_gateway, base_request):
         base_request.factor_header_names = ["Batch"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
             "MTBLS79",
@@ -1143,9 +1083,7 @@ class TestResolveSampleFilters:
         assert result.factor_header_names is None
 
     @pytest.mark.asyncio
-    async def test_no_matches_returns_sentinel(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_no_matches_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
         base_request.factor_header_names = ["NONEXISTENT"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = []
 
@@ -1154,9 +1092,7 @@ class TestResolveSampleFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_intersects_with_existing_study_ids(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_intersects_with_existing_study_ids(self, gateway, mock_sample_gateway, base_request):
         base_request.factor_header_names = ["Batch"]
         base_request.study_ids = ["MTBLS79", "MTBLS200"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = [
@@ -1169,9 +1105,7 @@ class TestResolveSampleFilters:
         assert result.study_ids == ["MTBLS79"]
 
     @pytest.mark.asyncio
-    async def test_empty_intersection_returns_sentinel(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_empty_intersection_returns_sentinel(self, gateway, mock_sample_gateway, base_request):
         base_request.factor_header_names = ["Batch"]
         base_request.study_ids = ["MTBLS999"]
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS79"]
@@ -1181,9 +1115,7 @@ class TestResolveSampleFilters:
         assert result.study_ids == ["__NO_MATCHING_STUDIES__"]
 
     @pytest.mark.asyncio
-    async def test_passes_operator_to_sample_gateway(
-        self, gateway, mock_sample_gateway, base_request
-    ):
+    async def test_passes_operator_to_sample_gateway(self, gateway, mock_sample_gateway, base_request):
         base_request.factor_header_names = ["Batch", "Gender"]
         base_request.factor_header_names_operator = "or"
         mock_sample_gateway.find_study_ids_by_factor_headers.return_value = ["MTBLS1"]
@@ -1335,9 +1267,7 @@ class TestExportResults:
         assert results[1]["studyId"] == "MTBLS2"
 
     @pytest.mark.asyncio
-    async def test_export_pages_with_search_after(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_pages_with_search_after(self, mock_client, gateway, base_request):
         mock_client.search.side_effect = [
             {
                 "hits": {
@@ -1369,15 +1299,10 @@ class TestExportResults:
         assert mock_client.search.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_export_respects_max_results(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_respects_max_results(self, mock_client, gateway, base_request):
         mock_client.search.return_value = {
             "hits": {
-                "hits": [
-                    {"_source": {"studyId": f"MTBLS{i}"}, "sort": [str(i)]}
-                    for i in range(5)
-                ],
+                "hits": [{"_source": {"studyId": f"MTBLS{i}"}, "sort": [str(i)]} for i in range(5)],
                 "total": {"value": 100},
             },
         }
@@ -1389,9 +1314,7 @@ class TestExportResults:
         assert len(results) == 3
 
     @pytest.mark.asyncio
-    async def test_export_strips_aggs_and_pagination(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_strips_aggs_and_pagination(self, mock_client, gateway, base_request):
         base_request.query = "cancer"
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},

@@ -30,20 +30,12 @@ class RedisSentinelConnectionProvider(PubSubConnection):
     def get_url(self) -> str:
         sc = self.connection
         return ";".join(
-            [
-                f"sentinel://:{sc.password}@{service.host}:{service.port}/{sc.db}"
-                for service in sc.sentinel_services
-            ]
+            [f"sentinel://:{sc.password}@{service.host}:{service.port}/{sc.db}" for service in sc.sentinel_services]
         )
 
     def get_connection_repr(self) -> str:
         sc = self.connection
-        return ";".join(
-            [
-                f"sentinel://:***@{service.host}:{service.port}/{sc.db}"
-                for service in sc.sentinel_services
-            ]
-        )
+        return ";".join([f"sentinel://:***@{service.host}:{service.port}/{sc.db}" for service in sc.sentinel_services])
 
     def get_transport_options(self) -> dict[str, Any]:
         return self.transport_options

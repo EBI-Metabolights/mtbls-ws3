@@ -126,16 +126,12 @@ class PolicySummaryResult(CamelCaseModel):
                 elif isinstance(item, dict):
                     result.append(UpdateLog.model_validate(item))
                 elif isinstance(item, str):
-                    result.append(
-                        UpdateLog(action=item, source="", old_value="", new_value="")
-                    )
+                    result.append(UpdateLog(action=item, source="", old_value="", new_value=""))
         else:
             if isinstance(value, UpdateLog):
                 result.append(value)
             elif isinstance(value, dict):
                 result.append(UpdateLog.model_validate(value))
             elif isinstance(value, str):
-                result.append(
-                    UpdateLog(action=value, source="", old_value="", new_value="")
-                )
+                result.append(UpdateLog(action=value, source="", old_value="", new_value=""))
         return result

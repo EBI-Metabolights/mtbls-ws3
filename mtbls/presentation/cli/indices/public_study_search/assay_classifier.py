@@ -34,19 +34,11 @@ class AssayTechnique(APIBaseModel):
 class AssayClassifier:
     ASSAY_TECHNIQUES_MAPPING = {
         "LC-MS": AssayTechnique(name="LC-MS", main="MS", technique="LC-MS", sub="LC"),
-        "LC-DAD": AssayTechnique(
-            name="LC-DAD", main="MS", technique="LC-MS", sub="LC-DAD"
-        ),
+        "LC-DAD": AssayTechnique(name="LC-DAD", main="MS", technique="LC-MS", sub="LC-DAD"),
         "GC-MS": AssayTechnique(name="GC-MS", main="MS", technique="GC-MS", sub="GC"),
-        "GCxGC-MS": AssayTechnique(
-            name="GCxGC-MS", main="MS", technique="GC-MS", sub="Tandem (GCxGC)"
-        ),
-        "GC-FID": AssayTechnique(
-            name="GC-FID", main="MS", technique="GC-MS", sub="GC-FID"
-        ),
-        "MS": AssayTechnique(
-            name="MS", main="MS", technique="Direct Injection", sub="MS"
-        ),
+        "GCxGC-MS": AssayTechnique(name="GCxGC-MS", main="MS", technique="GC-MS", sub="Tandem (GCxGC)"),
+        "GC-FID": AssayTechnique(name="GC-FID", main="MS", technique="GC-MS", sub="GC-FID"),
+        "MS": AssayTechnique(name="MS", main="MS", technique="Direct Injection", sub="MS"),
         "DI-MS": AssayTechnique(
             name="DI-MS",
             main="MS",
@@ -69,8 +61,7 @@ class AssayClassifier:
             name="MALDI-MS",
             main="MS",
             technique="Direct Injection",
-            sub="Matrix-assisted laser desorption-ionisation imaging "
-            "mass spectrometry (MALDI)",
+            sub="Matrix-assisted laser desorption-ionisation imaging mass spectrometry (MALDI)",
         ),
         "SPE-IMS-MS": AssayTechnique(
             name="SPE-IMS-MS",
@@ -78,9 +69,7 @@ class AssayClassifier:
             technique="Direct Injection",
             sub="Solid-Phase Extraction Ion Mobility Spectrometry (SPE-IMS)",
         ),
-        "MSImaging": AssayTechnique(
-            name="MSImaging", main="MS", technique="MS Imaging", sub="MS Imaging"
-        ),
+        "MSImaging": AssayTechnique(name="MSImaging", main="MS", technique="MS Imaging", sub="MS Imaging"),
         "NMR": AssayTechnique(
             name="NMR",
             main="NMR",
@@ -112,9 +101,7 @@ class AssayClassifier:
         "Magnetic resonance imaging": "MRImaging",
     }
 
-    MANUAL_ASSIGNMENTS: Annotated[
-        Set[str], Doc("Curator assignments in DB will be mapped to techniques")
-    ] = {
+    MANUAL_ASSIGNMENTS: Annotated[Set[str], Doc("Curator assignments in DB will be mapped to techniques")] = {
         "3D LAESI imaging MS": "MSImaging",
         "3D MALDI imaging MS": "MSImaging",
         "3D MALDI imaging MS simulation": "MSImaging",
@@ -158,12 +145,8 @@ class AssayClassifier:
         assay_path: Path,
         manual_assignment: str,
     ) -> AssayTechnique:
-        assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(
-            results_per_page=100000
-        )
-        assay_file_result: IsaTableFileReaderResult = assay_reader.get_headers(
-            file_buffer_or_path=assay_path
-        )
+        assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(results_per_page=100000)
+        assay_file_result: IsaTableFileReaderResult = assay_reader.get_headers(file_buffer_or_path=assay_path)
         assay_file: AssayFile = assay_file_result.isa_table_file
         if not investigation or not investigation.studies:
             return AssayTechnique()
@@ -197,10 +180,7 @@ class AssayClassifier:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["FIA-MS"]
             elif "Parameter Value[CE Instrument]" in all_columns:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["CE-MS"]
-            elif (
-                "Parameter Value[Column type 1]" in all_columns
-                and "Parameter Value[Column type 2]" in all_columns
-            ):
+            elif "Parameter Value[Column type 1]" in all_columns and "Parameter Value[Column type 2]" in all_columns:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["GCxGC-MS"]
             elif "Parameter Value[SPE-IMS Instrument]" in all_columns:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["SPE-IMS-MS"]
@@ -208,24 +188,17 @@ class AssayClassifier:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["TD-GC-MS"]
             elif "Parameter Value[Sectioning instrument]" in all_columns:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["MSImaging"]
-            elif (
-                "Parameter Value[Signal range]" in all_columns
-                and "Parameter Value[Resolution]" in all_columns
-            ):
+            elif "Parameter Value[Signal range]" in all_columns and "Parameter Value[Resolution]" in all_columns:
                 return AssayClassifier.ASSAY_TECHNIQUES_MAPPING["LC-DAD"]
             else:
                 if "Parameter Value[Column type]" in all_columns:
-                    column_type_values_result: IsaTableFileReaderResult = (
-                        assay_reader.read(
-                            file_buffer_or_path=assay_path,
-                            offset=0,
-                            limit=1000000,
-                            selected_columns=["Parameter Value[Column type]"],
-                        )
+                    column_type_values_result: IsaTableFileReaderResult = assay_reader.read(
+                        file_buffer_or_path=assay_path,
+                        offset=0,
+                        limit=1000000,
+                        selected_columns=["Parameter Value[Column type]"],
                     )
-                    colun_type_data = (
-                        column_type_values_result.isa_table_file.table.data
-                    )
+                    colun_type_data = column_type_values_result.isa_table_file.table.data
                     values = colun_type_data["Parameter Value[Column type]"]
                     for i in range(len(values) if len(values) < 3 else 3):
                         if values[i]:
@@ -249,11 +222,7 @@ class AssayClassifier:
 
         if investigation and investigation.studies:
             for study_item in investigation.studies:
-                if (
-                    study_item
-                    and study_item.study_assays
-                    and study_item.study_assays.assays
-                ):
+                if study_item and study_item.study_assays and study_item.study_assays.assays:
                     for assay_item in study_item.study_assays.assays:
                         if assay_item.file_name == assay_file.file_path:
                             if "mass spectrometry" in assay_item.technology_type.term:

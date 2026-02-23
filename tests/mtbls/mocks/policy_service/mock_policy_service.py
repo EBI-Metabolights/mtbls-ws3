@@ -27,19 +27,12 @@ class MockPolicyService(PolicyService):
         with Path("tests/mtbls/mocks/policy_service/rule_definitions.json").open() as f:
             self.rule_definitions = VersionedValidationsMap(
                 validation_version=self.versions[0],
-                validations={
-                    x["rule_id"]: Validation.model_validate(x)
-                    for x in json.load(f)["result"]
-                },
+                validations={x["rule_id"]: Validation.model_validate(x) for x in json.load(f)["result"]},
             )
         with Path("tests/mtbls/mocks/policy_service/templates.json").open() as f:
-            self.templates = FileTemplates.model_validate(
-                json.load(f)["result"], by_alias=True
-            )
+            self.templates = FileTemplates.model_validate(json.load(f)["result"], by_alias=True)
         with Path("tests/mtbls/mocks/policy_service/control_lists.json").open() as f:
-            self.control_lists = ValidationControls.model_validate(
-                json.load(f)["result"], by_alias=True
-            )
+            self.control_lists = ValidationControls.model_validate(json.load(f)["result"], by_alias=True)
 
         self.validation_result = ValidationResult()
 

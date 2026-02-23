@@ -50,9 +50,7 @@ async def get_validation_templates(
     policy_service: PolicyService = Depends(  # noqa: FAST002
         Provide["services.policy_service"]
     ),
-    version: Annotated[
-        None | Literal["1.0", "2.0"], Query(title="template version")
-    ] = None,
+    version: Annotated[None | Literal["1.0", "2.0"], Query(title="template version")] = None,
 ):
     templates: FileTemplates = await policy_service.get_templates()
 
@@ -61,17 +59,11 @@ async def get_validation_templates(
         filtered = FileTemplates()
 
         for k, items in templates.assay_file_header_templates.items():
-            filtered.assay_file_header_templates[k] = [
-                x for x in items if x.version == version
-            ]
+            filtered.assay_file_header_templates[k] = [x for x in items if x.version == version]
         for k, items in templates.sample_file_header_templates.items():
-            filtered.sample_file_header_templates[k] = [
-                x for x in items if x.version == version
-            ]
+            filtered.sample_file_header_templates[k] = [x for x in items if x.version == version]
         for k, items in templates.assignment_file_header_templates.items():
-            filtered.assignment_file_header_templates[k] = [
-                x for x in items if x.version == version
-            ]
+            filtered.assignment_file_header_templates[k] = [x for x in items if x.version == version]
         for k, items in templates.protocol_templates.items():
             filtered.protocol_templates[k] = [x for x in items if x.version == version]
         content = filtered

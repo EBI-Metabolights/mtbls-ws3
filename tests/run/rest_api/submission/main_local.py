@@ -80,24 +80,16 @@ if __name__ == "__main__":
     # )
 
     # Override system health check service
-    standalone_health_check_config_str = (
-        container.config.services.system_health_check.standalone()
-    )
-    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(
-        standalone_health_check_config_str
-    )
+    standalone_health_check_config_str = container.config.services.system_health_check.standalone()
+    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(standalone_health_check_config_str)
     container.services.system_health_check_service.override(
-        StandaloneSystemHealthCheckService(
-            config=health_check_config, http_client=container.gateways.http_client
-        )
+        StandaloneSystemHealthCheckService(config=health_check_config, http_client=container.gateways.http_client)
     )
     # Override Cache and use in-memory cache for testing
     container.services.cache_service.override(InMemoryCacheImpl())
     # Override Authentication service
     standalone_auth_config_str = container.config.services.authentication.standalone()
-    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(
-        standalone_auth_config_str
-    )
+    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(standalone_auth_config_str)
 
     # Override Authentication service and use standalone authentication for testing
     container.services.authentication_service.override(

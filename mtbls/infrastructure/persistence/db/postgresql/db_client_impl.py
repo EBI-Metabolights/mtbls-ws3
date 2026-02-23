@@ -22,13 +22,8 @@ class DatabaseClientImpl(DatabaseClient):
         if isinstance(db_connection, dict):
             self.db_connection = DatabaseConnection.model_validate(db_connection)
         cn = self.db_connection
-        self.db_url = (
-            f"{cn.url_scheme}://{cn.user}:{cn.password}"
-            + f"@{cn.host}:{cn.port}/{cn.database}"
-        )
-        self.db_url_repr = (
-            f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}/{cn.database}"
-        )
+        self.db_url = f"{cn.url_scheme}://{cn.user}:{cn.password}" + f"@{cn.host}:{cn.port}/{cn.database}"
+        self.db_url_repr = f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}/{cn.database}"
         if db_pool_size is not None and db_pool_size > 0:
             self.engine = create_async_engine(
                 self.db_url,
@@ -38,8 +33,7 @@ class DatabaseClientImpl(DatabaseClient):
             )
         else:
             logger.warning(
-                "Database pool size is not set so connection pool will not be used. "
-                "This may cause performance issues."
+                "Database pool size is not set so connection pool will not be used. This may cause performance issues."
             )
             self.engine = create_async_engine(
                 self.db_url,

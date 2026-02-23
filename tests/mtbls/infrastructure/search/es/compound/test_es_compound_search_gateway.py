@@ -42,44 +42,32 @@ class TestExtractStudyIdsFromQuery:
     """Tests for _extract_study_ids_from_query helper method."""
 
     def test_none_query_returns_none(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query(None)
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query(None)
         assert detected is None
         assert remaining is None
 
     def test_empty_query_returns_none(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query("")
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query("")
         assert detected is None
         assert remaining == ""
 
     def test_regular_text_query_returns_none_detected(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query("aspirin")
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query("aspirin")
         assert detected is None
         assert remaining == "aspirin"
 
     def test_study_id_query_returns_detected_and_none_remaining(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query("MTBLS123")
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query("MTBLS123")
         assert detected == ["MTBLS123"]
         assert remaining is None
 
     def test_lowercase_study_id_normalized_to_uppercase(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query("mtbls456")
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query("mtbls456")
         assert detected == ["MTBLS456"]
         assert remaining is None
 
     def test_study_id_with_whitespace_trimmed(self):
-        detected, remaining = (
-            ElasticsearchCompoundGateway._extract_study_ids_from_query("  MTBLS789  ")
-        )
+        detected, remaining = ElasticsearchCompoundGateway._extract_study_ids_from_query("  MTBLS789  ")
         assert detected == ["MTBLS789"]
         assert remaining is None
 
@@ -149,9 +137,7 @@ class TestBuildSearchPayloadStudyIds:
         # Should NOT have text search (detected study ID consumes the query)
         assert bool_query["must"] == [{"match_all": {}}]
 
-    def test_explicit_study_ids_takes_precedence_over_detected(
-        self, gateway, base_request
-    ):
+    def test_explicit_study_ids_takes_precedence_over_detected(self, gateway, base_request):
         base_request.query = "MTBLS123"  # Would be detected
         base_request.study_ids = ["MTBLS456", "MTBLS789"]  # Explicit takes precedence
         payload = gateway._build_search_payload(base_request)
@@ -167,9 +153,7 @@ class TestBuildSearchPayloadStudyIds:
         assert len(must_clause) == 1
         assert "bool" in must_clause[0]  # Text search clause
 
-    def test_text_query_with_explicit_study_ids_combines_with_and(
-        self, gateway, base_request
-    ):
+    def test_text_query_with_explicit_study_ids_combines_with_and(self, gateway, base_request):
         base_request.query = "aspirin"
         base_request.study_ids = ["MTBLS1", "MTBLS2"]
         payload = gateway._build_search_payload(base_request)
@@ -249,9 +233,7 @@ class TestBuildSearchPayloadIntegration:
         assert payload["sort"] == [{"name": {"order": "asc"}}]
         # Check study filter
         bool_query = payload["query"]["bool"]
-        assert {"terms": {"studyIds": ["MTBLS1", "MTBLS2", "MTBLS3"]}} in bool_query[
-            "filter"
-        ]
+        assert {"terms": {"studyIds": ["MTBLS1", "MTBLS2", "MTBLS3"]}} in bool_query["filter"]
 
 
 class TestExportResults:
@@ -305,9 +287,7 @@ class TestExportResults:
         assert results[0]["name"] == "Aspirin"
 
     @pytest.mark.asyncio
-    async def test_export_pages_with_search_after(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_pages_with_search_after(self, mock_client, gateway, base_request):
         mock_client.search.side_effect = [
             {
                 "hits": {
@@ -332,14 +312,10 @@ class TestExportResults:
         assert mock_client.search.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_export_respects_max_results(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_respects_max_results(self, mock_client, gateway, base_request):
         mock_client.search.return_value = {
             "hits": {
-                "hits": [
-                    {"_source": {"id": f"MTBLC{i}"}, "sort": [str(i)]} for i in range(5)
-                ],
+                "hits": [{"_source": {"id": f"MTBLC{i}"}, "sort": [str(i)]} for i in range(5)],
                 "total": {"value": 100},
             },
         }
@@ -351,9 +327,7 @@ class TestExportResults:
         assert len(results) == 3
 
     @pytest.mark.asyncio
-    async def test_export_strips_aggs_and_pagination(
-        self, mock_client, gateway, base_request
-    ):
+    async def test_export_strips_aggs_and_pagination(self, mock_client, gateway, base_request):
         base_request.query = "aspirin"
         mock_client.search.return_value = {
             "hits": {"hits": [], "total": {"value": 0}},

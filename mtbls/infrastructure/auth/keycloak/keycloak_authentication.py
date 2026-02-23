@@ -34,8 +34,8 @@ class KeycloakAuthenticationService(AuthenticationService):
         if isinstance(config, KeycloakAuthenticationConfiguration):
             self.config = config
         else:
-            self.config: KeycloakAuthenticationConfiguration = (
-                KeycloakAuthenticationConfiguration.model_validate(config)
+            self.config: KeycloakAuthenticationConfiguration = KeycloakAuthenticationConfiguration.model_validate(
+                config
             )
         self.user_read_repository = user_read_repository
         self.keycloak_openid = KeycloakOpenID(
@@ -46,9 +46,7 @@ class KeycloakAuthenticationService(AuthenticationService):
         )
 
     @validate_inputs_outputs
-    async def authenticate_with_token(
-        self, token_type: TokenType, token: TokenStr, username: str = None
-    ) -> str:
+    async def authenticate_with_token(self, token_type: TokenType, token: TokenStr, username: str = None) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
         keycloak_openid: KeycloakOpenID = KeycloakOpenID(
@@ -79,9 +77,7 @@ class KeycloakAuthenticationService(AuthenticationService):
             logger.warning("error: %s", str(ex))
             raise ex
 
-    async def validate_token(
-        self, token_type: TokenType, token: str, username: str = None
-    ) -> str:
+    async def validate_token(self, token_type: TokenType, token: str, username: str = None) -> str:
         if token_type != TokenType.JWT_TOKEN:
             raise NotImplementedError("Only Jwt Tokens can be validated.")
 

@@ -65,15 +65,9 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
             metadata = model.StudyDBMetadata(
                 db_id=study.id_,
                 study_id=study.accession_number,
-                numeric_study_id=int(
-                    study.accession_number.replace("MTBLS", "").replace("REQ", "")
-                ),
-                submission_date=study.submission_date.strftime("%Y-%m-%d")
-                if study.submission_date
-                else "",
-                release_date=study.release_date.strftime("%Y-%m-%d")
-                if study.release_date
-                else "",
+                numeric_study_id=int(study.accession_number.replace("MTBLS", "").replace("REQ", "")),
+                submission_date=study.submission_date.strftime("%Y-%m-%d") if study.submission_date else "",
+                release_date=study.release_date.strftime("%Y-%m-%d") if study.release_date else "",
                 update_date=study.update_date.isoformat() if study.update_date else "",
                 status_date=study.status_date.isoformat() if study.status_date else "",
                 obfuscation_code=study.obfuscation_code,
@@ -81,9 +75,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 study_types=study.study_type.split(";") if study.study_type else [],
                 status=STUDY_STATUS_MAP[study.status],
                 curation_request=CURATION_REQUEST_MAP[study.curation_type],
-                study_category=mtbls_utils_model.StudyCategory(
-                    study.study_category.value
-                ),
+                study_category=mtbls_utils_model.StudyCategory(study.study_category.value),
                 sample_template=study.sample_type or "",
                 template_version=study.template_version or "",
                 reserved_mhd_accession=study.mhd_accession or "",
@@ -92,21 +84,13 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 mhd_model_version=study.mhd_model_version or "",
                 dataset_license=study.dataset_license or "",
                 dataset_license_version=study.dataset_license_version or "",
-                first_public_date=study.first_public_date.isoformat()
-                if study.first_public_date
-                else "",
-                first_private_date=study.first_private_date.isoformat()
-                if study.first_private_date
-                else "",
+                first_public_date=study.first_public_date.isoformat() if study.first_public_date else "",
+                first_private_date=study.first_private_date.isoformat() if study.first_private_date else "",
                 revision_number=study.revision_number or 0,
-                revision_date=study.revision_datetime.isoformat()
-                if study.revision_datetime
-                else "",
+                revision_date=study.revision_datetime.isoformat() if study.revision_datetime else "",
                 created_at=study.created_at.isoformat() if study.created_at else "",
             )
-            submitters: list[
-                UserOutput
-            ] = await self.user_read_repository.get_study_submitters_by_accession(
+            submitters: list[UserOutput] = await self.user_read_repository.get_study_submitters_by_accession(
                 resource_id
             )
 
@@ -116,9 +100,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                         db_id=submitter.id_,
                         orcid=submitter.orcid or "",
                         address=submitter.address or "",
-                        join_date=submitter.join_date.isoformat()
-                        if submitter.join_date
-                        else "",
+                        join_date=submitter.join_date.isoformat() if submitter.join_date else "",
                         user_name=submitter.username or "",
                         first_name=submitter.first_name or "",
                         last_name=submitter.last_name or "",
@@ -130,6 +112,4 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 )
             return metadata, []
         except Exception as ex:
-            return model.StudyDBMetadata(), [
-                ErrorMessage(short="Error while loading db metadata", detail=str(ex))
-            ]
+            return model.StudyDBMetadata(), [ErrorMessage(short="Error while loading db metadata", detail=str(ex))]

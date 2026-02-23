@@ -41,16 +41,12 @@ class InMemoryCacheImpl(CacheService):
             return self.store[key]
         return None
 
-    async def set_value_with_expiration_time(
-        self, key: str, value: Any, expiration_timestamp: int
-    ):
+    async def set_value_with_expiration_time(self, key: str, value: Any, expiration_timestamp: int):
         # Set a value with a specific expiration timestamp (Unix timestamp in seconds)
         self.store[key] = value
         self.expiration_times[key] = expiration_timestamp
 
-    async def set_value(
-        self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None
-    ) -> bool:
+    async def set_value(self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None) -> bool:
         # Set the value in the cache and optionally set an expiration time
         self.store[key] = value
         if expiration_time_in_seconds is not None:

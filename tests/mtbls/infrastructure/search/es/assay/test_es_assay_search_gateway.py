@@ -70,21 +70,15 @@ class TestFindStudyIdsByAssayFilters:
         mock_client.search.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_filters_with_empty_values_returns_empty_list(
-        self, gateway, mock_client
-    ):
-        result = await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"column_type": [], "instrument": []}
-        )
+    async def test_filters_with_empty_values_returns_empty_list(self, gateway, mock_client):
+        result = await gateway.find_study_ids_by_assay_filters(ms_filters={"column_type": [], "instrument": []})
 
         assert result == []
         mock_client.search.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_unknown_filter_key_ignored(self, gateway, mock_client):
-        result = await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"unknown_field": ["value"]}
-        )
+        result = await gateway.find_study_ids_by_assay_filters(ms_filters={"unknown_field": ["value"]})
 
         assert result == []
         mock_client.search.assert_not_called()
@@ -102,17 +96,13 @@ class TestFindStudyIdsByAssayFilters:
             }
         }
 
-        result = await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"column_type": ["reverse phase"]}
-        )
+        result = await gateway.find_study_ids_by_assay_filters(ms_filters={"column_type": ["reverse phase"]})
 
         assert result == ["MTBLS1", "MTBLS42"]
         mock_client.search.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_find_study_ids_with_multiple_filters_and_operator(
-        self, gateway, mock_client
-    ):
+    async def test_find_study_ids_with_multiple_filters_and_operator(self, gateway, mock_client):
         mock_client.search.return_value = {
             "aggregations": {
                 "unique_studies": {
@@ -135,13 +125,9 @@ class TestFindStudyIdsByAssayFilters:
 
     @pytest.mark.asyncio
     async def test_no_matches_returns_empty_list(self, gateway, mock_client):
-        mock_client.search.return_value = {
-            "aggregations": {"unique_studies": {"buckets": []}}
-        }
+        mock_client.search.return_value = {"aggregations": {"unique_studies": {"buckets": []}}}
 
-        result = await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"instrument": ["NONEXISTENT"]}
-        )
+        result = await gateway.find_study_ids_by_assay_filters(ms_filters={"instrument": ["NONEXISTENT"]})
 
         assert result == []
 
@@ -149,9 +135,7 @@ class TestFindStudyIdsByAssayFilters:
     async def test_missing_aggregations_returns_empty_list(self, gateway, mock_client):
         mock_client.search.return_value = {}
 
-        result = await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"instrument": ["Q Exactive"]}
-        )
+        result = await gateway.find_study_ids_by_assay_filters(ms_filters={"instrument": ["Q Exactive"]})
 
         assert result == []
 
@@ -239,11 +223,7 @@ class TestSearchCallParameters:
     def mock_client(self):
         client = MagicMock()
         client.search = AsyncMock(
-            return_value={
-                "aggregations": {
-                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
-                }
-            }
+            return_value={"aggregations": {"unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}}}
         )
         return client
 
@@ -251,9 +231,7 @@ class TestSearchCallParameters:
     async def test_search_called_with_correct_index(self, mock_client):
         gateway = ElasticsearchAssayGateway(client=mock_client, config=None)
 
-        await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"column_type": ["reverse phase"]}
-        )
+        await gateway.find_study_ids_by_assay_filters(ms_filters={"column_type": ["reverse phase"]})
 
         call_kwargs = mock_client.search.call_args.kwargs
         assert call_kwargs["index"] == "assay"
@@ -267,9 +245,7 @@ class TestSearchCallParameters:
         )
         gateway = ElasticsearchAssayGateway(client=mock_client, config=config)
 
-        await gateway.find_study_ids_by_assay_filters(
-            ms_filters={"instrument": ["Q Exactive"]}
-        )
+        await gateway.find_study_ids_by_assay_filters(ms_filters={"instrument": ["Q Exactive"]})
 
         call_kwargs = mock_client.search.call_args.kwargs
         assert call_kwargs["index"] == "custom_assay_index"

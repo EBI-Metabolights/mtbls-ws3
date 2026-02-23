@@ -68,9 +68,7 @@ async def create_license_agreement(
 
     if not default_license_name and not default_license_version:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        response_message = APIErrorResponse(
-            error="Dataset license is not configured properly."
-        )
+        response_message = APIErrorResponse(error="Dataset license is not configured properly.")
         response_message.content = DatasetLicenseResponse(
             dataset=None, message="Dataset license is not configured properly."
         )
@@ -82,34 +80,21 @@ async def create_license_agreement(
         agreeing_user=agreeing_user,
         license_url=license_url,
     )
-    if (
-        license_name == default_license_name
-        and license_version == default_license_version
-    ):
+    if license_name == default_license_name and license_version == default_license_version:
         response_message = APIResponse()
-        response_message.content = DatasetLicenseResponse(
-            dataset=dl, message="Dataset license is same."
-        )
+        response_message.content = DatasetLicenseResponse(dataset=dl, message="Dataset license is same.")
         return response_message
 
-    if (
-        license_name
-        and license_version
-        and context.user.role not in (UserRole.CURATOR, UserRole.SYSTEM_ADMIN)
-    ):
+    if license_name and license_version and context.user.role not in (UserRole.CURATOR, UserRole.SYSTEM_ADMIN):
         msg = "A user has already agreed to the dataset license for this study."
         response.status_code = status.HTTP_403_FORBIDDEN
         response_message = APIErrorResponse(error_message=msg)
-        response_message.content = DatasetLicenseResponse(
-            dataset=None, message="Operation failed."
-        )
+        response_message.content = DatasetLicenseResponse(dataset=None, message="Operation failed.")
         return response_message
     study.dataset_license = default_license_name
     study.dataset_license_version = default_license_version
     study.dataset_license_agreeing_user = str(context.user.id_)
-    default_license_url = LICENSE_URLS.get(
-        (default_license_name.upper(), default_license_version.upper())
-    )
+    default_license_url = LICENSE_URLS.get((default_license_name.upper(), default_license_version.upper()))
     dl = DatasetLicense(
         name=default_license_name,
         agreed=True,
@@ -157,13 +142,9 @@ async def get_study_license_agreement(
         license_url=license_url,
     )
 
-    response: APIResponse[DatasetLicenseResponse] = APIResponse[
-        DatasetLicenseResponse
-    ]()
+    response: APIResponse[DatasetLicenseResponse] = APIResponse[DatasetLicenseResponse]()
     response.content = DatasetLicenseResponse(dataset=dl)
     response.content.message = (
-        f"Dataset license retrieved {resource_id}"
-        if dl is not None
-        else "This study has no agreed license"
+        f"Dataset license retrieved {resource_id}" if dl is not None else "This study has no agreed license"
     )
     return response

@@ -34,9 +34,7 @@ class IsaTableModifier(BaseIsaModifier):
     ):
         super().__init__(model, templates, control_lists, isa_table_file.file_path)
         self.isa_table_file = isa_table_file
-        self.header_update_actions: Union[
-            None, dict[str, list[TsvUpdateColumnHeaderAction]]
-        ] = {}
+        self.header_update_actions: Union[None, dict[str, list[TsvUpdateColumnHeaderAction]]] = {}
         self.new_header_actions: Union[None, dict[str, list[TsvAddColumnsAction]]] = {}
         self.max_row_number_limit = max_row_number_limit
 
@@ -46,18 +44,10 @@ class IsaTableModifier(BaseIsaModifier):
             column_name = header.column_name
             column_index = header.column_index
             cleaned_column_name = " ".join(
-                [
-                    x.strip()
-                    for x in column_name.replace("\ufeff", "").strip().split()
-                    if x.strip()
-                ]
+                [x.strip() for x in column_name.replace("\ufeff", "").strip().split() if x.strip()]
             )
             cleaned_column_header = " ".join(
-                [
-                    x.strip()
-                    for x in header.column_header.replace("\ufeff", "").strip().split()
-                    if x.strip()
-                ]
+                [x.strip() for x in header.column_header.replace("\ufeff", "").strip().split() if x.strip()]
             )
 
             suffix = cleaned_column_name.replace(cleaned_column_header, "")
@@ -133,13 +123,9 @@ class IsaTableModifier(BaseIsaModifier):
                 data = self.isa_table_file.table.data
                 term_column_name = columns[term_column_index]
                 term_source_ref_column_name = columns[term_source_ref_column_index]
-                term_accession_number_column_name = columns[
-                    term_accession_number_column_index
-                ]
+                term_accession_number_column_name = columns[term_accession_number_column_index]
                 current_ontologies: dict[str, OntologyAnnotation] = {}
-                updated_rows: dict[
-                    str, dict[int, tuple[OntologyAnnotation, OntologyAnnotation]]
-                ] = {}
+                updated_rows: dict[str, dict[int, tuple[OntologyAnnotation, OntologyAnnotation]]] = {}
                 for idx, term in enumerate(data[term_column_name]):
                     onto = None
                     source_ref = data[term_source_ref_column_name][idx]
@@ -153,9 +139,7 @@ class IsaTableModifier(BaseIsaModifier):
                     if source_ref and source_ref_lower in control_source_refs:
                         current_source_ref = control_source_refs[source_ref_lower]
                     if accession and accession_lower in control_accessions:
-                        current_accession = control_accessions[
-                            accession_lower
-                        ].term_accession_number
+                        current_accession = control_accessions[accession_lower].term_accession_number
                     if term in current_ontologies:
                         onto = current_ontologies[term]
                     elif term_lower in control_terms:
@@ -197,35 +181,25 @@ class IsaTableModifier(BaseIsaModifier):
                             updated_rows[term][idx][0].term = term
                             updated_rows[term][idx][1].term = onto.term
                         if source_ref != onto.term_source_ref:
-                            cells = self.isa_table_file.table.data[
-                                term_source_ref_column_name
-                            ]
+                            cells = self.isa_table_file.table.data[term_source_ref_column_name]
                             cells[idx] = onto.term_source_ref
                             updated_rows[term][idx][0].term_source_ref = source_ref
-                            updated_rows[term][idx][
-                                1
-                            ].term_source_ref = onto.term_source_ref
+                            updated_rows[term][idx][1].term_source_ref = onto.term_source_ref
                         if accession != onto.term_accession_number:
-                            cells = self.isa_table_file.table.data[
-                                term_accession_number_column_name
-                            ]
+                            cells = self.isa_table_file.table.data[term_accession_number_column_name]
                             cells[idx] = onto.term_accession_number
                             updated_rows[term][idx][0].term_accession_number = accession
                             new_onto = updated_rows[term][idx][1]
                             new_onto.term_accession_number = onto.term_accession_number
                     else:
                         if current_source_ref != source_ref:
-                            cells = self.isa_table_file.table.data[
-                                term_source_ref_column_name
-                            ]
+                            cells = self.isa_table_file.table.data[term_source_ref_column_name]
                             cells[idx] = current_source_ref
                             updated_rows[term][idx][0].term_source_ref = source_ref
                             new_onto = updated_rows[term][idx][1]
                             new_onto.term_source_ref = current_source_ref
                         if current_accession != accession:
-                            cells = self.isa_table_file.table.data[
-                                term_accession_number_column_name
-                            ]
+                            cells = self.isa_table_file.table.data[term_accession_number_column_name]
                             cells[idx] = current_accession
                             update = updated_rows[term][idx]
                             update[0].term_accession_number = accession
@@ -247,9 +221,7 @@ class IsaTableModifier(BaseIsaModifier):
                             for new_str, update_values in old_str_updates.items():
                                 rows = list(update_values)
                                 rows.sort()
-                                rows_str = self.get_list_string(
-                                    rows, self.max_row_number_limit
-                                )
+                                rows_str = self.get_list_string(rows, self.max_row_number_limit)
                                 action = (
                                     f"Row update: Column [{header.column_index + 1}] "
                                     f"{header.column_header}, rows {rows_str}"
@@ -262,16 +234,12 @@ class IsaTableModifier(BaseIsaModifier):
                                     new_value=new_str,
                                 )
 
-    def _get_header_control_terms(
-        self, header: IsaTableColumn, technique: str, file_type: str
-    ):
+    def _get_header_control_terms(self, header: IsaTableColumn, technique: str, file_type: str):
         structure = ColumnsStructure
         rule, terms = self.get_related_rule(file_type, technique, header.column_header)
         # terms = self.get_control_list_terms(category, header.column_header, technique)
 
-        is_unit_column = (
-            header.column_structure == structure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
-        )
+        is_unit_column = header.column_structure == structure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
         _, unit_terms = self.get_related_rule(file_type, technique, "Unit")
         # unit_terms = self.get_control_list_terms("unitColumns", "Unit", None)
         unit_term_sources: dict[str, str] = {}
@@ -279,15 +247,8 @@ class IsaTableModifier(BaseIsaModifier):
         unit_terms = unit_terms or {}
         terms = terms or {}
         for x in unit_terms:
-            unit_term_sources.update(
-                {
-                    x.term_source_ref.lower(): x.term_source_ref
-                    for x in unit_terms[x].values()
-                }
-            )
-            unit_term_accession_numbers.update(
-                {x.term_accession_number.lower(): x for x in unit_terms[x].values()}
-            )
+            unit_term_sources.update({x.term_source_ref.lower(): x.term_source_ref for x in unit_terms[x].values()})
+            unit_term_accession_numbers.update({x.term_accession_number.lower(): x for x in unit_terms[x].values()})
         control_terms = terms if not is_unit_column else unit_terms
         if not control_terms:
             return {}, {}, {}
@@ -297,24 +258,14 @@ class IsaTableModifier(BaseIsaModifier):
 
         for x in control_terms:
             term_sources.update(
-                {
-                    term.term_source_ref.lower(): term.term_source_ref
-                    for term in control_terms[x].values()
-                }
+                {term.term_source_ref.lower(): term.term_source_ref for term in control_terms[x].values()}
             )
             term_accession_numbers.update(
-                {
-                    term.term_accession_number.lower(): term
-                    for term in control_terms[x].values()
-                }
+                {term.term_accession_number.lower(): term for term in control_terms[x].values()}
             )
 
         control_source_refs = term_sources if not is_unit_column else unit_term_sources
-        control_accessions = (
-            term_accession_numbers
-            if not is_unit_column
-            else unit_term_accession_numbers
-        )
+        control_accessions = term_accession_numbers if not is_unit_column else unit_term_accession_numbers
 
         return control_terms, control_source_refs, control_accessions
 
@@ -331,13 +282,9 @@ class IsaTableModifier(BaseIsaModifier):
         if file_type == "assay":
             technique = None
             if self.isa_table_file.file_path in self.model.assays:
-                technique = self.model.assays[
-                    self.isa_table_file.file_path
-                ].assay_technique.name
+                technique = self.model.assays[self.isa_table_file.file_path].assay_technique.name
             elif self.isa_table_file.file_path in self.model.metabolite_assignments:
-                technique = self.model.metabolite_assignments[
-                    self.isa_table_file.file_path
-                ].assay_technique.name
+                technique = self.model.metabolite_assignments[self.isa_table_file.file_path].assay_technique.name
 
             return technique
         elif file_type == "sample":
@@ -353,9 +300,7 @@ class IsaTableModifier(BaseIsaModifier):
         # control_terms = self.get_control_list_terms(
         #     category, header.column_header, technique
         # )
-        rule, control_lists = self.get_related_rule(
-            file_type, template_type, header.column_header
-        )
+        rule, control_lists = self.get_related_rule(file_type, template_type, header.column_header)
         if not control_lists:
             return
         term_column_name = header.column_name

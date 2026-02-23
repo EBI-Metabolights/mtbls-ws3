@@ -101,17 +101,13 @@ class TestFindStudyIdsByCompounds:
             }
         }
 
-        result = await gateway.find_study_ids_by_compounds(
-            database_identifiers=["HMDB0031111"]
-        )
+        result = await gateway.find_study_ids_by_compounds(database_identifiers=["HMDB0031111"])
 
         assert result == ["MTBLS1", "MTBLS42"]
         mock_client.search.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_find_study_ids_with_multiple_database_identifiers(
-        self, gateway, mock_client
-    ):
+    async def test_find_study_ids_with_multiple_database_identifiers(self, gateway, mock_client):
         mock_client.search.return_value = {
             "aggregations": {
                 "unique_studies": {
@@ -124,9 +120,7 @@ class TestFindStudyIdsByCompounds:
             }
         }
 
-        result = await gateway.find_study_ids_by_compounds(
-            database_identifiers=["HMDB0031111", "HMDB0000001"]
-        )
+        result = await gateway.find_study_ids_by_compounds(database_identifiers=["HMDB0031111", "HMDB0000001"])
 
         assert result == ["MTBLS1", "MTBLS2", "MTBLS3"]
         mock_client.search.assert_called_once()
@@ -134,9 +128,7 @@ class TestFindStudyIdsByCompounds:
     @pytest.mark.asyncio
     async def test_all_operator_builds_bucket_selector(self, gateway, mock_client):
         mock_client.search.return_value = {
-            "aggregations": {
-                "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
-            }
+            "aggregations": {"unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}}
         }
         await gateway.find_study_ids_by_compounds(
             database_identifiers=["HMDB1", "HMDB2"],
@@ -160,9 +152,7 @@ class TestFindStudyIdsByCompounds:
         assert "params.met_any > 0" in script
 
     @pytest.mark.asyncio
-    async def test_find_study_ids_with_metabolite_identifications(
-        self, gateway, mock_client
-    ):
+    async def test_find_study_ids_with_metabolite_identifications(self, gateway, mock_client):
         mock_client.search.return_value = {
             "aggregations": {
                 "unique_studies": {
@@ -201,13 +191,9 @@ class TestFindStudyIdsByCompounds:
 
     @pytest.mark.asyncio
     async def test_no_matches_returns_empty_list(self, gateway, mock_client):
-        mock_client.search.return_value = {
-            "aggregations": {"unique_studies": {"buckets": []}}
-        }
+        mock_client.search.return_value = {"aggregations": {"unique_studies": {"buckets": []}}}
 
-        result = await gateway.find_study_ids_by_compounds(
-            database_identifiers=["NONEXISTENT123"]
-        )
+        result = await gateway.find_study_ids_by_compounds(database_identifiers=["NONEXISTENT123"])
 
         assert result == []
 
@@ -215,9 +201,7 @@ class TestFindStudyIdsByCompounds:
     async def test_missing_aggregations_returns_empty_list(self, gateway, mock_client):
         mock_client.search.return_value = {}
 
-        result = await gateway.find_study_ids_by_compounds(
-            database_identifiers=["HMDB0031111"]
-        )
+        result = await gateway.find_study_ids_by_compounds(database_identifiers=["HMDB0031111"])
 
         assert result == []
 
@@ -292,12 +276,8 @@ class TestBuildQuery:
 
         # Order may vary, so check both are present
         should_clauses = bool_query["should"]
-        db_clause = {
-            "terms": {"fields.database_identifier.value.keyword": ["HMDB0031111"]}
-        }
-        met_clause = {
-            "terms": {"fields.metabolite_identification.value.keyword": ["Aspirin"]}
-        }
+        db_clause = {"terms": {"fields.database_identifier.value.keyword": ["HMDB0031111"]}}
+        met_clause = {"terms": {"fields.metabolite_identification.value.keyword": ["Aspirin"]}}
         assert db_clause in should_clauses
         assert met_clause in should_clauses
 
@@ -365,11 +345,7 @@ class TestSearchCallParameters:
     def mock_client(self):
         client = MagicMock()
         client.search = AsyncMock(
-            return_value={
-                "aggregations": {
-                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
-                }
-            }
+            return_value={"aggregations": {"unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}}}
         )
         return client
 

@@ -25,10 +25,7 @@ class RedisSentinelCacheImpl(CacheService):
         self.service_name = self.connection.master_name
         sc = self.connection
         self.url_repr = ";".join(
-            [
-                f"sentinel://:***@{service.host}:{service.port}/{sc.db}"
-                for service in sc.sentinel_services
-            ]
+            [f"sentinel://:***@{service.host}:{service.port}/{sc.db}" for service in sc.sentinel_services]
         )
 
     async def get_connection_repr(self) -> None:
@@ -66,15 +63,11 @@ class RedisSentinelCacheImpl(CacheService):
         slave = await self._get_slave_connection()
         return await slave.get(key)
 
-    async def set_value_with_expiration_time(
-        self, key: str, value: Any, expiration_timestamp: int
-    ):
+    async def set_value_with_expiration_time(self, key: str, value: Any, expiration_timestamp: int):
         master = await self._get_master_connection()
         return await master.setex(key, expiration_timestamp, value)
 
-    async def set_value(
-        self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None
-    ) -> bool:
+    async def set_value(self, key: str, value: Any, expiration_time_in_seconds: Union[None, int] = None) -> bool:
         master = await self._get_master_connection()
         if expiration_time_in_seconds:
             return await master.setex(key, expiration_time_in_seconds, value)

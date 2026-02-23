@@ -23,9 +23,7 @@ class MafFileModifier(IsaTableModifier):
         control_lists: ValidationControls,
         max_row_number_limit: int = 10,
     ):
-        super().__init__(
-            model, isa_table_file, templates, control_lists, max_row_number_limit
-        )
+        super().__init__(model, isa_table_file, templates, control_lists, max_row_number_limit)
 
     def modify(self) -> list[UpdateLog]:
         self.update_from_parser_messages()
@@ -55,11 +53,7 @@ class MafFileModifier(IsaTableModifier):
             return
         maf_column_name = "Metabolite Assignment File"
         for assay_filename, assay in self.model.assays.items():
-            if (
-                not assay.table.data
-                or "Sample Name" not in assay.table.data
-                or maf_column_name not in assay.table.data
-            ):
+            if not assay.table.data or "Sample Name" not in assay.table.data or maf_column_name not in assay.table.data:
                 continue
 
             sample_column_validation[assay_filename] = False
@@ -91,19 +85,13 @@ class MafFileModifier(IsaTableModifier):
 
         valid = True
         for assay_filename in assay_lists:
-            if (
-                not sample_column_validation[assay_filename]
-                or not maf_column_validation[assay_filename]
-            ):
+            if not sample_column_validation[assay_filename] or not maf_column_validation[assay_filename]:
                 valid = False
                 break
         if not valid:
             return
 
-        maf_column_names = {
-            x.column_header
-            for x in self.model.metabolite_assignments[maf_filename].table.headers
-        }
+        maf_column_names = {x.column_header for x in self.model.metabolite_assignments[maf_filename].table.headers}
         sample_names = []
         unique_sample_names = set()
         for assay_filename in assay_lists:
@@ -118,9 +106,7 @@ class MafFileModifier(IsaTableModifier):
             assay = self.model.assays[assay_filename]
             for header in assay.table.headers:
                 if header.column_header.strip().endswith(" Assay Name"):
-                    for val in self.model.assays[assay_filename].table.data[
-                        header.column_name
-                    ]:
+                    for val in self.model.assays[assay_filename].table.data[header.column_name]:
                         if val and val not in unique_assay_names:
                             unique_assay_names.add(val)
                             assay_names.append(val)
@@ -137,9 +123,7 @@ class MafFileModifier(IsaTableModifier):
         unreferenced_sample_names = unique_sample_names - maf_column_names
         if not unreferenced_sample_names:
             return
-        new_columns = [
-            x for x in ordered_sample_names if x in unreferenced_sample_names
-        ]
+        new_columns = [x for x in ordered_sample_names if x in unreferenced_sample_names]
         action: Union[None, TsvAddColumnsAction] = None
         if maf_filename not in self.new_header_actions:
             action = TsvAddColumnsAction()

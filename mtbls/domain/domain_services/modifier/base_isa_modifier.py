@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 
 class BaseIsaModifier(abc.ABC, BaseModifier):
     characteristics_pattern = r"^[ ]*Characteristics[ ]*\[[ ]*(\w[ -~]*)[ ]*\](\.\d+)?$"
-    parameter_value_pattern = (
-        r"^[ ]*Parameter[ ]+Value[ ]*\[[ ]*(\w[ -~]*)[ ]*\](\.\d+)?$"
-    )
+    parameter_value_pattern = r"^[ ]*Parameter[ ]+Value[ ]*\[[ ]*(\w[ -~]*)[ ]*\](\.\d+)?$"
     factor_value_pattern = r"^[ ]*Factor[ ]+Value[ ]*\[[ ]*(\w[ -~]*)[ ]*\](\.\d+)?$"
 
     @abstractmethod
@@ -74,26 +72,19 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
             return None, None
         if not hasattr(self.control_lists, file_type + "_file_controls"):
             return None, None
-        rules_dict: dict[str, list[FieldValueValidation]] = getattr(
-            self.control_lists, file_type + "_file_controls"
-        )
+        rules_dict: dict[str, list[FieldValueValidation]] = getattr(self.control_lists, file_type + "_file_controls")
         rules = rules_dict.get(rule_key, None)
 
         if not rules:
             return None, None
         version = self.model.study_db_metadata.template_version
         study_category = self.model.study_db_metadata.study_category
-        category = (
-            study_category.name.lower().replace("_", "-")
-            if study_category is not None
-            else ""
-        )
+        category = study_category.name.lower().replace("_", "-") if study_category is not None else ""
         study_created = self.model.study_db_metadata.created_at or ""
 
         if not version or not category or not study_created:
             logger.warning(
-                "Template version '%s', study category '%s' or study created '%s'"
-                "values are not set properly",
+                "Template version '%s', study category '%s' or study created '%s'values are not set properly",
                 version,
                 category,
                 study_created,
@@ -119,9 +110,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                 control_terms: dict[str, dict[str, OntologyAnnotation]] = {}
                 if rule.terms:
                     for term in rule.terms:
-                        item = OntologyAnnotation.model_validate(
-                            term, from_attributes=True
-                        )
+                        item = OntologyAnnotation.model_validate(term, from_attributes=True)
                         key = term.term.lower()
                         second_key = term.term_source_ref.lower()
                         if key not in control_terms:
@@ -269,14 +258,8 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
             return {}
         return self.protocol_parameters[key]
 
-    def get_protocol_template(
-        self, technique_name: str
-    ) -> None | StudyProtocolTemplate:
-        if (
-            not technique_name
-            or not self.templates
-            or not self.templates.protocol_templates
-        ):
+    def get_protocol_template(self, technique_name: str) -> None | StudyProtocolTemplate:
+        if not technique_name or not self.templates or not self.templates.protocol_templates:
             logger.warning("Protocol template is not defined for %s", technique_name)
             return None
 
@@ -302,21 +285,14 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
 
         return ordered_protocol_names
 
-    def get_protocol_parameters_in_assay(
-        self, isa_table_file: AssayFile
-    ) -> dict[str, tuple[int, str, list[str]]]:
+    def get_protocol_parameters_in_assay(self, isa_table_file: AssayFile) -> dict[str, tuple[int, str, list[str]]]:
         protocols: dict[str, tuple[int, str, list[str]]] = {}
         current_protocol_header = None
-        ordered_protocol_names = self.get_ordered_protocol_names(
-            isa_table_file.assay_technique.name.upper()
-        )
+        ordered_protocol_names = self.get_ordered_protocol_names(isa_table_file.assay_technique.name.upper())
 
         # sample collection is referenced in sample file so filter it.
         assigned_protocol_index = -1
-        if (
-            ordered_protocol_names
-            and ordered_protocol_names[0].lower() == "sample collection"
-        ):
+        if ordered_protocol_names and ordered_protocol_names[0].lower() == "sample collection":
             assigned_protocol_index = 0
         additional_protocol = 0
         for header in isa_table_file.table.headers:
@@ -326,9 +302,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
 
                 ordered_protocol_name = ""
                 if assigned_protocol_index < len(ordered_protocol_names):
-                    ordered_protocol_name = ordered_protocol_names[
-                        assigned_protocol_index
-                    ]
+                    ordered_protocol_name = ordered_protocol_names[assigned_protocol_index]
                 elif header.column_name in isa_table_file.table.data:
                     values = isa_table_file.table.data[header.column_name]
                     for i in range(len(values)):
@@ -337,9 +311,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                             break
                 if not ordered_protocol_name:
                     additional_protocol += 1
-                    ordered_protocol_name = (
-                        f"Unnamed protocol.{str(additional_protocol)}"
-                    )
+                    ordered_protocol_name = f"Unnamed protocol.{str(additional_protocol)}"
 
                 protocols[header.column_name] = (
                     header.column_index,
@@ -351,13 +323,8 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                 parameter_value = ""
                 if current_protocol_header and result and result.groups():
                     parameter_value = result.groups()[0]
-                    if (
-                        parameter_value
-                        not in protocols[current_protocol_header.column_name][2]
-                    ):
-                        protocols[current_protocol_header.column_name][2].append(
-                            parameter_value
-                        )
+                    if parameter_value not in protocols[current_protocol_header.column_name][2]:
+                        protocols[current_protocol_header.column_name][2].append(parameter_value)
         return protocols
 
     def get_study_default_protocol_parameters(self) -> dict[str, set[str]]:
@@ -370,12 +337,8 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                     and self.model.assays[assay.file_name].assay_technique
                     and self.model.assays[assay.file_name].assay_technique.name
                 ):
-                    techniques.add(
-                        self.model.assays[assay.file_name].assay_technique.name
-                    )
-            protocol_params: dict[str, list[str]] = self.get_protocol_parameters(
-                techniques
-            )
+                    techniques.add(self.model.assays[assay.file_name].assay_technique.name)
+            protocol_params: dict[str, list[str]] = self.get_protocol_parameters(techniques)
             return protocol_params
         return {}
 
@@ -399,10 +362,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
 
     def update_from_parser_messages(self):
         file_path = self.file_path
-        if (
-            not self.model.parser_messages
-            or file_path not in self.model.parser_messages
-        ):
+        if not self.model.parser_messages or file_path not in self.model.parser_messages:
             return
         empty_rows = False
         new_lines_in_cells = False
@@ -415,10 +375,7 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
                     new_value="",
                 )
                 empty_rows = True
-            if (
-                not new_lines_in_cells
-                and "Removed new line characters" in message.short
-            ):
+            if not new_lines_in_cells and "Removed new line characters" in message.short:
                 self.modifier_update(
                     source=file_path,
                     action=message.detail,

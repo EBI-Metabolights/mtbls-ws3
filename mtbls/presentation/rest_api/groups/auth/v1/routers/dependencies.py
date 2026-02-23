@@ -34,9 +34,7 @@ async def check_read_permission(
                 context.user.id_,
                 resource_id,
             )
-            raise AuthorizationError(
-                f"User {context.user.id_} is not granted to view resource {resource_id}"
-            )
+            raise AuthorizationError(f"User {context.user.id_} is not granted to view resource {resource_id}")
         logger.debug(
             "User %s is granted to view resource %s",
             context.user.id_,
@@ -70,9 +68,7 @@ async def check_update_permission(
     if isinstance(request.user, AuthenticatedUser):
         context = request.user.permission_context
         if not context or not context.study:
-            raise AuthorizationError(
-                resource_id, f"{resource_id} is not valid or user has no permission."
-            )
+            raise AuthorizationError(resource_id, f"{resource_id} is not valid or user has no permission.")
         if not context.permissions.update:
             raise AuthorizationError(
                 context.user.id_,

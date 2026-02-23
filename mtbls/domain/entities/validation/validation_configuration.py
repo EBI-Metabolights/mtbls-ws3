@@ -52,9 +52,7 @@ class StudyBaseModel(CamelCaseModel):
         alias_generator=to_camel,
         populate_by_name=True,
         json_schema_serialization_defaults_required=True,
-        field_title_generator=lambda field, field_info: to_pascal(
-            field.replace("_", " ").strip()
-        ),
+        field_title_generator=lambda field, field_info: to_pascal(field.replace("_", " ").strip()),
     )
 
 
@@ -64,8 +62,7 @@ class OntologyTerm(StudyBaseModel):
     term_accession_number: Annotated[
         str,
         Field(
-            description="The accession number from the Term Source "
-            "associated with the term.",
+            description="The accession number from the Term Source associated with the term.",
         ),
     ]
     term_source_ref: Annotated[
@@ -98,10 +95,7 @@ class FieldSelector(StudyBaseModel):
     ]
     value: Annotated[
         None | str,
-        Field(
-            description="Node value to match."
-            " e.g. Protocol REF with value 'Sample collection'"
-        ),
+        Field(description="Node value to match. e.g. Protocol REF with value 'Sample collection'"),
     ]
 
 
@@ -151,9 +145,7 @@ class SelectionCriteria(StudyBaseModel):
 
 
 class AdditionalSource(StudyBaseModel):
-    source_label: Annotated[
-        str, Field(description="Source label. e.g., ILX, wikidata, etc.")
-    ]
+    source_label: Annotated[str, Field(description="Source label. e.g., ILX, wikidata, etc.")]
     accession_prefix: Annotated[
         str,
         Field(
@@ -167,9 +159,7 @@ class AdditionalSource(StudyBaseModel):
 
 
 class FieldConstraint(StudyBaseModel):
-    constraint: Annotated[
-        None | str | int | float | bool, Field(description="Constraint value")
-    ] = None
+    constraint: Annotated[None | str | int | float | bool, Field(description="Constraint value")] = None
     error_message: Annotated[
         str,
         Field(description="Error message if value does not satisfy the constraint."),
@@ -212,9 +202,9 @@ class BaseOntologyValidation(StudyBaseModel):
         ),
     ]
 
-    validation_type: Annotated[
-        None | OntologyValidationType, Field(description="Validation rule type")
-    ] = OntologyValidationType.ANY_ONTOLOGY_TERM
+    validation_type: Annotated[None | OntologyValidationType, Field(description="Validation rule type")] = (
+        OntologyValidationType.ANY_ONTOLOGY_TERM
+    )
 
     ontologies: Annotated[
         None | list[str],
@@ -241,9 +231,7 @@ class FieldValueValidation(BaseOntologyValidation):
         str,
         Field(description="Definition of rule and summary of selection criteria."),
     ] = ""
-    selection_criteria: Annotated[
-        SelectionCriteria, Field(description="Field selection criteria")
-    ]
+    selection_criteria: Annotated[SelectionCriteria, Field(description="Field selection criteria")]
     term_enforcement_level: Annotated[
         EnforcementLevel, Field(description="Rule enforcement level for ontology terms")
     ] = EnforcementLevel.REQUIRED
@@ -255,9 +243,7 @@ class FieldValueValidation(BaseOntologyValidation):
         None | dict[ConstraintType, FieldConstraint],
         Field(description="Field constraints"),
     ] = {}
-    default_value: Annotated[
-        None | OntologyTerm, Field(description="Default ontology term")
-    ] = None
+    default_value: Annotated[None | OntologyTerm, Field(description="Default ontology term")] = None
     allowed_missing_ontology_terms: Annotated[
         None | list[OntologyTerm], Field(description="Allowed missing ontology terms")
     ] = []
@@ -319,27 +305,18 @@ class ColumnDescription(StudyBaseModel):
         Field(description="column structure"),
     ]
     column_category: Annotated[
-        None
-        | Literal[
-            "", "Basic", "Protocol", "Parameter", "Characteristics", "File", "Label"
-        ],
+        None | Literal["", "Basic", "Protocol", "Parameter", "Characteristics", "File", "Label"],
         Field(description="column category"),
     ] = None
     column_header: Annotated[str, Field(description="column header")]
     column_prefix: Annotated[None | str, Field(description="column prefix")] = None
     default_value: Annotated[None | str, Field(description="column prefix")] = None
     default_column_index: Annotated[int, Field(description="default column index")]
-    min_length: Annotated[
-        None | int, Field(description="column value minimum length")
-    ] = None
-    max_length: Annotated[
-        None | int, Field(description="column value maximum length")
-    ] = None
+    min_length: Annotated[None | int, Field(description="column value minimum length")] = None
+    max_length: Annotated[None | int, Field(description="column value maximum length")] = None
     required: Annotated[bool, Field(description="column value is required")] = False
     description: Annotated[None | str, Field(description="column description")] = None
-    examples: Annotated[
-        None | list[str], Field(description="column value examples")
-    ] = None
+    examples: Annotated[None | list[str], Field(description="column value examples")] = None
 
     @field_validator("min_length", "max_length", mode="before")
     def min_max_validator(val):
@@ -351,9 +328,7 @@ class ColumnDescription(StudyBaseModel):
 class InvestigationFileSection(StudyBaseModel):
     name: Annotated[str, Field(description="Section name")]
     fields: Annotated[list[str], Field(description="Section row prefixes")] = []
-    default_comments: Annotated[
-        list[str], Field(description="Default comments for the section")
-    ] = []
+    default_comments: Annotated[list[str], Field(description="Default comments for the section")] = []
     default_field_values: Annotated[
         dict[str, str | list[str] | list[list[str]]],
         Field(description="Default field values"),
@@ -367,54 +342,40 @@ class InvestigationFileSection(StudyBaseModel):
 class InvestigationFileTemplate(StudyBaseModel):
     version: Annotated[str, Field(description="Template version")]
     description: Annotated[str, Field(description="Template name")]
-    sections: Annotated[
-        list[InvestigationFileSection], Field(description="Investigation file sections")
-    ]
+    sections: Annotated[list[InvestigationFileSection], Field(description="Investigation file sections")]
 
 
 class IsaTableFileTemplate(StudyBaseModel):
     fixed_column_count: Annotated[int, Field(description="Fixed column count.")] = 0
     description: Annotated[str, Field(description="Template name")]
     version: Annotated[str, Field(description="Template version")]
-    headers: Annotated[
-        list[ColumnDescription], Field(description="ISA-TAB table column definitions")
-    ]
+    headers: Annotated[list[ColumnDescription], Field(description="ISA-TAB table column definitions")]
 
 
 class ProtocolParameterDefinition(StudyBaseModel):
     definition: Annotated[str, Field(description="Definition of protocol parameter.")]
-    type: Annotated[
-        OntologyTerm, Field(description="Ontology term of protocol parameter type")
-    ]
+    type: Annotated[OntologyTerm, Field(description="Ontology term of protocol parameter type")]
     type_curie: Annotated[
         str,
-        Field(
-            description="Compact URI presentation (obo_id) of protocol parameter type. "
-            "e.g. MS:1000831, OBI:0001139"
-        ),
+        Field(description="Compact URI presentation (obo_id) of protocol parameter type. e.g. MS:1000831, OBI:0001139"),
     ] = ""
     format: Annotated[
         Literal["Text", "Ontology", "Numeric"],
         Field(description="value representation format"),
     ]
-    examples: Annotated[
-        list[str], Field(description="Example protocol parameter values.")
-    ] = []
+    examples: Annotated[list[str], Field(description="Example protocol parameter values.")] = []
 
 
 class ProtocolDefinition(StudyBaseModel):
     name: Annotated[str, Field(description="Name of protocol")]
     description: Annotated[str, Field(description="Description of protocol")]
     type: Annotated[OntologyTerm, Field(description="Ontology term of protocol type")]
-    type_curie: Annotated[
-        str, Field(description="Compact URI presentation (obo_id) of protocol type")
-    ] = ""
+    type_curie: Annotated[str, Field(description="Compact URI presentation (obo_id) of protocol type")] = ""
     parameters: Annotated[list[str], Field(description="Parameters of protocol")] = []
     parameter_definitions: Annotated[
         dict[str, ProtocolParameterDefinition],
         Field(
-            description="Definition of protocol parameter "
-            "listed in the `parameters` field",
+            description="Definition of protocol parameter listed in the `parameters` field",
         ),
     ] = {}
 
@@ -433,9 +394,7 @@ class OntologySourceReferenceTemplate(StudyBaseModel):
     source_name: Annotated[str, Field(description="Source name")]
     source_file: Annotated[str, Field(description="Source file")]
     source_version: Annotated[str, Field(description="Source version")]
-    source_description: Annotated[
-        str, Field(description="Source description and full name")
-    ]
+    source_description: Annotated[str, Field(description="Source description and full name")]
 
 
 class DefaultControl(StudyBaseModel):
@@ -450,24 +409,12 @@ class ActiveMhdProfile(StudyBaseModel):
 
 
 class TemplateConfiguration(StudyBaseModel):
-    active_investigation_file_templates: Annotated[
-        list[str], Field(description="active investigation file templates")
-    ]
-    active_assignment_file_templates: Annotated[
-        list[str], Field(description="active assignment file templates")
-    ]
-    active_sample_file_templates: Annotated[
-        list[str], Field(description="active sample file templates")
-    ]
-    active_assay_file_templates: Annotated[
-        list[str], Field(description="active assay file templates")
-    ]
-    active_study_categories: Annotated[
-        list[str], Field(description="active study categories")
-    ]
-    active_dataset_licenses: Annotated[
-        list[str], Field(description="active dataset licenses")
-    ]
+    active_investigation_file_templates: Annotated[list[str], Field(description="active investigation file templates")]
+    active_assignment_file_templates: Annotated[list[str], Field(description="active assignment file templates")]
+    active_sample_file_templates: Annotated[list[str], Field(description="active sample file templates")]
+    active_assay_file_templates: Annotated[list[str], Field(description="active assay file templates")]
+    active_study_categories: Annotated[list[str], Field(description="active study categories")]
+    active_dataset_licenses: Annotated[list[str], Field(description="active dataset licenses")]
     active_mhd_profiles: Annotated[
         dict[StudyCategoryStr, ActiveMhdProfile],
         Field(description="active dataset licenses"),
@@ -480,22 +427,12 @@ class TemplateConfiguration(StudyBaseModel):
         list[str],
         Field(description="active assay design descriptor categories"),
     ]
-    default_sample_file_template: Annotated[
-        str, Field(description="default sample file name")
-    ]
-    default_investigation_file_template: Annotated[
-        str, Field(description="default study file name")
-    ]
+    default_sample_file_template: Annotated[str, Field(description="default sample file name")]
+    default_investigation_file_template: Annotated[str, Field(description="default study file name")]
     default_study_category: Annotated[str, Field(description="default study category")]
-    default_dataset_license: Annotated[
-        str, Field(description="default dataset license name")
-    ]
-    investigation_file_name: Annotated[
-        str, Field(description="investigation file name")
-    ]
-    derived_file_extensions: Annotated[
-        list[str], Field(description="derived file extensions")
-    ]
+    default_dataset_license: Annotated[str, Field(description="default dataset license name")]
+    investigation_file_name: Annotated[str, Field(description="investigation file name")]
+    derived_file_extensions: Annotated[list[str], Field(description="derived file extensions")]
     raw_file_extensions: Annotated[list[str], Field(description="raw file extensions")]
 
     assay_file_type_mappings: Annotated[
@@ -513,9 +450,7 @@ class LicenseInfo(StudyBaseModel):
 class MhdProfileInfo(StudyBaseModel):
     file_schema: Annotated[str, Field(description="File schema URL")]
     mhd_file_profile: Annotated[str, Field(description="MHD file profile URL")] = ""
-    announcement_file_profile: Annotated[
-        str, Field(description="announcement file profile URL")
-    ] = ""
+    announcement_file_profile: Annotated[str, Field(description="announcement file profile URL")] = ""
 
 
 class StudyCategoryDefinition(StudyBaseModel):
@@ -528,25 +463,17 @@ class StudyCategoryDefinition(StudyBaseModel):
 class CommentDescription(StudyBaseModel):
     name: Annotated[str, Field(description="Comment name")]
     label: Annotated[str, Field(description="Comment label")]
-    is_ontology: Annotated[
-        bool, Field(description="Is the comment an ontology term")
-    ] = False
-    control_list_key: Annotated[
-        None | str, Field(description="Comment control list key")
-    ] = None
+    is_ontology: Annotated[bool, Field(description="Is the comment an ontology term")] = False
+    control_list_key: Annotated[None | str, Field(description="Comment control list key")] = None
 
 
 class CommentGroupDefinition(StudyBaseModel):
-    allow_multiple: Annotated[
-        bool, Field(description="comment group can be defined multiple")
-    ] = False
+    allow_multiple: Annotated[bool, Field(description="comment group can be defined multiple")] = False
     join_operator: Annotated[
         None | str,
         Field(description="join operator if group has multiple values"),
     ] = None
-    comments: Annotated[
-        list[CommentDescription], Field(description="comments in group")
-    ] = False
+    comments: Annotated[list[CommentDescription], Field(description="comments in group")] = False
 
 
 class SectionDefaultComments(StudyBaseModel):
@@ -559,87 +486,55 @@ class SectionDefaultComments(StudyBaseModel):
 
 
 class DefaultCommentConfiguration(StudyBaseModel):
-    study_comments: Annotated[
-        SectionDefaultComments, Field(description="study section comments")
-    ]
-    assay_comments: Annotated[
-        SectionDefaultComments, Field(description="study assay section comments")
-    ]
+    study_comments: Annotated[SectionDefaultComments, Field(description="study section comments")]
+    assay_comments: Annotated[SectionDefaultComments, Field(description="study assay section comments")]
     study_design_descriptor_comments: Annotated[
         SectionDefaultComments,
         Field(description="study design descriptors section comments"),
     ]
-    study_factor_comments: Annotated[
-        SectionDefaultComments, Field(description="study factors section comments")
-    ]
-    study_protocol_comments: Annotated[
-        SectionDefaultComments, Field(description="study protocol section comments")
-    ]
+    study_factor_comments: Annotated[SectionDefaultComments, Field(description="study factors section comments")]
+    study_protocol_comments: Annotated[SectionDefaultComments, Field(description="study protocol section comments")]
     study_publication_comments: Annotated[
         SectionDefaultComments, Field(description="study publications section comments")
     ]
-    study_contact_comments: Annotated[
-        SectionDefaultComments, Field(description="study contacts section comments")
-    ]
+    study_contact_comments: Annotated[SectionDefaultComments, Field(description="study contacts section comments")]
 
 
 class DescriptorCategoryDefinition(StudyBaseModel):
     name: Annotated[str, Field(description="study category name")]
     label: Annotated[str, Field(description="study category label")]
-    control_list_key: Annotated[
-        None | str, Field(description="study category description")
-    ]
+    control_list_key: Annotated[None | str, Field(description="study category description")]
 
 
 class DescriptorConfiguration(StudyBaseModel):
-    default_descriptor_category: Annotated[
-        str, Field(description="default descriptor category")
-    ] = "default"
-    default_submitter_source: Annotated[
-        str, Field(description="default submitter source")
-    ] = ""
-    default_data_curation_source: Annotated[
-        str, Field(description="default data curation source")
-    ] = ""
-    default_workflow_source: Annotated[
-        str, Field(description="default workflow source")
-    ] = ""
+    default_descriptor_category: Annotated[str, Field(description="default descriptor category")] = "default"
+    default_submitter_source: Annotated[str, Field(description="default submitter source")] = ""
+    default_data_curation_source: Annotated[str, Field(description="default data curation source")] = ""
+    default_workflow_source: Annotated[str, Field(description="default workflow source")] = ""
     default_descriptor_categories: Annotated[
         dict[str, DescriptorCategoryDefinition],
         Field(description="default descriptor sources"),
     ] = {}
-    default_descriptor_sources: Annotated[
-        dict[str, OntologyTerm], Field(description="default descriptor sources")
-    ] = {}
+    default_descriptor_sources: Annotated[dict[str, OntologyTerm], Field(description="default descriptor sources")] = {}
 
 
 class TemplateSettings(StudyBaseModel):
-    active_template_versions: Annotated[
-        list[str], Field(description="active template versions")
-    ]
-    default_template_version: Annotated[
-        str, Field(description="default study template version")
-    ]
+    active_template_versions: Annotated[list[str], Field(description="active template versions")]
+    default_template_version: Annotated[str, Field(description="default study template version")]
     dataset_licenses: Annotated[
         dict[str, LicenseInfo],
         Field(description="MetaboLights template versions"),
     ] = {}
-    descriptor_configuration: Annotated[
-        DescriptorConfiguration, Field(description="default comment configuration")
-    ] = DescriptorConfiguration()
-    result_file_formats: Annotated[
-        dict[str, OntologyTerm], Field(description="result file formats")
-    ] = {}
+    descriptor_configuration: Annotated[DescriptorConfiguration, Field(description="default comment configuration")] = (
+        DescriptorConfiguration()
+    )
+    result_file_formats: Annotated[dict[str, OntologyTerm], Field(description="result file formats")] = {}
     default_file_controls: Annotated[
         dict[MetadataFileType, list[DefaultControl]],
         Field(description="default control lists"),
     ]
-    default_comments: Annotated[
-        DefaultCommentConfiguration, Field(description="default comment configuration")
-    ]
-    study_categories: Annotated[
-        dict[str, StudyCategoryDefinition], Field(description="study categories")
-    ] = {}
+    default_comments: Annotated[DefaultCommentConfiguration, Field(description="default comment configuration")]
+    study_categories: Annotated[dict[str, StudyCategoryDefinition], Field(description="study categories")] = {}
     mhd_profiles: Annotated[
         dict[str, dict[str, MhdProfileInfo]],
         Field(description="MHD profiles and versions"),
@@ -725,6 +620,6 @@ class ValidationConfiguration(StudyBaseModel):
         ValidationControls,
         Field(description="Investigation, sample, assay validation controls"),
     ] = ValidationControls()
-    templates: Annotated[
-        FileTemplates, Field(description="Investigation, sample, assay file templates")
-    ] = FileTemplates()
+    templates: Annotated[FileTemplates, Field(description="Investigation, sample, assay file templates")] = (
+        FileTemplates()
+    )

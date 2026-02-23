@@ -5,9 +5,7 @@ from mtbls.domain.enums.token_type import TokenType
 
 class AuthenticationService(abc.ABC):
     @abc.abstractmethod
-    async def authenticate_with_token(
-        self, token_type: TokenType, token: str, username: str
-    ) -> str:
+    async def authenticate_with_token(self, token_type: TokenType, token: str, username: str) -> str:
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -19,7 +17,5 @@ class AuthenticationService(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    async def validate_token(
-        self, token_type: TokenType, token: str, username: str = None
-    ) -> str:
+    async def validate_token(self, token_type: TokenType, token: str, username: str = None) -> str:
         raise NotImplementedError()

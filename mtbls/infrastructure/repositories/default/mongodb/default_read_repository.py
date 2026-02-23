@@ -20,9 +20,7 @@ from mtbls.infrastructure.persistence.db.mongodb.config import (
 logger = logging.getLogger(__name__)
 
 
-class MongoDbDefaultReadRepository(
-    AbstractReadRepository[OUTPUT_TYPE, ID_TYPE], Generic[OUTPUT_TYPE, ID_TYPE]
-):
+class MongoDbDefaultReadRepository(AbstractReadRepository[OUTPUT_TYPE, ID_TYPE], Generic[OUTPUT_TYPE, ID_TYPE]):
     def __init__(
         self,
         connection: MongoDbConnection,
@@ -82,9 +80,7 @@ class MongoDbDefaultReadRepository(
         if query_options.sort_options:
             sort_options = []
             for item in query_options.sort_options:
-                sort_options.append(
-                    {item.key, 1 if item.order == SortOrder.ASC else -1}
-                )
+                sort_options.append({item.key, 1 if item.order == SortOrder.ASC else -1})
             if sort_options:
                 result = result.sort(sort_options)
         offset = query_options.offset if query_options.offset else 0
@@ -96,9 +92,7 @@ class MongoDbDefaultReadRepository(
         items = [self.output_entity_class.model_validate(x) for x in result_data]
         return PaginatedOutput(offset=offset, size=len(items), data=items)
 
-    async def select_fields(
-        self, query_field_options: QueryFieldOptions
-    ) -> PaginatedOutput[tuple[Any, ...]]:
+    async def select_fields(self, query_field_options: QueryFieldOptions) -> PaginatedOutput[tuple[Any, ...]]:
         options = query_field_options
         filter = {}
         for item in options.filters:
@@ -120,9 +114,7 @@ class MongoDbDefaultReadRepository(
         items = [self.output_entity_class.model_validate(x) for x in result]
         return PaginatedOutput(offset=offset, size=len(items), data=items)
 
-    async def select_field(
-        self, field_name, query_options: QueryOptions
-    ) -> PaginatedOutput[tuple[Any, ...]]:
+    async def select_field(self, field_name, query_options: QueryOptions) -> PaginatedOutput[tuple[Any, ...]]:
         query_field_options = QueryFieldOptions.model_validate(query_options)
         query_field_options.selected_fields = [field_name]
         return await self.select_fields(query_field_options=query_field_options)

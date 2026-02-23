@@ -20,9 +20,7 @@ from mtbls.infrastructure.persistence.db.model.study_models import Base
 logger = logging.getLogger(__name__)
 
 
-class SqlDbDefaultWriteRepository(
-    AbstractWriteRepository[INPUT_TYPE, OUTPUT_TYPE, ID_TYPE]
-):
+class SqlDbDefaultWriteRepository(AbstractWriteRepository[INPUT_TYPE, OUTPUT_TYPE, ID_TYPE]):
     def __init__(
         self,
         entity_mapper: EntityMapper,
@@ -43,9 +41,7 @@ class SqlDbDefaultWriteRepository(
             self.input_type_alias_dict[field] = value
 
         self.output_type: Type[BaseModel] = generics[1]
-        self.output_entity_type: Entity = self.output_type.model_config.get(
-            "entity_type"
-        )
+        self.output_entity_type: Entity = self.output_type.model_config.get("entity_type")
         self.output_type_alias_dict = OrderedDict()
         for field in self.output_type.model_fields:
             value = alias_generator.get_alias(self.output_entity_type, field)
@@ -82,9 +78,7 @@ class SqlDbDefaultWriteRepository(
             await session.commit()
             await session.refresh(table_row)
 
-            return await self.entity_mapper.convert_to_output_type(
-                table_row, self.output_type
-            )
+            return await self.entity_mapper.convert_to_output_type(table_row, self.output_type)
 
     @validate_inputs_outputs
     async def create_many(self, entities: list[INPUT_TYPE]) -> list[OUTPUT_TYPE]:
@@ -101,11 +95,7 @@ class SqlDbDefaultWriteRepository(
             await session.commit()
             for table_row in table_rows:
                 await session.refresh(table_row)
-                outputs.append(
-                    await self.entity_mapper.convert_to_output_type(
-                        table_row, self.output_type
-                    )
-                )
+                outputs.append(await self.entity_mapper.convert_to_output_type(table_row, self.output_type))
         return outputs
 
     async def update(self, entity: OUTPUT_TYPE) -> OUTPUT_TYPE:
@@ -118,9 +108,7 @@ class SqlDbDefaultWriteRepository(
                 table_row = await self.update_table_row(table_row_result, entity)
                 session.add(table_row)
                 await session.commit()
-                return await self.entity_mapper.convert_to_output_type(
-                    table_row, self.output_type
-                )
+                return await self.entity_mapper.convert_to_output_type(table_row, self.output_type)
             except Exception as ex:
                 logger.error(str(ex))
                 await session.rollback()

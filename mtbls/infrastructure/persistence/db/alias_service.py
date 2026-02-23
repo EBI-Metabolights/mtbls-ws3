@@ -33,19 +33,11 @@ class AliasService:
             name = self.get_full_class_name(self.alias_generator)
             logger.info("Alias generator '%s' will be used.", name)
 
-        all_loaded_modules = {
-            m: sys.modules[m]
-            for m in sys.modules
-            if re.match(rf"{mtbls.__name__}(\..+)?", m)
-        }
+        all_loaded_modules = {m: sys.modules[m] for m in sys.modules if re.match(rf"{mtbls.__name__}(\..+)?", m)}
         target_modules = {}
         for package in self.root_packages:
             target_modules.update(
-                {
-                    m: all_loaded_modules[m]
-                    for m in all_loaded_modules
-                    if re.match(rf"{package}(\..+)?", m)
-                }
+                {m: all_loaded_modules[m] for m in all_loaded_modules if re.match(rf"{package}(\..+)?", m)}
             )
 
         loaded_entity_classes: OrderedDict[str, type[BaseModel]] = OrderedDict()
@@ -68,9 +60,7 @@ class AliasService:
         return name
 
     @classmethod
-    def set_model_validation_alias(
-        cls, domain_class: BaseModel, alias_generator: Callable
-    ) -> None:
+    def set_model_validation_alias(cls, domain_class: BaseModel, alias_generator: Callable) -> None:
         for field_name in domain_class.model_fields:
             if field_name in domain_class.model_fields:
                 field_info = domain_class.model_fields[field_name]

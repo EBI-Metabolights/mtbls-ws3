@@ -17,13 +17,7 @@ class ArgumentFilter(BaseModel):
 
 
 def to_module_name(app_path: Path, file_path: Path) -> str:
-    return (
-        str(file_path)
-        .replace(str(app_path), "")
-        .strip(os.sep)
-        .replace(os.sep, ".")
-        .removesuffix(".py")
-    )
+    return str(file_path).replace(str(app_path), "").strip(os.sep).replace(os.sep, ".").removesuffix(".py")
 
 
 def find_injectable_modules() -> list[tuple[str, str]]:
@@ -75,9 +69,7 @@ def find_decorator_in_file(
     decorator_name: str,
     decorator_kwargs=Union[None, dict[str, ArgumentFilter]],
 ):
-    decorator_kwargs: dict[str, ArgumentFilter] = (
-        decorator_kwargs if decorator_kwargs else {}
-    )
+    decorator_kwargs: dict[str, ArgumentFilter] = decorator_kwargs if decorator_kwargs else {}
     with file_path.open("r", encoding="utf-8") as f:
         file_content = f.read()
 
@@ -91,11 +83,7 @@ def find_decorator_in_file(
         if not isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef)):
             continue
         for decorator in node.decorator_list:
-            if (
-                isinstance(decorator, ast.Name)
-                and hasattr(decorator, "id")
-                and decorator.id == decorator_name
-            ):
+            if isinstance(decorator, ast.Name) and hasattr(decorator, "id") and decorator.id == decorator_name:
                 decorated_functions.append(node.name)
             elif (
                 isinstance(decorator, ast.Call)
@@ -104,11 +92,7 @@ def find_decorator_in_file(
             ):
                 keywords = {x.arg: x.value.value for x in decorator.keywords}
                 keywords.update(
-                    {
-                        key: filter_.default
-                        for key, filter_ in decorator_kwargs.items()
-                        if key not in keywords
-                    }
+                    {key: filter_.default for key, filter_ in decorator_kwargs.items() if key not in keywords}
                 )
                 matched = True
                 for key, filter_ in decorator_kwargs.items():
@@ -121,9 +105,7 @@ def find_decorator_in_file(
     return decorated_functions
 
 
-def find_decorator_in_package(
-    package_path, decorator_name, decorator_kwargs=Union[None, dict[str, Any]]
-):
+def find_decorator_in_package(package_path, decorator_name, decorator_kwargs=Union[None, dict[str, Any]]):
     """
     Recursively searches through a package for functions decorated with a specific decorator.
 
@@ -144,9 +126,7 @@ def find_decorator_in_package(
         for file in files:
             if file.endswith(".py"):  # Only process Python files
                 file_path = root_path / Path(file)
-                decorated_functions = find_decorator_in_file(
-                    file_path, decorator_name, decorator_kwargs
-                )
+                decorated_functions = find_decorator_in_file(file_path, decorator_name, decorator_kwargs)
                 if decorated_functions:
                     result[file_path] = decorated_functions
 

@@ -19,9 +19,7 @@ async def get_validation_reports(
     limit: Union[None, ZeroOrPositiveInt],
     validation_report_service: ValidationReportService,
 ) -> list[ValidationResultFile]:
-    return await validation_report_service.find_all(
-        resource_id=resource_id, offset=offset, limit=limit
-    )
+    return await validation_report_service.find_all(resource_id=resource_id, offset=offset, limit=limit)
 
 
 async def load_validation_report_by_task_id(
@@ -29,9 +27,7 @@ async def load_validation_report_by_task_id(
     task_id: str,
     validation_report_service: ValidationReportService,
 ) -> PolicySummaryResult:
-    return await validation_report_service.load_validation_report_by_task_id(
-        resource_id=resource_id, task_id=task_id
-    )
+    return await validation_report_service.load_validation_report_by_task_id(resource_id=resource_id, task_id=task_id)
 
 
 async def override_and_save_validation_report(
@@ -41,9 +37,7 @@ async def override_and_save_validation_report(
     validation_report_service: ValidationReportService,
     validation_override_service: ValidationOverrideService,
 ) -> PolicySummaryResult:
-    overrides = await validation_override_service.get_validation_overrides(
-        resource_id=resource_id
-    )
+    overrides = await validation_override_service.get_validation_overrides(resource_id=resource_id)
     overrides.validation_overrides.sort(key=lambda x: x.rule_id + x.source_file)
     validation_result.overrides = overrides
     await apply_overrides_on_validations_result(
@@ -75,9 +69,7 @@ async def apply_overrides_on_validations_result(
         for violation in validation_result.messages.violations:
             all_violations_map[violation.identifier] = violation
             if violation.identifier in overrides_map:
-                override = match_override(
-                    overrides_map[violation.identifier], violation
-                )
+                override = match_override(overrides_map[violation.identifier], violation)
                 if override:
                     violation.overridden = True
                     violation.override_comment = override.comment
@@ -91,16 +83,10 @@ async def apply_overrides_on_validations_result(
         for rule_id, overrides in overrides_map.items():
             for override in overrides:
                 if override.enabled and rule_id not in all_violations_map:
-                    definition = (
-                        definitions.validations[rule_id]
-                        if rule_id in definitions.validations
-                        else None
-                    )
+                    definition = definitions.validations[rule_id] if rule_id in definitions.validations else None
                     rule_id = definition.rule_id if definition else override.rule_id
                     title = definition.title if definition else override.title
-                    description = (
-                        definition.description if definition else override.description
-                    )
+                    description = definition.description if definition else override.description
                     priority = definition.priority if definition else "HIGH"
                     section = definition.section if definition else ""
                     validation_result.messages.violations.append(
@@ -132,15 +118,11 @@ async def apply_overrides_on_validations_result(
 
     for summary in validation_result.messages.summary:
         if summary.identifier in summary_overrides:
-            message_type = select_summary_message_type(
-                summary_overrides[summary.identifier]
-            )
+            message_type = select_summary_message_type(summary_overrides[summary.identifier])
             if message_type != summary.type:
                 summary.overridden = True
 
-    validation_result.messages.violations.sort(
-        key=lambda x: x.identifier + x.source_file + x.source_column_header
-    )
+    validation_result.messages.violations.sort(key=lambda x: x.identifier + x.source_file + x.source_column_header)
 
 
 def match_override(overrides: list[ValidationOverride], violation: PolicyMessage):
@@ -151,10 +133,7 @@ def match_override(overrides: list[ValidationOverride], violation: PolicyMessage
             matches.append(1)
         if not x.source_file or x.source_file == violation.source_file:
             matches.append(1)
-        if (
-            not x.source_column_header
-            or x.source_column_header == violation.source_column_header
-        ):
+        if not x.source_column_header or x.source_column_header == violation.source_column_header:
             matches.append(1)
         if not x.source_file or x.source_column_index == violation.source_column_index:
             matches.append(1)

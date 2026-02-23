@@ -50,15 +50,9 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
                 raise HealthCheckError("Remote service response is not valid.")
 
             transfer_status = TransferStatus(
-                aspera=ProtocolServerStatus(
-                    online=ts.get("aspera", {}).get("online", False)
-                ),
-                private_ftp=ProtocolServerStatus(
-                    online=ts.get("private_ftp", {}).get("online", False)
-                ),
-                public_ftp=ProtocolServerStatus(
-                    online=ts.get("public_ftp", {}).get("online", False)
-                ),
+                aspera=ProtocolServerStatus(online=ts.get("aspera", {}).get("online", False)),
+                private_ftp=ProtocolServerStatus(online=ts.get("private_ftp", {}).get("online", False)),
+                public_ftp=ProtocolServerStatus(online=ts.get("public_ftp", {}).get("online", False)),
             )
             return transfer_status
 

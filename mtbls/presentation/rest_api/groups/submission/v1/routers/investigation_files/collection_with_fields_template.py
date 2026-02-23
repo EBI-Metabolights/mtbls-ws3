@@ -51,9 +51,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
         post_item_enabled: bool = True,
         patch_item_enabled: bool = True,
         delete_item_enabled: bool = True,
-        updatable_fields: Union[
-            None, list[tuple[str, Union[str, OntologyItem]]]
-        ] = None,
+        updatable_fields: Union[None, list[tuple[str, Union[str, OntologyItem]]]] = None,
     ):
         super().__init__(
             endpoint_prefix=endpoint_prefix,
@@ -109,9 +107,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
             @inject
             async def get_item_field_wrapper(
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_read_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
                 index: Annotated[int, Path(description=index_description)],
                 study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
                     Provide[  # noqa: FAST002
@@ -119,9 +115,7 @@ class StudyItemCollectionWithFields(StudyItemCollection):
                     ]
                 ),
             ):
-                jsonpath_template = self._get_rendered_json_path(
-                    self.item_jsonpath, [index]
-                )
+                jsonpath_template = self._get_rendered_json_path(self.item_jsonpath, [index])
                 json_response = await self._get_field_value(
                     field_name=field_name,
                     field_type=field_type,
@@ -149,22 +143,16 @@ class StudyItemCollectionWithFields(StudyItemCollection):
             @inject
             async def update_item_field_wrapper(
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_update_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
                 index: Annotated[int, Path(description=index_description)],
-                value: Annotated[
-                    FieldData[field_type], Body(description=field_description)
-                ],
+                value: Annotated[FieldData[field_type], Body(description=field_description)],
                 study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
                     Provide[  # noqa: FAST002
                         "services.study_metadata_service_factory"
                     ]
                 ),
             ):
-                jsonpath_template = self._get_rendered_json_path(
-                    self.item_jsonpath, [index]
-                )
+                jsonpath_template = self._get_rendered_json_path(self.item_jsonpath, [index])
                 json_response = await self._update_field_value(
                     field_name=field_name,
                     field_type=field_type,
@@ -195,13 +183,9 @@ class StudyItemCollectionWithFields(StudyItemCollection):
         render_values: list[int],
     ) -> Union[None, StudyJsonListResponse]:
         render_values = [str(x) for x in render_values]
-        jsonpath = self._get_rendered_json_path(
-            jsonpath=jsonpath_template, values=render_values
-        )
+        jsonpath = self._get_rendered_json_path(jsonpath=jsonpath_template, values=render_values)
         route_path = self._get_route_path(resource_id)
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         response = None
         with metadata_service:
             field_path = jsonpath + "." + to_camel(field_name)
@@ -233,13 +217,9 @@ class StudyItemCollectionWithFields(StudyItemCollection):
         value: FieldData,
     ) -> Union[None, StudyJsonListResponse]:
         render_values = [str(x) for x in render_values]
-        jsonpath = self._get_rendered_json_path(
-            jsonpath=jsonpath_template, values=render_values
-        )
+        jsonpath = self._get_rendered_json_path(jsonpath=jsonpath_template, values=render_values)
         route_path = self._get_route_path(resource_id)
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         response = None
         with metadata_service:
             data, _ = await metadata_service.process_investigation_file(

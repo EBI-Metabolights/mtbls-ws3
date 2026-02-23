@@ -23,9 +23,7 @@ logger = logging.getLogger(__name__)
 
 class MongoDbValidationOverrideRepository(
     ValidationOverrideRepository,
-    MongoDbDefaultWriteRepository[
-        ValidationOverrideFileObject, ValidationOverrideFileObject, str
-    ],
+    MongoDbDefaultWriteRepository[ValidationOverrideFileObject, ValidationOverrideFileObject, str],
 ):
     def __init__(
         self,
@@ -35,9 +33,7 @@ class MongoDbValidationOverrideRepository(
         study_bucket: StudyBucket = StudyBucket.INTERNAL_FILES,
         observer: None | FileObjectObserver = None,
     ):
-        super(ValidationOverrideRepository, self).__init__(
-            study_bucket=study_bucket, observers=[observer]
-        )
+        super(ValidationOverrideRepository, self).__init__(study_bucket=study_bucket, observers=[observer])
         super(MongoDbDefaultWriteRepository, self).__init__(
             connection=connection,
             collection_name=collection_name,

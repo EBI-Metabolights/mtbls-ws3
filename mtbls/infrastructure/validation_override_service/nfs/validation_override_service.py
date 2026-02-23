@@ -33,9 +33,7 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
         self.policy_service = policy_service
         self.study_bucket = file_object_repository.get_bucket()
         self.temp_directory = (
-            pathlib.Path(temp_directory)
-            if temp_directory
-            else pathlib.Path("/tmp/validation-overrides-tmp")
+            pathlib.Path(temp_directory) if temp_directory else pathlib.Path("/tmp/validation-overrides-tmp")
         )
         self.temp_directory.mkdir(parents=True, exist_ok=True)
         self.validation_overrides_object_key = (
@@ -48,9 +46,7 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
     async def get_validation_definitions(self) -> VersionedValidationsMap:
         return await self.policy_service.get_rule_definitions()
 
-    async def _initiate_validation_override(
-        self, resource_id: str
-    ) -> Union[None, ValidationOverrideList]:
+    async def _initiate_validation_override(self, resource_id: str) -> Union[None, ValidationOverrideList]:
         if not await self.file_object_repository.exists(
             resource_id=resource_id,
             object_key=self.validation_overrides_parent_object_key,
@@ -77,18 +73,12 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
             return overrides
         return None
 
-    async def get_validation_overrides(
-        self, resource_id: str
-    ) -> ValidationOverrideList:
+    async def get_validation_overrides(self, resource_id: str) -> ValidationOverrideList:
         temp_filename = pathlib.Path(f"{str(uuid.uuid4())}.json")
         tmp_file_path = self.temp_directory / temp_filename
-        initiated_overrides = await self._initiate_validation_override(
-            resource_id=resource_id
-        )
+        initiated_overrides = await self._initiate_validation_override(resource_id=resource_id)
         if initiated_overrides:
-            await self.save_validation_overrides(
-                resource_id=resource_id, validation_overrides=initiated_overrides
-            )
+            await self.save_validation_overrides(resource_id=resource_id, validation_overrides=initiated_overrides)
             study_object = await self.file_object_repository.get_info(
                 resource_id=resource_id, object_key=self.validation_overrides_object_key
             )
@@ -108,9 +98,7 @@ class FileSystemValidationOverrideService(ValidationOverrideService):
         finally:
             tmp_file_path.unlink(missing_ok=True)
 
-    async def save_validation_overrides(
-        self, resource_id: str, validation_overrides: ValidationOverrideList
-    ) -> bool:
+    async def save_validation_overrides(self, resource_id: str, validation_overrides: ValidationOverrideList) -> bool:
         temp_filename = pathlib.Path(f"{str(uuid.uuid4())}.json")
         tmp_file_path = self.temp_directory / temp_filename
         source_uri = f"file://{str(tmp_file_path)}"

@@ -23,24 +23,18 @@ async def init_db(sqlite_client: SQLiteDatabaseClientImpl, init_script_path: Pat
                     line = line.strip()
                     if line and not line.startswith("--"):
                         query = text(line.strip())
-                        await conn.execute(
-                            query, execution_options={"no_parameters": True}
-                        )
+                        await conn.execute(query, execution_options={"no_parameters": True})
         except Exception as ex:
             logger.exception(ex)
             raise ex
 
 
-async def create_test_sqlite_db(
-    file_path: Path, init_script_path: Path, scheme: str = "sqlite+aiosqlite"
-):
+async def create_test_sqlite_db(file_path: Path, init_script_path: Path, scheme: str = "sqlite+aiosqlite"):
     file_path.unlink(missing_ok=True)
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
     sqlite_client = SQLiteDatabaseClientImpl(
-        db_connection=SQLiteDatabaseConnection(
-            url_scheme=scheme, file_path=str(file_path)
-        )
+        db_connection=SQLiteDatabaseConnection(url_scheme=scheme, file_path=str(file_path))
     )
 
     await init_db(sqlite_client, init_script_path)

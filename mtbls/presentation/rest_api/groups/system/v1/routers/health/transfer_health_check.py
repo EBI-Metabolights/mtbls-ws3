@@ -23,8 +23,7 @@ router = APIRouter(tags=["System"], prefix="/system/v2/transfer-status")
 @router.get(
     "",
     summary="Get current status of EBI FTP and Aspera servers.",
-    description="Test EBI FASP and FTP servers are online and responsive, "
-    "and report the results",
+    description="Test EBI FASP and FTP servers are online and responsive, and report the results",
     response_model=APIResponse[TransferHealthCheckResponse],
 )
 @inject

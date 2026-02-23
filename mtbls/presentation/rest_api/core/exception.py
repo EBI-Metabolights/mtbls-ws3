@@ -49,6 +49,4 @@ async def exception_handler(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         response_content.error_message = error_type
         response_content.errors.append(message)
-    return JSONResponse(
-        content=response_content.model_dump(), status_code=status_code, headers=headers
-    )
+    return JSONResponse(content=response_content.model_dump(), status_code=status_code, headers=headers)

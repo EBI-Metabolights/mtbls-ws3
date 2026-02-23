@@ -36,16 +36,14 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
         if isinstance(config, MtblsWs2AuthenticationConfiguration):
             self.config = config
         else:
-            self.config: MtblsWs2AuthenticationConfiguration = (
-                MtblsWs2AuthenticationConfiguration.model_validate(config)
+            self.config: MtblsWs2AuthenticationConfiguration = MtblsWs2AuthenticationConfiguration.model_validate(
+                config
             )
         self.backend_ws_base_url = self.config.get_url()
         self.user_read_repository = user_read_repository
 
     @validate_inputs_outputs
-    async def authenticate_with_token(
-        self, token_type: TokenType, token: TokenStr, username: str = None
-    ) -> str:
+    async def authenticate_with_token(self, token_type: TokenType, token: TokenStr, username: str = None) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
         url = f"{self.backend_ws_base_url}/auth/login-with-token"
@@ -86,9 +84,7 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
     async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
         raise NotImplementedError()
 
-    async def validate_token(
-        self, token_type: TokenType, token: str, username: str = None
-    ) -> str:
+    async def validate_token(self, token_type: TokenType, token: str, username: str = None) -> str:
         if token_type != TokenType.JWT_TOKEN:
             raise NotImplementedError("Only Jwt Tokens can be validated.")
         payload = None

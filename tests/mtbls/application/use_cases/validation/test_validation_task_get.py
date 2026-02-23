@@ -54,9 +54,7 @@ class TestGetStudyValidationResult:
         task_id = "initial-task-id"
 
         summary_result = PolicySummaryResult()
-        validation_report_service.load_validation_report_by_task_id.return_value = (
-            summary_result
-        )
+        validation_report_service.load_validation_report_by_task_id.return_value = summary_result
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
         result: AsyncTaskSummary = await get_study_validation_result(
             resource_id=resource_id,
@@ -93,9 +91,7 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
 
         summary_result = PolicySummaryResult()
-        validation_report_service.load_validation_report_by_task_id.return_value = (
-            summary_result
-        )
+        validation_report_service.load_validation_report_by_task_id.return_value = summary_result
 
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
         result: AsyncTaskSummary = await get_study_validation_result(
@@ -131,9 +127,7 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = ""
 
         summary_result = PolicySummaryResult()
-        validation_report_service.load_validation_report_by_task_id.return_value = (
-            summary_result
-        )
+        validation_report_service.load_validation_report_by_task_id.return_value = summary_result
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
         with pytest.raises(AsyncTaskNotFoundError):
             await get_study_validation_result(
@@ -169,8 +163,8 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
 
-        validation_report_service.load_validation_report_by_task_id.side_effect = (
-            StudyObjectNotFoundError(resource_id, "", "")
+        validation_report_service.load_validation_report_by_task_id.side_effect = StudyObjectNotFoundError(
+            resource_id, "", ""
         )
 
         result: AsyncTaskResult = Mock(spec=AsyncTaskResult)
@@ -216,13 +210,11 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
 
-        validation_report_service.load_validation_report_by_task_id.side_effect = (
-            StudyObjectNotFoundError(resource_id, "", "")
+        validation_report_service.load_validation_report_by_task_id.side_effect = StudyObjectNotFoundError(
+            resource_id, "", ""
         )
 
-        policy_result = PolicyResultList(
-            results=[PolicyResult(resource_id=resource_id)]
-        )
+        policy_result = PolicyResultList(results=[PolicyResult(resource_id=resource_id)])
 
         result: AsyncTaskResult = Mock(spec=AsyncTaskResult)
         result.get_id.return_value = task_id
@@ -231,8 +223,8 @@ class TestGetStudyValidationResult:
         result.is_ready.return_value = True
         result.get.return_value = policy_result
         async_task_service.get_async_task_result.return_value = result
-        validation_override_service.get_validation_overrides.return_value = (
-            ValidationOverrideList(resource_id=resource_id)
+        validation_override_service.get_validation_overrides.return_value = ValidationOverrideList(
+            resource_id=resource_id
         )
         summary_result: AsyncTaskSummary = await get_study_validation_result(
             resource_id=resource_id,
@@ -272,8 +264,8 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
 
-        validation_report_service.load_validation_report_by_task_id.side_effect = (
-            StudyObjectNotFoundError(resource_id, "", "")
+        validation_report_service.load_validation_report_by_task_id.side_effect = StudyObjectNotFoundError(
+            resource_id, "", ""
         )
 
         result: AsyncTaskResult = Mock(spec=AsyncTaskResult)
@@ -283,8 +275,8 @@ class TestGetStudyValidationResult:
         result.is_ready.return_value = True
         result.get.side_effect = Exception("Error")
         async_task_service.get_async_task_result.return_value = result
-        validation_override_service.get_validation_overrides.return_value = (
-            ValidationOverrideList(resource_id=resource_id)
+        validation_override_service.get_validation_overrides.return_value = ValidationOverrideList(
+            resource_id=resource_id
         )
         with pytest.raises(AsyncTaskRemoteFailure):
             await get_study_validation_result(
@@ -323,8 +315,8 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
 
-        validation_report_service.load_validation_report_by_task_id.side_effect = (
-            StudyObjectNotFoundError(resource_id, "", "")
+        validation_report_service.load_validation_report_by_task_id.side_effect = StudyObjectNotFoundError(
+            resource_id, "", ""
         )
 
         result: AsyncTaskResult = Mock(spec=AsyncTaskResult)
@@ -334,8 +326,8 @@ class TestGetStudyValidationResult:
         result.is_ready.return_value = True
         result.get.return_value = Exception("Error")
         async_task_service.get_async_task_result.return_value = result
-        validation_override_service.get_validation_overrides.return_value = (
-            ValidationOverrideList(resource_id=resource_id)
+        validation_override_service.get_validation_overrides.return_value = ValidationOverrideList(
+            resource_id=resource_id
         )
         with pytest.raises(AsyncTaskRemoteFailure):
             await get_study_validation_result(
@@ -373,8 +365,8 @@ class TestGetStudyValidationResult:
         cache_service.get_value.return_value = task_id
         resource_id = ms_metabolights_model.investigation.studies[0].identifier
 
-        validation_report_service.load_validation_report_by_task_id.side_effect = (
-            StudyObjectNotFoundError(resource_id, "", "")
+        validation_report_service.load_validation_report_by_task_id.side_effect = StudyObjectNotFoundError(
+            resource_id, "", ""
         )
 
         async_task_service.get_async_task_result.side_effect = Exception()

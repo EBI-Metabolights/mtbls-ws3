@@ -55,9 +55,7 @@ class GatewaysContainer(containers.DeclarativeContainer):
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
     )
-    http_client: HttpClient = providers.Singleton(
-        HttpxClient, max_timeount_in_seconds=60
-    )
+    http_client: HttpClient = providers.Singleton(HttpxClient, max_timeount_in_seconds=60)
     search_index_management_gateway: SearchIndexManagementGateway = providers.Singleton(
         ElasticsearchIndexManagementGateway,
         config=config.database.elasticsearch.connection,
@@ -68,9 +66,7 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     entity_mapper: EntityMapper = providers.Singleton(EntityMapper)
 
-    alias_generator: AliasGenerator = providers.Singleton(
-        DbTableAliasGeneratorImpl, entity_mapper
-    )
+    alias_generator: AliasGenerator = providers.Singleton(DbTableAliasGeneratorImpl, entity_mapper)
 
     gateways = providers.DependenciesContainer()
     study_read_repository: StudyReadRepository = providers.Singleton(
@@ -83,14 +79,12 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         StudyFolderManager, config=config.repositories.study_folders
     )
 
-    index_cache_files_object_repository: FileObjectWriteRepository = (
-        providers.Singleton(
-            FileSystemObjectWriteRepository,
-            folder_manager=folder_manager,
-            study_bucket=StudyBucket.INDICES_CACHE_FILES,
-            http_client=gateways.http_client,
-            observer=None,
-        )
+    index_cache_files_object_repository: FileObjectWriteRepository = providers.Singleton(
+        FileSystemObjectWriteRepository,
+        folder_manager=folder_manager,
+        study_bucket=StudyBucket.INDICES_CACHE_FILES,
+        http_client=gateways.http_client,
+        observer=None,
     )
     metadata_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,
@@ -116,14 +110,8 @@ class EsCliApplicationContainer(containers.DeclarativeContainer):
         config=config,
     )
 
-    gateways = providers.Container(
-        GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 0}
-    )
+    gateways = providers.Container(GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 0})
 
-    services = providers.Container(
-        ServicesContainer, config=config.services, gateways=gateways
-    )
+    services = providers.Container(ServicesContainer, config=config.services, gateways=gateways)
 
-    repositories = providers.Container(
-        RepositoriesContainer, config=config, gateways=gateways
-    )
+    repositories = providers.Container(RepositoriesContainer, config=config, gateways=gateways)

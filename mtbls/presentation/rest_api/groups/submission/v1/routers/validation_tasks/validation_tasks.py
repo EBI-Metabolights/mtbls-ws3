@@ -57,15 +57,12 @@ from mtbls.presentation.rest_api.shared.dependencies import get_resource_id, get
 
 logger = getLogger(__name__)
 
-router = APIRouter(
-    tags=["MetaboLights Submission"], prefix="/submissions/v2/validations"
-)
+router = APIRouter(tags=["MetaboLights Submission"], prefix="/submissions/v2/validations")
 
 
 @router.get(
     "/{resource_id}",
-    summary="Get Study Validation Results History "
-    "ordered by validation time descending",
+    summary="Get Study Validation Results History ordered by validation time descending",
     description="Get Validation Results",
     response_model=APIResponse[PaginatedOutput[ValidationResultFile]],
 )
@@ -97,15 +94,11 @@ async def get_validation_history(
         size=len(validation_history),
         data=validation_history,
     )
-    response = APIResponse[PaginatedOutput[ValidationResultFile]](
-        content=paginated_data
-    )
+    response = APIResponse[PaginatedOutput[ValidationResultFile]](content=paginated_data)
     if not validation_history:
         response.success_message = "No validation result in history."
     else:
-        response.success_message = (
-            f"{len(validation_history)} validation result(s) in history."
-        )
+        response.success_message = f"{len(validation_history)} validation result(s) in history."
     return response
 
 
@@ -122,8 +115,7 @@ async def create_validation_task(
         bool,
         Field(
             title="Run metadata modifier",
-            description="Updates metadata files and "
-            "fixes common errors in metadata files.",
+            description="Updates metadata files and fixes common errors in metadata files.",
         ),
     ] = True,
     override_previous_task_results: Annotated[
@@ -154,9 +146,7 @@ async def create_validation_task(
     )
 
     response = APIResponse[StartValidationResponse]()
-    response.success_message = (
-        f"Validation task {task_status.task_id} is started for {resource_id}."
-    )
+    response.success_message = f"Validation task {task_status.task_id} is started for {resource_id}."
     logger.info(response.success_message)
     response.content = StartValidationResponse(
         task=AsyncTaskStatus(
@@ -205,9 +195,7 @@ async def get_validation_task_result(  # noqa: PLR0913
     except AsyncTaskNotFoundError as ex:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=APIErrorResponse(
-                error_message=f"{type(ex).__name__}: {str(ex)}"
-            ).model_dump(),
+            content=APIErrorResponse(error_message=f"{type(ex).__name__}: {str(ex)}").model_dump(),
         )
     except (
         AsyncTaskCheckStatusFailure,
@@ -215,27 +203,19 @@ async def get_validation_task_result(  # noqa: PLR0913
     ) as ex:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=APIErrorResponse(
-                error_message=f"{type(ex).__name__}: {str(ex)}"
-            ).model_dump(),
+            content=APIErrorResponse(error_message=f"{type(ex).__name__}: {str(ex)}").model_dump(),
         )
     response = APIResponse[GetValidationResponse]()
-    response.content = GetValidationResponse.model_validate(
-        result, from_attributes=True
-    )
+    response.content = GetValidationResponse.model_validate(result, from_attributes=True)
     task_id = result.task.task_id
     if result.task.ready:
         if not result.task.is_successful:
             response.status = Status.ERROR
             response.error_message = f"{resource_id} validation task {task_id} failed."
         else:
-            response.success_message = (
-                f"Result of {resource_id} validation task: {task_id}."
-            )
+            response.success_message = f"Result of {resource_id} validation task: {task_id}."
     else:
-        response.success_message = (
-            f"Status of validation task {task_id} for {resource_id}."
-        )
+        response.success_message = f"Status of validation task {task_id} for {resource_id}."
     return response
 
 
@@ -252,19 +232,11 @@ async def get_validation_task_report(  # noqa: PLR0913
     context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
     min_violation_level: Annotated[
         Union[PolicyMessageType],
-        Param(
-            description="Minimum violation message level. WARNING, ERROR, INFO, SUCCESS"
-        ),
+        Param(description="Minimum violation message level. WARNING, ERROR, INFO, SUCCESS"),
     ] = PolicyMessageType.SUCCESS,
-    include_summary_messages: Annotated[
-        bool, Param(description="Include summary messages")
-    ] = True,
-    include_isa_metadata_updates: Annotated[
-        bool, Param(description="Include metadata file updates")
-    ] = True,
-    include_overrides: Annotated[
-        bool, Param(description="Include validation rule overrides")
-    ] = True,
+    include_summary_messages: Annotated[bool, Param(description="Include summary messages")] = True,
+    include_isa_metadata_updates: Annotated[bool, Param(description="Include metadata file updates")] = True,
+    include_overrides: Annotated[bool, Param(description="Include validation rule overrides")] = True,
     async_task_service: AsyncTaskService = Depends(  # noqa: FAST002
         Provide["services.async_task_service"]
     ),
@@ -294,9 +266,7 @@ async def get_validation_task_report(  # noqa: PLR0913
         )
         task_id = summary.task.task_id
         now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
-        download_filename = (
-            f'attachment; filename="{resource_id}_validation_{now}_{task_id}.tsv"'
-        )
+        download_filename = f'attachment; filename="{resource_id}_validation_{now}_{task_id}.tsv"'
         headers = {
             "x-mtbls-file-type": media_type,
             "Content-Disposition": download_filename,
@@ -312,9 +282,7 @@ async def get_validation_task_report(  # noqa: PLR0913
     except (AsyncTaskNotFoundError, AsyncTaskNotReadyError) as ex:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=APIErrorResponse(
-                error_message=f"{type(ex).__name__}: {str(ex)}"
-            ).model_dump(),
+            content=APIErrorResponse(error_message=f"{type(ex).__name__}: {str(ex)}").model_dump(),
         )
     except (
         AsyncTaskCheckStatusFailure,
@@ -322,9 +290,7 @@ async def get_validation_task_report(  # noqa: PLR0913
     ) as ex:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=APIErrorResponse(
-                error_message=f"{type(ex).__name__}: {str(ex)}"
-            ).model_dump(),
+            content=APIErrorResponse(error_message=f"{type(ex).__name__}: {str(ex)}").model_dump(),
         )
 
 

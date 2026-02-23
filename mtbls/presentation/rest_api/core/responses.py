@@ -66,10 +66,7 @@ class APIBaseResponse(APIBaseModel):
 
     errors: Annotated[
         Union[List[str], List[APIValidationError]],
-        Field(
-            description="If status is `error`, "
-            "response may contain a list of error details."
-        ),
+        Field(description="If status is `error`, response may contain a list of error details."),
     ] = []
 
 
@@ -112,12 +109,8 @@ example_params = PaginationParams(
 
 class PaginatedResult(APIBaseModel, Generic[T]):
     page: Annotated[List[T], Field(description="Result list of the response.")] = []
-    page_size: Annotated[
-        int, Field(ge=0, description="Current page's size.", examples=[1])
-    ] = 0
-    total: Annotated[
-        int, Field(ge=0, description="Total items count.", examples=[1234])
-    ] = 0
+    page_size: Annotated[int, Field(ge=0, description="Current page's size.", examples=[1])] = 0
+    total: Annotated[int, Field(ge=0, description="Total items count.", examples=[1234])] = 0
     params: Annotated[
         PaginationParams,
         Field(description="Parameters of the request.", examples=[example_params]),

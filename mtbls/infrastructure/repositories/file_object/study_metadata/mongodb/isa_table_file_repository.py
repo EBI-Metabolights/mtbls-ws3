@@ -36,6 +36,4 @@ class MongoDbIsaTableObjectRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
-        super(IsaTableObjectRepository, self).__init__(
-            study_bucket, observers=[observer]
-        )
+        super(IsaTableObjectRepository, self).__init__(study_bucket, observers=[observer])

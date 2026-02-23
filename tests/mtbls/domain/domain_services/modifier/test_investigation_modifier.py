@@ -77,9 +77,7 @@ class TestUpdateTrailingSpaces:
         study = metabolights_model.investigation.studies[0]
         expected_title = study.title
         study.title = f" {study.title} \"' "
-        modifier.update_trailing_spaces(
-            [metabolights_model.investigation], "Investigation", list_items=True
-        )
+        modifier.update_trailing_spaces([metabolights_model.investigation], "Investigation", list_items=True)
         assert expected_title == study.title
         assert len(modifier.update_logs) == 1
 
@@ -95,9 +93,7 @@ class TestUpdateTrailingSpaces:
         role_accession = role.term_accession_number
         role.term = f" {role_term}"
         role.term_accession_number = f" {role_accession}"
-        modifier.update_trailing_spaces(
-            [metabolights_model.investigation], "Investigation", list_items=True
-        )
+        modifier.update_trailing_spaces([metabolights_model.investigation], "Investigation", list_items=True)
         assert role.term == role_term
         assert role.term_accession_number == role_accession
         expected_logs_count = 2
@@ -161,17 +157,13 @@ class TestUpdateOntologies:
         contact.roles[0].term = ""
         contact.roles[0].term_source_ref = ""
 
-        contact.roles[
-            0
-        ].term_accession_number = "http://purl.obolibrary.org/obo/NCIT_C25936"
+        contact.roles[0].term_accession_number = "http://purl.obolibrary.org/obo/NCIT_C25936"
 
         modifier.update_ontologies()
         role = modifier.model.investigation.studies[0].study_contacts.people[0].roles[0]
         assert role.term == "Investigator"
         assert role.term_source_ref == "NCIT"
-        assert (
-            role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
-        )
+        assert role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
         assert len(modifier.update_logs) == 1
 
     @pytest.mark.asyncio
@@ -198,9 +190,7 @@ class TestUpdateOntologies:
         publication.status.term_accession_number = ""
         publication.status.term_source_ref = ""
         modifier.update_ontologies()
-        assert (
-            expected_term_accession_number == publication.status.term_accession_number
-        )
+        assert expected_term_accession_number == publication.status.term_accession_number
         assert expected_term_source_ref == publication.status.term_source_ref
         assert len(modifier.update_logs) == 1
 
@@ -557,9 +547,7 @@ class Test_rule_i_100_360_004_01:
         role = people[0].roles[0]
         assert role.term == "Investigator"
         assert role.term_source_ref == "NCIT"
-        assert (
-            role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
-        )
+        assert role.term_accession_number == "http://purl.obolibrary.org/obo/NCIT_C25936"
         assert len(modifier.update_logs) == 1
 
 
@@ -579,9 +567,7 @@ class TestUpperCaseName:
             ("Test Result", "Test Result"),
         ],
     )
-    async def test_upper_case_name_01(
-        self, modifier: InvestigationFileModifier, in_out: tuple[str, str]
-    ):
+    async def test_upper_case_name_01(self, modifier: InvestigationFileModifier, in_out: tuple[str, str]):
         name = in_out[0]
         expected = in_out[1]
         actual = modifier.upper_case_name(name)
@@ -623,10 +609,7 @@ class TestUpdateAssayDefaults:
         assay = study.study_assays.assays[0]
         assay.technology_platform = ""
         ms_modifier.update_assay_defaults()
-        assert (
-            assay.technology_platform
-            == "Liquid Chromatography MS - positive - reverse phase"
-        )
+        assert assay.technology_platform == "Liquid Chromatography MS - positive - reverse phase"
         assert len(ms_modifier.update_logs) == 1
 
     @pytest.mark.asyncio
@@ -639,10 +622,7 @@ class TestUpdateAssayDefaults:
         assay = study.study_assays.assays[0]
         assay.technology_platform = "test"
         ms_modifier.update_assay_defaults()
-        assert (
-            assay.technology_platform
-            == "Liquid Chromatography MS - positive - reverse phase - test"
-        )
+        assert assay.technology_platform == "Liquid Chromatography MS - positive - reverse phase - test"
         assert len(ms_modifier.update_logs) == 1
 
     @pytest.mark.asyncio
@@ -655,9 +635,7 @@ class TestUpdateAssayDefaults:
         assay = study.study_assays.assays[0]
         old_name = assay.file_name
         assay.file_name = "a_MTBLS1_GC-MS_a.txt"
-        assay.technology_platform = (
-            "Liquid Chromatography MS - positive - reverse phase - test"
-        )
+        assay.technology_platform = "Liquid Chromatography MS - positive - reverse phase - test"
 
         metabolights_model.assays[assay.file_name] = metabolights_model.assays[old_name]
         del metabolights_model.assays[old_name]
@@ -752,9 +730,7 @@ class TestUpdateOntologySources:
         self,
         ms_modifier: InvestigationFileModifier,
     ):
-        ontology_sources = (
-            ms_modifier.model.investigation.ontology_source_references.references
-        )
+        ontology_sources = ms_modifier.model.investigation.ontology_source_references.references
 
         source_name = ontology_sources[0].source_name
         source_file = ontology_sources[0].source_file
@@ -778,9 +754,7 @@ class TestUpdateOntologySources:
         self,
         ms_modifier: InvestigationFileModifier,
     ):
-        ontology_sources = (
-            ms_modifier.model.investigation.ontology_source_references.references
-        )
+        ontology_sources = ms_modifier.model.investigation.ontology_source_references.references
 
         source_name = ontology_sources[0].source_name
         source_file = ontology_sources[0].source_file
@@ -802,9 +776,7 @@ class TestUpdateOntologySources:
         self,
         ms_modifier: InvestigationFileModifier,
     ):
-        ontology_sources = (
-            ms_modifier.model.investigation.ontology_source_references.references
-        )
+        ontology_sources = ms_modifier.model.investigation.ontology_source_references.references
 
         source_name = ontology_sources[-1].source_name
         source_file = ontology_sources[-1].source_file
@@ -912,16 +884,12 @@ class TestUpdateProtocolParameters:
         protocols = study.study_protocols.protocols
         expected_number_of_parameters = len(protocols[2].parameters) + 1
         test_protocol = templates.protocol_templates["NMR"][0].protocols[2]
-        test_protocol_def = templates.protocol_templates["NMR"][0].protocol_definitions[
-            test_protocol
-        ]
+        test_protocol_def = templates.protocol_templates["NMR"][0].protocol_definitions[test_protocol]
         template_parameters = test_protocol_def.parameters
         test_protocol_def.parameter_definitions["Test"] = ProtocolParameterDefinition(
             format="Text",
             definition="",
-            type=OntologyTerm(
-                term="Test", term_source_ref="", term_accession_number=""
-            ),
+            type=OntologyTerm(term="Test", term_source_ref="", term_accession_number=""),
         )
         template_parameters.append("Test")
         modifier.update_protocol_parameters()

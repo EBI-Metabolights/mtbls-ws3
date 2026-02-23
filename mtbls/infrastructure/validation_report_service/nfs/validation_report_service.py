@@ -31,15 +31,11 @@ class FileSystemValidationReportService(ValidationReportService):
         self.study_bucket = file_object_repository.get_bucket()
 
         self.temp_directory = (
-            pathlib.Path(temp_directory)
-            if temp_directory
-            else pathlib.Path("/tmp/validation-history-tmp")
+            pathlib.Path(temp_directory) if temp_directory else pathlib.Path("/tmp/validation-history-tmp")
         )
         self.temp_directory.mkdir(parents=True, exist_ok=True)
         self.validation_history_object_key = (
-            validation_history_object_key.rstrip("/")
-            if validation_history_object_key
-            else "validation-history"
+            validation_history_object_key.rstrip("/") if validation_history_object_key else "validation-history"
         )
 
     async def find_all(
@@ -58,9 +54,7 @@ class FileSystemValidationReportService(ValidationReportService):
             match = re.match(r"validation-history__(.+)__(.+).json$", item.basename)
             if match:
                 groups = match.groups()
-                definition = ValidationResultFile(
-                    validation_time=groups[0], task_id=groups[1]
-                )
+                definition = ValidationResultFile(validation_time=groups[0], task_id=groups[1])
                 files.append(definition)
         files.sort(key=lambda x: x.validation_time, reverse=True)
         if offset:
@@ -69,9 +63,7 @@ class FileSystemValidationReportService(ValidationReportService):
             files = files[:limit]
         return files
 
-    async def find_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> ValidationResultFile:
+    async def find_by_task_id(self, resource_id: str, task_id: str) -> ValidationResultFile:
         await self._initiate_validation_history_folder(resource_id=resource_id)
         items: list[StudyFileOutput] = await self.file_object_repository.list(
             resource_id=resource_id,
@@ -82,18 +74,14 @@ class FileSystemValidationReportService(ValidationReportService):
             if match:
                 groups = match.groups()
                 if task_id == groups[1]:
-                    return ValidationResultFile(
-                        validation_time=groups[0], task_id=groups[1]
-                    )
+                    return ValidationResultFile(validation_time=groups[0], task_id=groups[1])
         raise StudyObjectNotFoundError(
             resource_id,
             self.study_bucket.value,
             f"validation-history__*__{task_id}.json",
         )
 
-    async def find_by_validation_time(
-        self, resource_id: str, validation_time: str
-    ) -> ValidationResultFile:
+    async def find_by_validation_time(self, resource_id: str, validation_time: str) -> ValidationResultFile:
         await self._initiate_validation_history_folder(resource_id=resource_id)
         items: list[StudyFileOutput] = await self.file_object_repository.list(
             resource_id=resource_id,
@@ -104,9 +92,7 @@ class FileSystemValidationReportService(ValidationReportService):
             if match:
                 groups = match.groups()
                 if validation_time == groups[0]:
-                    return ValidationResultFile(
-                        validation_time=groups[0], task_id=groups[1]
-                    )
+                    return ValidationResultFile(validation_time=groups[0], task_id=groups[1])
         raise StudyObjectNotFoundError(
             resource_id,
             self.study_bucket.value,
@@ -126,25 +112,17 @@ class FileSystemValidationReportService(ValidationReportService):
                 f.write(validation_result.model_dump_json(indent=4, by_alias=True))
 
             await self._initiate_validation_history_folder(resource_id=resource_id)
-            file_exists = await self.file_object_repository.exists(
-                resource_id=resource_id, object_key=object_key
-            )
+            file_exists = await self.file_object_repository.exists(resource_id=resource_id, object_key=object_key)
             await self.file_object_repository.put_object(
                 resource_id=resource_id,
                 object_key=object_key,
                 source_uri=source_uri,
             )
-            study_object = await self.file_object_repository.get_info(
-                resource_id=resource_id, object_key=object_key
-            )
+            study_object = await self.file_object_repository.get_info(resource_id=resource_id, object_key=object_key)
             if file_exists:
-                await self.file_object_repository.object_updated(
-                    study_object=study_object
-                )
+                await self.file_object_repository.object_updated(study_object=study_object)
             else:
-                await self.file_object_repository.object_created(
-                    study_object=study_object
-                )
+                await self.file_object_repository.object_created(study_object=study_object)
 
         finally:
             tmp_file_path.unlink(missing_ok=True)
@@ -165,27 +143,17 @@ class FileSystemValidationReportService(ValidationReportService):
             )
             await self.file_object_repository.object_created(study_object=study_object)
 
-    async def load_validation_report_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> PolicySummaryResult:
+    async def load_validation_report_by_task_id(self, resource_id: str, task_id: str) -> PolicySummaryResult:
         await self._initiate_validation_history_folder(resource_id=resource_id)
-        selected_object = await self.find_by_task_id(
-            resource_id=resource_id, task_id=task_id
-        )
-        return await self._load_validation_report(
-            resource_id=resource_id, selected_object=selected_object
-        )
+        selected_object = await self.find_by_task_id(resource_id=resource_id, task_id=task_id)
+        return await self._load_validation_report(resource_id=resource_id, selected_object=selected_object)
 
     async def load_validation_report_by_validation_time(
         self, resource_id: str, validation_time: str
     ) -> PolicySummaryResult:
         await self._initiate_validation_history_folder(resource_id=resource_id)
-        selected_object = await self.find_by_validation_time(
-            resource_id=resource_id, validation_time=validation_time
-        )
-        return self._load_validation_report(
-            resource_id=resource_id, selected_object=selected_object
-        )
+        selected_object = await self.find_by_validation_time(resource_id=resource_id, validation_time=validation_time)
+        return self._load_validation_report(resource_id=resource_id, selected_object=selected_object)
 
     async def _load_validation_report(
         self, resource_id: str, selected_object: ValidationResultFile

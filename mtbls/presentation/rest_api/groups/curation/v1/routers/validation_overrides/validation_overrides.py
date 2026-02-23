@@ -30,9 +30,7 @@ from mtbls.presentation.rest_api.shared.dependencies import get_resource_id
 
 logger = getLogger(__name__)
 
-router = APIRouter(
-    tags=["MetaboLights Curation"], prefix="/curation/v2/validation-overrides"
-)
+router = APIRouter(tags=["MetaboLights Curation"], prefix="/curation/v2/validation-overrides")
 
 
 @router.get(
@@ -54,9 +52,7 @@ async def get_validation_overrides_endpoint(
         validation_override_service=validation_override_service,
     )
 
-    return APIResponse[ValidationOverrideList](
-        content=overrides, success_message="Validation overrides are listed."
-    )
+    return APIResponse[ValidationOverrideList](content=overrides, success_message="Validation overrides are listed.")
 
 
 @router.patch(
@@ -151,9 +147,7 @@ async def patch_validation_overrides_endpoint(
 @inject
 async def delete_validation_overrides_endpoint(
     resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-    override_id: Annotated[
-        str, Path(description="Override id in study overrides list")
-    ],
+    override_id: Annotated[str, Path(description="Override id in study overrides list")],
     user: Annotated[UserOutput, Depends(check_curator_role)],
     validation_override_service: ValidationOverrideService = Depends(  # noqa: FAST002
         Provide["services.validation_override_service"]

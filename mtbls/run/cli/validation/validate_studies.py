@@ -91,9 +91,7 @@ def run_validation_cli(
     container.init_resources()
     policy_service: PolicyService = container.services.policy_service()
 
-    study_read_repository: StudyReadRepository = (
-        container.repositories.study_read_repository()
-    )
+    study_read_repository: StudyReadRepository = container.repositories.study_read_repository()
     internal_files_object_repository: FileObjectReadRepository = (
         container.repositories.internal_files_object_repository()
     )
@@ -147,18 +145,14 @@ def create_study_model_task(
     container.init_resources()
     # render secrets in config file
 
-    study_read_repository: StudyReadRepository = (
-        container.repositories.study_read_repository()
-    )
+    study_read_repository: StudyReadRepository = container.repositories.study_read_repository()
     internal_files_object_repository: FileObjectReadRepository = (
         container.repositories.internal_files_object_repository()
     )
     metadata_files_object_repository: FileObjectReadRepository = (
         container.repositories.metadata_files_object_repository()
     )
-    user_read_repository: UserReadRepository = (
-        container.repositories.user_read_repository()
-    )
+    user_read_repository: UserReadRepository = container.repositories.user_read_repository()
     logger = logging.getLogger(__name__)
     logger.info("CLI container started")
     request_tracker = get_request_tracker()
@@ -254,9 +248,7 @@ async def run_validation_and_save_report(
             release_date_str = release_date.strftime("%Y-%m-%d %H-%M-%S")
             study_path = studies_root_path / Path(resource_id)
             audit_folder_root_path = study_path / Path("AUDIT_FILES")
-            report_path = validation_reports_root_path / Path(
-                f"{resource_id}_validation.tsv"
-            )
+            report_path = validation_reports_root_path / Path(f"{resource_id}_validation.tsv")
             try:
                 # Load study
                 logger.debug("Loading study: %s on %s", resource_id, study_path)
@@ -299,9 +291,7 @@ async def run_validation_and_save_report(
                         mtbls_model=model, output_dir=str(study_path)
                     )
                 else:
-                    logger.debug(
-                        "No model change after modifiers for study: %s.", resource_id
-                    )
+                    logger.debug("No model change after modifiers for study: %s.", resource_id)
                 updated_model = await get_input_data(
                     study_model_provider=provider,
                     study_id=resource_id,
@@ -341,11 +331,7 @@ async def run_validation_and_save_report(
                     report_path,
                     resource_id,
                 )
-                error_count = sum(
-                    1
-                    for x in summary_result.messages.violations
-                    if x.type in {PolicyMessageType.ERROR}
-                )
+                error_count = sum(1 for x in summary_result.messages.violations if x.type in {PolicyMessageType.ERROR})
                 validation_result = "SUCCESS" if error_count == 0 else "ERROR"
                 logger.info(
                     "Validation status for study %s: %s. Error count: %s",
@@ -353,27 +339,15 @@ async def run_validation_and_save_report(
                     validation_result,
                     error_count,
                 )
-                fw.write(
-                    f"{resource_id}\t"
-                    f"{release_date_str}\t"
-                    f"{status.value}\t"
-                    f"{validation_result}\t"
-                    f"{error_count}\n"
-                )
+                fw.write(f"{resource_id}\t{release_date_str}\t{status.value}\t{validation_result}\t{error_count}\n")
                 fw.flush()
             except Exception as ex:
                 # print(traceback.format_exc())
                 logger.exception(ex)
                 exception_message = f"{type(ex)} {str(ex)}"
-                logger.error(
-                    "Failed to validate study %s: %s", resource_id, exception_message
-                )
+                logger.error("Failed to validate study %s: %s", resource_id, exception_message)
                 fw.write(
-                    f"{resource_id}\t"
-                    f"{release_date_str}\t"
-                    f"{status.value}\t"
-                    f"Failed to validate\t"
-                    f"{exception_message}\n"
+                    f"{resource_id}\t{release_date_str}\t{status.value}\tFailed to validate\t{exception_message}\n"
                 )
                 fw.flush()
 
@@ -415,9 +389,7 @@ async def get_input_data(
                 assignment_sheet_limit=assignment_sheet_limit,
             )
         elif phase == ValidationPhase.PHASE_4:
-            model = await provider.get_phase4_input_data(
-                study_id, study_path, connection, model=model
-            )
+            model = await provider.get_phase4_input_data(study_id, study_path, connection, model=model)
     return model
 
 
@@ -426,9 +398,7 @@ async def modify_model(
 ) -> StudyMetadataModifierResult:
     control_lists = await policy_service.get_control_lists()
     templates = await policy_service.get_templates()
-    modifier = MetabolightsStudyModelModifier(
-        model=model, templates=templates, control_lists=control_lists
-    )
+    modifier = MetabolightsStudyModelModifier(model=model, templates=templates, control_lists=control_lists)
 
     result = StudyMetadataModifierResult(resource_id=resource_id)
 
@@ -445,6 +415,4 @@ async def modify_model(
 if __name__ == "__main__":
     study_root_path = "/nfs/public/rw/metabolomics/prod/data/studies/metadata-files"
     # run_validation_cli([study_root_path])
-    create_study_model_task(
-        [study_root_path, "REQ20251203215173", "model_REQ20251203215173_base.json"]
-    )
+    create_study_model_task([study_root_path, "REQ20251203215173", "model_REQ20251203215173_base.json"])

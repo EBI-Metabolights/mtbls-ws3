@@ -72,11 +72,7 @@ async def create_validation_configuration(
         local_result_files = []
 
         for result_file in result_files:
-            local_result_file_path = (
-                temp_folder_path
-                / pathlib.Path(resource_id)
-                / pathlib.Path(result_file.object_key)
-            )
+            local_result_file_path = temp_folder_path / pathlib.Path(resource_id) / pathlib.Path(result_file.object_key)
             local_result_files.append(local_result_file_path)
             local_result_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -89,9 +85,7 @@ async def create_validation_configuration(
         total_result_file_lines = 0
         if file_lines:
             total_result_file_lines = sum([x for x in file_lines.values()])
-        validation_run_configuration = ValidationRunConfiguration(
-            apply_modifiers=apply_modifiers
-        )
+        validation_run_configuration = ValidationRunConfiguration(apply_modifiers=apply_modifiers)
         if total_result_file_lines > 4000:
             logger.warning(
                 "Validation result MAF file lines exceed the limit: %d > 4000. "
@@ -99,15 +93,11 @@ async def create_validation_configuration(
                 total_result_file_lines,
             )
             validation_run_configuration.skip_result_file_modification = True
-            validation_run_configuration.validation_phases = [
-                x for x in ValidationPhase
-            ]
+            validation_run_configuration.validation_phases = [x for x in ValidationPhase]
             validation_run_configuration.assignmet_sheet_limit = 100
         return validation_run_configuration
     except Exception as ex:
-        logger.error(
-            "Creating validation configuration for %s failed: %s", resource_id, ex
-        )
+        logger.error("Creating validation configuration for %s failed: %s", resource_id, ex)
         logger.exception(ex)
         return ValidationRunConfiguration(apply_modifiers=apply_modifiers)
     finally:
@@ -141,13 +131,9 @@ def run_validation(  # noqa: PLR0913
     resource_id: str,
     apply_modifiers: bool = True,
     serialize_result: bool = True,
-    study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
-        "services.study_metadata_service_factory"
-    ],
+    study_metadata_service_factory: StudyMetadataServiceFactory = Provide["services.study_metadata_service_factory"],
     policy_service: PolicyService = Provide["services.policy_service"],
-    ontology_search_service: OntologySearchService = Provide[
-        "services.ontology_search_service"
-    ],
+    ontology_search_service: OntologySearchService = Provide["services.ontology_search_service"],
     temp_folder: Union[None, str] = None,
     metadata_files_object_repository: FileObjectWriteRepository = Provide[
         "repositories.metadata_files_object_repository"
@@ -250,9 +236,7 @@ async def run_validation_task(  # noqa: PLR0913
         validation_run_configuration = ValidationRunConfiguration()
     phases = validation_run_configuration.validation_phases
 
-    logger.debug(
-        "Running %s validation for phases %s", resource_id, [str(x) for x in phases]
-    )
+    logger.debug("Running %s validation for phases %s", resource_id, [str(x) for x in phases])
 
     if not resource_id or not phases:
         logger.error("Invalid resource id or phases for %s", resource_id)
@@ -280,11 +264,7 @@ async def run_validation_task(  # noqa: PLR0913
         logger.error("Validation task error for %s.", resource_id)
         logger.exception(ex)
         raise ex
-    errors_count = sum(
-        1
-        for x in policy_result.messages.violations
-        if x.type == PolicyMessageType.ERROR
-    )
+    errors_count = sum(1 for x in policy_result.messages.violations if x.type == PolicyMessageType.ERROR)
 
     logger.debug("Validation task ended: Validation Errors %s", errors_count)
     if serialize_result:
@@ -327,20 +307,14 @@ async def validate_by_policy_service(
 
     try:
         messages = await policy_service.validate_study(resource_id, model)
-        policy_result.start_time = datetime.datetime.fromtimestamp(
-            start_time
-        ).isoformat()
-        policy_result.completion_time = datetime.datetime.fromtimestamp(
-            time.time()
-        ).isoformat()
+        policy_result.start_time = datetime.datetime.fromtimestamp(start_time).isoformat()
+        policy_result.completion_time = datetime.datetime.fromtimestamp(time.time()).isoformat()
         policy_result.messages = messages
     except Exception as ex:
         logger.error("Invalid OPA response or parse error for %s", resource_id)
         logger.exception(ex)
         raise ex
-    await post_process_validation_messages(
-        model, policy_result, policy_service, ontology_search_service
-    )
+    await post_process_validation_messages(model, policy_result, policy_service, ontology_search_service)
     return policy_result
 
 
@@ -348,9 +322,7 @@ def investigation_value_parser(value: str) -> tuple[None | str, None | str, None
     parts = value.split("\t")
     if len(parts) == 3:
         _, _, part_3 = value.split("\t")
-        term, source, accession = [
-            x.strip() for x in part_3.strip("[]").split(",", maxsplit=2)
-        ]
+        term, source, accession = [x.strip() for x in part_3.strip("[]").split(",", maxsplit=2)]
     else:
         logger.error("The value has no three parts: %s", value)
         return None, None, None
@@ -359,9 +331,7 @@ def investigation_value_parser(value: str) -> tuple[None | str, None | str, None
 
 
 def isa_table_value_parser(value: str) -> tuple[None | str, None | str, None | str]:
-    term, source, accession = [
-        x.strip() for x in value.strip("[]").split(",", maxsplit=2)
-    ]
+    term, source, accession = [x.strip() for x in value.strip("[]").split(",", maxsplit=2)]
     return term, source, accession
 
 
@@ -373,9 +343,7 @@ def find_rule(
     template_name: str,
     created_at: str,
 ) -> None | FieldValueValidation:
-    selected_controls: dict[str, list[FieldValueValidation]] = getattr(
-        controls, isa_table_type + "_file_controls"
-    )
+    selected_controls: dict[str, list[FieldValueValidation]] = getattr(controls, isa_table_type + "_file_controls")
     control_list = selected_controls.get(template_name, [])
     rule = None
     for control in control_list:
@@ -484,9 +452,7 @@ async def post_process_validation_messages(
 
         new_values = []
         deleted_values = []
-        default_controls = file_templates.configuration.default_file_controls.get(
-            MetadataFileType(isa_table_type), []
-        )
+        default_controls = file_templates.configuration.default_file_controls.get(MetadataFileType(isa_table_type), [])
         field_key = violation.source_column_header
         if not field_key:
             field_key = "__default__"
@@ -516,9 +482,7 @@ async def post_process_validation_messages(
             created_at,
         )
         selected_rule = rule or default_rule
-        is_child_rule = (
-            rule and rule.validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
-        )
+        is_child_rule = rule and rule.validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
         parents = []
         if is_child_rule and rule and rule.allowed_parent_ontology_terms:
             parents = rule.allowed_parent_ontology_terms.parents
@@ -528,16 +492,11 @@ async def post_process_validation_messages(
                 continue
 
             if is_child_rule and rule and term:
-                search = await search_exact_match_term(
-                    ontology_search_service, term, rule
-                )
+                search = await search_exact_match_term(ontology_search_service, term, rule)
                 if not search.result:
                     logger.warning("'%s' is not valid or a child of parents.", value)
                     new_values.append(value)
-                elif (
-                    search.result[0].term_accession_number != accession
-                    or search.result[0].term_source_ref != source
-                ):
+                elif search.result[0].term_accession_number != accession or search.result[0].term_source_ref != source:
                     logger.warning(
                         "Current: %s search result: [%s, %s, %s]",
                         value,
@@ -594,17 +553,14 @@ async def post_process_validation_messages(
                     + ", ".join([str(x) for x in parents])
                 )
             else:
-                violation.violation = (
-                    f"{field} ontology terms not found on ontology search service: "
-                    + ", ".join([escape(x) for x in new_values])
+                violation.violation = f"{field} ontology terms not found on ontology search service: " + ", ".join(
+                    [escape(x) for x in new_values]
                 )
             violation.values = new_values
             new_violations.append(violation)
         else:
             logger.debug(
-                "Terms in violation are validated "
-                "and the violation is removed: "
-                "%s %s %s",
+                "Terms in violation are validated and the violation is removed: %s %s %s",
                 violation.identifier,
                 violation.source_file,
                 ", ".join(violation.values),
@@ -612,9 +568,7 @@ async def post_process_validation_messages(
     policy_result.messages.violations = new_violations
 
 
-def is_exceptional_term(
-    default_rule: FieldValueValidation, term: str, source: str, accession: str
-):
+def is_exceptional_term(default_rule: FieldValueValidation, term: str, source: str, accession: str):
     if not default_rule:
         return False
     accession = accession or ""
@@ -622,25 +576,15 @@ def is_exceptional_term(
     term = term or ""
     if default_rule.allowed_placeholders:
         for item in default_rule.allowed_placeholders:
-            if (
-                item.term_accession_number == accession
-                and item.term_source_ref == source
-            ):
+            if item.term_accession_number == accession and item.term_source_ref == source:
                 return True
     if default_rule.allowed_other_sources:
         for item in default_rule.allowed_other_sources:
-            if (
-                accession.startswith(item.accession_prefix)
-                and item.source_label == source
-            ):
+            if accession.startswith(item.accession_prefix) and item.source_label == source:
                 return True
     if default_rule.allowed_missing_ontology_terms:
         for item in default_rule.allowed_missing_ontology_terms:
-            if (
-                item.term == term
-                and item.term_accession_number == accession
-                and item.term_source_ref == source
-            ):
+            if item.term == term and item.term_accession_number == accession and item.term_source_ref == source:
                 return True
         return False
 

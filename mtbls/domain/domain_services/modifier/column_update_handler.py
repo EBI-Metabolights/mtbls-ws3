@@ -22,9 +22,7 @@ class IsaTableColumnUpdateHandler(BaseModifier):
         self.isa_table_file = isa_table_file
         self.column_updates: Dict[str, ColumnUpdateLog] = {}
 
-    def update_isa_table_cell(
-        self, column: IsaTableColumn, old_value: str, new_value: str, index: int
-    ):
+    def update_isa_table_cell(self, column: IsaTableColumn, old_value: str, new_value: str, index: int):
         if column.column_name not in self.column_updates:
             self.column_updates[column.column_name] = ColumnUpdateLog(
                 header=column.column_header, index=column.column_index
@@ -47,10 +45,7 @@ class IsaTableColumnUpdateHandler(BaseModifier):
             column_index = column_log.index
             column_header = column_log.header
             file = self.isa_table_file.file_path
-            values = [
-                (x, "".join(column_log.cell_updates[x].keys()))
-                for x in column_log.cell_updates
-            ]
+            values = [(x, "".join(column_log.cell_updates[x].keys())) for x in column_log.cell_updates]
             old_values = [f"'{x[0]}'" for x in values]
             old_values_str = self.get_list_string(old_values, limit=limit)
 

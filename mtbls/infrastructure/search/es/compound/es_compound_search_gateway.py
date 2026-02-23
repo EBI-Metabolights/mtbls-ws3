@@ -71,9 +71,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         """
         Return the ES mapping for the configured index.
         """
-        mapping = await self._client.get_mapping(
-            self.config.index_name, api_key_name=self.config.api_key_name
-        )
+        mapping = await self._client.get_mapping(self.config.index_name, api_key_name=self.config.api_key_name)
         return mapping.get(self.config.index_name, mapping)
 
     async def search(
@@ -180,9 +178,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             effective_study_ids = [sid.upper() for sid in req.study_ids]
         else:
             # Check if query looks like a study ID
-            detected_ids, remaining_query = self._extract_study_ids_from_query(
-                req.query
-            )
+            detected_ids, remaining_query = self._extract_study_ids_from_query(req.query)
             if detected_ids:
                 effective_study_ids = detected_ids
                 effective_query = remaining_query  # None if query was just a study ID
@@ -192,16 +188,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             # Respect study_ids_operator: "any" uses terms; "all" requires every ID
             operator = req.study_ids_operator or "any"
             if operator == "all":
-                filter_clauses.append(
-                    {
-                        "bool": {
-                            "must": [
-                                {"term": {"studyIds": sid}}
-                                for sid in effective_study_ids
-                            ]
-                        }
-                    }
-                )
+                filter_clauses.append({"bool": {"must": [{"term": {"studyIds": sid}} for sid in effective_study_ids]}})
             else:
                 filter_clauses.append({"terms": {"studyIds": effective_study_ids}})
 
@@ -225,10 +212,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                                     }
                                 },
                                 # prefix match (fast)
-                                *[
-                                    {"prefix": {field: effective_query.lower()}}
-                                    for field in self.config.search_fields
-                                ],
+                                *[{"prefix": {field: effective_query.lower()}} for field in self.config.search_fields],
                             ],
                             "minimum_should_match": 1,
                         }
@@ -244,9 +228,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                 ranges = spec.get("ranges") or []
                 range_queries: List[Dict[str, Any]] = []
                 for v in f.values:
-                    rq = self._range_query_from_value(
-                        spec.get("field") or f.field, ranges, v
-                    )
+                    rq = self._range_query_from_value(spec.get("field") or f.field, ranges, v)
                     if rq:
                         range_queries.append(rq)
                 if not range_queries:
@@ -254,9 +236,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
                 if f.operator == "none":
                     must_not.extend(range_queries)
                 elif f.operator == "any":
-                    filter_clauses.append(
-                        {"bool": {"should": range_queries, "minimum_should_match": 1}}
-                    )
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
                 else:  # "all"
                     filter_clauses.extend(range_queries)
             else:
@@ -348,9 +328,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
         return base_query
 
     @staticmethod
-    def _range_query_from_value(
-        field: str, ranges: List[Dict[str, Any]], value: Any
-    ) -> Dict[str, Any] | None:
+    def _range_query_from_value(field: str, ranges: List[Dict[str, Any]], value: Any) -> Dict[str, Any] | None:
         """
         Map a selected bucket name back to its range query.
         Matches either the explicit 'name' or the derived _range_key form.
@@ -433,12 +411,7 @@ class ElasticsearchCompoundGateway(BaseElasticSearchGateway):
             elif ftype == "range":
                 ranges = spec.get("ranges") or []
                 filters_agg = {
-                    "filters": {
-                        "filters": {
-                            self._range_key(r): self._range_query(field, r)
-                            for r in ranges
-                        }
-                    }
+                    "filters": {"filters": {self._range_key(r): self._range_query(field, r) for r in ranges}}
                 }
 
                 if nested_path:

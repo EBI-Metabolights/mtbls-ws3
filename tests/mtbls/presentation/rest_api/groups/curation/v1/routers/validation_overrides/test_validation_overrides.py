@@ -89,9 +89,7 @@ def jwt_token(mock_submission_api_client: MockApiClient):
     auth_service.authenticate_with_token = mock_auth
     auth_service.authenticate_with_password = mock_auth
 
-    async def mock_validate_token(
-        token_type: TokenType, token: str, username: str = None
-    ):
+    async def mock_validate_token(token_type: TokenType, token: str, username: str = None):
         return return_value
 
     auth_service.validate_token = mock_validate_token
@@ -220,11 +218,7 @@ def validation_result_01() -> ValidationResult:
 @pytest.fixture
 def policy_result_list_01(validation_result_01: ValidationResult) -> PolicyResultList:
     def get_list(resource_id: str):
-        return PolicyResultList(
-            results=[
-                PolicyResult(resource_id=resource_id, messages=validation_result_01)
-            ]
-        )
+        return PolicyResultList(results=[PolicyResult(resource_id=resource_id, messages=validation_result_01)])
 
     return get_list
 
@@ -239,9 +233,7 @@ class MockIdGenerator(IdGenerator):
 
 class TestGetOverridesV1:
     @pytest.mark.asyncio
-    async def test_get_overrides_01(
-        self, mock_submission_api_client: MockApiClient, jwt_token: str
-    ):
+    async def test_get_overrides_01(self, mock_submission_api_client: MockApiClient, jwt_token: str):
         """
         Return override list
         expected: return empty list
@@ -251,9 +243,7 @@ class TestGetOverridesV1:
 
         client = api_client.client
         headers = {"Authorization": f"Bearer {jwt_token}"}
-        response = client.get(
-            f"/curation/v2/validation-overrides/{resource_id}", headers=headers
-        )
+        response = client.get(f"/curation/v2/validation-overrides/{resource_id}", headers=headers)
         assert response.status_code == status.HTTP_200_OK
         json_response = response.json()
         result = APIResponse[GetValidationResponse].model_validate(json_response)

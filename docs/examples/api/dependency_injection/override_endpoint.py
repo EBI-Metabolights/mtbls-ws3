@@ -43,9 +43,7 @@ async def patch_validation_overrides_endpoint(
         ),
     ],
     user: Annotated[UserOutput, Depends(check_curator_role)],
-    validation_override_service: ValidationOverrideService = Depends(
-        Provide["services.validation_override_service"]
-    ),
+    validation_override_service: ValidationOverrideService = Depends(Provide["services.validation_override_service"]),
 ):
     if not overrides:
         return APIErrorResponse(error_message="No overrides.")

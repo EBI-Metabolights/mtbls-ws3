@@ -8,9 +8,7 @@ from mtbls.run.config import ModuleConfiguration
 logger = logging.getLogger()
 
 
-def load_modules(
-    modules, module_config: Union[None, ModuleConfiguration] = None
-) -> list:
+def load_modules(modules, module_config: Union[None, ModuleConfiguration] = None) -> list:
     if not module_config:
         return []
     async_task_modules = []
@@ -29,9 +27,7 @@ def load_modules(
     return async_task_modules
 
 
-def is_filtered(
-    module_name: str, module_config: Union[None, ModuleConfiguration] = None
-) -> bool:
+def is_filtered(module_name: str, module_config: Union[None, ModuleConfiguration] = None) -> bool:
     if not module_config:
         return False
     for selected_base_module in module_config.loaded_sub_package_names:

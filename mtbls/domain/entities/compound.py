@@ -7,9 +7,7 @@ from mtbls.domain.enums.entity import Entity
 
 
 class CompoundOutput(BaseCompound):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Compound
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Compound)
 
 
 class CompoundFlags(BaseModel):
@@ -177,11 +175,10 @@ class Compound(BaseCompound):
         return cls.from_mongo_with_raw(doc, include_raw=False)
 
     @classmethod
-    def from_mongo_with_raw(
-        cls, doc: Dict[str, Any], include_raw: bool = True
-    ) -> "Compound":
+    def from_mongo_with_raw(cls, doc: Dict[str, Any], include_raw: bool = True) -> "Compound":
         """
-        Build a Compound from a MongoDB document, with optional inclusion of the raw payload.
+        Build a Compound from a MongoDB document, with optional
+        inclusion of the raw payload.
         """
         data = dict(doc)  # shallow copy
         data.pop("_id", None)

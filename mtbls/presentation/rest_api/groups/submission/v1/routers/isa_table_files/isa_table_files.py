@@ -40,24 +40,18 @@ def get_isa_file_items(data_type: str, filename_regex: str):
     async def get_isa_items(
         resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
         context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
-        file_name: Annotated[
-            str, Query(description=file_name_description, pattern=filename_regex)
-        ],
+        file_name: Annotated[str, Query(description=file_name_description, pattern=filename_regex)],
         study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
             Provide["services.study_metadata_service_factory"]
         ),
-        offset: Annotated[
-            Union[None, ZeroOrPositiveInt], Query(description="row number")
-        ] = None,
+        offset: Annotated[Union[None, ZeroOrPositiveInt], Query(description="row number")] = None,
         limit: Annotated[
             Union[None, ZeroOrPositiveInt],
             Query(description="maximum number of rows"),
         ] = None,
     ):
         resource_id = context.study.accession_number
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         with metadata_service:
             isa_table_data = await metadata_service.load_isa_table_file(
                 object_key=file_name,
@@ -66,8 +60,7 @@ def get_isa_file_items(data_type: str, filename_regex: str):
             )
 
         isa_table_data.columns = [
-            ColumnDefinition.model_validate(x, from_attributes=True)
-            for x in isa_table_data.columns
+            ColumnDefinition.model_validate(x, from_attributes=True) for x in isa_table_data.columns
         ]
         response = APIResponse[IsaTableData](content=isa_table_data)
 
@@ -86,9 +79,7 @@ def update_isa_file_items(data_type: str, filename_regex: str):
     @inject
     async def update_isa_table_row(
         resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-        file_name: Annotated[
-            str, Query(description=file_name_description, pattern=filename_regex)
-        ],
+        file_name: Annotated[str, Query(description=file_name_description, pattern=filename_regex)],
         context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
         study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
             Provide["services.study_metadata_service_factory"]
@@ -97,17 +88,11 @@ def update_isa_file_items(data_type: str, filename_regex: str):
     ):
         if not file_name:
             file_name = f"s_{resource_id}.txt"
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         with metadata_service:
-            isa_table_data = await metadata_service.update_isa_table_rows(
-                object_key=file_name, updates=updates
-            )
+            isa_table_data = await metadata_service.update_isa_table_rows(object_key=file_name, updates=updates)
 
-        response = APIListResponse[IsaTableRow](
-            success_message=f"{resource_id}", content=isa_table_data
-        )
+        response = APIListResponse[IsaTableRow](success_message=f"{resource_id}", content=isa_table_data)
         if not isa_table_data:
             response.success_message = "There is no data that matches the criteria."
         else:
@@ -123,22 +108,16 @@ def get_isa_file_headers(data_type: str, filename_regex: str):
     @inject
     async def get_headers(
         resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-        file_name: Annotated[
-            str, Query(description=file_name_description, pattern=filename_regex)
-        ],
+        file_name: Annotated[str, Query(description=file_name_description, pattern=filename_regex)],
         context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
         study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
             Provide["services.study_metadata_service_factory"]
         ),
     ):
         resource_id = context.study.accession_number
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         with metadata_service:
-            isa_table = await metadata_service.get_isa_table_data_columns(
-                object_key=file_name
-            )
+            isa_table = await metadata_service.get_isa_table_data_columns(object_key=file_name)
 
         response = APIResponse[IsaTableFileObject](content=isa_table)
         return response
@@ -152,18 +131,14 @@ def pub_isa_file_headers(data_type: str, filename_regex: str):
     @inject
     async def get_headers(
         resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
-        file_name: Annotated[
-            str, Query(description=file_name_description, pattern=filename_regex)
-        ],
+        file_name: Annotated[str, Query(description=file_name_description, pattern=filename_regex)],
         context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
         study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
             Provide["services.study_metadata_service_factory"]
         ),
     ):
         resource_id = context.study.accession_number
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         with metadata_service:
             isa_table = await metadata_service.save_isa_table_file(object_key=file_name)
 

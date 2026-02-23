@@ -48,9 +48,7 @@ async def get_studies_by_orcid(
         response_message = APIErrorResponse(error="ORCID is not valid.")
         return response_message
 
-    all_studies: list[StudyOutput] = await study_read_repository.get_studies_by_orcid(
-        orcid=orcid
-    )
+    all_studies: list[StudyOutput] = await study_read_repository.get_studies_by_orcid(orcid=orcid)
 
     study_list = await find_studies_on_europmc_by_orcid(
         http_client=http_client,

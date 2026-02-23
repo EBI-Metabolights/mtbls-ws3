@@ -70,9 +70,7 @@ class ThreadingAsyncTaskResult(AsyncTaskResult):
         if terminate and self.thread.is_alive():
             logger.info("Thread is still running. Trying to kill thread...")
             thread_id = self.thread.ident
-            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
-                ctypes.c_long(thread_id), ctypes.py_object(SystemExit)
-            )
+            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
             if res == 0:
                 raise AsyncTaskRemoteFailure("Invalid thread ID")
             if res > 1:
@@ -114,9 +112,7 @@ class ThreadingAsyncTaskExecutor(AsyncTaskExecutor):
                 logger.info("Task %s with id %s started.", self.task_name, task_id)
                 async_task.status = "RUNNING"
                 request_tracker = get_request_tracker()
-                model = RequestTrackerModel.model_validate(
-                    self.kwargs["request_tracker"]
-                )
+                model = RequestTrackerModel.model_validate(self.kwargs["request_tracker"])
                 model.task_id = task_id
                 request_tracker.update_request_tracker(model)
 
@@ -129,9 +125,7 @@ class ThreadingAsyncTaskExecutor(AsyncTaskExecutor):
                 async_task.result = output
                 async_task.ready = True
                 async_task.successful = True
-                logger.info(
-                    "Task %s with %s completed successfully.", self.task_name, task_id
-                )
+                logger.info("Task %s with %s completed successfully.", self.task_name, task_id)
             except Exception as e:
                 logger.error("Task %s failed.", task_id)
                 logger.exception(e)
@@ -176,9 +170,7 @@ class ThreadingAsyncTaskService(AsyncTaskService):
     ):
         if not app_name:
             app_name = "default"
-        super().__init__(
-            broker, backend, app_name, queue_names, default_queue, async_task_registry
-        )
+        super().__init__(broker, backend, app_name, queue_names, default_queue, async_task_registry)
         self.async_task_results_dict: dict[str, AsyncTaskResult] = OrderedDict()
         self.app_tasks: dict[str, AsyncTaskDescription] = OrderedDict()
         self.app = self._create_async_app(

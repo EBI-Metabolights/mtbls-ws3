@@ -16,14 +16,10 @@ class ValidationReportService(abc.ABC):
     ) -> list[ValidationReport]: ...
 
     @abc.abstractmethod
-    async def find_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> ValidationReport: ...
+    async def find_by_task_id(self, resource_id: str, task_id: str) -> ValidationReport: ...
 
     @abc.abstractmethod
-    async def find_by_validation_time(
-        self, resource_id: str, validation_time: str
-    ) -> ValidationReport: ...
+    async def find_by_validation_time(self, resource_id: str, validation_time: str) -> ValidationReport: ...
 
     @abc.abstractmethod
     async def save_validation_report(
@@ -31,9 +27,7 @@ class ValidationReportService(abc.ABC):
     ) -> bool: ...
 
     @abc.abstractmethod
-    async def load_validation_report_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> PolicySummaryResult: ...
+    async def load_validation_report_by_task_id(self, resource_id: str, task_id: str) -> PolicySummaryResult: ...
 
     @abc.abstractmethod
     async def load_validation_report_by_validation_time(

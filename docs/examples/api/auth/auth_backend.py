@@ -41,13 +41,10 @@ class AuthBackend(AuthenticationBackend):
 
         if not username:
             return AuthCredentials({"unauthenticated"}), UnauthenticatedUser()
-        user: UserOutput = await self.user_read_repository.get_user_by_username(
-            username
-        )
+        user: UserOutput = await self.user_read_repository.get_user_by_username(username)
         if not user:
             logger.error(
-                "User role check failure. "
-                "User %s details are not fetched by from database.",
+                "User role check failure. User %s details are not fetched by from database.",
                 username,
             )
             raise AuthenticationError("User details are not fetched from database")
@@ -79,12 +76,8 @@ class AuthBackend(AuthenticationBackend):
         except (ValueError, UnicodeDecodeError, binascii.Error) as exc:
             raise AuthenticationError("Invalid auth credentials") from exc
         if scheme.lower() == "basic" and username:
-            username = await self.authentication_service.authenticate_with_password(
-                username, password
-            )
+            username = await self.authentication_service.authenticate_with_password(username, password)
         elif scheme.lower() == "bearer" and jwt:
-            username = await self.authentication_service.validate_token(
-                TokenType.JWT_TOKEN, jwt
-            )
+            username = await self.authentication_service.validate_token(TokenType.JWT_TOKEN, jwt)
 
         return username

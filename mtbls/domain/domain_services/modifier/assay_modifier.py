@@ -37,9 +37,7 @@ class AssayFileModifier(IsaTableModifier):
         control_lists: ValidationControls,
         max_row_number_limit: int = 10,
     ):
-        super().__init__(
-            model, isa_table_file, templates, control_lists, max_row_number_limit
-        )
+        super().__init__(model, isa_table_file, templates, control_lists, max_row_number_limit)
 
     def modify(self) -> list[UpdateLog]:
         self.update_from_parser_messages()
@@ -53,10 +51,7 @@ class AssayFileModifier(IsaTableModifier):
         return self.update_logs
 
     def update_protocol_ref_columns(self):
-        if (
-            not self.model.investigation.studies
-            or not self.model.investigation.studies[0]
-        ):
+        if not self.model.investigation.studies or not self.model.investigation.studies[0]:
             return
 
         protocols: Dict[str, set[str]] = {}
@@ -66,9 +61,7 @@ class AssayFileModifier(IsaTableModifier):
 
         for file_name in self.model.assays:
             protocol_ref_columns = self.get_isa_table_protocol_ref_columns(file_name)
-            protocol_ref_values = self.get_protocol_ref_values(
-                protocols, protocol_ref_columns
-            )
+            protocol_ref_values = self.get_protocol_ref_values(protocols, protocol_ref_columns)
             data = self.model.assays[file_name].table.data
 
             for protocol_ref, new_val in protocol_ref_values.items():
@@ -136,10 +129,7 @@ class AssayFileModifier(IsaTableModifier):
 
     def rule_f_400_090_001_02(self):
         content = []
-        if (
-            self.model.study_folder_metadata.files
-            or self.model.study_folder_metadata.folders
-        ):
+        if self.model.study_folder_metadata.files or self.model.study_folder_metadata.folders:
             folders = self.model.study_folder_metadata.folders
             content = list(folders)
             files = self.model.study_folder_metadata.files
@@ -168,10 +158,7 @@ class AssayFileModifier(IsaTableModifier):
                     rows[idx] = new_relative_path
                 assay_file_ref = rows[idx]
 
-                if (
-                    is_file_names_unique
-                    and assay_file_ref not in all_files_in_case_sensitive
-                ):
+                if is_file_names_unique and assay_file_ref not in all_files_in_case_sensitive:
                     lower_assay_file_ref = assay_file_ref.lower().strip("/")
                     files_prefixed_assay_file_ref = f"files/{lower_assay_file_ref}"
 
@@ -179,21 +166,15 @@ class AssayFileModifier(IsaTableModifier):
                         assay_file_ref.lower() in all_files_in_lowercase
                         or files_prefixed_assay_file_ref in all_files_in_lowercase
                     ):
-                        new_relative_path = all_files_in_lowercase[
-                            assay_file_ref.lower()
-                        ]
+                        new_relative_path = all_files_in_lowercase[assay_file_ref.lower()]
                         update = (initial_value, new_relative_path)
                         rows[idx] = new_relative_path
                 if update:
                     updates.append(update)
             if updates:
                 limit = self.max_row_number_limit
-                old_values = self.get_list_string(
-                    [f"'{x[0]}'" for x in updates], limit=limit
-                )
-                new_values = self.get_list_string(
-                    [f"'{x[1]}'" for x in updates], limit=limit
-                )
+                old_values = self.get_list_string([f"'{x[0]}'" for x in updates], limit=limit)
+                new_values = self.get_list_string([f"'{x[1]}'" for x in updates], limit=limit)
 
                 self.modifier_update(
                     source=file_name,
@@ -233,8 +214,7 @@ class AssayFileModifier(IsaTableModifier):
                     if (
                         val
                         and val.lower().strip()
-                        and val.lower().strip()
-                        not in {"positive", "negative", "alternating"}
+                        and val.lower().strip() not in {"positive", "negative", "alternating"}
                     ):
                         new_val = ""
                         if val.strip().lower().startswith("neg"):
@@ -246,12 +226,8 @@ class AssayFileModifier(IsaTableModifier):
                         old_values.add(val)
                         updates.append(f"Row {idx + 1}: '{val}' -> '{new_val}'")
                 if updates:
-                    old_values_str = self.get_list_string(
-                        list(old_values), self.max_row_number_limit
-                    )
-                    updates_str = self.get_list_string(
-                        updates, self.max_row_number_limit
-                    )
+                    old_values_str = self.get_list_string(list(old_values), self.max_row_number_limit)
+                    updates_str = self.get_list_string(updates, self.max_row_number_limit)
 
                     self.modifier_update(
                         source=assay_file.file_path,
@@ -281,9 +257,7 @@ class AssayFileModifier(IsaTableModifier):
                         valid_sample_name_column = True
                 if not valid_sample_name_column or not sample_names:
                     return
-                sample_name_str = self.get_list_string(
-                    sample_names, self.max_row_number_limit
-                )
+                sample_name_str = self.get_list_string(sample_names, self.max_row_number_limit)
                 for column_name in names:
                     if column_name in assay_file.table.data:
                         empty = True

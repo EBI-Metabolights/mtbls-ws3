@@ -16,9 +16,7 @@ class CacheService(abc.ABC):
     async def get_value(self, key: str) -> Any: ...
 
     @abc.abstractmethod
-    async def set_value_with_expiration_time(
-        self, key: str, value: Any, expiration_timestamp: int
-    ): ...
+    async def set_value_with_expiration_time(self, key: str, value: Any, expiration_timestamp: int): ...
 
     @abc.abstractmethod
     async def set_value(

@@ -7,9 +7,7 @@ from mtbls.domain.entities.search.index_search import IndexSearchResult
 from mtbls.presentation.rest_api.core.responses import APIResponse
 
 
-def test_compound_search_with_basic_query(
-    public_api_client: TestClient, submission_api_container
-):
+def test_compound_search_with_basic_query(public_api_client: TestClient, submission_api_container):
     url = "/public/v2/public-compound-index/search"
     query = {
         "query": "aspirin",
@@ -27,9 +25,7 @@ def test_compound_search_with_basic_query(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(
-        mock_gateway
-    )
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
 
     response = public_api_client.post(url, json=query)
 
@@ -39,17 +35,13 @@ def test_compound_search_with_basic_query(
     assert result.content.results[0]["id"] == "MTBLC123"
 
 
-def test_get_compound_index_mapping(
-    public_api_client: TestClient, submission_api_container
-):
+def test_get_compound_index_mapping(public_api_client: TestClient, submission_api_container):
     url = "/public/v2/public-compound-index/mapping"
     mock_mapping = {"public-compound-index": {"mappings": {"properties": {}}}}
 
     mock_gateway = AsyncMock()
     mock_gateway.get_index_mapping.return_value = mock_mapping
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(
-        mock_gateway
-    )
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
 
     response = public_api_client.get(url)
 
@@ -58,9 +50,7 @@ def test_get_compound_index_mapping(
     assert result.content == mock_mapping
 
 
-def test_compound_search_with_study_ids_filter(
-    public_api_client: TestClient, submission_api_container
-):
+def test_compound_search_with_study_ids_filter(public_api_client: TestClient, submission_api_container):
     """Test that study_ids parameter is accepted and passed to the gateway."""
     url = "/public/v2/public-compound-index/search"
     query = {
@@ -83,9 +73,7 @@ def test_compound_search_with_study_ids_filter(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(
-        mock_gateway
-    )
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
 
     response = public_api_client.post(url, json=query)
 
@@ -97,9 +85,7 @@ def test_compound_search_with_study_ids_filter(
     assert call_args.kwargs["query"].study_ids == ["MTBLS1", "MTBLS2"]
 
 
-def test_compound_search_with_study_id_pattern_in_query(
-    public_api_client: TestClient, submission_api_container
-):
+def test_compound_search_with_study_id_pattern_in_query(public_api_client: TestClient, submission_api_container):
     """Test that a query matching MTBLS pattern is accepted."""
     url = "/public/v2/public-compound-index/search"
     query = {
@@ -116,9 +102,7 @@ def test_compound_search_with_study_id_pattern_in_query(
     )
     mock_gateway = AsyncMock()
     mock_gateway.search.return_value = mock_search_result
-    submission_api_container.gateways.elasticsearch_compound_gateway.override(
-        mock_gateway
-    )
+    submission_api_container.gateways.elasticsearch_compound_gateway.override(mock_gateway)
 
     response = public_api_client.post(url, json=query)
 

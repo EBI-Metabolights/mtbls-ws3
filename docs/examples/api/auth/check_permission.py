@@ -32,9 +32,7 @@ async def check_read_permission(
                 context.user.id_,
                 resource_id,
             )
-            raise AuthorizationError(
-                f"User {context.user.id_} is not granted to view resource {resource_id}"
-            )
+            raise AuthorizationError(f"User {context.user.id_} is not granted to view resource {resource_id}")
         logger.debug(
             "User %s is granted to view resource %s",
             context.user.id_,

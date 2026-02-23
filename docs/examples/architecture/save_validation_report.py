@@ -17,9 +17,7 @@ async def save_validation_report(
     validation_report_service: ValidationReportService,  # noqa: F821
     validation_override_service: ValidationOverrideService,
 ) -> PolicySummaryResult:
-    overrides = await validation_override_service.get_validation_overrides(
-        resource_id=resource_id
-    )
+    overrides = await validation_override_service.get_validation_overrides(resource_id=resource_id)
     overrides.validation_overrides.sort(key=lambda x: x.rule_id)
     validation_result.overrides = overrides
     await apply_overrides_on_validations_result(

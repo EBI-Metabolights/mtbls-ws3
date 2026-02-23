@@ -173,9 +173,7 @@ class StudyItemCollection:
         return camelcase_jsonpath
 
     def _get_items(self):
-        index_description = (
-            f"{self.item_name.lower()} item index, e.g. 0 or 1 (First item index is 0)."
-        )
+        index_description = f"{self.item_name.lower()} item index, e.g. 0 or 1 (First item index is 0)."
         filter_description = f"{self.item_name.lower()} item filter, e.g. name=Extraction,description=data"  # noqa: E501
 
         @inject
@@ -187,12 +185,8 @@ class StudyItemCollection:
                     "services.study_metadata_service_factory"
                 ]
             ),
-            index: Annotated[
-                Union[None, int], Query(description=index_description)
-            ] = None,
-            filter: Annotated[
-                Union[None, str], Query(description=filter_description)
-            ] = None,
+            index: Annotated[Union[None, int], Query(description=index_description)] = None,
+            filter: Annotated[Union[None, str], Query(description=filter_description)] = None,
         ):
             filters = self.convert_filter_to_dict(filter)
             json_response = await self._get_all(
@@ -215,9 +209,7 @@ class StudyItemCollection:
         @inject
         async def create_an_item_wrapper(
             resource_id: Annotated[str, Depends(get_resource_id)],
-            context: Annotated[
-                StudyPermissionContext, Depends(check_update_permission)
-            ],
+            context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
             updated_content: Annotated[
                 self.input_model_class,
                 Body(description=updated_content_description),
@@ -229,9 +221,7 @@ class StudyItemCollection:
             ),
         ):
             route_path = self._get_route_path(resource_id)
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             jsonpath = self._get_rendered_json_path(self.collection_jsonpath, [])
             with metadata_service:
                 data, indices = await metadata_service.process_investigation_file(
@@ -251,9 +241,7 @@ class StudyItemCollection:
                             indices=indices,
                         )
                     )
-            return APIErrorResponse(
-                error_message="Investigation file does not have study"
-            )
+            return APIErrorResponse(error_message="Investigation file does not have study")
 
         return create_an_item_wrapper
 
@@ -264,9 +252,7 @@ class StudyItemCollection:
         async def patch_item_wrapper(
             resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
             index: Annotated[int, Path(description=index_description)],
-            context: Annotated[
-                StudyPermissionContext, Depends(check_update_permission)
-            ],
+            context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
             updated_content: Annotated[
                 self.input_model_class,
                 Body(description=f"Updated {self.item_name.lower()} content"),
@@ -284,9 +270,7 @@ class StudyItemCollection:
         ):
             route_path = self._get_route_path(resource_id)
             jsonpath = self._get_rendered_json_path(self.item_jsonpath, [index])
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             with metadata_service:
                 operation = "patch" if ignore_empty_input_fields else "update-object"
 
@@ -310,9 +294,7 @@ class StudyItemCollection:
                     error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
-            return APIErrorResponse(
-                error_message="Investigation file does not have study"
-            )
+            return APIErrorResponse(error_message="Investigation file does not have study")
 
         return patch_item_wrapper
 
@@ -323,9 +305,7 @@ class StudyItemCollection:
         async def delete_item_wrapper(
             resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
             index: Annotated[int, Path(description=index_description)],
-            context: Annotated[
-                StudyPermissionContext, Depends(check_update_permission)
-            ],
+            context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
             study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
                 Provide[  # noqa: FAST002
                     "services.study_metadata_service_factory"
@@ -334,9 +314,7 @@ class StudyItemCollection:
         ):
             jsonpath = self._get_rendered_json_path(self.item_jsonpath, [index])
             route_path = self._get_route_path(resource_id)
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             with metadata_service:
                 data, indices = await metadata_service.process_investigation_file(
                     operation="delete",
@@ -379,9 +357,7 @@ class StudyItemCollection:
         if not subitem_filter and not index:
             jsonpath += "[*]"
         route_path = self._get_route_path(resource_id)
-        metadata_service = await study_metadata_service_factory.create_service(
-            resource_id
-        )
+        metadata_service = await study_metadata_service_factory.create_service(resource_id)
         response = None
         with metadata_service:
             data, indices = await metadata_service.process_investigation_file(

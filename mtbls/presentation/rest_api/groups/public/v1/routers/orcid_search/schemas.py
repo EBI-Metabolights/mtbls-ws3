@@ -5,14 +5,10 @@ from pydantic import Field
 
 
 class CitedDataset(CamelCaseModel):
-    study_accession: Annotated[str, Field(description="Cited MetaboLights dataset")] = (
-        ""
-    )
+    study_accession: Annotated[str, Field(description="Cited MetaboLights dataset")] = ""
     is_submitter: Annotated[
         bool,
-        Field(
-            description="Is summitter a member of the MetaboLights dataset submitters"
-        ),
+        Field(description="Is summitter a member of the MetaboLights dataset submitters"),
     ] = False
     is_public: Annotated[
         bool,
@@ -26,9 +22,7 @@ class Citation(CamelCaseModel):
     pubmed_id: Annotated[str, Field(description="PubMedId of the publication")] = ""
     authors: Annotated[str, Field(description="Authors of the publication")] = ""
     journal: Annotated[str, Field(description="Journal of the publication")] = ""
-    publication_date: Annotated[
-        str, Field(description="Publication year of the publication")
-    ] = ""
+    publication_date: Annotated[str, Field(description="Publication year of the publication")] = ""
     cited_datasets: Annotated[
         None | list[CitedDataset],
         Field(description="Cited MetaboLights datasets."),
@@ -36,12 +30,8 @@ class Citation(CamelCaseModel):
 
 
 class MetaboLightsStudyCitation(CamelCaseModel):
-    study_accession: Annotated[
-        str, Field(description="MetaboLights Study accession number")
-    ] = ""
-    study_title: Annotated[
-        str, Field(description="Title of the MetaboLights study")
-    ] = ""
+    study_accession: Annotated[str, Field(description="MetaboLights Study accession number")] = ""
+    study_title: Annotated[str, Field(description="Title of the MetaboLights study")] = ""
 
     publications: Annotated[
         list[Citation],
@@ -55,16 +45,12 @@ class MetaboLightsStudyCitation(CamelCaseModel):
     ] = False
     is_submitter: Annotated[
         bool,
-        Field(
-            description="Is ORCID owner a member of the MetaboLights study submitters"
-        ),
+        Field(description="Is ORCID owner a member of the MetaboLights study submitters"),
     ] = False
 
 
 class EuroPmcSearchResult(CamelCaseModel):
     study_list: Annotated[
         list[MetaboLightsStudyCitation],
-        Field(
-            description="Is ORCID owner a member of the MetaboLights study submitters"
-        ),
+        Field(description="Is ORCID owner a member of the MetaboLights study submitters"),
     ] = []

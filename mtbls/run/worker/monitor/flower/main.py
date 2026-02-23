@@ -65,9 +65,7 @@ def main(container: Ws3MonitorApplicationContainer):
     port = container.config.run.monitor.port()
     if not port or not isinstance(port, int):
         if logger:
-            logger.warning(
-                "Port configuration is not valid. Default port 5555 will be used."
-            )
+            logger.warning("Port configuration is not valid. Default port 5555 will be used.")
         port = 5555
     app.start(argv=["flower", f"--port={port}"])
 

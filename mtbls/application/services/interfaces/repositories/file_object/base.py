@@ -14,9 +14,7 @@ class BaseObjectRepository(abc.ABC):
         self.study_bucket = study_bucket
 
 
-class BaseFileObjectRepository(
-    BaseObjectRepository, FileObjectRepositorySource, abc.ABC
-):
+class BaseFileObjectRepository(BaseObjectRepository, FileObjectRepositorySource, abc.ABC):
     def __init__(
         self,
         study_bucket,

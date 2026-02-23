@@ -177,14 +177,10 @@ async def get_investigation_file(
 ):
     metadata_service = await study_metadata_service_factory.create_service(resource_id)
     with metadata_service:
-        investigation_item: inv.InvestigationItem = (
-            await metadata_service.load_investigation_file()
-        )
+        investigation_item: inv.InvestigationItem = await metadata_service.load_investigation_file()
 
         if not investigation_item:
-            return APIErrorResponse(
-                error_message=f"Invalid input for the study {resource_id}"
-            )
+            return APIErrorResponse(error_message=f"Invalid input for the study {resource_id}")
         return APIResponse(content=investigation_item)
 
 
@@ -208,9 +204,7 @@ async def create_investigation_file(
     metadata_service = await study_metadata_service_factory.create_service(resource_id)
     with metadata_service:
         try:
-            investigation_item: inv.InvestigationItem = (
-                await metadata_service.load_investigation_file()
-            )
+            investigation_item: inv.InvestigationItem = await metadata_service.load_investigation_file()
         except StudyObjectNotFoundError:
             study = context.study
             investigation_item = inv.InvestigationItem(

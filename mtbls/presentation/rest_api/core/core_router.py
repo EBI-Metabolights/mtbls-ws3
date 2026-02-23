@@ -62,9 +62,7 @@ def set_oauth2_redirect_endpoint(api_server_config: ApiServerConfiguration):
     server_config = api_server_config.server_info
     swagger_ui_oauth2_redirect_url = f"{server_config.root_path}/api/oauth2-redirect"
 
-    router.add_api_route(
-        swagger_ui_oauth2_redirect_url, swagger_ui_redirect, include_in_schema=False
-    )
+    router.add_api_route(swagger_ui_oauth2_redirect_url, swagger_ui_redirect, include_in_schema=False)
 
 
 @router.get("/", include_in_schema=False)

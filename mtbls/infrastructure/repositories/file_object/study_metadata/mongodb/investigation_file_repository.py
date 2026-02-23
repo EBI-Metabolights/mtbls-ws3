@@ -22,9 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class MongoDbInvestigationObjectRepository(
-    MongoDbDefaultWriteRepository[
-        InvestigationFileObject, InvestigationFileObject, str
-    ],
+    MongoDbDefaultWriteRepository[InvestigationFileObject, InvestigationFileObject, str],
     InvestigationObjectRepository,
 ):
     def __init__(
@@ -40,6 +38,4 @@ class MongoDbInvestigationObjectRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
-        super(InvestigationObjectRepository, self).__init__(
-            study_bucket, observers=[observer]
-        )
+        super(InvestigationObjectRepository, self).__init__(study_bucket, observers=[observer])

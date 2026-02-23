@@ -33,9 +33,7 @@ from mtbls.infrastructure.repositories.default.mongodb.default_write_repository 
 logger = logging.getLogger(__name__)
 
 
-class MongoDbStudyFileRepository(
-    MongoDbDefaultWriteRepository, StudyFileRepository, DefaultFileObjectObserver
-):
+class MongoDbStudyFileRepository(MongoDbDefaultWriteRepository, StudyFileRepository, DefaultFileObjectObserver):
     def __init__(
         self,
         connection: MongoDbConnection,
@@ -131,9 +129,7 @@ class MongoDbStudyFileRepository(
         if query_options.sort_options:
             sort_options = []
             for item in query_options.sort_options:
-                sort_options.append(
-                    {item.key, 1 if item.order == SortOrder.ASC else -1}
-                )
+                sort_options.append({item.key, 1 if item.order == SortOrder.ASC else -1})
             if sort_options:
                 result = result.sort(sort_options)
         offset = query_options.offset if query_options.offset else 0
@@ -144,9 +140,7 @@ class MongoDbStudyFileRepository(
         items = [StudyFileOutput.model_validate(x) for x in result]
         return PaginatedOutput(offset=offset, size=len(items), data=items)
 
-    async def select_fields(
-        self, query_field_options: QueryFieldOptions
-    ) -> PaginatedOutput[tuple[Any, ...]]:
+    async def select_fields(self, query_field_options: QueryFieldOptions) -> PaginatedOutput[tuple[Any, ...]]:
         options = query_field_options
         filter = {}
         for item in options.filters:
@@ -168,9 +162,7 @@ class MongoDbStudyFileRepository(
         items = [StudyFileOutput.model_validate(x) for x in result]
         return PaginatedOutput(offset=offset, size=len(items), data=items)
 
-    async def select_field(
-        self, field_name, query_options: QueryOptions
-    ) -> PaginatedOutput[tuple[Any, ...]]:
+    async def select_field(self, field_name, query_options: QueryOptions) -> PaginatedOutput[tuple[Any, ...]]:
         query_field_options = QueryFieldOptions.model_validate(query_options)
         query_field_options.selected_fields = [field_name]
         return await self.select_fields(query_field_options=query_field_options)
@@ -199,9 +191,7 @@ class MongoDbStudyFileRepository(
         )
         return await self.find(query_options)
 
-    async def get_root_object(
-        self, resource_id: str, bucket_name: str
-    ) -> StudyFileOutput:
+    async def get_root_object(self, resource_id: str, bucket_name: str) -> StudyFileOutput:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(
@@ -246,9 +236,7 @@ class MongoDbStudyFileRepository(
     async def create_objects(self, entities: list[StudyFileInput]) -> list[str]:
         return await self.create_many(entities=entities)
 
-    async def update_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
+    async def update_object(self, entity: StudyFileOutput) -> Union[None, StudyFileOutput]:
         current_ids = await self.get_ids(
             filters=[
                 EntityFilter(key="resourceId", value=entity.resource_id),
@@ -260,17 +248,13 @@ class MongoDbStudyFileRepository(
             current_id = current_ids[0]
 
             input_json = entity.model_dump(by_alias=True, exclude="id_")
-            result: UpdateResult = self.collection.update_one(
-                {"_id": current_id}, {"$set": input_json}
-            )
+            result: UpdateResult = self.collection.update_one({"_id": current_id}, {"$set": input_json})
             if result.modified_count > 0:
                 entity.id_ = current_id
                 return entity
         return None
 
-    async def delete_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
+    async def delete_object(self, entity: StudyFileOutput) -> Union[None, StudyFileOutput]:
         current_ids = await self.get_ids(
             filters=[
                 EntityFilter(key="resourceId", value=entity.resource_id),
@@ -282,9 +266,7 @@ class MongoDbStudyFileRepository(
             current_id = current_ids[0]
 
             input_json = entity.model_dump(by_alias=True, exclude="id_")
-            result: DeleteResult = self.collection.delete_one(
-                {"_id": current_id}, {"$set": input_json}
-            )
+            result: DeleteResult = self.collection.delete_one({"_id": current_id}, {"$set": input_json})
             if result.deleted_count > 0:
                 entity.id_ = current_id
                 return entity
@@ -292,9 +274,7 @@ class MongoDbStudyFileRepository(
 
     async def update(self, entity: StudyFileOutput) -> StudyFileOutput:
         input_json = entity.model_dump()
-        result: UpdateResult = self.collection.update_one(
-            {"_id": ObjectId(entity.id_)}, input_json
-        )
+        result: UpdateResult = self.collection.update_one({"_id": ObjectId(entity.id_)}, input_json)
         return self.collection.find_one({"_id": result.inserted_id})
 
     async def delete(self, id_: str) -> bool:

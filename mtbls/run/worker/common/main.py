@@ -47,9 +47,7 @@ async def update_container(
     queue_names: Union[None, Sequence[str]] = None,
     container: Union[None, Ws3WorkerApplicationContainer] = None,
 ) -> Ws3WorkerApplicationContainer:
-    success = set_application_configuration(
-        container, config_file_path, secrets_file_path
-    )
+    success = set_application_configuration(container, config_file_path, secrets_file_path)
     if not success:
         raise Exception("Configuration update task failed.")
     container.init_resources()
@@ -72,9 +70,7 @@ async def update_container(
         "Registered modules contain dependency injections. %s",
         [x.__name__ for x in injectable_modules],
     )
-    await initialization.init_application(
-        test_async_task_service=False, test_policy_service=True
-    )
+    await initialization.init_application(test_async_task_service=False, test_policy_service=True)
     return container
 
 
@@ -129,9 +125,7 @@ if __name__ == "__main__":
     set_worker_loop(loop)
 
     _config_file_path, _secrets_file_path = get_application_config_files()
-    success = set_application_configuration(
-        container, _config_file_path, _secrets_file_path
-    )
+    success = set_application_configuration(container, _config_file_path, _secrets_file_path)
     if not success:
         raise Exception("Configuration update task failed.")
     asyncio.set_event_loop(loop)
@@ -147,6 +141,4 @@ if __name__ == "__main__":
     container.wire(modules=[__name__])
     celery_app = get_worker_app(container)
 
-    celery_app.start(
-        argv=["worker", "-Q", "common", "--concurrency=1", "--loglevel=INFO"]
-    )
+    celery_app.start(argv=["worker", "-Q", "common", "--concurrency=1", "--loglevel=INFO"])

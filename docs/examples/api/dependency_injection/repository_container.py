@@ -55,9 +55,7 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     entity_mapper: EntityMapper = providers.Singleton(EntityMapper)
 
-    alias_generator: AliasGenerator = providers.Singleton(
-        DbTableAliasGeneratorImpl, entity_mapper
-    )
+    alias_generator: AliasGenerator = providers.Singleton(DbTableAliasGeneratorImpl, entity_mapper)
 
     gateways = providers.DependenciesContainer()
     services = providers.DependenciesContainer()
@@ -94,9 +92,7 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         database_client=gateways.database_client,
     )
 
-    folder_manager = providers.Singleton(
-        StudyFolderManager, config=config.repositories.study_folders
-    )
+    folder_manager = providers.Singleton(StudyFolderManager, config=config.repositories.study_folders)
 
     internal_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,

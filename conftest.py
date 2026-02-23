@@ -80,26 +80,18 @@ def local_env_container() -> Generator[Any, Any, Ws3ApplicationContainer]:
 @pytest.fixture(scope="module")
 def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
     container = local_env_container
-    standalone_heath_check_config_str = (
-        container.config.services.system_health_check.standalone()
-    )
-    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(
-        standalone_heath_check_config_str
-    )
+    standalone_heath_check_config_str = container.config.services.system_health_check.standalone()
+    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(standalone_heath_check_config_str)
     container.gateways.http_client.override(Mock(spec=HttpClient))
 
     container.services.system_health_check_service.override(
-        StandaloneSystemHealthCheckService(
-            config=health_check_config, http_client=container.gateways.http_client
-        )
+        StandaloneSystemHealthCheckService(config=health_check_config, http_client=container.gateways.http_client)
     )
     # Override Cache
     container.services.cache_service.override(InMemoryCacheImpl())
     # Override Authentication service
     standalone_auth_config_str = container.config.services.authentication.standalone()
-    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(
-        standalone_auth_config_str
-    )
+    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(standalone_auth_config_str)
     container.services.authentication_service.override(
         AuthenticationServiceImpl(
             config=standalone_auth_config,
@@ -116,9 +108,7 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
 
 
 @pytest.fixture(scope="module")
-def submission_api_client(
-    submission_api_container, local_config_file, local_secrets_file
-):
+def submission_api_client(submission_api_container, local_config_file, local_secrets_file):
     app, _ = create_app(
         config_file_path=local_config_file,
         secrets_file_path=local_secrets_file,

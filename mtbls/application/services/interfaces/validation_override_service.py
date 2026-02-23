@@ -11,9 +11,7 @@ class ValidationOverrideService(abc.ABC):
     async def get_validation_definitions(self) -> VersionedValidationsMap: ...
 
     @abc.abstractmethod
-    async def get_validation_overrides(
-        self, resource_id: str
-    ) -> ValidationOverrideList: ...
+    async def get_validation_overrides(self, resource_id: str) -> ValidationOverrideList: ...
 
     @abc.abstractmethod
     async def save_validation_overrides(

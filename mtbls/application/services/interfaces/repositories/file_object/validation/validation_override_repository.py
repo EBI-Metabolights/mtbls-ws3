@@ -11,9 +11,7 @@ from mtbls.domain.entities.validation.validation_override import (
 
 class ValidationOverrideRepository(
     BaseFileObjectRepository,
-    AbstractWriteRepository[
-        ValidationOverrideFileObject, ValidationOverrideFileObject, str
-    ],
+    AbstractWriteRepository[ValidationOverrideFileObject, ValidationOverrideFileObject, str],
 ):
     def __init__(self, study_bucket):
         super().__init__(study_bucket)

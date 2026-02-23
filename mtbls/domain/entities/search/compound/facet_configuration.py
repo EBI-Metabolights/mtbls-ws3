@@ -3,7 +3,8 @@ from typing import Any, Dict
 COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
     #
     # ---- FLAG FACETS (booleans) ----
-    # Each one will become a facet; with `only_true` you can hide the `false` bucket in the UI mapping.
+    # Each one will become a facet; with `only_true`
+    # you can hide the `false` bucket in the UI mapping.
     #
     "hasLiterature": {
         "type": "value",
@@ -46,8 +47,10 @@ COMPOUND_FACET_CONFIG: Dict[str, Dict[str, Any]] = {
         "type": "value",
         "field": "organisms",
     },
-    # If you don’t want to deal with nested aggs yet, you can still facet on species like this.
-    # (It will count documents, not individual species_hits rows, but it’s usually fine.)
+    # If you don’t want to deal with nested aggs yet, you can still
+    # facet on species like this.
+    # (It will count documents, not individual species_hits rows,
+    # but it’s usually fine.)
     "species": {
         "type": "value",
         "field": "species_hits.species",

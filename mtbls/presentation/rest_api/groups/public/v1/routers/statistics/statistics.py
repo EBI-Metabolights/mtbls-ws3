@@ -38,15 +38,9 @@ async def get_statistics_by_section(
         response_message = APIErrorResponse(error="Category is not defined.")
         return response_message
     category_value = category.get_db_value()
-    metrics = await statistic_read_repository.get_metrics_by_section(
-        section=category_value
-    )
-    title = await statistic_read_repository.get_metric_by_section_and_name(
-        section="title", name=category_value
-    )
+    metrics = await statistic_read_repository.get_metrics_by_section(section=category_value)
+    title = await statistic_read_repository.get_metric_by_section_and_name(section="title", name=category_value)
     response: APIResponse[StatisticData] = APIResponse[StatisticData]()
     response.content = StatisticData(title=title)
-    response.content.key_values = [
-        MetricData(key=x.name, value=x.value) for x in metrics
-    ]
+    response.content.key_values = [MetricData(key=x.name, value=x.value) for x in metrics]
     return response

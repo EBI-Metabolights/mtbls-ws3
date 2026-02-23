@@ -14,9 +14,7 @@ from mtbls.domain.shared.data_types import Integer
 
 
 class StudyInput(BaseStudy):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Study
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Study)
     accession_number: Union[None, str] = None
     obfuscation_code: Union[None, str] = None
     release_date: Union[None, datetime.datetime] = None
@@ -47,9 +45,7 @@ class StudyInput(BaseStudy):
 
 
 class StudyOutput(StudyInput):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Study
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Study)
     id_: Union[int, str]
     revisions: None | list[StudyRevisionOutput] = []
     submitters: None | list[UserOutput] = []

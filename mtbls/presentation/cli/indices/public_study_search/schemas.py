@@ -24,12 +24,8 @@ def coerce_ontology_item(v: Any) -> OntologyModel:
         # allow both snake_case and camelCase keys if your cache varies
         return OntologyModel(
             term=v.get("term", ""),
-            term_source_ref=v.get("termSourceRef")
-            or v.get("term_source_ref", "")
-            or "",
-            term_accession_number=v.get("termAccessionNumber")
-            or v.get("term_accession_number", "")
-            or "",
+            term_source_ref=v.get("termSourceRef") or v.get("term_source_ref", "") or "",
+            term_accession_number=v.get("termAccessionNumber") or v.get("term_accession_number", "") or "",
         )
     raise TypeError(f"Unsupported ontology item type: {type(v)}")
 
@@ -53,8 +49,7 @@ class OntologySourceReferenceModel(APIBaseModel):
         str,
         Field(
             exclude=True,
-            description="The version number of the Term Source "
-            "to support terms tracking.",
+            description="The version number of the Term Source to support terms tracking.",
         ),
     ] = ""
     source_description: Annotated[
@@ -94,10 +89,7 @@ class OntologyModel(APIBaseModel):
     ] = ""
     term_accession_number: Annotated[
         str,
-        Field(
-            description="The accession number from the Term Source "
-            "associated with the selected term."
-        ),
+        Field(description="The accession number from the Term Source associated with the selected term."),
     ] = ""
     model_config = ConfigDict(from_attributes=True)
 
@@ -174,10 +166,7 @@ class ValueAndUnitModel(APIBaseModel):
 class ContactModel(APIBaseModel):
     last_name: Annotated[
         str,
-        Field(
-            description="The last name of a person "
-            "associated with the study or investigation."
-        ),
+        Field(description="The last name of a person associated with the study or investigation."),
     ] = ""
     first_name: Annotated[
         str,
@@ -185,31 +174,19 @@ class ContactModel(APIBaseModel):
     ] = ""
     mid_initials: Annotated[
         str,
-        Field(
-            description="The middle initials of a person "
-            "associated with the study or investigation."
-        ),
+        Field(description="The middle initials of a person associated with the study or investigation."),
     ] = ""
     email: Annotated[
         str,
-        Field(
-            description="The email address of a person "
-            "associated with the study or investigation."
-        ),
+        Field(description="The email address of a person associated with the study or investigation."),
     ] = ""
     address: Annotated[
         str,
-        Field(
-            description="The address of a person associated "
-            "with the study or investigation."
-        ),
+        Field(description="The address of a person associated with the study or investigation."),
     ] = ""
     affiliation: Annotated[
         str,
-        Field(
-            description="The organization affiliation "
-            "for a person associated with the study or investigation."
-        ),
+        Field(description="The organization affiliation for a person associated with the study or investigation."),
     ] = ""
     roles: Annotated[
         List[OntologyModel],
@@ -222,10 +199,7 @@ class ContactModel(APIBaseModel):
 
     orcid: Annotated[
         str,
-        Field(
-            description="A unique Open Researcher and "
-            "Contributor IDentifier (ORCID) of person."
-        ),
+        Field(description="A unique Open Researcher and Contributor IDentifier (ORCID) of person."),
     ] = ""
 
     model_config = ConfigDict(from_attributes=True)
@@ -297,17 +271,11 @@ class AssayModel(APIBaseModel):
     ] = ""
     technique: Annotated[
         AssayTechniqueModel,
-        Field(
-            description="A term to identify the technology used "
-            "to perform the measurement."
-        ),
+        Field(description="A term to identify the technology used to perform the measurement."),
     ] = AssayTechniqueModel()
     assignment_files: Annotated[
         List[str],
-        Field(
-            description="Relative paths of metabolite assignment files "
-            "referenced in the assay file."
-        ),
+        Field(description="Relative paths of metabolite assignment files referenced in the assay file."),
     ] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
@@ -391,18 +359,13 @@ class PublicStudyLiteIndexBaseModel(APIBaseModel):
         Field(description="The date on which the study was released publicly."),
     ] = None
 
-    curation_request: Annotated[
-        CurationRequest, Field(description="Curation Request.")
-    ] = ""
+    curation_request: Annotated[CurationRequest, Field(description="Curation Request.")] = ""
 
     study_id: Annotated[str, Field(description="Study identifier.")] = ""
 
     title: Annotated[
         str,
-        Field(
-            description="A concise phrase used to encapsulate the purpose "
-            "and goal of the study."
-        ),
+        Field(description="A concise phrase used to encapsulate the purpose and goal of the study."),
     ] = ""
 
     size_in_bytes: Annotated[
@@ -524,18 +487,12 @@ class PublicStudyLiteIndexBaseModel(APIBaseModel):
 class FundingModel(APIBaseModel):
     funder: Annotated[
         str,
-        Field(
-            description="The name of the funding agency(s) that have sponsored "
-            "the author and the study."
-        ),
+        Field(description="The name of the funding agency(s) that have sponsored the author and the study."),
     ] = ""
 
     fund_ref_id: Annotated[
         str,
-        Field(
-            description="The unique fund reference identifier "
-            "for the funding agency(s)."
-        ),
+        Field(description="The unique fund reference identifier for the funding agency(s)."),
     ] = ""
 
     grant_identifier: Annotated[
@@ -550,10 +507,7 @@ class FundingModel(APIBaseModel):
 class ProtocolComponentModel(APIBaseModel):
     name: Annotated[
         str,
-        Field(
-            description="A component of protocol; e.g. instrument name, software name, "
-            "and reagents name, etc."
-        ),
+        Field(description="A component of protocol; e.g. instrument name, software name, and reagents name, etc."),
     ] = ""
     type: Annotated[
         str,
@@ -562,17 +516,13 @@ class ProtocolComponentModel(APIBaseModel):
     term_accession_number: Annotated[
         str,
         Field(
-            description="The accession number for protocol component type "
-            "from the term source reference associated."
+            description="The accession number for protocol component type from the term source reference associated."
         ),
     ] = ""
 
     term_source_ref: Annotated[
         str,
-        Field(
-            description="The controlled vocabulary or ontology source name "
-            "that this protocol term comes from."
-        ),
+        Field(description="The controlled vocabulary or ontology source name that this protocol term comes from."),
     ] = ""
 
 
@@ -589,10 +539,7 @@ class PublicStudyLiteIndexModel(PublicStudyLiteIndexBaseModel):
 
     submission_date: Annotated[
         Union[None, datetime.datetime],
-        Field(
-            description="The date on which the investigation was reported "
-            "to the MetaboLights repository."
-        ),
+        Field(description="The date on which the investigation was reported to the MetaboLights repository."),
     ] = None
 
     investigation_file_path: Annotated[
@@ -608,8 +555,7 @@ class PublicStudyLiteIndexModel(PublicStudyLiteIndexBaseModel):
     description: Annotated[
         str,
         Field(
-            description="A textual description or abstract of the study, "
-            "with components such as objective or goals."
+            description="A textual description or abstract of the study, with components such as objective or goals."
         ),
     ] = ""
 
@@ -682,17 +628,13 @@ class PaginatedSearchResultResponse(APIPaginatedResponse, Generic[T]):
 
     content: Annotated[
         Union[None, PaginatedSearchResult],
-        Field(
-            description="Paginated data and metadata of the response with aggregations."
-        ),
+        Field(description="Paginated data and metadata of the response with aggregations."),
     ] = None
 
 
 class PublicStudyLiteSearchResult(APIBaseModel):
     studies: Annotated[List[PublicStudyLiteIndexModel], Field(description="")] = []
-    aggregations: Annotated[
-        Dict[str, List[AggregationResponse]], Field(description="")
-    ] = []
+    aggregations: Annotated[Dict[str, List[AggregationResponse]], Field(description="")] = []
 
 
 class PublicStudyLiteIndexReferences(APIBaseModel):
@@ -701,24 +643,18 @@ class PublicStudyLiteIndexReferences(APIBaseModel):
     source_references: Annotated[Set[OntologySourceReferenceModel], Field()] = set()
     assay_techniques: Annotated[Set[AssayTechniqueModel], Field()] = set()
 
-    organisms: Annotated[
-        Set[OntologyModel], Field(json_schema_extra={"ontology_category": "organism"})
-    ] = set()
+    organisms: Annotated[Set[OntologyModel], Field(json_schema_extra={"ontology_category": "organism"})] = set()
     organism_parts: Annotated[
         Set[OntologyModel],
         Field(json_schema_extra={"ontology_category": "organism_part"}),
     ] = set()
 
-    variants: Annotated[
-        Set[OntologyModel], Field(json_schema_extra={"ontology_category": "variant"})
-    ] = set()
+    variants: Annotated[Set[OntologyModel], Field(json_schema_extra={"ontology_category": "variant"})] = set()
     sample_types: Annotated[
         Set[OntologyModel],
         Field(json_schema_extra={"ontology_category": "sample_type"}),
     ] = set()
-    factors: Annotated[
-        Set[OntologyModel], Field(json_schema_extra={"ontology_category": "factor"})
-    ] = set()
+    factors: Annotated[Set[OntologyModel], Field(json_schema_extra={"ontology_category": "factor"})] = set()
     design_descriptors: Annotated[
         Set[OntologyModel],
         Field(json_schema_extra={"ontology_category": "design_descriptor"}),

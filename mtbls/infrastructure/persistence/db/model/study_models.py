@@ -141,9 +141,7 @@ class User(Base):
     apitoken: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     firstname: Mapped[str] = mapped_column(String(255), nullable=False)
-    joindate: Mapped[datetime.datetime] = mapped_column(
-        server_default=func.now(), nullable=False
-    )
+    joindate: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), nullable=False)
     lastname: Mapped[str] = mapped_column(String(255), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
@@ -162,18 +160,14 @@ class StudyRevision(Base):
 
     __field_alias_exceptions__: dict[str, str] = {"id_": "id"}
 
-    id: Mapped[int] = mapped_column(
-        study_revisions_id_seq, primary_key=True, unique=True, index=True
-    )
+    id: Mapped[int] = mapped_column(study_revisions_id_seq, primary_key=True, unique=True, index=True)
     accession_number: Mapped[str] = mapped_column(
         String(255),
         ForeignKey("studies.acc", ondelete="CASCADE"),
         nullable=False,
     )
     revision_number: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    revision_datetime: Mapped[datetime.datetime] = mapped_column(
-        DateTime, nullable=False
-    )
+    revision_datetime: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
     revision_comment: Mapped[str] = mapped_column(String(1024), nullable=False)
     created_by: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[int] = mapped_column(
@@ -183,9 +177,7 @@ class StudyRevision(Base):
         server_default=text("0"),
     )
     task_started_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=True)
-    task_completed_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime, nullable=True
-    )
+    task_completed_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=True)
     created_by: Mapped[str] = mapped_column(Text, nullable=True)
     mhd_share_status: Mapped[int] = mapped_column(
         IntEnum(MhdShareStatus),
@@ -215,12 +207,8 @@ class Study(Base):
     }
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    acc: Mapped[str] = mapped_column(
-        String(255), unique=True, nullable=False, index=True
-    )
-    obfuscationcode: Mapped[str] = mapped_column(
-        String(255), unique=True, nullable=False, index=True
-    )
+    acc: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    obfuscationcode: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     releasedate: Mapped[datetime.datetime] = mapped_column(nullable=False)
     status: Mapped[StudyStatus] = mapped_column(
         IntEnum(StudyStatus),
@@ -242,9 +230,7 @@ class Study(Base):
     sample_rows: Mapped[int] = mapped_column(nullable=True)
     assay_rows: Mapped[int] = mapped_column(nullable=True)
     maf_rows: Mapped[int] = mapped_column(nullable=True)
-    biostudies_acc: Mapped[str] = mapped_column(
-        String(255), unique=False, nullable=True
-    )
+    biostudies_acc: Mapped[str] = mapped_column(String(255), unique=False, nullable=True)
     placeholder: Mapped[str] = mapped_column(nullable=True)
     validation_status: Mapped[str] = mapped_column(nullable=True)
     status_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
@@ -256,53 +242,37 @@ class Study(Base):
         default=CurationType.NO_CURATION,
         server_default=text(str(CurationType.NO_CURATION.value)),
     )
-    reserved_accession: Mapped[str] = mapped_column(
-        String(50), unique=False, nullable=True
-    )
-    reserved_submission_id: Mapped[str] = mapped_column(
-        String(50), unique=False, nullable=True
-    )
+    reserved_accession: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
+    reserved_submission_id: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
     first_public_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
     first_private_date: Mapped[datetime.datetime] = mapped_column(nullable=True)
 
     created_at: Mapped[datetime.datetime] = mapped_column(nullable=True)
     dataset_license: Mapped[str] = mapped_column(String(255), nullable=True)
     dataset_license_version: Mapped[str] = mapped_column(String(255), nullable=True)
-    dataset_license_agreeing_user: Mapped[str] = mapped_column(
-        String(255), nullable=True
-    )
-    revision_number: Mapped[int] = mapped_column(
-        BigInteger, nullable=False, server_default=text("0"), default=0
-    )
+    dataset_license_agreeing_user: Mapped[str] = mapped_column(String(255), nullable=True)
+    revision_number: Mapped[int] = mapped_column(BigInteger, nullable=False, server_default=text("0"), default=0)
     revision_datetime: Mapped[datetime.datetime] = mapped_column(nullable=True)
     sample_type: Mapped[str] = mapped_column(
         String(255), nullable=False, server_default=text("minimum"), default="minimum"
     )
-    data_policy_agreement: Mapped[int] = mapped_column(
-        BigInteger, nullable=False, server_default=text("0"), default=0
-    )
+    data_policy_agreement: Mapped[int] = mapped_column(BigInteger, nullable=False, server_default=text("0"), default=0)
     study_category: Mapped[StudyCategory] = mapped_column(
         IntEnum(StudyCategory),
         nullable=False,
         default=StudyCategory.OTHER,
         server_default=text(str(StudyCategory.OTHER.value)),
     )
-    template_version: Mapped[str] = mapped_column(
-        String(50), nullable=False, server_default=text("1.0"), default="1.0"
-    )
+    template_version: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("1.0"), default="1.0")
     mhd_accession: Mapped[str] = mapped_column(String(50), nullable=True)
     mhd_model_version: Mapped[str] = mapped_column(String(50), nullable=True)
 
-    submitters: Mapped[list[User]] = relationship(
-        "User", secondary="study_user", back_populates="studies"
-    )
+    submitters: Mapped[list[User]] = relationship("User", secondary="study_user", back_populates="studies")
     revisions: Mapped[list["StudyRevision"]] = relationship(
         back_populates="study",
         cascade="all, delete-orphan",
     )
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        nullable=False, server_default=func.now()
-    )
+    created_at: Mapped[datetime.datetime] = mapped_column(nullable=False, server_default=func.now())
     study_template: Mapped[str] = mapped_column(
         String(50), nullable=False, server_default=text("minimum"), default="minimum"
     )
@@ -336,9 +306,7 @@ class MtblsDataReuse(Base):
     content_name = Column(String(300), nullable=False)
     data_format = Column(String(50), nullable=False)
     content = Column(Text, nullable=False)
-    updated_timestamp: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=False), nullable=False
-    )
+    updated_timestamp: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=False), nullable=False)
 
 
 class StudyTasks(Base):
@@ -376,12 +344,8 @@ class StudyFile(Base):
     basename = Column(String(512), nullable=False)
     object_key = Column(String(1024), nullable=False)
     parent_object_key = Column(String(1024), nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    updated_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     size_in_bytes: Mapped[Decimal] = mapped_column(nullable=True)
     size_in_str = Column(String(128), nullable=True)
     is_directory = Column(Integer, nullable=False, default=0)

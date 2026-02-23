@@ -23,26 +23,18 @@ from tests.mtbls.mocks.policy_service.mock_policy_service import MockPolicyServi
 @pytest.fixture(scope="module")
 def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
     container = local_env_container
-    standalone_heath_check_config_str = (
-        container.config.services.system_health_check.standalone()
-    )
-    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(
-        standalone_heath_check_config_str
-    )
+    standalone_heath_check_config_str = container.config.services.system_health_check.standalone()
+    health_check_config = StandaloneSystemHealthCheckConfiguration.model_validate(standalone_heath_check_config_str)
     container.gateways.http_client.override(Mock(spec=HttpClient))
 
     container.services.system_health_check_service.override(
-        StandaloneSystemHealthCheckService(
-            config=health_check_config, http_client=container.gateways.http_client
-        )
+        StandaloneSystemHealthCheckService(config=health_check_config, http_client=container.gateways.http_client)
     )
     # Override Cache
     container.services.cache_service.override(InMemoryCacheImpl())
     # Override Authentication service
     standalone_auth_config_str = container.config.services.authentication.standalone()
-    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(
-        standalone_auth_config_str
-    )
+    standalone_auth_config = StandaloneAuthenticationConfiguration.model_validate(standalone_auth_config_str)
     container.services.authentication_service.override(
         AuthenticationServiceImpl(
             config=standalone_auth_config,

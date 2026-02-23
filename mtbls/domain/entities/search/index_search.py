@@ -7,9 +7,7 @@ class BaseSearchResult(BaseModel):
     result: Annotated[
         Any, Field(description="Search result (override in subclass)")
     ]  # type intended to be overriden by implementing classes.
-    message: Annotated[
-        str, Field(description="Message indicating outcome of the search query")
-    ] = ""
+    message: Annotated[str, Field(description="Message indicating outcome of the search query")] = ""
 
 
 class SortModel(BaseModel):
@@ -24,9 +22,7 @@ class PageModel(BaseModel):
 
 class FilterModel(BaseModel):
     field: Annotated[str, Field(description="Field being filtered")]
-    values: Annotated[
-        List[Any], Field(default_factory=list, description="List of selected values")
-    ]
+    values: Annotated[List[Any], Field(default_factory=list, description="List of selected values")]
     operator: Annotated[
         Optional[Literal["all", "any", "none"]],
         Field(default="all", description="Filter operator (all/any/none)"),
@@ -34,21 +30,15 @@ class FilterModel(BaseModel):
 
 
 class BaseSearchInput(BaseModel):
-    query: Annotated[
-        Optional[str], Field(default=None, description="Search term or query string")
-    ]
+    query: Annotated[Optional[str], Field(default=None, description="Search term or query string")]
 
 
 class IndexSearchInput(BaseSearchInput):
     """Base class for index search inputs with common fields."""
 
-    query: Annotated[
-        Optional[str], Field(default=None, description="Search term or query string")
-    ]
+    query: Annotated[Optional[str], Field(default=None, description="Search term or query string")]
     page: Annotated[PageModel, Field(description="Pagination parameters")]
-    sort: Annotated[
-        Optional[SortModel], Field(default=None, description="Sort configuration")
-    ]
+    sort: Annotated[Optional[SortModel], Field(default=None, description="Sort configuration")]
     filters: Annotated[
         Optional[List[FilterModel]],
         Field(
@@ -72,14 +62,14 @@ class CompoundSearchInput(IndexSearchInput):
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']). Returns compounds that appear in the specified studies.",
+            description="Filter compounds by study IDs (e.g., ['MTBLS1', 'MTBLS2']). Returns compounds that appear in the specified studies.",  # noqa: E501
         ),
     ]
     study_ids_operator: Annotated[
         Optional[Literal["any", "all"]],
         Field(
             default="any",
-            description="Operator for study_ids filter: 'any' returns compounds in ANY of the studies, 'all' returns compounds in ALL of the studies.",
+            description="Operator for study_ids filter: 'any' returns compounds in ANY of the studies, 'all' returns compounds in ALL of the studies.",  # noqa: E501
         ),
     ]
 
@@ -131,49 +121,49 @@ class StudySearchInput(IndexSearchInput):
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter studies by compound database identifiers (e.g., ['HMDB0031111']). Returns studies containing these compounds.",
+            description="Filter studies by compound database identifiers (e.g., ['HMDB0031111']). Returns studies containing these compounds.",  # noqa: E501
         ),
     ]
     metabolite_identifications: Annotated[
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter studies by compound names (e.g., ['Lithocholic acid 3-O-glucuronide']). Returns studies containing these compounds.",
+            description="Filter studies by compound names (e.g., ['Lithocholic acid 3-O-glucuronide']). Returns studies containing these compounds.",  # noqa: E501
         ),
     ]
     database_identifiers_operator: Annotated[
         Optional[Literal["any", "all"]],
         Field(
             default="any",
-            description="Operator for database_identifiers filter: 'any' returns studies with ANY of the identifiers, 'all' requires all identifiers to be present somewhere in the study.",
+            description="Operator for database_identifiers filter: 'any' returns studies with ANY of the identifiers, 'all' requires all identifiers to be present somewhere in the study.",  # noqa: E501
         ),
     ]
     metabolite_identifications_operator: Annotated[
         Optional[Literal["any", "all"]],
         Field(
             default="any",
-            description="Operator for metabolite_identifications filter: 'any' returns studies with ANY of the names, 'all' requires all names to be present somewhere in the study.",
+            description="Operator for metabolite_identifications filter: 'any' returns studies with ANY of the names, 'all' requires all names to be present somewhere in the study.",  # noqa: E501
         ),
     ]
     factor_header_names: Annotated[
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter studies by sample factor header names (e.g., ['Batch', 'Gender']). Queries the sample index against both factorHeaderNames and modifiedFactorHeaderNames.",
+            description="Filter studies by sample factor header names (e.g., ['Batch', 'Gender']). Queries the sample index against both factorHeaderNames and modifiedFactorHeaderNames.",  # noqa: E501
         ),
     ]
     factor_header_names_operator: Annotated[
         Optional[Literal["and", "or"]],
         Field(
             default="and",
-            description="Operator for factor_header_names filter: 'and' requires all values to match, 'or' requires any.",
+            description="Operator for factor_header_names filter: 'and' requires all values to match, 'or' requires any.",  # noqa: E501
         ),
     ]
     study_ids: Annotated[
         Optional[List[str]],
         Field(
             default=None,
-            description="Filter to specific study IDs (e.g., ['MTBLS1', 'MTBLS2']). Primarily used internally after resolving chemical filters.",
+            description="Filter to specific study IDs (e.g., ['MTBLS1', 'MTBLS2']). Primarily used internally after resolving chemical filters.",  # noqa: E501
         ),
     ]
 
@@ -198,13 +188,11 @@ class IndexSearchResult(BaseModel):
         Optional[List[str]],
         Field(
             default=None,
-            description="All matching study IDs (only populated when include_all_ids=true and search has query/filters)",
+            description="All matching study IDs (only populated when include_all_ids=true and search has query/filters)",  # noqa: E501
         ),
     ]
 
 
 class IndexSearchResultEnvelope(BaseSearchResult):
     result: Annotated[IndexSearchResult, Field(description="Index search result")] = {}
-    message: Annotated[
-        str, Field(description="Message indicating outcome of the search query")
-    ] = ""
+    message: Annotated[str, Field(description="Message indicating outcome of the search query")] = ""

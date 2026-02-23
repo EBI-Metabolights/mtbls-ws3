@@ -52,18 +52,10 @@ class RepositoryInfoCollector(AbstractFolderMetadataCollector):
         )
         return study_files_metadata, messages
 
-    def convert_to_file_descriptor(
-        self, source: StudyFileOutput, subfolder: str = ""
-    ) -> StudyFileDescriptor:
-        parent_directory = (
-            f"{subfolder}/{source.parent_object_key}"
-            if subfolder
-            else source.parent_object_key,
-        )
+    def convert_to_file_descriptor(self, source: StudyFileOutput, subfolder: str = "") -> StudyFileDescriptor:
+        parent_directory = (f"{subfolder}/{source.parent_object_key}" if subfolder else source.parent_object_key,)
         return StudyFileDescriptor(
-            file_path=f"{subfolder}/{source.object_key}"
-            if subfolder
-            else source.object_key,
+            file_path=f"{subfolder}/{source.object_key}" if subfolder else source.object_key,
             created_at=source.created_at,
             updated_at=source.updated_at,
             is_directory=source.is_directory,

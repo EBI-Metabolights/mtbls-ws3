@@ -27,9 +27,7 @@ class SQLiteDatabaseClientImpl(DatabaseClient):
         logger.warning("Database is SQLite and it is only for development.")
         self.engine = create_async_engine(self.db_url, echo=True)
 
-        self._async_session_factory = async_sessionmaker(
-            self.engine, expire_on_commit=False
-        )
+        self._async_session_factory = async_sessionmaker(self.engine, expire_on_commit=False)
 
     async def get_connection_repr(self) -> str:
         return self.db_url_repr

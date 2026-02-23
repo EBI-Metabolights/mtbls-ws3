@@ -46,13 +46,9 @@ class MongoDbValidationReportRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
-        super(ValidationReportRepository, self).__init__(
-            study_bucket, observers=[observer]
-        )
+        super(ValidationReportRepository, self).__init__(study_bucket, observers=[observer])
         self.validation_history_object_key = (
-            validation_history_object_key.rstrip("/")
-            if validation_history_object_key
-            else "validation-history"
+            validation_history_object_key.rstrip("/") if validation_history_object_key else "validation-history"
         )
         self.parent_object_key = str(Path(validation_history_object_key).parent)
         if self.parent_object_key == ".":
@@ -78,9 +74,7 @@ class MongoDbValidationReportRepository(
     def _format_datetime(self, date_value: datetime.datetime):
         return date_value.strftime("%Y-%m-%d_%H-%M-%S")
 
-    async def find_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> ValidationResultFile:
+    async def find_by_task_id(self, resource_id: str, task_id: str) -> ValidationResultFile:
         filters = {"resourceId": resource_id, "taskId": task_id}
         result = self.find_with_filter(filters=filters)
         if result:
@@ -91,9 +85,7 @@ class MongoDbValidationReportRepository(
             f"validation-history__*__{task_id}.json",
         )
 
-    async def find_by_validation_time(
-        self, resource_id: str, validation_time: str
-    ) -> ValidationResultFile:
+    async def find_by_validation_time(self, resource_id: str, validation_time: str) -> ValidationResultFile:
         filters = {"resourceId": resource_id, "startTime": validation_time}
         result = self.find_with_filter(filters=filters)
         if result:
@@ -142,9 +134,7 @@ class MongoDbValidationReportRepository(
             await self.object_updated(study_object=study_object)
         return True
 
-    async def load_validation_report_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> PolicySummaryResult:
+    async def load_validation_report_by_task_id(self, resource_id: str, task_id: str) -> PolicySummaryResult:
         await self._initiate_validation_history_folder(resource_id=resource_id)
         filters = [
             EntityFilter(key="resourceId", value=resource_id),
@@ -166,6 +156,4 @@ class MongoDbValidationReportRepository(
         reports = await self.find(query_options=QueryOptions(filters=filters))
         if reports.data:
             return reports.data[0].data
-        raise StudyObjectNotFoundError(
-            resource_id, self.study_bucket.value, validation_time
-        )
+        raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, validation_time)

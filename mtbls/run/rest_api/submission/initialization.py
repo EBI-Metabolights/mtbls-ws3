@@ -30,21 +30,13 @@ logger = logging.getLogger(__name__)
 @inject
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
-    document_database_client: DocumentDatabaseClient = Provide[
-        "gateways.document_database_client"
-    ],
-    elasticsearch_client: ElasticsearchClient = Provide[
-        "gateways.elasticsearch_client"
-    ],
+    document_database_client: DocumentDatabaseClient = Provide["gateways.document_database_client"],
+    elasticsearch_client: ElasticsearchClient = Provide["gateways.elasticsearch_client"],
     cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
-    user_read_repository: UserReadRepository = Provide[
-        "repositories.user_read_repository"
-    ],
+    user_read_repository: UserReadRepository = Provide["repositories.user_read_repository"],
     policy_service: PolicyService = Provide["services.policy_service"],
-    ontology_search_service: OntologySearchService = Provide[
-        "services.ontology_search_service"
-    ],
+    ontology_search_service: OntologySearchService = Provide["services.ontology_search_service"],
     test_database_connection: bool = True,
     test_cache_service: bool = True,
     test_async_task_service: bool = True,
@@ -83,9 +75,7 @@ async def init_ontology_search_service(
         logger.info("Ontology search service is not initialized.")
         return False
     try:
-        search = await ontology_search_service.find_by_accession(
-            "http://purl.obolibrary.org/obo/NCIT_C49019", "NCIT"
-        )
+        search = await ontology_search_service.find_by_accession("http://purl.obolibrary.org/obo/NCIT_C49019", "NCIT")
         if search and search.result:
             logger.info("Ontology search service is ready.")
             return True
@@ -125,9 +115,7 @@ async def init_cache_service(cache_service: CacheService) -> bool:
 
     cache_url = await cache_service.get_connection_repr()
     logger.info("Cache service connection: %s.", cache_url)
-    cache_service_name = (
-        f"{cache_service.__module__}.{cache_service.__class__.__name__}"
-    )
+    cache_service_name = f"{cache_service.__module__}.{cache_service.__class__.__name__}"
     try:
         result = await cache_service.ping()
         if result:
@@ -135,9 +123,7 @@ async def init_cache_service(cache_service: CacheService) -> bool:
         else:
             raise Exception(f"Unexpected ping response from cache service: {result}")
     except Exception as ex:
-        logger.error(
-            "Cache service initialisation failed: %s. %s", cache_service_name, str(ex)
-        )
+        logger.error("Cache service initialisation failed: %s. %s", cache_service_name, str(ex))
         logger.critical("Any service or method that uses cache service may fail.")
         return False
     return True
@@ -147,9 +133,7 @@ async def init_async_task_service(async_task_service: AsyncTaskService) -> bool:
     if not async_task_service:
         logger.info("Async task service is not initialized.")
         return False
-    async_task_service_name = (
-        f"{async_task_service.__module__}.{async_task_service.__class__.__name__}"
-    )
+    async_task_service_name = f"{async_task_service.__module__}.{async_task_service.__class__.__name__}"
 
     logger.info(
         "Async task service '%s' is initialized: %s.",
@@ -243,9 +227,7 @@ async def init_elasticsearch_client(elasticsearch_client: ElasticsearchClient) -
     try:
         await elasticsearch_client.ensure_started()
         logger.info("Elasticsearch client initialized: %s", elasticsearch_client_name)
-        logger.info(
-            "Elasticsearch connection: %s", await elasticsearch_client.get_info()
-        )
+        logger.info("Elasticsearch connection: %s", await elasticsearch_client.get_info())
         return True
     except Exception as ex:
         logger.error(

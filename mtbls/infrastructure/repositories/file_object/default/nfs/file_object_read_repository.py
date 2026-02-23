@@ -36,29 +36,21 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         study_bucket: StudyBucket,
         observer: None | FileObjectObserver = None,
     ):
-        super().__init__(
-            study_bucket=study_bucket, observers=[observer] if observer else None
-        )
+        super().__init__(study_bucket=study_bucket, observers=[observer] if observer else None)
         self.folder_manager = folder_manager
         self.study_bucket = study_bucket
 
     def get_bucket(self) -> StudyBucket:
         return self.study_bucket
 
-    async def list(
-        self, resource_id: str, object_key: Union[None, str] = None
-    ) -> list[StudyFileOutput]:
+    async def list(self, resource_id: str, object_key: Union[None, str] = None) -> list[StudyFileOutput]:
         resources = []
 
-        study_path, directory_path = await self._get_directory_path(
-            resource_id, object_key
-        )
+        study_path, directory_path = await self._get_directory_path(resource_id, object_key)
         directory_path: pathlib.Path = directory_path
         for object_path in directory_path.iterdir():
             if await self._does_path_exist(object_path):
-                object_key = (
-                    str(object_path).replace(str(study_path), "", 1).lstrip("/")
-                )
+                object_key = str(object_path).replace(str(study_path), "", 1).lstrip("/")
                 resource = await self.get_study_object(
                     resource_id=resource_id,
                     bucket_name=self.study_bucket.value,
@@ -97,14 +89,10 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         )
 
     async def get_uri(self, resource_id: str, object_key: str) -> str:
-        _, object_path = await self._get_object_path(
-            resource_id, self.study_bucket.value, object_key
-        )
+        _, object_path = await self._get_object_path(resource_id, self.study_bucket.value, object_key)
         return f"file://{str(object_path)}"
 
-    async def download(
-        self, resource_id: str, object_key: str, target_path: str
-    ) -> StudyFileOutput:
+    async def download(self, resource_id: str, object_key: str, target_path: str) -> StudyFileOutput:
         _, object_path = await self._get_object_path(resource_id, object_key)
         shutil.copy(object_path, target_path)
 
@@ -166,9 +154,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         created_at = datetime.fromtimestamp(stat.st_ctime)
         updated_at = datetime.fromtimestamp(stat.st_mtime)
         size_in_bytes = stat.st_size if object_path.is_file() else None
-        size_in_str = (
-            get_size_in_str(size_in_bytes) if size_in_bytes is not None else ""
-        )
+        size_in_str = get_size_in_str(size_in_bytes) if size_in_bytes is not None else ""
         is_directory = object_path.is_dir()
         suffix = ""
         if not is_directory:
@@ -205,29 +191,21 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         study_path, object_path = await self._get_object_path(resource_id, object_key)
         if not object_path.is_dir():
             logger.warning("Study object does not exist: %s", object_path)
-            raise StudyObjectIsNotFolderError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectIsNotFolderError(resource_id, self.study_bucket.value, object_key)
         return study_path, object_path
 
     async def _get_object_path(
         self, resource_id: str, object_key: Union[None, str]
     ) -> tuple[pathlib.Path, pathlib.Path]:
-        study_path = self.folder_manager.get_study_folder_path(
-            resource_id, self.study_bucket.value
-        )
+        study_path = self.folder_manager.get_study_folder_path(resource_id, self.study_bucket.value)
 
         if not study_path.exists():
             logger.warning("Study path does not exist: %s", study_path)
             raise StudyResourceNotFoundError(resource_id)
 
-        object_path = self.folder_manager.get_study_folder_path(
-            resource_id, self.study_bucket.value, object_key
-        )
+        object_path = self.folder_manager.get_study_folder_path(resource_id, self.study_bucket.value, object_key)
 
         if not object_path.exists():
             logger.warning("Study path does not exist: %s", object_path)
-            raise StudyObjectNotFoundError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, object_key)
         return study_path, object_path

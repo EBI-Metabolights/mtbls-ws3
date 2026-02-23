@@ -39,9 +39,7 @@ class SqlDbMtblsDataReuseReadRepository(
             value = alias_generator.get_alias(entity_type, field)
             self.user_type_alias_dict[field] = value
 
-    async def get_latest_data_by_title(
-        self, title: str
-    ) -> Union[str, MtblsDataReuseOutput]:
+    async def get_latest_data_by_title(self, title: str) -> Union[str, MtblsDataReuseOutput]:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(

@@ -12,9 +12,7 @@ def assay_modifier(
     control_lists: dict[str, Any],
     metabolights_model: MetabolightsStudyModel,
 ) -> AssayFileModifier:
-    assay_file_name = (
-        metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-    )
+    assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
     isa_table_file = metabolights_model.assays[assay_file_name]
     modifier = AssayFileModifier(
         model=metabolights_model,
@@ -31,9 +29,7 @@ def ms_assay_modifier(
     control_lists: dict[str, Any],
     ms_metabolights_model: MetabolightsStudyModel,
 ) -> AssayFileModifier:
-    assay_file_name = (
-        ms_metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-    )
+    assay_file_name = ms_metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
     isa_table_file = ms_metabolights_model.assays[assay_file_name]
     modifier = AssayFileModifier(
         model=ms_metabolights_model,
@@ -55,9 +51,7 @@ class TestRemoveTrailingAndPrefixSpaces:
     @pytest.mark.asyncio
     async def test_modifier_remove_trailing_01(self, assay_modifier: AssayFileModifier):
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_file = metabolights_model.assays[assay_file_name]
         header_def = assay_file.table.headers[0]
         header = header_def.column_header
@@ -66,9 +60,7 @@ class TestRemoveTrailingAndPrefixSpaces:
         header_def.column_header = new_header
         header_def.column_name = header_def.column_name.replace(header, new_header, 1)
         assay_file.table.columns[header_def.column_index] = header_def.column_name
-        assay_file.table.data[header_def.column_name] = assay_file.table.data[
-            header_column_name
-        ]
+        assay_file.table.data[header_def.column_name] = assay_file.table.data[header_column_name]
         del assay_file.table.data[header_column_name]
 
         update_logs = assay_modifier.remove_trailing_and_prefix_spaces()
@@ -82,9 +74,7 @@ class TestRemoveTrailingAndPrefixSpaces:
     async def test_modifier_remove_trailing_02(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_file = metabolights_model.assays[assay_file_name]
         values = assay_file.table.data[assay_file.table.columns[0]]
         expected_values = ", ".join([x for x in values])
@@ -108,23 +98,16 @@ class TestUpdateUpadateOntologyColumn:
     async def test_update_ontology_columns_02(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Parameter Value[Instrument]"][0] = (
-            "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assay_table.data["Parameter Value[Instrument]"][0] = "Bruker AVANCE DRX 700 MHz spectrometer"
         assay_table.data["Term Source REF.4"][0] = ""
         assay_table.data["Term Accession Number.4"][0] = ""
         assay_modifier.update_ontology_columns()
-        assay_table.data["Parameter Value[Instrument]"][0] = (
-            "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assay_table.data["Parameter Value[Instrument]"][0] = "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -132,24 +115,16 @@ class TestUpdateUpadateOntologyColumn:
     async def test_update_ontology_columns_03(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
         assay_table.data["Parameter Value[Instrument]"][0] = ""
         assay_table.data["Term Source REF.4"][0] = ""
-        assay_table.data["Term Accession Number.4"][0] = (
-            "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
-        )
+        assay_table.data["Term Accession Number.4"][0] = "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         assay_modifier.update_ontology_columns()
-        assert (
-            assay_table.data["Parameter Value[Instrument]"][0]
-            == "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assert assay_table.data["Parameter Value[Instrument]"][0] == "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -157,36 +132,22 @@ class TestUpdateUpadateOntologyColumn:
     async def test_update_ontology_columns_04(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Parameter Value[Instrument]"][0] = (
-            "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assay_table.data["Parameter Value[Instrument]"][0] = "Bruker AVANCE DRX 700 MHz spectrometer"
         assay_table.data["Term Source REF.4"][0] = ""
-        assay_table.data["Term Accession Number.4"][0] = (
-            "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
-        )
+        assay_table.data["Term Accession Number.4"][0] = "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         assay_modifier.update_ontology_columns()
-        assert (
-            assay_table.data["Parameter Value[Instrument]"][0]
-            == "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assert assay_table.data["Parameter Value[Instrument]"][0] == "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assay_modifier.update_ontology_columns()
-        assert (
-            assay_table.data["Parameter Value[Instrument]"][0]
-            == "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assert assay_table.data["Parameter Value[Instrument]"][0] == "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -194,34 +155,22 @@ class TestUpdateUpadateOntologyColumn:
     async def test_update_ontology_columns_05(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
-        assay_table.data["Parameter Value[Instrument]"][0] = (
-            "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assay_table.data["Parameter Value[Instrument]"][0] = "Bruker AVANCE DRX 700 MHz spectrometer"
         assay_table.data["Term Source REF.4"][0] = "MTBLS"
         assay_table.data["Term Accession Number.4"][0] = ""
         assay_modifier.update_ontology_columns()
-        assert (
-            assay_table.data["Parameter Value[Instrument]"][0]
-            == "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assert assay_table.data["Parameter Value[Instrument]"][0] == "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assay_modifier.update_ontology_columns()
-        assert (
-            assay_table.data["Parameter Value[Instrument]"][0]
-            == "Bruker AVANCE DRX 700 MHz spectrometer"
-        )
+        assert assay_table.data["Parameter Value[Instrument]"][0] == "Bruker AVANCE DRX 700 MHz spectrometer"
         assert assay_table.data["Term Source REF.4"][0] == "MTBLS"
         assert (
-            assay_table.data["Term Accession Number.4"][0]
-            == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
+            assay_table.data["Term Accession Number.4"][0] == "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000410"
         )
         assert len(assay_modifier.update_logs) == 1
 
@@ -229,9 +178,7 @@ class TestUpdateUpadateOntologyColumn:
     async def test_update_ontology_columns_06(self, assay_modifier: AssayFileModifier):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
-        assay_file_name = (
-            metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file_name = metabolights_model.investigation.studies[0].study_assays.assays[0].file_name
         assay_table = assay_modifier.model.assays[assay_file_name].table
         assay_table.data["Unit"][0] = ""
         assay_table.data["Term Source REF.2"][0] = "UO"
@@ -336,9 +283,7 @@ class Test_rule_a_200_090_004_01:
             "Normalization Name",
         ],
     )
-    async def test_rule_a_200_090_004_01_02(
-        self, ms_assay_modifier: AssayFileModifier, column_name
-    ):
+    async def test_rule_a_200_090_004_01_02(self, ms_assay_modifier: AssayFileModifier, column_name):
         ms_assay_modifier.max_row_number_limit = 3
         metabolights_model = ms_assay_modifier.model
         study = metabolights_model.investigation.studies[0]
@@ -349,17 +294,13 @@ class Test_rule_a_200_090_004_01:
         length = len(assay_table.data[data_file_column])
         assay_table.data[data_file_column] = [""] * length
         ms_assay_modifier.rule_a_200_090_004_01()
-        assert set(assay_table.data[data_file_column]) == set(
-            assay_table.data[sample_name_column]
-        )
+        assert set(assay_table.data[data_file_column]) == set(assay_table.data[sample_name_column])
 
         assert len(ms_assay_modifier.update_logs) == 1
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("column_name", ["NMR Assay Name"])
-    async def test_rule_a_200_090_004_01_03(
-        self, assay_modifier: AssayFileModifier, column_name
-    ):
+    async def test_rule_a_200_090_004_01_03(self, assay_modifier: AssayFileModifier, column_name):
         assay_modifier.max_row_number_limit = 3
         metabolights_model = assay_modifier.model
         study = metabolights_model.investigation.studies[0]
@@ -370,9 +311,7 @@ class Test_rule_a_200_090_004_01:
         length = len(assay_table.data[column_name])
         assay_table.data[column_name] = [""] * length
         assay_modifier.rule_a_200_090_004_01()
-        assert set(assay_table.data[column_name]) == set(
-            assay_table.data[sample_name_column]
-        )
+        assert set(assay_table.data[column_name]) == set(assay_table.data[sample_name_column])
         assert len(assay_modifier.update_logs) == 1
 
     @pytest.mark.asyncio
@@ -396,9 +335,7 @@ class Test_rule_a_200_090_004_01:
 
         ms_assay_modifier.rule_a_200_090_004_01()
         for column in columns:
-            assert set(assay_table.data[column]) == set(
-                assay_table.data[sample_name_column]
-            )
+            assert set(assay_table.data[column]) == set(assay_table.data[sample_name_column])
         expected_log_items = 4
         assert len(ms_assay_modifier.update_logs) == expected_log_items
 
@@ -415,9 +352,7 @@ class TestUpdateScanPolarity:
         "polarity",
         ["positive", "negative", "alternating"],
     )
-    async def test_update_scan_polarity_02(
-        self, ms_assay_modifier: AssayFileModifier, polarity: str
-    ):
+    async def test_update_scan_polarity_02(self, ms_assay_modifier: AssayFileModifier, polarity: str):
         ms_assay_modifier.max_row_number_limit = 5
         scan_polarity_name = "Parameter Value[Scan polarity]"
         metabolights_model = ms_assay_modifier.model
@@ -439,17 +374,13 @@ class TestUpdateScanPolarity:
 
 class TestUpdateProtocolRefColumns:
     @pytest.mark.asyncio
-    async def test_update_protocol_ref_columns_01(
-        self, ms_assay_modifier: AssayFileModifier
-    ):
+    async def test_update_protocol_ref_columns_01(self, ms_assay_modifier: AssayFileModifier):
         ms_assay_modifier.max_row_number_limit = 3
         ms_assay_modifier.update_protocol_ref_columns()
         assert len(ms_assay_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_update_protocol_ref_columns_02(
-        self, ms_assay_modifier: AssayFileModifier
-    ):
+    async def test_update_protocol_ref_columns_02(self, ms_assay_modifier: AssayFileModifier):
         ms_assay_modifier.max_row_number_limit = 3
         metabolights_model = ms_assay_modifier.model
         study = metabolights_model.investigation.studies[0]

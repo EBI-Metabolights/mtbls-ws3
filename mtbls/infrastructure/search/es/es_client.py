@@ -9,28 +9,16 @@ logger = logging.getLogger(__name__)
 
 
 class ElasticsearchClientConfig(BaseModel):
-    hosts: List[str] | str = Field(
-        default_factory=list, description="List of Elasticsearch host URLs"
-    )
-    api_key: Optional[str] = Field(
-        None, description="Deprecated single API key for Elasticsearch authentication"
-    )
+    hosts: List[str] | str = Field(default_factory=list, description="List of Elasticsearch host URLs")
+    api_key: Optional[str] = Field(None, description="Deprecated single API key for Elasticsearch authentication")
     api_keys: Optional[Dict[str, str]] = Field(
         default=None,
         description="Named API keys for Elasticsearch authentication",
     )
-    username: Optional[str] = Field(
-        default=None, description="Username for basic authentication"
-    )
-    password: Optional[str] = Field(
-        default=None, description="Password for basic authentication"
-    )
-    request_timeout: Optional[float] = Field(
-        5.0, description="Request timeout in seconds"
-    )
-    verify_certs: bool = Field(
-        default=True, description="Verify SSL certificates for HTTPS connections"
-    )
+    username: Optional[str] = Field(default=None, description="Username for basic authentication")
+    password: Optional[str] = Field(default=None, description="Password for basic authentication")
+    request_timeout: Optional[float] = Field(5.0, description="Request timeout in seconds")
+    verify_certs: bool = Field(default=True, description="Verify SSL certificates for HTTPS connections")
 
 
 class ElasticsearchClient:
@@ -59,16 +47,11 @@ class ElasticsearchClient:
             if self._config.api_keys and api_key_name in self._config.api_keys:
                 return self._config.api_keys[api_key_name]
             raise ValueError(
-                f"API key '{api_key_name}' is not configured; "
-                f"available keys: {list(self._config.api_keys or {})}"
+                f"API key '{api_key_name}' is not configured; available keys: {list(self._config.api_keys or {})}"
             )
 
     async def start(self, api_key_name: Optional[str] = None) -> None:
-        target_keys = (
-            [api_key_name]
-            if api_key_name is not None
-            else self._configured_api_key_names()
-        )
+        target_keys = [api_key_name] if api_key_name is not None else self._configured_api_key_names()
 
         for key_name in target_keys:
             if key_name in self._clients:
@@ -96,9 +79,7 @@ class ElasticsearchClient:
                     )
                 self._clients[key_name] = es
                 if ok:
-                    logger.info(
-                        "Elasticsearch connection established successfully using a configured API key."
-                    )
+                    logger.info("Elasticsearch connection established successfully using a configured API key.")
             except ApiError as e:
                 status = getattr(e, "status_code", None)
                 if status in (401, 403):
@@ -118,24 +99,16 @@ class ElasticsearchClient:
                 raise
 
     async def ensure_started(self, api_key_name: Optional[str] = None) -> None:
-        target_keys = (
-            [api_key_name]
-            if api_key_name is not None
-            else self._configured_api_key_names()
-        )
+        target_keys = [api_key_name] if api_key_name is not None else self._configured_api_key_names()
         for key_name in target_keys:
             if key_name in self._clients:
                 continue
             await self.start(key_name)
 
-    async def _get_started_client(
-        self, api_key_name: Optional[str]
-    ) -> AsyncElasticsearch:
+    async def _get_started_client(self, api_key_name: Optional[str]) -> AsyncElasticsearch:
         effective_name = self._effective_api_key_name(api_key_name)
         await self.ensure_started(effective_name)
-        assert effective_name in self._clients, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
+        assert effective_name in self._clients, "Elasticsearch client not connected. Has start() been called?"
         return self._clients[effective_name]
 
     async def close(self) -> None:
@@ -143,9 +116,7 @@ class ElasticsearchClient:
             await client.close()
         self._clients.clear()
 
-    async def search(
-        self, index, body: Dict[str, Any], api_key_name: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def search(self, index, body: Dict[str, Any], api_key_name: Optional[str] = None) -> Dict[str, Any]:
         client = await self._get_started_client(api_key_name)
         started = time.monotonic()
         try:
@@ -168,15 +139,11 @@ class ElasticsearchClient:
                 )
 
     # no current usecase for multiple search, but adding for completeness / the future.
-    async def msearch(
-        self, index, body: Dict[str, Any], api_key_name: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def msearch(self, index, body: Dict[str, Any], api_key_name: Optional[str] = None) -> Dict[str, Any]:
         client = await self._get_started_client(api_key_name)
         return await client.msearch(index=index, body=body)
 
-    async def count(
-        self, index, body: Optional[Dict[str, Any]], api_key_name: Optional[str] = None
-    ) -> int:
+    async def count(self, index, body: Optional[Dict[str, Any]], api_key_name: Optional[str] = None) -> int:
         client = await self._get_started_client(api_key_name)
         resp = await client.count(index=index, body=body or {})
         return int(resp.get("count", 0))
@@ -185,8 +152,6 @@ class ElasticsearchClient:
         client = await self._get_started_client(api_key_name)
         return await client.info()
 
-    async def get_mapping(
-        self, index: str, api_key_name: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def get_mapping(self, index: str, api_key_name: Optional[str] = None) -> Dict[str, Any]:
         client = await self._get_started_client(api_key_name)
         return await client.indices.get_mapping(index=index)

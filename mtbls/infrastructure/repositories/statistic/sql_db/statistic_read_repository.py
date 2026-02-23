@@ -19,9 +19,7 @@ from mtbls.infrastructure.repositories.default.db.default_read_repository import
 logger = logging.getLogger(__name__)
 
 
-class SqlDbStatisticReadRepository(
-    SqlDbDefaultReadRepository[Statistic, int], StatisticReadRepository
-):
+class SqlDbStatisticReadRepository(SqlDbDefaultReadRepository[Statistic, int], StatisticReadRepository):
     def __init__(
         self,
         entity_mapper: EntityMapper,

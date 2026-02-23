@@ -20,11 +20,7 @@ class BaseModifier:
         if len(items) <= limit:
             str_value = ", ".join([str(x) for x in items])
         else:
-            str_value = (
-                ", ".join([str(x) for x in items[:limit]])
-                + " ... "
-                + f"(total: {len(items)})"
-            )
+            str_value = ", ".join([str(x) for x in items[:limit]]) + " ... " + f"(total: {len(items)})"
         return str_value
 
     @staticmethod

@@ -25,27 +25,11 @@ class RequestTracker:
 
     def update_request_tracker(self, request_tracker_update: RequestTrackerModel):
         self.user_id_var.set(request_tracker_update.user_id)
-        self.resource_id_var.set(
-            request_tracker_update.resource_id
-            if request_tracker_update.resource_id
-            else "-"
-        )
-        self.client_var.set(
-            request_tracker_update.client if request_tracker_update.client else "-"
-        )
-        self.route_path_var.set(
-            request_tracker_update.route_path
-            if request_tracker_update.route_path
-            else "-"
-        )
-        self.request_id_var.set(
-            request_tracker_update.request_id
-            if request_tracker_update.request_id
-            else "-"
-        )
-        self.task_id_var.set(
-            request_tracker_update.task_id if request_tracker_update.task_id else "-"
-        )
+        self.resource_id_var.set(request_tracker_update.resource_id if request_tracker_update.resource_id else "-")
+        self.client_var.set(request_tracker_update.client if request_tracker_update.client else "-")
+        self.route_path_var.set(request_tracker_update.route_path if request_tracker_update.route_path else "-")
+        self.request_id_var.set(request_tracker_update.request_id if request_tracker_update.request_id else "-")
+        self.task_id_var.set(request_tracker_update.task_id if request_tracker_update.task_id else "-")
 
     def reset_request_tracker(self):
         self.user_id_var.set(0)

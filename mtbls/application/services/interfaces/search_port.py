@@ -71,9 +71,7 @@ class BaseElasticSearchGateway(SearchPort):
             return {"_source": {"includes": list(self.config.source_includes)}}
         return {}
 
-    def _map_aggs_to_searchui(
-        self, aggs: Dict[str, Any], config: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _map_aggs_to_searchui(self, aggs: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
 
         for facet_name, spec in config.items():

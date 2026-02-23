@@ -25,9 +25,7 @@ router = APIRouter(tags=["Auth"], prefix="/auth/v1")
 @inject
 async def get_oauth2_token(
     response: Response,
-    form_data: Annotated[
-        OAuth2TokenRequestModel, Form(description="Authentication information.")
-    ],
+    form_data: Annotated[OAuth2TokenRequestModel, Form(description="Authentication information.")],
     authentication_service: AuthenticationService = Depends(  # noqa: FAST002
         Provide["services.authentication_service"]
     ),
@@ -40,14 +38,11 @@ async def get_oauth2_token(
     if username and password:
         if client_secret:
             return JwtToken(
-                message="If you want to authenticate with client secret, "
-                "user name/password pair must be empty."
+                message="If you want to authenticate with client secret, user name/password pair must be empty."
             )
 
         try:
-            access_token = await authentication_service.authenticate_with_password(
-                username, password
-            )
+            access_token = await authentication_service.authenticate_with_password(username, password)
             if access_token:
                 logger.info("%s is authenticated with username and password.", username)
         except Exception as ex:
@@ -56,10 +51,7 @@ async def get_oauth2_token(
             return JwtToken(message=f"Authentication failed for user '{username}'")
     elif client_secret:
         if not username:
-            return JwtToken(
-                message="If you want to authenticate with client secret, "
-                "user name must be defined."
-            )
+            return JwtToken(message="If you want to authenticate with client secret, user name must be defined.")
         try:
             access_token = await authentication_service.authenticate_with_token(
                 token_type=TokenType.API_TOKEN,
@@ -67,15 +59,9 @@ async def get_oauth2_token(
                 username=username,
             )
         except Exception as ex:
-            logger.error(
-                "Authentication failed with API token '%s'", client_secret[0] + "..."
-            )
+            logger.error("Authentication failed with API token '%s'", client_secret[0] + "...")
             logger.debug(str(ex))
-            return JwtToken(
-                message="Authentication failed with API token "
-                + client_secret[0]
-                + "..."
-            )
+            return JwtToken(message="Authentication failed with API token " + client_secret[0] + "...")
         if access_token:
             logger.info("%s is authenticated with API token.", client_secret[0] + "...")
 

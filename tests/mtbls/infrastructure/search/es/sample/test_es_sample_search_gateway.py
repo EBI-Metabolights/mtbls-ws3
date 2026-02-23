@@ -90,14 +90,10 @@ class TestFindStudyIdsByFactorHeaders:
     @pytest.mark.asyncio
     async def test_multiple_values_with_and_operator(self, gateway, mock_client):
         mock_client.search.return_value = {
-            "aggregations": {
-                "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 10}]}
-            }
+            "aggregations": {"unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 10}]}}
         }
 
-        result = await gateway.find_study_ids_by_factor_headers(
-            values=["Batch", "Gender"], operator="and"
-        )
+        result = await gateway.find_study_ids_by_factor_headers(values=["Batch", "Gender"], operator="and")
 
         assert result == ["MTBLS1"]
 
@@ -114,17 +110,13 @@ class TestFindStudyIdsByFactorHeaders:
             }
         }
 
-        result = await gateway.find_study_ids_by_factor_headers(
-            values=["Batch", "Gender"], operator="or"
-        )
+        result = await gateway.find_study_ids_by_factor_headers(values=["Batch", "Gender"], operator="or")
 
         assert result == ["MTBLS1", "MTBLS2"]
 
     @pytest.mark.asyncio
     async def test_no_matches_returns_empty_list(self, gateway, mock_client):
-        mock_client.search.return_value = {
-            "aggregations": {"unique_studies": {"buckets": []}}
-        }
+        mock_client.search.return_value = {"aggregations": {"unique_studies": {"buckets": []}}}
 
         result = await gateway.find_study_ids_by_factor_headers(values=["NONEXISTENT"])
 
@@ -222,11 +214,7 @@ class TestSearchCallParameters:
     def mock_client(self):
         client = MagicMock()
         client.search = AsyncMock(
-            return_value={
-                "aggregations": {
-                    "unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}
-                }
-            }
+            return_value={"aggregations": {"unique_studies": {"buckets": [{"key": "MTBLS1", "doc_count": 1}]}}}
         )
         return client
 

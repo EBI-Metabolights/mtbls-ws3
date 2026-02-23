@@ -62,19 +62,14 @@ class OpaPolicyService(PolicyService):
         return self.templates
 
     @cached(cache=TTLCache(maxsize=10, ttl=60))
-    async def get_rule_definitions(
-        self, version: Union[None, str] = None
-    ) -> None | VersionedValidationsMap:
+    async def get_rule_definitions(self, version: Union[None, str] = None) -> None | VersionedValidationsMap:
         try:
-            result = await self.get_http_response(
-                self.config.rule_definitions_url, "result"
-            )
+            result = await self.get_http_response(self.config.rule_definitions_url, "result")
             try:
                 validations_map = VersionedValidationsMap(
                     validation_version=result["validation_version"],
                     validations={
-                        x["rule_id"]: Validation.model_validate(x, by_name=True)
-                        for x in result["violations"]
+                        x["rule_id"]: Validation.model_validate(x, by_name=True) for x in result["violations"]
                     },
                 )
                 self.rule_definitions = validations_map
@@ -94,13 +89,9 @@ class OpaPolicyService(PolicyService):
     @cached(cache=TTLCache(maxsize=10, ttl=60))
     async def get_control_lists(self) -> None | ValidationControls:
         try:
-            result = await self.get_http_response(
-                self.config.control_lists_url, "result"
-            )
+            result = await self.get_http_response(self.config.control_lists_url, "result")
             try:
-                self.control_lists = ValidationControls.model_validate(
-                    result, by_alias=True
-                )
+                self.control_lists = ValidationControls.model_validate(result, by_alias=True)
                 logger.debug(
                     "Control lists are fetched from remote service: %s",
                     self.config.control_lists_url,
@@ -116,9 +107,7 @@ class OpaPolicyService(PolicyService):
 
     @cached(cache=TTLCache(maxsize=10, ttl=60))
     async def get_supported_validation_versions(self) -> list[str]:
-        versions_result = await self.get_http_response(
-            self.config.version_url, "result"
-        )
+        versions_result = await self.get_http_response(self.config.version_url, "result")
         self.versions = [versions_result]
         return self.versions
 
@@ -132,21 +121,15 @@ class OpaPolicyService(PolicyService):
         opa = PolicyInput()
         opa.input = model
         logger.debug("Loading study model schema to validate %s", resource_id)
-        timeout_in_seconds = (
-            timeout_in_seconds if timeout_in_seconds else self.config.timeout_in_seconds
-        )
-        validate_schema = (
-            validate_schema if validate_schema else self.config.validate_schema
-        )
+        timeout_in_seconds = timeout_in_seconds if timeout_in_seconds else self.config.timeout_in_seconds
+        validate_schema = validate_schema if validate_schema else self.config.validate_schema
         #
         dict_value = opa.model_dump(by_alias=True)
         if validate_schema:
             opa.model_json_schema(mode="serialization")
             logger.debug("Validating input model")
             study_model_json_schema = get_study_model_schema()
-            jsonschema.validate(
-                instance=dict_value["input"], schema=study_model_json_schema
-            )
+            jsonschema.validate(instance=dict_value["input"], schema=study_model_json_schema)
         logger.debug(
             "Sending %s validation request to %s",
             resource_id,
@@ -163,9 +146,7 @@ class OpaPolicyService(PolicyService):
         logger.debug("Validation report is received for %s", resource_id)
         return messages
 
-    async def get_http_response(
-        self, url: str, root_dict_key: Union[None, str] = None
-    ) -> Union[Any, dict[str, Any]]:
+    async def get_http_response(self, url: str, root_dict_key: Union[None, str] = None) -> Union[Any, dict[str, Any]]:
         if not url:
             raise ValueError("url is required")
 
@@ -174,9 +155,7 @@ class OpaPolicyService(PolicyService):
             return {}
 
         try:
-            response: HttpResponse = await self.http_client.send_request(
-                HttpRequestType.GET, url, timeout=10
-            )
+            response: HttpResponse = await self.http_client.send_request(HttpRequestType.GET, url, timeout=10)
 
             if not root_dict_key:
                 return response.json_data or {}

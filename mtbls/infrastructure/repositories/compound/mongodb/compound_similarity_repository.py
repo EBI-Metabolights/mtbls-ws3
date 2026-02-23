@@ -29,9 +29,7 @@ def _check_rdkit() -> bool:
             _rdkit_available = True
         except ImportError:
             _rdkit_available = False
-            logger.warning(
-                "RDKit not installed. Similarity search by SMILES/InChI will not be available."
-            )
+            logger.warning("RDKit not installed. Similarity search by SMILES/InChI will not be available.")
     return _rdkit_available
 
 
@@ -96,9 +94,7 @@ def _compute_fingerprint(
         return (None, None)
 
 
-def _select_screening_bits(
-    fingerprint_bits: List[int], max_bits: int = 20
-) -> List[int]:
+def _select_screening_bits(fingerprint_bits: List[int], max_bits: int = 20) -> List[int]:
     """
     Select a subset of bits for the screening stage.
 
@@ -131,9 +127,7 @@ def _build_similarity_pipeline(
     # Bit count range for pruning rule:
     # T * query_count <= candidate_count <= query_count / T
     min_bit_count = int(threshold * query_bit_count)
-    max_bit_count = (
-        int(query_bit_count / threshold) if threshold > 0 else fingerprint_nbits
-    )
+    max_bit_count = int(query_bit_count / threshold) if threshold > 0 else fingerprint_nbits
 
     pipeline: List[Dict[str, Any]] = []
 
@@ -162,9 +156,7 @@ def _build_similarity_pipeline(
     pipeline.append(
         {
             "$addFields": {
-                "_intersection": {
-                    "$size": {"$setIntersection": ["$fingerprint_bits", query_bits]}
-                },
+                "_intersection": {"$size": {"$setIntersection": ["$fingerprint_bits", query_bits]}},
                 "_query_bit_count": query_bit_count,
             }
         }
@@ -277,9 +269,7 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
                 )
 
             if query_bits is None:
-                raise ValueError(
-                    f"Compound '{compound_id}' has no parseable structure or fingerprint data"
-                )
+                raise ValueError(f"Compound '{compound_id}' has no parseable structure or fingerprint data")
 
             return await self._execute_similarity_search(
                 collection=collection,
@@ -358,9 +348,7 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
         exclude_id: Optional[str] = None,
     ) -> List[SimilarCompound]:
         """Execute the similarity search aggregation pipeline."""
-        screening_bits = _select_screening_bits(
-            query_bits, self.config.max_screening_bits
-        )
+        screening_bits = _select_screening_bits(query_bits, self.config.max_screening_bits)
 
         pipeline = _build_similarity_pipeline(
             query_bits=query_bits,
@@ -376,9 +364,7 @@ class MongoCompoundSimilarityRepository(CompoundSimilarityRepository):
 
         results = list(collection.aggregate(pipeline))
 
-        logger.debug(
-            "Found %s similar compounds with Tanimoto >= %s", len(results), threshold
-        )
+        logger.debug("Found %s similar compounds with Tanimoto >= %s", len(results), threshold)
 
         return [
             SimilarCompound(

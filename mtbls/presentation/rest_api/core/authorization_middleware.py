@@ -41,9 +41,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         self.request_tracker = request_tracker
 
         self.authorized_endpoints = (
-            [AuthorizedEndpoint.model_validate(x) for x in authorized_endpoints]
-            if authorized_endpoints
-            else []
+            [AuthorizedEndpoint.model_validate(x) for x in authorized_endpoints] if authorized_endpoints else []
         )
 
     async def dispatch(self, request: Request, call_next):
@@ -67,8 +65,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
 
             if user.is_authenticated:
                 access_request_message = (
-                    f"User {user.user_detail.id_} requests "
-                    f"{method} {route_path} from host/IP {client_host}."
+                    f"User {user.user_detail.id_} requests {method} {route_path} from host/IP {client_host}."
                 )
                 if resource_id:
                     permission_context: StudyPermissionContext = (
@@ -76,32 +73,24 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
                             user.user_detail, resource_id=resource_id
                         )
                     )
-                    self.check_permission_context(
-                        permission_context, client_host, route_path
-                    )
+                    self.check_permission_context(permission_context, client_host, route_path)
                     user.permission_context = permission_context
                     study = permission_context.study
                     if study and study.status != StudyStatus.PUBLIC:
-                        self.check_initial_authorization(
-                            route_path, user, client_host, auth
-                        )
+                        self.check_initial_authorization(route_path, user, client_host, auth)
             else:
                 if resource_id:
                     permission_context: StudyPermissionContext = (
-                        await self.authorization_service.get_user_resource_permission(
-                            None, resource_id=resource_id
-                        )
+                        await self.authorization_service.get_user_resource_permission(None, resource_id=resource_id)
                     )
-                    self.check_permission_context(
-                        permission_context, client_host, route_path
-                    )
+                    self.check_permission_context(permission_context, client_host, route_path)
                     user.permission_context = permission_context
                     study = permission_context.study
                     if study and study.status != StudyStatus.PUBLIC:
-                        self.check_initial_authorization(
-                            route_path, user, client_host, auth
-                        )
-                access_request_message = f"Unauthenticated user requests {method} {route_path} from host/IP {client_host}."  # noqa: E501
+                        self.check_initial_authorization(route_path, user, client_host, auth)
+                access_request_message = (
+                    f"Unauthenticated user requests {method} {route_path} from host/IP {client_host}."  # noqa: E501
+                )
             if resource_id:
                 access_request_message += f" Target resource id: {resource_id}"
             logger.debug(access_request_message)
@@ -109,9 +98,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         except AuthorizationError as ex:
             if user.is_authenticated:
-                message = (
-                    f"Authorization error for user {user.user_detail.id_}: {str(ex)}"
-                )
+                message = f"Authorization error for user {user.user_detail.id_}: {str(ex)}"
             else:
                 message = f"Authorization error: {str(ex)}"
             logger.debug(message)
@@ -121,9 +108,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             )
         except AuthenticationError as ex:
             if user.is_authenticated:
-                message = (
-                    f"Authentication error for user {user.user_detail.id_}: {str(ex)}"
-                )
+                message = f"Authentication error for user {user.user_detail.id_}: {str(ex)}"
                 logger.debug(message)
             else:
                 message = f"Authentication error for unauthenticated user: {str(ex)}"
@@ -138,19 +123,11 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         response.headers["X-Process-Time"] = str(process_time)
         return response
 
-    def check_permission_context(
-        self, context: StudyPermissionContext, client_host: str, route_path: str
-    ):
+    def check_permission_context(self, context: StudyPermissionContext, client_host: str, route_path: str):
         permission = context.permissions
-        if (
-            not permission.read
-            and not permission.create
-            and not permission.delete
-            and permission.update
-        ):
+        if not permission.read and not permission.create and not permission.delete and permission.update:
             error_log_message = (
-                f"User {context.user.id_} from host {client_host} "
-                f"has no permission to access {route_path}",
+                f"User {context.user.id_} from host {client_host} has no permission to access {route_path}",
             )
             logger.error(error_log_message)
             raise AuthorizationError(error_log_message)
@@ -174,8 +151,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         if authorized_path and not scope_match:
             if user.is_authenticated:
                 error_log_message = (
-                    f"User {user.user_detail.id_} from host {client_host} "
-                    f"has no permission to access {route_path}",
+                    f"User {user.user_detail.id_} from host {client_host} has no permission to access {route_path}",
                 )
                 logger.error(error_log_message)
                 raise AuthorizationError(error_log_message)
@@ -184,9 +160,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
                 route_path,
                 client_host,
             )
-            raise AuthenticationError(
-                f"Authentication is required to access {route_path}."
-            )
+            raise AuthenticationError(f"Authentication is required to access {route_path}.")
 
     def set_request_track(
         self,

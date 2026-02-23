@@ -56,9 +56,7 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
             stmt = select(table).where(table.id == id_)
             result = await session.execute(stmt)
             db_object = result.scalars().one_or_none()
-            return await self.entity_mapper.convert_to_output_type(
-                db_object, self.output_type
-            )
+            return await self.entity_mapper.convert_to_output_type(db_object, self.output_type)
 
     @validate_inputs_outputs
     async def get_ids(
@@ -104,14 +102,10 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
         query_field_options: QueryFieldOptions,
     ) -> PaginatedOutput:
         async with self.database_client.session() as a_session:
-            return await self._find_entities(
-                a_session, query_field_options=query_field_options
-            )
+            return await self._find_entities(a_session, query_field_options=query_field_options)
 
     @validate_inputs_outputs
-    async def _find_entities(
-        self, session, query_field_options: QueryFieldOptions
-    ) -> PaginatedOutput:
+    async def _find_entities(self, session, query_field_options: QueryFieldOptions) -> PaginatedOutput:
         if not session:
             raise Exception("Session is not provided.")
         output = PaginatedOutput()
@@ -123,23 +117,17 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
             if not query_field_options.selected_fields:
                 db_objects = result.scalars().all()
                 if db_objects:
-                    output.data = await self.entity_mapper.convert_to_output_type_list(
-                        db_objects, self.output_type
-                    )
+                    output.data = await self.entity_mapper.convert_to_output_type_list(db_objects, self.output_type)
             else:
                 all_data = result.all()
                 if all_data:
                     output.data = all_data
             output.size = len(output.data)
-            output.offset = (
-                query_field_options.offset if query_field_options.offset else 0
-            )
+            output.offset = query_field_options.offset if query_field_options.offset else 0
         return output
 
     @validate_inputs_outputs
-    async def _get_first_by_field_name(
-        self, field_name: str, value: Any
-    ) -> Union[None, OUTPUT_TYPE]:
+    async def _get_first_by_field_name(self, field_name: str, value: Any) -> Union[None, OUTPUT_TYPE]:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(
@@ -157,16 +145,10 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
     @validate_inputs_outputs
     async def _build_query(self, query_field_options: QueryFieldOptions):
         table = self.managed_table
-        selected_fields = await self._select_query_fields(
-            table, self.output_type, query_field_options.selected_fields
-        )
+        selected_fields = await self._select_query_fields(table, self.output_type, query_field_options.selected_fields)
         stmt = select(*selected_fields)
-        stmt = await self._filter_query(
-            stmt, table, self.output_type, query_field_options.filters
-        )
-        stmt = await self._sort_query(
-            stmt, table, self.output_type, query_field_options.sort_options
-        )
+        stmt = await self._filter_query(stmt, table, self.output_type, query_field_options.filters)
+        stmt = await self._sort_query(stmt, table, self.output_type, query_field_options.sort_options)
         if query_field_options.limit:
             stmt = stmt.limit(query_field_options.limit)
         if query_field_options.offset:
@@ -204,9 +186,7 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
         for sort in sort_options:
             sort_key = to_snake(sort.key)
             if sort_key not in self.output_type_alias_dict:
-                logger.warning(
-                    "Sort field %s is not in %s", sort_key, model_class.__name__
-                )
+                logger.warning("Sort field %s is not in %s", sort_key, model_class.__name__)
             column_name = self.output_type_alias_dict[sort_key]
             column = getattr(model_class, column_name, None)
             if not column:
@@ -248,9 +228,7 @@ class SqlDbDefaultReadRepository(AbstractReadRepository[Type[OUTPUT_TYPE], ID_TY
             except ValueError:
                 raise Exception("Invalid filter: %s" % filter.model_dump_json())
             if filter_key not in self.output_type_alias_dict:
-                logger.warning(
-                    ("Sort field %s is not in %s", filter_key, model_class.__name__)
-                )
+                logger.warning(("Sort field %s is not in %s", filter_key, model_class.__name__))
             column_name = self.output_type_alias_dict[filter_key]
             column = getattr(model_class, column_name, None)
             value = value.value if isinstance(value, enum.Enum) else value

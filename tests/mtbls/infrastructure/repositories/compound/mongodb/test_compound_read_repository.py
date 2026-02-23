@@ -42,20 +42,14 @@ class TestGetCompoundsByIds:
         mock_db.__getitem__ = MagicMock(return_value=mock_collection)
 
         mock_database_client.database = MagicMock(return_value=AsyncMock())
-        mock_database_client.database.return_value.__aenter__ = AsyncMock(
-            return_value=mock_db
-        )
+        mock_database_client.database.return_value.__aenter__ = AsyncMock(return_value=mock_db)
         mock_database_client.database.return_value.__aexit__ = AsyncMock()
 
-        compounds, missing_ids = await repository.get_compounds_by_ids(
-            ["MTBLC1", "MTBLC2"]
-        )
+        compounds, missing_ids = await repository.get_compounds_by_ids(["MTBLC1", "MTBLC2"])
 
         assert len(compounds) == 2
         assert missing_ids == []
-        mock_collection.find.assert_called_once_with(
-            {"id": {"$in": ["MTBLC1", "MTBLC2"]}}
-        )
+        mock_collection.find.assert_called_once_with({"id": {"$in": ["MTBLC1", "MTBLC2"]}})
 
     @pytest.mark.asyncio
     async def test_returns_missing_ids(self, mock_database_client, repository):
@@ -69,14 +63,10 @@ class TestGetCompoundsByIds:
         mock_db.__getitem__ = MagicMock(return_value=mock_collection)
 
         mock_database_client.database = MagicMock(return_value=AsyncMock())
-        mock_database_client.database.return_value.__aenter__ = AsyncMock(
-            return_value=mock_db
-        )
+        mock_database_client.database.return_value.__aenter__ = AsyncMock(return_value=mock_db)
         mock_database_client.database.return_value.__aexit__ = AsyncMock()
 
-        compounds, missing_ids = await repository.get_compounds_by_ids(
-            ["MTBLC1", "MTBLC999"]
-        )
+        compounds, missing_ids = await repository.get_compounds_by_ids(["MTBLC1", "MTBLC999"])
 
         assert len(compounds) == 1
         assert compounds[0].id == "MTBLC1"
@@ -92,22 +82,16 @@ class TestGetCompoundsByIds:
         mock_db.__getitem__ = MagicMock(return_value=mock_collection)
 
         mock_database_client.database = MagicMock(return_value=AsyncMock())
-        mock_database_client.database.return_value.__aenter__ = AsyncMock(
-            return_value=mock_db
-        )
+        mock_database_client.database.return_value.__aenter__ = AsyncMock(return_value=mock_db)
         mock_database_client.database.return_value.__aexit__ = AsyncMock()
 
-        compounds, missing_ids = await repository.get_compounds_by_ids(
-            ["MTBLC999", "MTBLC888"]
-        )
+        compounds, missing_ids = await repository.get_compounds_by_ids(["MTBLC999", "MTBLC888"])
 
         assert compounds == []
         assert set(missing_ids) == {"MTBLC999", "MTBLC888"}
 
     @pytest.mark.asyncio
-    async def test_uses_in_operator_for_batch_query(
-        self, mock_database_client, repository
-    ):
+    async def test_uses_in_operator_for_batch_query(self, mock_database_client, repository):
         mock_collection = MagicMock()
         mock_collection.find.return_value = []
 
@@ -115,9 +99,7 @@ class TestGetCompoundsByIds:
         mock_db.__getitem__ = MagicMock(return_value=mock_collection)
 
         mock_database_client.database = MagicMock(return_value=AsyncMock())
-        mock_database_client.database.return_value.__aenter__ = AsyncMock(
-            return_value=mock_db
-        )
+        mock_database_client.database.return_value.__aenter__ = AsyncMock(return_value=mock_db)
         mock_database_client.database.return_value.__aexit__ = AsyncMock()
 
         await repository.get_compounds_by_ids(["MTBLC1", "MTBLC2", "MTBLC3"])

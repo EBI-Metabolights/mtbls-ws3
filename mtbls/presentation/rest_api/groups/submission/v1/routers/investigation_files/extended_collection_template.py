@@ -58,9 +58,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
         delete_item_enabled: bool = True,
         ontology_subitems: Union[None, list[str]] = None,
         value_type_subitems: Union[None, list[str]] = None,
-        updatable_fields: Union[
-            None, list[tuple[str, Union[str, OntologyItem]]]
-        ] = None,
+        updatable_fields: Union[None, list[tuple[str, Union[str, OntologyItem]]]] = None,
     ):
         super().__init__(
             endpoint_prefix=endpoint_prefix,
@@ -157,9 +155,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
     ) -> RestApiEndpointConfiguration:
         return RestApiEndpointConfiguration(
             path=self.item_route_path + "/" + subitem + "/" + "{sub_index}",
-            method=self._update_a_subitem(
-                subitem=subitem, subitem_model_class=subitem_model_class
-            ),
+            method=self._update_a_subitem(subitem=subitem, subitem_model_class=subitem_model_class),
             http_method="PUT",
             summary=f"Update an item of {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
@@ -170,9 +166,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
     ) -> RestApiEndpointConfiguration:
         return RestApiEndpointConfiguration(
             path=self.item_route_path + "/" + subitem,
-            method=self._get_subitems(
-                subitem=subitem, subitem_model_class=subitem_model_class
-            ),
+            method=self._get_subitems(subitem=subitem, subitem_model_class=subitem_model_class),
             http_method="GET",
             summary=f"Add an item to selected {self.item_name.lower().replace('_', ' ')} {subitem.replace('_', ' ')} list.",  # noqa: E501
             response_model=APIResponse[StudyJsonListResponse[subitem_model_class]],
@@ -198,9 +192,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
         target_subitem_model_class: type[IsaAbstractModel],
     ) -> list[RestApiEndpointConfiguration]:
         configs = [
-            self.subitem_create_configuration(
-                subitem, subitem_model_class, target_subitem_model_class
-            ),
+            self.subitem_create_configuration(subitem, subitem_model_class, target_subitem_model_class),
             self.subitem_list_configuration(subitem, subitem_model_class),
             # self.subitem_get_configuration(subitem, subitem_model_class),
             self.subitem_update_configuration(subitem, subitem_model_class),
@@ -223,9 +215,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
             async def post_a_subitem(
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
                 index: Annotated[int, Path(description=index_description)],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_update_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
                 updated_content: Annotated[
                     subitem_model_class,
                     Body(description=content_description),
@@ -240,13 +230,9 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
 
                 jsonpath_template = self.item_jsonpath + f".{subitem.lower()}"
 
-                jsonpath = self._get_rendered_json_path(
-                    jsonpath=jsonpath_template, values=[index]
-                )
+                jsonpath = self._get_rendered_json_path(jsonpath=jsonpath_template, values=[index])
 
-                metadata_service = await study_metadata_service_factory.create_service(
-                    resource_id
-                )
+                metadata_service = await study_metadata_service_factory.create_service(resource_id)
                 with metadata_service:
                     data, indices = await metadata_service.process_investigation_file(
                         operation="insert",
@@ -265,9 +251,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                                 indices=indices,
                             )
                         )
-                return APIErrorResponse(
-                    error_message="Investigation file does not have study"
-                )
+                return APIErrorResponse(error_message="Investigation file does not have study")
 
             return post_a_subitem
 
@@ -275,9 +259,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
 
     def _get_subitems(self, subitem: str, subitem_model_class: type[CamelCaseModel]):
         index_description = f"{self.item_name.lower()} item index"
-        subitem_filter = (
-            f"{self.item_name.lower()} {subitem} filter. e.g. name=x or term=x,value=y"
-        )
+        subitem_filter = f"{self.item_name.lower()} {subitem} filter. e.g. name=x or term=x,value=y"
         sub_index_description = f"{self.item_name.lower()} {subitem} index"
 
         def _get_subitems_decorator():
@@ -285,17 +267,13 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
             async def get_list_subitems(
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
                 index: Annotated[int, Path(description=index_description)],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_read_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
                 study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
                     Provide[  # noqa: FAST002
                         "services.study_metadata_service_factory"
                     ]
                 ),
-                sub_index: Annotated[
-                    Union[int], Query(description=sub_index_description)
-                ] = None,
+                sub_index: Annotated[Union[int], Query(description=sub_index_description)] = None,
                 filter: Annotated[
                     Union[None, str],
                     Query(description=subitem_filter),
@@ -315,9 +293,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                     subitem_filter=filters,
                 )
 
-                metadata_service = await study_metadata_service_factory.create_service(
-                    resource_id
-                )
+                metadata_service = await study_metadata_service_factory.create_service(resource_id)
                 with metadata_service:
                     (
                         data,
@@ -385,9 +361,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
 
     #     return _get_a_subitem_decorator
 
-    def _update_a_subitem(
-        self, subitem: str, subitem_model_class: type[CamelCaseModel]
-    ):
+    def _update_a_subitem(self, subitem: str, subitem_model_class: type[CamelCaseModel]):
         index_description = f"{self.item_name.lower()} item index"
 
         sub_index_description = f"{self.item_name.lower()} {subitem} index"
@@ -398,9 +372,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
                 index: Annotated[int, Path(description=index_description)],
                 sub_index: Annotated[int, Path(description=sub_index_description)],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_update_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
                 updated_content: Annotated[
                     subitem_model_class,
                     Body(description=f"Updated {self.item_name.lower()} content"),
@@ -411,12 +383,8 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
             ):
                 route_path = self._get_route_path(resource_id)
                 jsonpath_template = self.item_jsonpath + f".{subitem.lower()}[$2]"
-                jsonpath = self._get_rendered_json_path(
-                    jsonpath=jsonpath_template, values=[index, sub_index]
-                )
-                metadata_service = await study_metadata_service_factory.create_service(
-                    resource_id
-                )
+                jsonpath = self._get_rendered_json_path(jsonpath=jsonpath_template, values=[index, sub_index])
+                metadata_service = await study_metadata_service_factory.create_service(resource_id)
                 with metadata_service:
                     data, indices = await metadata_service.process_investigation_file(
                         operation="update-object",
@@ -440,9 +408,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                         f"{index} or sub index {sub_index} for the study {resource_id}"
                     )
 
-                return APIErrorResponse(
-                    error_message="Investigation file does not have study"
-                )
+                return APIErrorResponse(error_message="Investigation file does not have study")
 
             return update_item
 
@@ -459,9 +425,7 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
                 resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
                 index: Annotated[int, Path(description=index_description)],
                 sub_index: Annotated[int, Path(description=sub_index_description)],
-                context: Annotated[
-                    StudyPermissionContext, Depends(check_update_permission)
-                ],
+                context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
                 study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
                     Provide[  # noqa: FAST002
                         "services.study_metadata_service_factory"
@@ -470,12 +434,8 @@ class ExtendedStudyItemCollection(CommentedStudyItemCollection):
             ):
                 route_path = self._get_route_path(resource_id)
                 jsonpath_template = self.item_jsonpath + f".{subitem.lower()}[$2]"
-                jsonpath = self._get_rendered_json_path(
-                    jsonpath=jsonpath_template, values=[index, sub_index]
-                )
-                metadata_service = await study_metadata_service_factory.create_service(
-                    resource_id
-                )
+                jsonpath = self._get_rendered_json_path(jsonpath=jsonpath_template, values=[index, sub_index])
+                metadata_service = await study_metadata_service_factory.create_service(resource_id)
                 with metadata_service:
                     data, indices = await metadata_service.process_investigation_file(
                         operation="delete",

@@ -39,15 +39,11 @@ async def find_studies_on_europmc_by_orcid(
         study = await study_read_repository.get_study_by_accession(mtbls_id)
         return study.status
 
-    mtbls_studies: dict[str, MetaboLightsStudyCitation] = (
-        submitter_public_studies.copy()
-    )
+    mtbls_studies: dict[str, MetaboLightsStudyCitation] = submitter_public_studies.copy()
 
     articles = await search_europe_pmc(http_client, orcid=orcid_id)
 
-    article_id_mtbls_id_map = await find_mtbls_ids_for_article_ids(
-        http_client, list(articles.keys())
-    )
+    article_id_mtbls_id_map = await find_mtbls_ids_for_article_ids(http_client, list(articles.keys()))
 
     mtbls_id_article_id_map: dict[str, set[str]] = {}
     for article_id, mtbls_id_list in article_id_mtbls_id_map.items():
@@ -59,9 +55,7 @@ async def find_studies_on_europmc_by_orcid(
 
     all_mtbls_ids.update(mtbls_id_article_id_map.keys())
 
-    mtbls_study_titles = {
-        x: await get_mtbls_title(http_client, mtbls_id=x) for x in all_mtbls_ids
-    }
+    mtbls_study_titles = {x: await get_mtbls_title(http_client, mtbls_id=x) for x in all_mtbls_ids}
 
     for mtbls_id in all_mtbls_ids:
         article_ids = mtbls_id_article_id_map.get(mtbls_id, [])
@@ -93,17 +87,13 @@ async def find_studies_on_europmc_by_orcid(
             )
             for x in article_ids
         ]
-        mtbls_studies[mtbls_id].publications.sort(
-            key=lambda x: x.publication_date, reverse=True
-        )
+        mtbls_studies[mtbls_id].publications.sort(key=lambda x: x.publication_date, reverse=True)
     result = list(mtbls_studies.values())
     result.sort(key=lambda x: int(x.study_accession.replace("MTBLS", "")), reverse=True)
     return result
 
 
-async def search_europe_pmc(
-    http_client: HttpClient, orcid: str
-) -> dict[str, dict[str, Any]]:
+async def search_europe_pmc(http_client: HttpClient, orcid: str) -> dict[str, dict[str, Any]]:
     europe_pmc_url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
     article_ids: dict[str, dict[str, Any]] = {}
     try:
@@ -125,9 +115,7 @@ async def search_europe_pmc(
     return article_ids
 
 
-async def find_mtbls_ids_for_article_ids(
-    http_client: HttpClient, article_ids: list[str]
-) -> dict[str, list[str]]:
+async def find_mtbls_ids_for_article_ids(http_client: HttpClient, article_ids: list[str]) -> dict[str, list[str]]:
     mtbls_study_references: dict[str, list[str]] = {}
     europmc_url_prefix = "https://www.ebi.ac.uk/ebisearch/ws/rest/europepmc"
     for arc_id in article_ids:

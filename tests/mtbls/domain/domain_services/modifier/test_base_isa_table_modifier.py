@@ -46,9 +46,7 @@ class TestUpdateSingleColumn:
                 break
         table_file.table.data[header.column_name][0] = "POSITIVE"
         table_file.table.data[header.column_name][1] = "NEGATIVE"
-        modifier.update_single_column(
-            template_type=technique, file_type=category, header=header
-        )
+        modifier.update_single_column(template_type=technique, file_type=category, header=header)
         assert table_file.table.data[header.column_name][0] == "positive"
         assert table_file.table.data[header.column_name][1] == "negative"
         assert len(modifier.update_logs) == 1

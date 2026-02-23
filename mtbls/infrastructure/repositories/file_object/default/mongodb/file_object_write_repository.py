@@ -54,9 +54,7 @@ class MongoDbFileObjectWriteRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
-        super(FileObjectWriteRepository, self).__init__(
-            study_bucket=study_bucket, observers=[observer]
-        )
+        super(FileObjectWriteRepository, self).__init__(study_bucket=study_bucket, observers=[observer])
         self.http_client = http_client
         self.study_bucket = study_bucket
         self.resource_category = resource_category
@@ -64,9 +62,7 @@ class MongoDbFileObjectWriteRepository(
     def get_bucket(self) -> StudyBucket:
         return self.study_bucket
 
-    async def list(
-        self, resource_id: str, object_key: Union[None, str] = None
-    ) -> list[StudyFileOutput]:
+    async def list(self, resource_id: str, object_key: Union[None, str] = None) -> list[StudyFileOutput]:
         result = await self.collection.find(
             {"resourceId": resource_id, "parentObjectId": object_key},
             {"_id": 0, "data": 0},
@@ -102,9 +98,7 @@ class MongoDbFileObjectWriteRepository(
         collection = self.collection.name
         return f"mongodb://{cn.host}/{cn.database}/{collection}/{resource_id}/{quote(object_key)}"
 
-    async def download(
-        self, resource_id: str, object_key: str, target_path: str
-    ) -> StudyFileOutput:
+    async def download(self, resource_id: str, object_key: str, target_path: str) -> StudyFileOutput:
         result = await self.collection.find_one(
             {"resourceId": resource_id, "objectId": object_key},
             {"_id": 1},
@@ -130,26 +124,18 @@ class MongoDbFileObjectWriteRepository(
         )
         file_exists = current is not None
         if file_exists and not override:
-            raise StudyObjectAlreadyExistsError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectAlreadyExistsError(resource_id, self.study_bucket.value, object_key)
 
         if source_uri and source_uri.startswith("file://"):
-            result = await self.put_with_local_file_provider(
-                source_uri, resource_id, object_key, file_exists
-            )
+            result = await self.put_with_local_file_provider(source_uri, resource_id, object_key, file_exists)
             uploaded = True
         elif re.match(r"^https?://", source_uri):
-            result = await self.put_with_http_file_provider(
-                source_uri, resource_id, object_key, file_exists
-            )
+            result = await self.put_with_http_file_provider(source_uri, resource_id, object_key, file_exists)
             uploaded = True
 
         if uploaded:
             if file_exists:
-                study_object = await self.object_updated(
-                    StudyFileOutput.model_validate(x) for x in current
-                )
+                study_object = await self.object_updated(StudyFileOutput.model_validate(x) for x in current)
             else:
                 study_object = await self.get_study_object(resource_id, object_key)
 
@@ -222,29 +208,21 @@ class MongoDbFileObjectWriteRepository(
         )
         file_exists = current is not None
         if file_exists and not exist_ok:
-            raise StudyObjectAlreadyExistsError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectAlreadyExistsError(resource_id, self.study_bucket.value, object_key)
 
-        study_object = await self.get_study_object(
-            resource_id, object_key, is_directory=True
-        )
+        study_object = await self.get_study_object(resource_id, object_key, is_directory=True)
 
         await self.object_created(study_object)
         return True
 
-    async def put_with_local_file_provider(
-        self, source_uri: str, resource_id: str, object_key: str
-    ) -> bool:
+    async def put_with_local_file_provider(self, source_uri: str, resource_id: str, object_key: str) -> bool:
         source_path = await self._convert_uri_to_path(source_uri)
         source = pathlib.Path(source_path)
         with source.open() as f:
             data = json.load(f)
         return self.update_data(resource_id, object_key, data)
 
-    async def update_data(
-        self, resource_id: str, object_key: str, data: dict[str, Any]
-    ):
+    async def update_data(self, resource_id: str, object_key: str, data: dict[str, Any]):
         result = await self.collection.find_one(
             {"resourceId": resource_id, "objectId": object_key},
             {"_id": 1, "data": 0},
@@ -274,14 +252,10 @@ class MongoDbFileObjectWriteRepository(
             raise UnaccessibleUriError(uri_path)
         return uri_path
 
-    async def put_with_http_file_provider(
-        self, source_uri: str, resource_id: str, object_key: str
-    ) -> bool:
+    async def put_with_http_file_provider(self, source_uri: str, resource_id: str, object_key: str) -> bool:
         if not source_uri or not re.match(r"^https?://", source_uri):
             raise UnsupportedUriError(source_uri)
-        response: HttpResponse = await self.http_client.send_request(
-            HttpRequestType.GET, source_uri
-        )
+        response: HttpResponse = await self.http_client.send_request(HttpRequestType.GET, source_uri)
         return self.update_data(resource_id, object_key, response.json_data)
 
     async def delete_object(
@@ -297,9 +271,7 @@ class MongoDbFileObjectWriteRepository(
         if not result and ignore_not_exist:
             return False
         collection = self.collection
-        delete_result: DeleteResult = await collection.delete_one(
-            {"_id": result["_id"]}
-        )
+        delete_result: DeleteResult = await collection.delete_one({"_id": result["_id"]})
         if delete_result.deleted_count > 0:
             study_object = StudyFileOutput.model_validate(result)
             await self.object_deleted(study_object)

@@ -50,10 +50,6 @@ class TestGetListString:
         limit = 5
         expected_list = list_item.copy()
         expected_list.sort()
-        expected = (
-            ", ".join([str(x) for x in expected_list[:limit]])
-            + " ... "
-            + f"(total: {len(expected_list)})"
-        )
+        expected = ", ".join([str(x) for x in expected_list[:limit]]) + " ... " + f"(total: {len(expected_list)})"
         actual = modifier.get_list_string(list_item, limit=limit)
         assert actual == expected

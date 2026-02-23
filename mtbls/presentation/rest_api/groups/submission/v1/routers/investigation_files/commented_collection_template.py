@@ -52,9 +52,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
         post_item_enabled: bool = True,
         patch_item_enabled: bool = True,
         delete_item_enabled: bool = True,
-        updatable_fields: Union[
-            None, list[tuple[str, Union[str, OntologyItem]]]
-        ] = None,
+        updatable_fields: Union[None, list[tuple[str, Union[str, OntologyItem]]]] = None,
     ):
         super().__init__(
             endpoint_prefix=endpoint_prefix,
@@ -139,12 +137,8 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
             template = self.comments_jsonpath
             if not filter:
                 template = self.comments_jsonpath + "[*]"
-            jsonpath = self._get_rendered_json_path(
-                template, [index], subitem_filter=filters
-            )
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            jsonpath = self._get_rendered_json_path(template, [index], subitem_filter=filters)
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             with metadata_service:
                 (
                     comments,
@@ -179,9 +173,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
         async def update_comment(
             resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
             index: Annotated[int, Path(description=index_description)],
-            context: Annotated[
-                StudyPermissionContext, Depends(check_update_permission)
-            ],
+            context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
             comment: Annotated[
                 CommentItem,
                 Body(description=f"{self.item_name.lower()} comment content"),
@@ -198,9 +190,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                 self.comments_jsonpath, [index], subitem_filter={"name": comment.name}
             )
 
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             with metadata_service:
                 data, indices = await metadata_service.process_investigation_file(
                     operation="patch",
@@ -223,9 +213,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                     error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
-            return APIErrorResponse(
-                error_message="Investigation file does not have study"
-            )
+            return APIErrorResponse(error_message="Investigation file does not have study")
 
         return update_comment
 
@@ -236,9 +224,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
         async def delete_comment(
             resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
             index: Annotated[int, Path(description=index_description)],
-            context: Annotated[
-                StudyPermissionContext, Depends(check_update_permission)
-            ],
+            context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
             comment: Annotated[
                 CommentItem,
                 Body(description=f"{self.item_name.lower()} comment content"),
@@ -255,9 +241,7 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                 [index],
                 subitem_filter={"name": comment.name, "value": comment.value},
             )
-            metadata_service = await study_metadata_service_factory.create_service(
-                resource_id
-            )
+            metadata_service = await study_metadata_service_factory.create_service(resource_id)
             with metadata_service:
                 data, indices = await metadata_service.process_investigation_file(
                     operation="delete",
@@ -280,8 +264,6 @@ class CommentedStudyItemCollection(StudyItemCollectionWithFields):
                     error_message=f"Invalid input {self.item_name.lower()} index {index} or filter for the study {resource_id}"  # noqa: E501
                 )
 
-            return APIErrorResponse(
-                error_message="Investigation file does not have study"
-            )
+            return APIErrorResponse(error_message="Investigation file does not have study")
 
         return delete_comment

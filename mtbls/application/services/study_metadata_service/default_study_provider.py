@@ -62,9 +62,7 @@ class AsyncLocalFolderMetadataCollector(AbstractFolderMetadataCollector):
 class DefaultMetabolightsStudyProvider(AsyncMetabolightsStudyProvider):
     def __init__(self, study_read_repository: StudyReadRepository) -> None:
         super().__init__(
-            db_metadata_collector=DefaultAsyncDbMetadataCollector(
-                study_read_repository=study_read_repository
-            ),
+            db_metadata_collector=DefaultAsyncDbMetadataCollector(study_read_repository=study_read_repository),
             folder_metadata_collector=AsyncLocalFolderMetadataCollector(),
         )
 
@@ -105,9 +103,7 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
     async def load_from_data_index_file(self) -> Dict[str, StudyFileDescriptor]:
         metadata: Dict[str, StudyFileDescriptor] = {}
         current = int(datetime.datetime.now().timestamp())
-        temp_file_path = Path(
-            f"/tmp/data_files/{self.resource_id}/{current}_" + str(uuid.uuid4())
-        )
+        temp_file_path = Path(f"/tmp/data_files/{self.resource_id}/{current}_" + str(uuid.uuid4()))
         file_content = {}
         try:
             temp_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,17 +156,13 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
                 size_in_bytes=file_descriptor.file_size,
             )
             metadata[relative_path] = descriptor
-        metadata_files = await self.metadata_files_object_repository.list(
-            self.resource_id
-        )
+        metadata_files = await self.metadata_files_object_repository.list(self.resource_id)
         for file in metadata_files:
             if file.is_link:
                 continue
             updated_at = 0
             if file.updated_at and isinstance(file.updated_at, str):
-                updated_at = int(
-                    datetime.datetime.fromisoformat(file.updated_at).timestamp()
-                )
+                updated_at = int(datetime.datetime.fromisoformat(file.updated_at).timestamp())
             elif file.updated_at and isinstance(file.updated_at, datetime.datetime):
                 updated_at = int(file.updated_at.timestamp())
 
@@ -196,9 +188,7 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
     ) -> Tuple[Union[None, StudyFolderMetadata], List[GenericMessage]]:
         messages: List[GenericMessage] = []
         study_folder_metadata = StudyFolderMetadata()
-        data_files: Dict[
-            str, StudyFileDescriptor
-        ] = await self.load_from_data_index_file()
+        data_files: Dict[str, StudyFileDescriptor] = await self.load_from_data_index_file()
 
         data_folder_size = 0
         for relative_path, item in data_files.items():

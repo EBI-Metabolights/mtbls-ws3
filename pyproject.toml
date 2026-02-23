@@ -123,6 +123,7 @@ cache_dir = ".pytest-cache"
 
 [tool.ruff]
 target-version = "py313"
+line-length = 120
 
 [tool.ruff.lint]
 extend-select = ["E4", "E7", "E9", "F", "I", "G", "SLF", "PTH", "Q"]

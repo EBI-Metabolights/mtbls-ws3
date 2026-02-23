@@ -26,9 +26,7 @@ from mtbls.infrastructure.repositories.default.db.default_read_repository import
 logger = logging.getLogger(__name__)
 
 
-class SqlDbStudyReadRepository(
-    SqlDbDefaultReadRepository[StudyOutput, int], StudyReadRepository
-):
+class SqlDbStudyReadRepository(SqlDbDefaultReadRepository[StudyOutput, int], StudyReadRepository):
     def __init__(
         self,
         entity_mapper: EntityMapper,
@@ -51,9 +49,7 @@ class SqlDbStudyReadRepository(
         include_revisions: bool = False,
         include_submitters: bool = False,
     ) -> Union[None, StudyOutput]:
-        return await self.get_study_by_filter(
-            lambda: Study.id == id, include_revisions, include_submitters
-        )
+        return await self.get_study_by_filter(lambda: Study.id == id, include_revisions, include_submitters)
 
     @validate_call(validate_return=True, config=ConfigDict(strict=True))
     async def get_study_by_accession(
@@ -62,13 +58,9 @@ class SqlDbStudyReadRepository(
         include_revisions: bool = False,
         include_submitters: bool = False,
     ) -> Union[None, StudyOutput]:
-        return await self.get_study_by_filter(
-            lambda: Study.acc == accession, include_revisions, include_submitters
-        )
+        return await self.get_study_by_filter(lambda: Study.acc == accession, include_revisions, include_submitters)
 
-    async def get_study_by_filter(
-        self, filter_, include_revisions, include_submitters
-    ) -> None | StudyOutput:
+    async def get_study_by_filter(self, filter_, include_revisions, include_submitters) -> None | StudyOutput:
         study_entity: None | StudyOutput = None
         async with self.database_client.session() as session:
             stmt = select(Study).where(filter_())
@@ -79,20 +71,14 @@ class SqlDbStudyReadRepository(
             result = await session.execute(stmt)
             study: None | Study = result.scalars().one_or_none()
             if study:
-                study_entity: StudyOutput = (
-                    await self.entity_mapper.convert_to_output_type(study, StudyOutput)
-                )
+                study_entity: StudyOutput = await self.entity_mapper.convert_to_output_type(study, StudyOutput)
                 if include_revisions and study.revisions:
-                    study_entity.revisions = (
-                        await self.entity_mapper.convert_to_output_type_list(
-                            study.revisions, StudyRevisionOutput
-                        )
+                    study_entity.revisions = await self.entity_mapper.convert_to_output_type_list(
+                        study.revisions, StudyRevisionOutput
                     )
                 if include_submitters and study.submitters:
-                    study_entity.submitters = (
-                        await self.entity_mapper.convert_to_output_type_list(
-                            study.submitters, UserOutput
-                        )
+                    study_entity.submitters = await self.entity_mapper.convert_to_output_type_list(
+                        study.submitters, UserOutput
                     )
 
         return study_entity
@@ -135,13 +121,9 @@ class SqlDbStudyReadRepository(
         self,
         filters: Union[None, list[EntityFilter]],
     ) -> list[str]:
-        return await self.select_field(
-            "accession_number", QueryOptions(filters=filters)
-        )
+        return await self.select_field("accession_number", QueryOptions(filters=filters))
 
-    async def _get_studies_by_filter(
-        self, filter_, include_revisions, include_submitters
-    ) -> None | StudyOutput:
+    async def _get_studies_by_filter(self, filter_, include_revisions, include_submitters) -> None | StudyOutput:
         async with self.database_client.session() as session:
             stmt = select(Study).where(filter_())
             if include_submitters:
@@ -153,22 +135,14 @@ class SqlDbStudyReadRepository(
             study_entities = []
             if studies:
                 for study in studies:
-                    study_entity: StudyOutput = (
-                        await self.entity_mapper.convert_to_output_type(
-                            study, StudyOutput
-                        )
-                    )
+                    study_entity: StudyOutput = await self.entity_mapper.convert_to_output_type(study, StudyOutput)
                     if include_revisions and study.revisions:
-                        study_entity.revisions = (
-                            await self.entity_mapper.convert_to_output_type_list(
-                                study.revisions, StudyRevisionOutput
-                            )
+                        study_entity.revisions = await self.entity_mapper.convert_to_output_type_list(
+                            study.revisions, StudyRevisionOutput
                         )
                     if include_submitters and study.submitters:
-                        study_entity.submitters = (
-                            await self.entity_mapper.convert_to_output_type_list(
-                                study.submitters, UserOutput
-                            )
+                        study_entity.submitters = await self.entity_mapper.convert_to_output_type_list(
+                            study.submitters, UserOutput
                         )
                     study_entities.append(study_entity)
 
@@ -181,9 +155,7 @@ class SqlDbStudyReadRepository(
             result = await session.execute(stmt)
             user: None | User = result.scalars().one_or_none()
             if user:
-                return await self.entity_mapper.convert_to_output_type_list(
-                    user.studies, StudyOutput
-                )
+                return await self.entity_mapper.convert_to_output_type_list(user.studies, StudyOutput)
         return []
 
     async def get_studies_by_username(self, username: str) -> list[StudyOutput]:

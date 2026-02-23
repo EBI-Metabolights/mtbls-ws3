@@ -7,9 +7,7 @@ class MongoDbConnection(BaseModel):
     url_scheme: str = "mongodb"
     host: str = ""
     port: int = -1
-    hosts: List[str] = Field(
-        default_factory=list
-    )  # optional: host:port entries for replica sets
+    hosts: List[str] = Field(default_factory=list)  # optional: host:port entries for replica sets
     user: str = ""
     password: str = ""
     database: str = ""
@@ -38,11 +36,7 @@ class MongoDbConnection(BaseModel):
             if "," in self.host:
                 host_list = [h.strip() for h in self.host.split(",") if h.strip()]
             else:
-                base = (
-                    self.host
-                    if self.port is None or self.port < 0
-                    else f"{self.host}:{self.port}"
-                )
+                base = self.host if self.port is None or self.port < 0 else f"{self.host}:{self.port}"
                 host_list = [base]
         hosts_str = ",".join(host_list)
 

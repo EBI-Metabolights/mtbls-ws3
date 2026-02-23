@@ -64,9 +64,7 @@ def run_es_cli(
         exit(1)
     container.init_resources()
 
-    study_read_repository: StudyReadRepository = (
-        container.repositories.study_read_repository()
-    )
+    study_read_repository: StudyReadRepository = container.repositories.study_read_repository()
     http_client: HttpClient = container.gateways.http_client()
     index_cache_files_object_repository: FileObjectWriteRepository = (
         container.repositories.index_cache_files_object_repository()
@@ -74,9 +72,7 @@ def run_es_cli(
     metadata_files_object_repository: FileObjectWriteRepository = (
         container.repositories.metadata_files_object_repository()
     )
-    search_index_manager: SearchIndexManagementGateway = (
-        container.gateways.search_index_management_gateway()
-    )
+    search_index_manager: SearchIndexManagementGateway = container.gateways.search_index_management_gateway()
     logger = logging.getLogger(__name__)
     logger.info("CLI container started")
     request_tracker = get_request_tracker()

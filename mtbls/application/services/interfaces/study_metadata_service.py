@@ -114,9 +114,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         updates: None | IsaTableDataUpdates = None,
     ) -> list[IsaTableRow]: ...
 
-    async def save_isa_table_file(
-        self, isa_table_file: IsaTableFile, object_key: str
-    ) -> None: ...
+    async def save_isa_table_file(self, isa_table_file: IsaTableFile, object_key: str) -> None: ...
 
     async def create_metadata_snapshot(
         self,
@@ -124,9 +122,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         suffix: Union[None, str] = None,
     ) -> tuple[str, str]: ...
 
-    async def restore_metadata_from_snapshot(
-        self, snapshot_name: str
-    ) -> tuple[str, str]: ...
+    async def restore_metadata_from_snapshot(self, snapshot_name: str) -> tuple[str, str]: ...
 
     async def dump_investigation_as_json(
         self,
@@ -251,20 +247,12 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
     ):
         with Path(file_path).open("w") as f:
             if values_in_quotation_mark:
-                header = [
-                    f'"{column_header_map[idx]}"'
-                    for idx in range(len(column_header_map))
-                ]
+                header = [f'"{column_header_map[idx]}"' for idx in range(len(column_header_map))]
             else:
-                header = [
-                    column_header_map[idx].strip('"')
-                    for idx in range(len(column_header_map))
-                ]
+                header = [column_header_map[idx].strip('"') for idx in range(len(column_header_map))]
             f.write("\t".join(header) + "\n")
 
-            column_names = [
-                column_order_map[idx] for idx in range(len(column_order_map))
-            ]
+            column_names = [column_order_map[idx] for idx in range(len(column_order_map))]
             for row_idx in range(len(data[column_names[0]])):
                 row = [data[column_name][row_idx] for column_name in column_names]
                 for idx, cell in enumerate(row):

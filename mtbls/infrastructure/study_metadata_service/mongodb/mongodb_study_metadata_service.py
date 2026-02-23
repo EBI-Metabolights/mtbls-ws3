@@ -88,34 +88,18 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         self.investigation_object_repository = investigation_object_repository
         self.isa_table_object_repository = isa_table_object_repository
         self.isa_table_row_object_repository = isa_table_row_object_repository
-        self.investigation_file_collection_name = (
-            self.investigation_object_repository.collection_name
-        )
-        self.isa_table_files_collection_name = (
-            self.isa_table_object_repository.collection_name
-        )
-        self.isa_table_items_collection_name = (
-            isa_table_row_object_repository.collection_name
-        )
-        self.study_bucket = (
-            study_bucket if study_bucket else StudyBucket.PRIVATE_METADATA_FILES
-        )
+        self.investigation_file_collection_name = self.investigation_object_repository.collection_name
+        self.isa_table_files_collection_name = self.isa_table_object_repository.collection_name
+        self.isa_table_items_collection_name = isa_table_row_object_repository.collection_name
+        self.study_bucket = study_bucket if study_bucket else StudyBucket.PRIVATE_METADATA_FILES
         self.isa_table_collection = self.isa_table_object_repository.collection
-        self.isa_table_items_collection = (
-            self.isa_table_row_object_repository.collection
-        )
-        self.investigation_file_collection = (
-            self.investigation_object_repository.collection
-        )
+        self.isa_table_items_collection = self.isa_table_row_object_repository.collection
+        self.investigation_file_collection = self.investigation_object_repository.collection
         self.resource_id = resource_id
-        self.numeric_resource_id = int(
-            resource_id.removeprefix("REQ").removeprefix("MTBLS")
-        )
+        self.numeric_resource_id = int(resource_id.removeprefix("REQ").removeprefix("MTBLS"))
         self.temp_path = temp_path if temp_path else "/tmp/study-metadata-service"
         self.transaction_id = str(uuid.uuid4())
-        self.staging_path = (
-            Path(self.temp_path) / Path(self.resource_id) / Path(self.transaction_id)
-        )
+        self.staging_path = Path(self.temp_path) / Path(self.resource_id) / Path(self.transaction_id)
 
         self.staging_path_str = str(self.staging_path)
 
@@ -128,17 +112,13 @@ class MongoDbStudyMetadataService(StudyMetadataService):
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         shutil.rmtree(self.staging_path, ignore_errors=True)
 
-    def get_study_metadata_path(
-        self, study_id: str, file_relative_path: Union[None, str] = None
-    ) -> str:
+    def get_study_metadata_path(self, study_id: str, file_relative_path: Union[None, str] = None) -> str:
         if file_relative_path:
             file_path = self.staging_path / Path(file_relative_path)
             return str(file_path)
         return self.staging_path_str
 
-    def exists(
-        self, study_id: str, file_relative_path: Union[None, str] = None
-    ) -> bool:
+    def exists(self, study_id: str, file_relative_path: Union[None, str] = None) -> bool:
         if file_relative_path:
             file_path = self.staging_path / Path(file_relative_path)
             return file_path
@@ -175,9 +155,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         )
         investigation_path = self.staging_path / Path(investigation_object_key)
         if investigation_result:
-            investigation_object = InvestigationFileObject.model_validate(
-                investigation_result
-            )
+            investigation_object = InvestigationFileObject.model_validate(investigation_result)
             item = investigation_object.data
             investigation = item.to_investigation()
             Writer.get_investigation_file_writer().write(
@@ -194,9 +172,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             #         ]
             #     )
             # )
-            isa_table_files = self.isa_table_collection.find(
-                {"resourceId": self.resource_id}
-            ).sort({"objectKey": 1})
+            isa_table_files = self.isa_table_collection.find({"resourceId": self.resource_id}).sort({"objectKey": 1})
 
             for item in isa_table_files:
                 isa_table = IsaTableFileObject.model_validate(item)
@@ -213,9 +189,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                 if load_folder_metadata
                 else None
             ),
-            db_metadata_collector=(
-                self.db_metadata_collector if load_db_metadata else None
-            ),
+            db_metadata_collector=(self.db_metadata_collector if load_db_metadata else None),
             metadata_file_provider=RepositoryStudyMetadataFileProvider(
                 resource_id=self.resource_id,
                 metadata_files_object_repository=self,
@@ -259,17 +233,13 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                 {"resourceId": self.resource_id, "objectKey": object_key},
                 {"$push": {"data." + jsonpath: input_value}},
             )
-            return_values, return_indices = self.fetch_nested_item(
-                target_jsonpath, output_model_class, object_key
-            )
+            return_values, return_indices = self.fetch_nested_item(target_jsonpath, output_model_class, object_key)
             if result.modified_count > 0:
                 return [return_values[-1]], [return_indices[-1]]
 
             raise ValueError(self.resource_id, jsonpath, "Update failed", input_value)
         elif operation == "delete":
-            return_values, return_indices = self.fetch_nested_item(
-                target_jsonpath, output_model_class, object_key
-            )
+            return_values, return_indices = self.fetch_nested_item(target_jsonpath, output_model_class, object_key)
 
             jsonpath = self.get_mongodb_update_path(object_key, target_jsonpath)
 
@@ -284,13 +254,9 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             )
             if result.modified_count > 0:
                 return return_values, return_indices
-            raise ValueError(
-                self.resource_id, jsonpath, "Delete failed", return_indices
-            )
+            raise ValueError(self.resource_id, jsonpath, "Delete failed", return_indices)
         elif operation == "update":
-            target_jsonpath += (
-                f"{field_name}.{field_name}" if field_name else target_jsonpath
-            )
+            target_jsonpath += f"{field_name}.{field_name}" if field_name else target_jsonpath
             jsonpath = self.get_mongodb_update_path(object_key, target_jsonpath)
             if issubclass(output_model_class, CamelCaseModel):
                 input_value = input_data.model_dump(by_alias=True)
@@ -309,9 +275,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         elif operation == "patch":
             jsonpath = self.get_mongodb_update_path(object_key, target_jsonpath)
             if issubclass(output_model_class, CamelCaseModel):
-                input_value = input_data.model_dump(
-                    by_alias=True, exclude_defaults=True, exclude_unset=True
-                )
+                input_value = input_data.model_dump(by_alias=True, exclude_defaults=True, exclude_unset=True)
                 update_dict = {}
                 for key, value in input_value.items():
                     update_dict[f"data.{jsonpath}.{key}"] = value
@@ -334,9 +298,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         else:
             raise ValueError("Unexpected operation")
 
-        return_values, return_indices = self.fetch_nested_item(
-            target_jsonpath, output_model_class, object_key
-        )
+        return_values, return_indices = self.fetch_nested_item(target_jsonpath, output_model_class, object_key)
         return return_values, return_indices
 
     def fetch_nested_item(
@@ -345,11 +307,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         output_model_class: type[CamelCaseModel],
         object_key: Union[int, None] = None,
     ):
-        convertor = (
-            self.string_convertor
-            if issubclass(output_model_class, str)
-            else self.object_convertor
-        )
+        convertor = self.string_convertor if issubclass(output_model_class, str) else self.object_convertor
         pipeline = [self.get_pipeline_match(object_key=object_key)]
         aggregation = self.jsonpath_to_mongodb("data." + target_jsonpath)
         pipeline.extend(aggregation)
@@ -376,9 +334,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         #     return_indices = []
         return return_values, return_indices
 
-    def object_convertor(
-        self, output_model_class: type[CamelCaseModel], data: dict
-    ) -> CamelCaseModel:
+    def object_convertor(self, output_model_class: type[CamelCaseModel], data: dict) -> CamelCaseModel:
         return output_model_class.model_validate(data)
 
     def string_convertor(self, output_model_class: str, data: str) -> str:
@@ -432,11 +388,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                     current_field = f"{field_name}"
             elif re.match(r"\d+", token):  # Array index
                 selected_indices = [int(token)]
-                pipeline.append(
-                    self.add_index_field(
-                        current_field, selected_indices=selected_indices
-                    )
-                )
+                pipeline.append(self.add_index_field(current_field, selected_indices=selected_indices))
                 pipeline.append(
                     {"$unwind": "$" + current_field},
                 )
@@ -458,13 +410,9 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                                 op = self.jsonpath_expression_map[operator]
                                 expr = {op: ["$$param." + field, value]}
                             else:
-                                raise ValueError(
-                                    f"Unsupported filter operator: {operator}"
-                                )
+                                raise ValueError(f"Unsupported filter operator: {operator}")
                         else:
-                            raise ValueError(
-                                f"Unsupported filter expression: '{expression}'"
-                            )
+                            raise ValueError(f"Unsupported filter expression: '{expression}'")
                     else:
                         raise ValueError(f"Unsupported filter condition: {condition}")
                     matches.append(expr)
@@ -492,9 +440,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         pipeline.append({"$project": {"_id": 0, "data": "$" + field}})
         return pipeline
 
-    def get_mongodb_update_path(
-        self, object_key: Union[None, str], target_jsonpath: str
-    ):
+    def get_mongodb_update_path(self, object_key: Union[None, str], target_jsonpath: str):
         object_key = object_key if object_key else "i_Investigation.txt"
         jsonpath = re.sub(r"\[([^\]]+)\]", r".\1", target_jsonpath)
         jsonpath = re.sub(r"\.\*(\.)?", "", jsonpath)
@@ -513,9 +459,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             }
         }
 
-    def add_index_field(
-        self, current_field: str, selected_indices: Union[None, list[int]] = None
-    ) -> dict:
+    def add_index_field(self, current_field: str, selected_indices: Union[None, list[int]] = None) -> dict:
         indices = {
             "$range": [
                 0,
@@ -563,9 +507,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         save_metadata_files: bool = True,
         save_result_files: bool = True,
     ) -> bool:
-        investigation_item = InvestigationItem.get_from_investigation(
-            model.investigation
-        )
+        investigation_item = InvestigationItem.get_from_investigation(model.investigation)
         self.save_investigation_file(investigation_item)
         # TODO complete saving metadata and result files tables
 
@@ -620,9 +562,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                 )
             )
 
-    async def restore_metadata_from_snapshot(
-        self, snapshot_name: str
-    ) -> tuple[str, str]: ...
+    async def restore_metadata_from_snapshot(self, snapshot_name: str) -> tuple[str, str]: ...
 
     def create_audit_folder_name(
         self,
@@ -669,9 +609,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             },
             {"_id": 0, "data": 0},
         )
-        isa_files.extend(
-            [StudyFileOutput.model_validate(x) for x in investigation_files]
-        )
+        isa_files.extend([StudyFileOutput.model_validate(x) for x in investigation_files])
         return isa_files
 
     async def update_isa_table_rows(
@@ -718,9 +656,9 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             "parentObjectKey": object_key,
             "bucketName": "metadata_files",
         }
-        query = self.isa_table_items_collection.find(
-            filtered_data, {"_id": 0, "rowIndex": 1, "data": 1}
-        ).sort({"rowIndex": 1})
+        query = self.isa_table_items_collection.find(filtered_data, {"_id": 0, "rowIndex": 1, "data": 1}).sort(
+            {"rowIndex": 1}
+        )
         if offset:
             query = query.skip(offset)
         if limit:
@@ -790,9 +728,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                 )
             )
             if rows_result and rows_result.data:
-                isa_table_data.rows = [
-                    IsaTableRow.model_validate(x) for x in rows_result.data
-                ]
+                isa_table_data.rows = [IsaTableRow.model_validate(x) for x in rows_result.data]
             return isa_table_data
 
         raise StudyObjectNotFoundError(self.resource_id, object_key)

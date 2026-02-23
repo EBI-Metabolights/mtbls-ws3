@@ -28,11 +28,7 @@ class RequestsClient(HttpClient):
         follow_redirects: bool = False,
         raise_error_for_status: bool = True,
     ) -> HttpResponse:
-        timeout = (
-            timeout
-            if timeout is not None and timeout > 0
-            else self.max_timeount_in_seconds
-        )
+        timeout = timeout if timeout is not None and timeout > 0 else self.max_timeount_in_seconds
         response: requests.Response = requests.request(
             method.value,
             url,
@@ -57,9 +53,7 @@ class RequestsClient(HttpClient):
                 json_data=json_utils.loads(response.text),
             )
         except Exception:
-            return HttpResponse(
-                status_code=response.status_code, headers=dict(response.headers)
-            )
+            return HttpResponse(status_code=response.status_code, headers=dict(response.headers))
 
     async def stream(
         self,
@@ -73,11 +67,7 @@ class RequestsClient(HttpClient):
         follow_redirects: bool = False,
         raise_error_for_status: bool = True,
     ) -> HttpResponse:
-        timeout = (
-            timeout
-            if timeout is not None and timeout > 0
-            else self.max_timeount_in_seconds
-        )
+        timeout = timeout if timeout is not None and timeout > 0 else self.max_timeount_in_seconds
         with requests.request(
             method=method.value,
             url=url,
@@ -94,6 +84,4 @@ class RequestsClient(HttpClient):
 
             for chunk in response.iter_bytes():
                 buffered_writer.write(chunk)
-            return HttpResponse(
-                status_code=response.status_code, headers=dict(response.headers)
-            )
+            return HttpResponse(status_code=response.status_code, headers=dict(response.headers))

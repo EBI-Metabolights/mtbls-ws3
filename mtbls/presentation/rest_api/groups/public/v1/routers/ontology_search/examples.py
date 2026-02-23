@@ -9,8 +9,7 @@ from mtbls.domain.entities.validation.validation_configuration import (
 
 ONTOLOGY_SEARCH_BODY_EXAMPLES = {
     "Search terms in any ontology": Example(
-        summary="Search terms in any ontology. "
-        "Results will be sorted the provided ontology order",
+        summary="Search terms in any ontology. Results will be sorted the provided ontology order",
         value=BaseOntologyValidation(
             field_name="Characteristics[Organism part]",
             rule_name="organism-part-rule-01",
@@ -85,8 +84,7 @@ ONTOLOGY_SEARCH_BODY_EXAMPLES = {
         ).model_dump(by_alias=True),
     ),
     "Search mass spectrometry instruments": Example(
-        summary="Search mass spectrometry instrument "
-        "ontology terms in parent ontology terms",
+        summary="Search mass spectrometry instrument ontology terms in parent ontology terms",
         value=BaseOntologyValidation(
             field_name="Parameter Value[Instrument]",
             rule_name="ms-intrument-rule-02",

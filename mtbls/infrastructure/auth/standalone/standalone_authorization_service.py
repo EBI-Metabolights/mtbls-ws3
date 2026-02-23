@@ -38,9 +38,7 @@ class AuthorizationServiceImpl(AuthorizationService):
         permission_context = StudyPermissionContext(user=user)
 
         try:
-            permission_context.study = (
-                await self.study_read_repository.get_study_by_accession(resource_id)
-            )
+            permission_context.study = await self.study_read_repository.get_study_by_accession(resource_id)
             if not permission_context.study:
                 raise StudyResourceNotFoundError(f"Study  {resource_id} not found")
         except Exception as e:
@@ -55,9 +53,7 @@ class AuthorizationServiceImpl(AuthorizationService):
         permission_context = StudyPermissionContext()
 
         try:
-            permission_context.study = (
-                await self.study_read_repository.get_study_by_accession(resource_id)
-            )
+            permission_context.study = await self.study_read_repository.get_study_by_accession(resource_id)
             if not permission_context.study:
                 raise StudyResourceNotFoundError(f"Study  {resource_id} not found")
         except Exception as e:
@@ -65,9 +61,7 @@ class AuthorizationServiceImpl(AuthorizationService):
             return permission_context
 
         try:
-            permission_context.user = (
-                await self.user_read_repository.get_user_by_username(username)
-            )
+            permission_context.user = await self.user_read_repository.get_user_by_username(username)
             if not permission_context.user:
                 raise Exception("User not found")
         except Exception as e:
@@ -78,16 +72,12 @@ class AuthorizationServiceImpl(AuthorizationService):
 
         return await self.update_permission_context(permission_context)
 
-    async def update_permission_context(
-        self, permission_context: StudyPermissionContext
-    ):
+    async def update_permission_context(self, permission_context: StudyPermissionContext):
         if permission_context.study.status == StudyStatus.PUBLIC:
             permission_context.permissions.read = True
         if permission_context.user and permission_context.user.username:
-            study_users = (
-                await self.user_read_repository.get_study_submitters_by_accession(
-                    permission_context.study.accession_number
-                )
+            study_users = await self.user_read_repository.get_study_submitters_by_accession(
+                permission_context.study.accession_number
             )
             user_names = {}
             if study_users:

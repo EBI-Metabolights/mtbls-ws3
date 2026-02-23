@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileSystemValidationOverrideRepository(
-    MongoDbDefaultWriteRepository[
-        ValidationOverrideFileObject, ValidationOverrideFileObject, str
-    ],
+    MongoDbDefaultWriteRepository[ValidationOverrideFileObject, ValidationOverrideFileObject, str],
     ValidationOverrideRepository,
 ):
     def __init__(

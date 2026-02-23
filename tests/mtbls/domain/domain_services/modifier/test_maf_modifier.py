@@ -43,9 +43,7 @@ class TestRemoveTrailingAndPrefixSpaces:
         header_def.column_header = new_header
         header_def.column_name = header_def.column_name.replace(header, new_header, 1)
         maf_file.table.columns[header_def.column_index] = header_def.column_name
-        maf_file.table.data[header_def.column_name] = maf_file.table.data[
-            header_column_name
-        ]
+        maf_file.table.data[header_def.column_name] = maf_file.table.data[header_column_name]
         del maf_file.table.data[header_column_name]
 
         maf_modifier.remove_trailing_and_prefix_spaces()
@@ -112,9 +110,7 @@ class TestAddMafSampleColumns:
         del maf_file.table.data[header_column_name]
         assay = metabolights_model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
-        sample_value = metabolights_model.assays[assay_name].table.data["Sample Name"][
-            0
-        ]
+        sample_value = metabolights_model.assays[assay_name].table.data["Sample Name"][0]
         metabolights_model.assays[assay_name].table.data["Sample Name"][0] = ""
         metabolights_model.assays[assay_name].sample_names.remove(sample_value)
         maf_modifier.add_maf_sample_columns()
@@ -172,9 +168,7 @@ class TestAddMafSampleColumns:
 
     @pytest.mark.asyncio
     async def test_add_maf_sample_columns_09(self, maf_modifier: MafFileModifier):
-        assay_file = (
-            maf_modifier.model.investigation.studies[0].study_assays.assays[0].file_name
-        )
+        assay_file = maf_modifier.model.investigation.studies[0].study_assays.assays[0].file_name
         table = maf_modifier.model.assays[assay_file].table
         del table.data["Sample Name"]
         table.columns[0] = "Sample Name-Test"

@@ -58,18 +58,14 @@ class ColumnInfo(CamelCaseModel):
 
     column_category: Annotated[
         str,
-        Field(
-            description="Column category. e.g., Parameter Value, Factor Value, protocol"
-        ),
+        Field(description="Column category. e.g., Parameter Value, Factor Value, protocol"),
     ] = ""
 
-    column_structure: Annotated[
-        ColumnsStructure, Field(description="Structure of column in ISA table.")
-    ] = ColumnsStructure.SINGLE_COLUMN
+    column_structure: Annotated[ColumnsStructure, Field(description="Structure of column in ISA table.")] = (
+        ColumnsStructure.SINGLE_COLUMN
+    )
 
-    column_prefix: Annotated[
-        str, Field(description="Column prefix if header has a value between [].")
-    ] = ""
+    column_prefix: Annotated[str, Field(description="Column prefix if header has a value between [].")] = ""
 
     default_value: Annotated[
         str,
@@ -90,9 +86,7 @@ class IndexedData(CamelCaseModel):
 
 class IsaTableRow(CamelCaseModel):
     row_index: Union[None, int] = None
-    data: Annotated[
-        dict[str, str], Field(description="Row data with column names")
-    ] = {}
+    data: Annotated[dict[str, str], Field(description="Row data with column names")] = {}
 
 
 class IsaTableFileObject(BaseEntity, IndexedData):

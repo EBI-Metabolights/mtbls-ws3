@@ -243,12 +243,10 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
         config.run.submission.module_config,
     )
 
-    default_dataset_license_config: DatasetLicenseInfoConfiguration = (
-        providers.Resource(
-            create_config_from_dict,
-            DatasetLicenseInfoConfiguration,
-            config.run.submission.default_dataset_license,
-        )
+    default_dataset_license_config: DatasetLicenseInfoConfiguration = providers.Resource(
+        create_config_from_dict,
+        DatasetLicenseInfoConfiguration,
+        config.run.submission.default_dataset_license,
     )
 
     api_server_config: ApiServerConfiguration = providers.Resource(
@@ -257,6 +255,4 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
         config.run.submission.api_server_config,
     )
 
-    oauth2_endpoint = providers.Resource(
-        set_oauth2_redirect_endpoint, api_server_config
-    )
+    oauth2_endpoint = providers.Resource(set_oauth2_redirect_endpoint, api_server_config)

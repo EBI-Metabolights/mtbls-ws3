@@ -24,21 +24,15 @@ class BaseOutputEntity(BaseEntity):
 
 
 class BaseStudyInput(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Study
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Study)
 
 
 class BaseStudy(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Study
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Study)
 
 
 class MtblsDataReuseOutput(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.MtblsDataReuse
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.MtblsDataReuse)
     id: int
     content_name: str
     content: str
@@ -47,54 +41,36 @@ class MtblsDataReuseOutput(BaseOutputEntity):
 
 
 class BaseUserInput(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.User
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.User)
 
 
 class BaseUser(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.User
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.User)
 
 
 class BaseStatisticInput(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Statistic
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Statistic)
 
 
 class BaseStatistic(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Statistic
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Statistic)
 
 
 class BaseStudyFileInput(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyFile
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyFile)
 
 
 class BaseStudyFile(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyFile
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyFile)
 
 
 class BaseStudyRevisionInput(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyRevision)
 
 
 class BaseStudyRevision(BaseOutputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyRevision)
 
 
 class BaseCompound(BaseInputEntity):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.Compound
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.Compound)

@@ -31,9 +31,7 @@ class SampleFileModifier(IsaTableModifier):
         control_lists: ValidationControls,
         max_row_number_limit: int = 10,
     ):
-        super().__init__(
-            model, isa_table_file, templates, control_lists, max_row_number_limit
-        )
+        super().__init__(model, isa_table_file, templates, control_lists, max_row_number_limit)
 
     def modify(self) -> list[UpdateLog]:
         self.update_from_parser_messages()
@@ -106,9 +104,7 @@ class SampleFileModifier(IsaTableModifier):
             if name not in sample_sheet_factors:
                 last_index = len(table.columns) + len(action.columns)
 
-                self.add_new_action_for_factor_values_columns(
-                    action, name, factor, last_index
-                )
+                self.add_new_action_for_factor_values_columns(action, name, factor, last_index)
                 self.modifier_update(
                     source=study.file_name,
                     action=f"A new Factor Value for factor {name}: Factor Value[{name}]",  # noqa: E501
@@ -126,24 +122,14 @@ class SampleFileModifier(IsaTableModifier):
         factor: Factor,
         last_index: int,
     ):
-        action.columns[last_index] = TsvColumnData(
-            header_name=f"Factor Value[{factor_name}]"
-        )
+        action.columns[last_index] = TsvColumnData(header_name=f"Factor Value[{factor_name}]")
         if factor.type.term_source_ref.lower() == "uo":
             action.columns[last_index + 1] = TsvColumnData(header_name="Unit")
-            action.columns[last_index + 2] = TsvColumnData(
-                header_name="Term Source REF"
-            )
-            action.columns[last_index + 3] = TsvColumnData(
-                header_name="Term Accession Number"
-            )
+            action.columns[last_index + 2] = TsvColumnData(header_name="Term Source REF")
+            action.columns[last_index + 3] = TsvColumnData(header_name="Term Accession Number")
         else:
-            action.columns[last_index + 1] = TsvColumnData(
-                header_name="Term Source REF"
-            )
-            action.columns[last_index + 2] = TsvColumnData(
-                header_name="Term Accession Number"
-            )
+            action.columns[last_index + 1] = TsvColumnData(header_name="Term Source REF")
+            action.columns[last_index + 2] = TsvColumnData(header_name="Term Accession Number")
 
     def get_study_factors(self, study: Study):
         study_factors: OrderedDict[str, Factor] = OrderedDict()
@@ -166,8 +152,6 @@ class SampleFileModifier(IsaTableModifier):
             if result and result.groups():
                 factor = result.groups()[0]
             if factor:
-                cleaned_factor_name = SampleFileModifier.first_character_uppercase(
-                    factor
-                )
+                cleaned_factor_name = SampleFileModifier.first_character_uppercase(factor)
                 sample_sheet_factors.add(cleaned_factor_name)
         return sample_sheet_factors

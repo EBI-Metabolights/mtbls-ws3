@@ -12,9 +12,7 @@ class StudyBaseModel(CamelCaseModel):
         alias_generator=to_camel,
         populate_by_name=True,
         json_schema_serialization_defaults_required=True,
-        field_title_generator=lambda field, field_info: to_pascal(
-            field.replace("_", " ").strip()
-        ),
+        field_title_generator=lambda field, field_info: to_pascal(field.replace("_", " ").strip()),
     )
 
 
@@ -24,14 +22,10 @@ class OntologyTerm(StudyBaseModel):
     term_accession_number: Annotated[
         str,
         Field(
-            description="The accession number from "
-            "the Term Source associated with the term.",
+            description="The accession number from the Term Source associated with the term.",
         ),
     ]
     term_source_ref: Annotated[
         str,
-        Field(
-            description="Source reference name of ontology term. "
-            "e.g., EFO, OBO, NCBITAXON."
-        ),
+        Field(description="Source reference name of ontology term. e.g., EFO, OBO, NCBITAXON."),
     ]

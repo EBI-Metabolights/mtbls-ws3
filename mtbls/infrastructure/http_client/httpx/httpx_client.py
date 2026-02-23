@@ -28,11 +28,7 @@ class HttpxClient(HttpClient):
         follow_redirects: bool = False,
         raise_error_for_status: bool = True,
     ) -> HttpResponse:
-        timeout = (
-            timeout
-            if timeout is not None and timeout > 0
-            else self.max_timeount_in_seconds
-        )
+        timeout = timeout if timeout is not None and timeout > 0 else self.max_timeount_in_seconds
         async with httpx.AsyncClient() as client:
             try:
                 response: httpx.Response = await client.request(
@@ -87,11 +83,7 @@ class HttpxClient(HttpClient):
         follow_redirects: bool = False,
         raise_error_for_status: bool = True,
     ) -> int:
-        timeout = (
-            timeout
-            if timeout is not None and timeout > 0
-            else self.max_timeount_in_seconds
-        )
+        timeout = timeout if timeout is not None and timeout > 0 else self.max_timeount_in_seconds
         async with httpx.AsyncClient() as client:
             async with client.stream(
                 method=method.value,
@@ -108,6 +100,4 @@ class HttpxClient(HttpClient):
 
                 async for chunk in response.aiter_bytes():
                     buffered_writer.write(chunk)
-                return HttpResponse(
-                    status_code=response.status_code, headers=dict(response.headers)
-                )
+                return HttpResponse(status_code=response.status_code, headers=dict(response.headers))

@@ -9,9 +9,7 @@ from mtbls.presentation.rest_api.groups.public.v1.routers.orcid_search.schemas i
 )
 
 
-def test_get_studies_by_orcid_id(
-    public_api_client: TestClient, submission_api_container
-):
+def test_get_studies_by_orcid_id(public_api_client: TestClient, submission_api_container):
     orcid = "0000-0002-7899-7192"
     url = f"/public/v2/orcids/{orcid}/studies"
 

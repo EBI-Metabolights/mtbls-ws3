@@ -10,9 +10,7 @@ from mtbls.domain.enums.study_revision_status import StudyRevisionStatus
 
 
 class StudyRevisionInput(BaseStudyRevision):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyRevision)
     accession_number: Union[None, str] = None
     revision_number: Union[None, int] = None
     revision_datetime: Union[None, datetime.datetime] = None
@@ -48,7 +46,5 @@ class StudyRevisionInput(BaseStudyRevision):
 
 
 class StudyRevisionOutput(StudyRevisionInput):
-    model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyRevision
-    )
+    model_config = ConfigDict(from_attributes=True, strict=True, entity_type=Entity.StudyRevision)
     id_: Union[int, str]

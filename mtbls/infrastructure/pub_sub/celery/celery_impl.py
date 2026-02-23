@@ -72,9 +72,7 @@ class CeleryAsyncTaskResult(AsyncTaskResult):
 
 
 class CeleryAsyncTaskExecutor(AsyncTaskExecutor):
-    def __init__(
-        self, task_method: Callable, task_name: str, id_generator: IdGenerator, **kwargs
-    ):
+    def __init__(self, task_method: Callable, task_name: str, id_generator: IdGenerator, **kwargs):
         self.task_method = task_method
         self.kwargs = kwargs
         self.task_name = task_name
@@ -106,15 +104,11 @@ class CeleryAsyncTaskService(AsyncTaskService):
         default_queue: Union[None, str] = None,
         async_task_registry: Union[None, AsyncTaskRegistry] = None,
     ):
-        super().__init__(
-            broker, backend, app_name, queue_names, default_queue, async_task_registry
-        )
+        super().__init__(broker, backend, app_name, queue_names, default_queue, async_task_registry)
         self.app_dict: dict[str, Celery] = {}
         self.app_tasks: dict[str, dict[str, dict[str, Callable]]] = {}
 
-        self.app = self._create_async_app(
-            broker, backend, app_name, queue_names, default_queue
-        )
+        self.app = self._create_async_app(broker, backend, app_name, queue_names, default_queue)
 
     def _create_async_app(
         self,
@@ -167,14 +161,10 @@ class CeleryAsyncTaskService(AsyncTaskService):
             app_tasks = self.app_tasks[app_name]
             for task_name in registry:
                 async_task: AsyncTaskDescription = registry[task_name]
-                celery_task = celery_app.task(name=task_name, base=CeleryBaseTask)(
-                    async_task.task_method
-                )
+                celery_task = celery_app.task(name=task_name, base=CeleryBaseTask)(async_task.task_method)
                 async_task.task_method = celery_task
                 app_tasks[task_name] = celery_task
-                logger.info(
-                    "Task %s is registered to celery app '%s'", task_name, app_name
-                )
+                logger.info("Task %s is registered to celery app '%s'", task_name, app_name)
         return self.app_dict[app_name]
 
     async def get_async_task(
@@ -189,9 +179,7 @@ class CeleryAsyncTaskService(AsyncTaskService):
         if task_name not in self.app_tasks[app_name]:
             raise AsyncTaskError(f"Task {task_name} is not registered.")
         task = self.app_tasks[app_name][task_name]
-        return CeleryAsyncTaskExecutor(
-            task, task_name=task_name, id_generator=id_generator, **kwargs
-        )
+        return CeleryAsyncTaskExecutor(task, task_name=task_name, id_generator=id_generator, **kwargs)
 
     async def get_async_task_result(self, task_id: str) -> AsyncTaskResult:
         if not task_id:

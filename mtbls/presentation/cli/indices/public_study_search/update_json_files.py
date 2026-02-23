@@ -114,9 +114,7 @@ async def get_public_studies(
                     study_id=study.accession_number,
                     study_size=int(study.study_size) if study.study_size else 0,
                     study_type=study.study_type or "",
-                    curation_request=CurationRequest.get_from_int(
-                        study.curation_type.value
-                    ),
+                    curation_request=CurationRequest.get_from_int(study.curation_type.value),
                     submitters={
                         f"{x.first_name} {x.last_name}": {
                             "email": x.email or "",
@@ -149,9 +147,7 @@ async def update_study_metadata_json_files(
     ontology_categories: Dict[str, Dict[str, str]] = {}
 
     if not ncbi_taxonomy_url:
-        ncbi_taxonomy_url = (
-            "https://www.ebi.ac.uk/metabolights/resources/ontologies/ncbi-taxonomy.tsv"
-        )
+        ncbi_taxonomy_url = "https://www.ebi.ac.uk/metabolights/resources/ontologies/ncbi-taxonomy.tsv"
 
     temp_folder_path.mkdir(parents=True, exist_ok=True)
     temp_ncbi_filename = "ncbi-taxonomy.tsv"
@@ -193,24 +189,16 @@ async def update_study_metadata_json_files(
     studies.sort(key=sort_by_study_id)
     timestamp = int(datetime.datetime.now().timestamp())
 
-    investigation_reader: InvestigationFileReader = (
-        Reader.get_investigation_file_reader()
-    )
+    investigation_reader: InvestigationFileReader = Reader.get_investigation_file_reader()
     sample_file_reader = Reader.get_sample_file_reader(results_per_page=100000)
-    assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(
-        results_per_page=100000
-    )
+    assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(results_per_page=100000)
 
-    lookup: schemas.PublicStudyLiteIndexReferences = (
-        schemas.PublicStudyLiteIndexReferences()
-    )
+    lookup: schemas.PublicStudyLiteIndexReferences = schemas.PublicStudyLiteIndexReferences()
     indexed_study_count = 0
     errored_studies = []
     for study_id in studies:
         try:
-            file_exist = await index_cache_files_object_repository.exists(
-                study_id, f"{study_id}.json"
-            )
+            file_exist = await index_cache_files_object_repository.exists(study_id, f"{study_id}.json")
             if not reindex_all and file_exist:
                 logger.info(
                     "%s is skipped. File exists: %s, Force reindex: %s",
@@ -221,25 +209,15 @@ async def update_study_metadata_json_files(
                 continue
             logger.info("%s is being processed.", study_id)
             inv_file_name = "i_Investigation.txt"
-            tmp_metadata_root_path = (
-                pathlib.Path(temp_folder_path)
-                / pathlib.Path("metadata")
-                / pathlib.Path(study_id)
-            )
-            inv_file_exists = await metadata_files_object_repository.exists(
-                study_id, inv_file_name
-            )
+            tmp_metadata_root_path = pathlib.Path(temp_folder_path) / pathlib.Path("metadata") / pathlib.Path(study_id)
+            inv_file_exists = await metadata_files_object_repository.exists(study_id, inv_file_name)
             if inv_file_exists:
                 tmp_metadata_root_path.mkdir(parents=True, exist_ok=True)
                 tmp_inv_file_path = tmp_metadata_root_path / pathlib.Path(inv_file_name)
                 if not tmp_inv_file_path.exists() or reindex_all:
-                    await metadata_files_object_repository.download(
-                        study_id, inv_file_name, tmp_inv_file_path
-                    )
+                    await metadata_files_object_repository.download(study_id, inv_file_name, tmp_inv_file_path)
 
-                result: InvestigationFileReaderResult = investigation_reader.read(
-                    file_buffer_or_path=tmp_inv_file_path
-                )
+                result: InvestigationFileReaderResult = investigation_reader.read(file_buffer_or_path=tmp_inv_file_path)
                 studies = result.investigation.studies
                 errors: list[ParserMessage] = [
                     x
@@ -253,15 +231,10 @@ async def update_study_metadata_json_files(
                     continue
 
                 references = result.investigation.ontology_source_references.references
-                source_references_set = {
-                    schemas.OntologySourceReferenceModel.model_validate(x)
-                    for x in references
-                }
+                source_references_set = {schemas.OntologySourceReferenceModel.model_validate(x) for x in references}
 
                 factors_set: Set[schemas.OntologyModel] = set()
-                study_factors_list = [
-                    x.study_factors for x in result.investigation.studies
-                ]
+                study_factors_list = [x.study_factors for x in result.investigation.studies]
 
                 for study_factors in study_factors_list:
                     for study_factor in study_factors.factors:
@@ -269,9 +242,7 @@ async def update_study_metadata_json_files(
                         factors_set.add(model)
 
                 design_descriptors_set: Set[schemas.OntologyModel] = set()
-                study_design_descriptors_list = [
-                    x.study_design_descriptors for x in result.investigation.studies
-                ]
+                study_design_descriptors_list = [x.study_design_descriptors for x in result.investigation.studies]
 
                 for descriptors in study_design_descriptors_list:
                     for design_type in descriptors.design_types:
@@ -280,24 +251,14 @@ async def update_study_metadata_json_files(
 
                 sample_files = [x.file_name for x in result.investigation.studies]
                 for sample_file in sample_files:
-                    sample_file_exists = await metadata_files_object_repository.exists(
-                        study_id, sample_file
-                    )
+                    sample_file_exists = await metadata_files_object_repository.exists(study_id, sample_file)
                     if not sample_file_exists:
-                        logger.warning(
-                            "%s %s file does not exist.", study_id, sample_file
-                        )
+                        logger.warning("%s %s file does not exist.", study_id, sample_file)
                         continue
-                    tmp_sample_file_path: pathlib.Path = (
-                        tmp_metadata_root_path / sample_file
-                    )
+                    tmp_sample_file_path: pathlib.Path = tmp_metadata_root_path / sample_file
                     if not tmp_sample_file_path.exists() or reindex_all:
-                        await metadata_files_object_repository.download(
-                            study_id, sample_file, tmp_sample_file_path
-                        )
-                    samples_result = sample_file_reader.get_headers(
-                        tmp_sample_file_path
-                    )
+                        await metadata_files_object_repository.download(study_id, sample_file, tmp_sample_file_path)
+                    samples_result = sample_file_reader.get_headers(tmp_sample_file_path)
                     table: IsaTable = samples_result.isa_table_file.table
                     selected_column_names = []
                     selected_column_structures = {}
@@ -308,14 +269,10 @@ async def update_study_metadata_json_files(
                         if column_name.startswith("Factor Value"):
                             selected_column_names.append(column_name)
                             factor_column_names.append(column_name)
-                            selected_column_structures[column_name] = (
-                                header.column_structure
-                            )
+                            selected_column_structures[column_name] = header.column_structure
                         elif column_name.startswith("Characteristics"):
                             selected_column_names.append(column_name)
-                            selected_column_structures[column_name] = (
-                                header.column_structure
-                            )
+                            selected_column_structures[column_name] = header.column_structure
 
                     samples_result = sample_file_reader.read(
                         file_buffer_or_path=tmp_sample_file_path,
@@ -332,14 +289,11 @@ async def update_study_metadata_json_files(
                     additional_characteristics_column_names = [
                         x
                         for x in selected_column_names
-                        if x not in factor_column_names
-                        and x not in default_characteristics
+                        if x not in factor_column_names and x not in default_characteristics
                     ]
                     table: IsaTable = samples_result.isa_table_file.table
                     sample_file_ontology_column_indices: Dict[str, int] = {}
-                    sample_file_ontology_column_values: Dict[
-                        str, Set[schemas.OntologyModel]
-                    ] = {}
+                    sample_file_ontology_column_values: Dict[str, Set[schemas.OntologyModel]] = {}
                     for column_name in selected_column_names:
                         idx = table.columns.index(column_name)
                         sample_file_ontology_column_indices[column_name] = idx
@@ -352,18 +306,13 @@ async def update_study_metadata_json_files(
                             structure = selected_column_structures[column_name]
                             if structure == ColumnsStructure.ONTOLOGY_COLUMN:
                                 update_ontology_set(value_set, table, row_id, idx)
-                            elif (
-                                structure
-                                == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
-                            ):
+                            elif structure == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY:
                                 update_unit_ontology_set(value_set, table, row_id, idx)
                             elif structure == ColumnsStructure.SINGLE_COLUMN:
                                 value = rm_quotations(table.data[column_name][row_id])
                                 if value:
                                     value_set.add(value)
-                study_index_model: schemas.PublicStudyLiteIndexModel = (
-                    schemas.PublicStudyLiteIndexModel()
-                )
+                study_index_model: schemas.PublicStudyLiteIndexModel = schemas.PublicStudyLiteIndexModel()
                 for submitter in study_map[study_id].submitters:
                     country_code = study_map[study_id].submitters[submitter]["address"]
                     country = schemas.COUNTRIES.get(country_code, "")
@@ -373,13 +322,8 @@ async def update_study_metadata_json_files(
                             email=study_map[study_id].submitters[submitter]["email"],
                             country=country,
                             roles=["submitter"],
-                            affiliation=study_map[study_id].submitters[submitter][
-                                "affiliation"
-                            ],
-                            orcid=study_map[study_id]
-                            .submitters[submitter]
-                            .get("orcid", "")
-                            .strip('"'),
+                            affiliation=study_map[study_id].submitters[submitter]["affiliation"],
+                            orcid=study_map[study_id].submitters[submitter].get("orcid", "").strip('"'),
                         )
                     )
                 curation_tags = study_map[study_id].study_type
@@ -393,19 +337,15 @@ async def update_study_metadata_json_files(
                 study_index_model.title = study.title
                 study_index_model.description = study.description
                 study_index_model.sample_file_path = study.file_name
-                study_index_model.curation_request = study_map[
-                    study_id
-                ].curation_request
+                study_index_model.curation_request = study_map[study_id].curation_request
                 try:
                     study_index_model.public_release_date = datetime.datetime.strptime(
                         study.public_release_date, ISA_DATE_FORMAT
                     )
                 except Exception:
                     try:
-                        study_index_model.public_release_date = (
-                            datetime.datetime.strptime(
-                                study.public_release_date, COMMON_DATE_FORMAT
-                            )
+                        study_index_model.public_release_date = datetime.datetime.strptime(
+                            study.public_release_date, COMMON_DATE_FORMAT
                         )
                     except Exception as sub_exc:
                         logger.warning(str(sub_exc))
@@ -421,50 +361,27 @@ async def update_study_metadata_json_files(
                     except Exception as sub_exc:
                         logger.warning(str(sub_exc))
                 study_index_model.factors = sorted(list(factors_set))
-                study_index_model.design_descriptors = sorted(
-                    list(design_descriptors_set)
-                )
+                study_index_model.design_descriptors = sorted(list(design_descriptors_set))
                 if "Characteristics[Organism]" in sample_file_ontology_column_values:
                     study_index_model.organisms = sorted(
-                        list(
-                            sample_file_ontology_column_values[
-                                "Characteristics[Organism]"
-                            ]
-                        )
+                        list(sample_file_ontology_column_values["Characteristics[Organism]"])
                     )
-                if (
-                    "Characteristics[Organism part]"
-                    in sample_file_ontology_column_values
-                ):
+                if "Characteristics[Organism part]" in sample_file_ontology_column_values:
                     study_index_model.organism_parts = sorted(
-                        list(
-                            sample_file_ontology_column_values[
-                                "Characteristics[Organism part]"
-                            ]
-                        )
+                        list(sample_file_ontology_column_values["Characteristics[Organism part]"])
                     )
                 if "Characteristics[Sample type]" in sample_file_ontology_column_values:
                     study_index_model.sample_types = sorted(
-                        list(
-                            sample_file_ontology_column_values[
-                                "Characteristics[Sample type]"
-                            ]
-                        )
+                        list(sample_file_ontology_column_values["Characteristics[Sample type]"])
                     )
 
                 if "Characteristics[Variant]" in sample_file_ontology_column_values:
                     study_index_model.variants = sorted(
-                        list(
-                            sample_file_ontology_column_values[
-                                "Characteristics[Variant]"
-                            ]
-                        )
+                        list(sample_file_ontology_column_values["Characteristics[Variant]"])
                     )
 
                 study_index_model.size_in_bytes = study_map[study_id].study_size
-                study_index_model.size_in_text = get_size_in_str(
-                    study_map[study_id].study_size
-                )
+                study_index_model.size_in_text = get_size_in_str(study_map[study_id].study_size)
                 study = result.investigation.studies[0]
 
                 orcid_ids = []
@@ -520,11 +437,7 @@ async def update_study_metadata_json_files(
                 for i in range(funding_count):
                     model = schemas.FundingModel()
                     for key in funding_comments:
-                        if (
-                            funding_comments[key]
-                            and len(funding_comments[key]) > i
-                            and funding_comments[key][i]
-                        ):
+                        if funding_comments[key] and len(funding_comments[key]) > i and funding_comments[key][i]:
                             setattr(model, key, funding_comments[key][i])
                     if ";" in model.grant_identifier:
                         grant_ids = model.grant_identifier.split(";")
@@ -542,21 +455,13 @@ async def update_study_metadata_json_files(
 
                 assignment_files_set: Set[str] = set()
                 for assay in result.investigation.studies[0].study_assays.assays:
-                    assay_file_exists = await metadata_files_object_repository.exists(
-                        study_id, assay.file_name
-                    )
+                    assay_file_exists = await metadata_files_object_repository.exists(study_id, assay.file_name)
                     if not assay_file_exists:
-                        logger.warning(
-                            "%s %s file does not exist.", study_id, assay.file_name
-                        )
+                        logger.warning("%s %s file does not exist.", study_id, assay.file_name)
                         continue
-                    tmp_assay_file_path: pathlib.Path = (
-                        tmp_metadata_root_path / assay.file_name
-                    )
+                    tmp_assay_file_path: pathlib.Path = tmp_metadata_root_path / assay.file_name
                     if not tmp_assay_file_path.exists() or reindex_all:
-                        await metadata_files_object_repository.download(
-                            study_id, assay.file_name, tmp_assay_file_path
-                        )
+                        await metadata_files_object_repository.download(study_id, assay.file_name, tmp_assay_file_path)
 
                     model = schemas.AssayModel.model_validate(assay)
                     model.file_path = assay.file_name
@@ -566,31 +471,21 @@ async def update_study_metadata_json_files(
                         manual_assignment=study_map[study_id].study_type,
                     )
 
-                    model.technique = schemas.AssayTechniqueModel.model_validate(
-                        technique
-                    )
+                    model.technique = schemas.AssayTechniqueModel.model_validate(technique)
                     append_unique(study_index_model.assays, model)
                     append_unique(study_index_model.assay_techniques, model.technique)
-                    append_unique(
-                        study_index_model.technology_types, model.technology_type
-                    )
-                    assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(
-                        results_per_page=100000
-                    )
+                    append_unique(study_index_model.technology_types, model.technology_type)
+                    assay_reader: IsaTableFileReader = Reader.get_assay_file_reader(results_per_page=100000)
 
                     try:
                         column_name = "Metabolite Assignment File"
-                        assignment_files_result: IsaTableFileReaderResult = (
-                            assay_reader.read(
-                                file_buffer_or_path=tmp_assay_file_path,
-                                offset=0,
-                                limit=None,
-                                selected_columns=[column_name],
-                            )
+                        assignment_files_result: IsaTableFileReaderResult = assay_reader.read(
+                            file_buffer_or_path=tmp_assay_file_path,
+                            offset=0,
+                            limit=None,
+                            selected_columns=[column_name],
                         )
-                        data = assignment_files_result.isa_table_file.table.data[
-                            column_name
-                        ]
+                        data = assignment_files_result.isa_table_file.table.data[column_name]
                         assignment_files_set.update(data)
                         assignment_files_set.discard(None)
                         assignment_files_set.discard("")
@@ -602,27 +497,15 @@ async def update_study_metadata_json_files(
                         )
 
                 lookup.source_references.update(source_references_set)
-                study_index_model.organisms = normalize_ontology_model_list(
-                    study_index_model.organisms
-                )
-                study_index_model.organism_parts = normalize_ontology_model_list(
-                    study_index_model.organism_parts
-                )
-                study_index_model.variants = normalize_ontology_model_list(
-                    study_index_model.variants
-                )
-                study_index_model.sample_types = normalize_ontology_model_list(
-                    study_index_model.sample_types
-                )
-                study_index_model.factors = normalize_ontology_model_list(
-                    study_index_model.factors
-                )
+                study_index_model.organisms = normalize_ontology_model_list(study_index_model.organisms)
+                study_index_model.organism_parts = normalize_ontology_model_list(study_index_model.organism_parts)
+                study_index_model.variants = normalize_ontology_model_list(study_index_model.variants)
+                study_index_model.sample_types = normalize_ontology_model_list(study_index_model.sample_types)
+                study_index_model.factors = normalize_ontology_model_list(study_index_model.factors)
                 study_index_model.design_descriptors = normalize_ontology_model_list(
                     study_index_model.design_descriptors
                 )
-                study_index_model.technology_types = normalize_ontology_model_list(
-                    study_index_model.technology_types
-                )
+                study_index_model.technology_types = normalize_ontology_model_list(study_index_model.technology_types)
                 lookup.organisms.update(study_index_model.organisms)
                 lookup.organism_parts.update(study_index_model.organism_parts)
                 lookup.variants.update(study_index_model.variants)
@@ -647,9 +530,7 @@ async def update_study_metadata_json_files(
 
                 new_index_item.annotations.sort()
                 study_index_model.annotations = new_index_item.annotations
-                study_index_model.modified_time = datetime.datetime.now(
-                    datetime.timezone.utc
-                )
+                study_index_model.modified_time = datetime.datetime.now(datetime.timezone.utc)
                 temp_output_path = temp_folder_path / pathlib.Path(f"{study_id}.json")
                 with pathlib.Path(temp_output_path).open("w") as f:
                     f.write(study_index_model.model_dump_json(indent=4))
@@ -692,9 +573,7 @@ def update_new_index_item(
     study_index_model: schemas.PublicStudyLiteIndexModel,
     additional_characteristics_column_names: List[str],
     factor_column_names: List[str],
-    sample_file_ontology_column_values: Dict[
-        str, Set[Union[schemas.OntologyModel, schemas.ValueAndUnitModel]]
-    ],
+    sample_file_ontology_column_values: Dict[str, Set[Union[schemas.OntologyModel, schemas.ValueAndUnitModel]]],
     ontology_categories: Dict[str, Dict[str, str]],
     ncbi_taxonomy_df: pd.DataFrame,
     filtered_columns: List[str],
@@ -723,9 +602,7 @@ def update_new_index_item(
         protocol_name = to_camel(convert_name(protocol.name))
         for param in protocol.parameters:
             param_name = to_camel(convert_name(param.term))
-            protocol_parameters[param.term] = (
-                f"assay.protocol.{protocol_name}.{param_name}"
-            )
+            protocol_parameters[param.term] = f"assay.protocol.{protocol_name}.{param_name}"
 
     headers_result: IsaTableFileReaderResult = assay_reader.get_headers(
         file_buffer_or_path=assay_file_path,
@@ -775,10 +652,7 @@ def update_new_index_item(
                             term_accession_number=term_accession_number,
                         )
                         unique_values.add(ontology)
-            if (
-                header.column_structure
-                == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
-            ):
+            if header.column_structure == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY:
                 idx = table.columns.index(column_name)
 
                 for i in range(len(table.data[column_name])):
@@ -788,12 +662,7 @@ def update_new_index_item(
                         term_source_ref,
                         term_accession_number,
                     ) = read_unit_ontology_columns(table, i, idx)
-                    if (
-                        term_value
-                        or unit_term
-                        or term_source_ref
-                        or term_accession_number
-                    ):
+                    if term_value or unit_term or term_source_ref or term_accession_number:
                         value_model = schemas.ValueAndUnitModel(
                             value=term_value,
                             unit_term=unit_term,
@@ -802,9 +671,7 @@ def update_new_index_item(
                         )
                         unique_values.add(value_model)
             elif header.column_structure == ColumnsStructure.SINGLE_COLUMN:
-                unique_values = {
-                    x for x in table_data[column_name] if x and rm_quotations(x)
-                }
+                unique_values = {x for x in table_data[column_name] if x and rm_quotations(x)}
 
             parameter_name = column_name_parameter_map[column_name]
             protocol_parameter_values[parameter_name] = unique_values
@@ -813,13 +680,8 @@ def update_new_index_item(
         logger.error("%s does not have column: %s", assay_file_path, exc)
     for column_name in protocol_parameters:
         param_value_key = protocol_parameters[column_name]
-        if (
-            column_name in protocol_parameter_values
-            and len(protocol_parameter_values[column_name]) < 10
-        ):
-            add_annotation(
-                item, param_value_key, protocol_parameter_values[column_name]
-            )
+        if column_name in protocol_parameter_values and len(protocol_parameter_values[column_name]) < 10:
+            add_annotation(item, param_value_key, protocol_parameter_values[column_name])
     for column_name in additional_characteristics_column_names:
         match = re.match(characteristic_value_pattern, column_name)
         param = ""
@@ -873,9 +735,7 @@ def create_study_item(
     ncbi_taxonomy_df: pd.DataFrame,
     filtered_columns: List[str],
 ) -> schemas.MetabolightsIndexItem:
-    study_index_item = schemas.MetabolightsIndexItem(
-        item_id=study_id, item_type="study"
-    )
+    study_index_item = schemas.MetabolightsIndexItem(item_id=study_id, item_type="study")
 
     funders_set: Set[str] = set()
     funding_ref_id_set: Set[str] = set()
@@ -964,41 +824,27 @@ def add_annotation(
         if val:
             if isinstance(val, str):
                 sanitized_val = rm_quotations(val)
-                item.annotations.append(
-                    str(schemas.Annotation(key=key, value=sanitized_val))
-                )
+                item.annotations.append(str(schemas.Annotation(key=key, value=sanitized_val)))
             elif isinstance(val, schemas.OntologyModel):
                 sanitized_val: schemas.OntologyModel = schemas.OntologyModel()
                 sanitized_val.term = rm_quotations(val.term)
                 sanitized_val.term_source_ref = rm_quotations(val.term_source_ref)
-                sanitized_val.term_accession_number = rm_quotations(
-                    val.term_accession_number
-                )
-                if (
-                    sanitized_val.term
-                    or sanitized_val.term_source_ref
-                    or sanitized_val.term_accession_number
-                ):
-                    item.annotations.append(
-                        str(schemas.Annotation(key=key, value=sanitized_val))
-                    )
+                sanitized_val.term_accession_number = rm_quotations(val.term_accession_number)
+                if sanitized_val.term or sanitized_val.term_source_ref or sanitized_val.term_accession_number:
+                    item.annotations.append(str(schemas.Annotation(key=key, value=sanitized_val)))
             elif isinstance(val, schemas.ValueAndUnitModel):
                 sanitized_val: schemas.ValueAndUnitModel = schemas.ValueAndUnitModel()
                 sanitized_val.value = rm_quotations(val.value)
                 sanitized_val.unit_term = rm_quotations(val.unit_term)
                 sanitized_val.term_source_ref = rm_quotations(val.term_source_ref)
-                sanitized_val.term_accession_number = rm_quotations(
-                    val.term_accession_number
-                )
+                sanitized_val.term_accession_number = rm_quotations(val.term_accession_number)
                 if (
                     sanitized_val.value
                     or sanitized_val.unit_term
                     or sanitized_val.term_source_ref
                     or sanitized_val.term_accession_number
                 ):
-                    item.annotations.append(
-                        str(schemas.Annotation(key=key, value=sanitized_val))
-                    )
+                    item.annotations.append(str(schemas.Annotation(key=key, value=sanitized_val)))
 
 
 def find_accession_id(source_ref: str, accession_number: str):
@@ -1031,9 +877,7 @@ def find_organism_categories(
             data = ncbi_taxonomy_df.loc[idx, :]
             data_dict = data.to_dict()
             for column_name in filtered_columns:
-                categories.append(
-                    f"study.characteristic.organism.{column_name}::{data_dict[column_name]}"
-                )
+                categories.append(f"study.characteristic.organism.{column_name}::{data_dict[column_name]}")
         ontology_categories[accession_number] = categories
     return categories
 
@@ -1056,12 +900,7 @@ def update_unit_ontology_set(
         term_source_ref=rm_quotations(term_source_ref),
         term_accession_number=rm_quotations(term_accession_number),
     )
-    if (
-        ontology.value
-        or ontology.unit_term
-        or ontology.term_accession_number
-        or ontology.term_source_ref
-    ):
+    if ontology.value or ontology.unit_term or ontology.term_accession_number or ontology.term_source_ref:
         current_set.add(ontology)
 
 
@@ -1071,9 +910,7 @@ def update_ontology_set(
     row_id: int,
     term_column_index: int,
 ):
-    term, term_source_ref, term_accession_number = read_ontology_columns(
-        table, row_id, term_column_index
-    )
+    term, term_source_ref, term_accession_number = read_ontology_columns(table, row_id, term_column_index)
     ontology = schemas.OntologyModel(
         term=rm_quotations(term),
         term_source_ref=rm_quotations(term_source_ref),
@@ -1083,9 +920,7 @@ def update_ontology_set(
         current_set.add(ontology)
 
 
-def read_ontology_columns(
-    table: IsaTable, row_id: int, term_column_index: int
-) -> Tuple[str, str, str]:
+def read_ontology_columns(table: IsaTable, row_id: int, term_column_index: int) -> Tuple[str, str, str]:
     next_header_name = table.columns[term_column_index]
     next_column = table.data[next_header_name]
     term = next_column[row_id] if next_column[row_id] else ""
@@ -1105,9 +940,7 @@ def read_ontology_columns(
     )
 
 
-def read_unit_ontology_columns(
-    table: IsaTable, row_id: int, value_column_index: int
-) -> Tuple[str, str, str, str]:
+def read_unit_ontology_columns(table: IsaTable, row_id: int, value_column_index: int) -> Tuple[str, str, str, str]:
     next_header_name = table.columns[value_column_index]
     next_column = table.data[next_header_name]
     value = next_column[row_id] if next_column[row_id] else ""

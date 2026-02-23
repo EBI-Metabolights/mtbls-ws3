@@ -52,14 +52,14 @@ class ElasticsearchIndexManagementGateway(SearchIndexManagementGateway):
     ) -> bool:
         mappings = None
         if delete_before:
-            await self.es.options(
-                ignore_status=404, request_timeout=30, retry_on_timeout=True
-            ).indices.delete(index=index)
+            await self.es.options(ignore_status=404, request_timeout=30, retry_on_timeout=True).indices.delete(
+                index=index
+            )
         if mappings_file_path:
             mappings = await self.load_file(mappings_file_path)
-        await self.es.options(
-            ignore_status=400, request_timeout=30, retry_on_timeout=True
-        ).indices.create(index=index, body=mappings)
+        await self.es.options(ignore_status=400, request_timeout=30, retry_on_timeout=True).indices.create(
+            index=index, body=mappings
+        )
         return True
 
     async def index_document(self, index: str, id: str, body: dict[str, Any]) -> bool:
@@ -85,10 +85,7 @@ class ElasticsearchIndexManagementGateway(SearchIndexManagementGateway):
             index=index, fields=update_time_fields, from_=from_, size=size
         )
         return [
-            IndexDocumentInfo(
-                id=x, updated_at=datetime.datetime.fromisoformat(x[update_field_name])
-            )
-            for x in documents
+            IndexDocumentInfo(id=x, updated_at=datetime.datetime.fromisoformat(x[update_field_name])) for x in documents
         ]
 
     async def get_all_documents_with_fields(

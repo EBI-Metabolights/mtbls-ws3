@@ -43,9 +43,7 @@ async def search_ontologies(
             openapi_examples=ONTOLOGY_SEARCH_BODY_EXAMPLES,
         ),
     ] = None,
-    exact_match: Annotated[
-        bool, Query(title="Exact matched terms only (case insensitive)")
-    ] = False,
+    exact_match: Annotated[bool, Query(title="Exact matched terms only (case insensitive)")] = False,
     ontology_search_service: OntologySearchService = Depends(  # noqa: FAST002
         Provide["services.ontology_search_service"]
     ),
@@ -61,61 +59,45 @@ async def search_ontologies(
             allowed_parent_ontology_terms=None,
         )
     result = await ontology_search_service.search(q, rule=rule, exact_match=exact_match)
-    response: APIResponse[OntologyTermSearchResult] = APIResponse[
-        OntologyTermSearchResult
-    ](content=result)
+    response: APIResponse[OntologyTermSearchResult] = APIResponse[OntologyTermSearchResult](content=result)
     return response
 
 
 @router.get(
     "/ontology-terms/{ontology}/{label}",
-    summary="Find ontology term by label. "
-    "It is exact match search in the selected ontology",
+    summary="Find ontology term by label. It is exact match search in the selected ontology",
     description="Find ontology term by label",
     response_model=APIResponse[OntologyTermSearchResult],
 )
 @inject
 async def find_term_by_label(
     response: Response,
-    ontology: Annotated[
-        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")
-    ],
+    ontology: Annotated[str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")],
     label: Annotated[str, Path(min_length=3, title="keyword to find an ontology term")],
     ontology_search_service: OntologySearchService = Depends(  # noqa: FAST002
         Provide["services.ontology_search_service"]
     ),
 ):
     result = await ontology_search_service.find_ontology_term(label, ontology.lower())
-    response: APIResponse[OntologyTermSearchResult] = APIResponse[
-        OntologyTermSearchResult
-    ](content=result)
+    response: APIResponse[OntologyTermSearchResult] = APIResponse[OntologyTermSearchResult](content=result)
     return response
 
 
 @router.get(
     "/ontology-terms/{ontology}",
-    summary="Find ontology term by label. "
-    "It is exact match search in the selected ontology",
+    summary="Find ontology term by label. It is exact match search in the selected ontology",
     description="Find ontology term by label",
     response_model=APIResponse[OntologyTermSearchResult],
 )
 @inject
 async def find_term_by_accession(
     response: Response,
-    ontology: Annotated[
-        str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")
-    ],
-    accession: Annotated[
-        str, Header(min_length=3, title="Accession number of an ontology term")
-    ],
+    ontology: Annotated[str, Path(min_length=1, title="ontology prefix. e.g., MS, NCBITAXON")],
+    accession: Annotated[str, Header(min_length=3, title="Accession number of an ontology term")],
     ontology_search_service: OntologySearchService = Depends(  # noqa: FAST002
         Provide["services.ontology_search_service"]
     ),
 ):
-    result = await ontology_search_service.find_by_accession(
-        accession, ontology.lower()
-    )
-    response: APIResponse[OntologyTermSearchResult] = APIResponse[
-        OntologyTermSearchResult
-    ](content=result)
+    result = await ontology_search_service.find_by_accession(accession, ontology.lower())
+    response: APIResponse[OntologyTermSearchResult] = APIResponse[OntologyTermSearchResult](content=result)
     return response

@@ -33,9 +33,7 @@ from mtbls.infrastructure.repositories.file_object.default.nfs.study_folder_mana
 logger = logging.getLogger(__name__)
 
 
-class FileSystemObjectWriteRepository(
-    FileSystemObjectReadRepository, FileObjectWriteRepository
-):
+class FileSystemObjectWriteRepository(FileSystemObjectReadRepository, FileObjectWriteRepository):
     def __init__(
         self,
         folder_manager: StudyFolderManager,
@@ -43,9 +41,7 @@ class FileSystemObjectWriteRepository(
         http_client: HttpClient,
         observer: None | FileObjectObserver = None,
     ):
-        super().__init__(
-            folder_manager=folder_manager, study_bucket=study_bucket, observer=observer
-        )
+        super().__init__(folder_manager=folder_manager, study_bucket=study_bucket, observer=observer)
         self.http_client = http_client
 
     async def put_object(
@@ -55,15 +51,11 @@ class FileSystemObjectWriteRepository(
         source_uri: str,
         override: bool = True,
     ) -> bool:
-        source_uri = (
-            f"file://{source_uri}" if source_uri.startswith("/") else source_uri
-        )
+        source_uri = f"file://{source_uri}" if source_uri.startswith("/") else source_uri
         if not source_uri:
             raise StudyResourceError("source_uri is required")
         if not await self.exists(resource_id=resource_id):
-            self.folder_manager.create_study_folder_path(
-                resource_id=resource_id, bucket_name=self.study_bucket.value
-            )
+            self.folder_manager.create_study_folder_path(resource_id=resource_id, bucket_name=self.study_bucket.value)
             # raise StudyBucketNotFoundError(resource_id, self.study_bucket.value)
 
         dest_path = self.folder_manager.get_study_folder_path(
@@ -72,9 +64,7 @@ class FileSystemObjectWriteRepository(
             object_key=object_key,
         )
         if not override and dest_path.exists():
-            raise StudyObjectAlreadyExistsError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectAlreadyExistsError(resource_id, self.study_bucket.value, object_key)
         file_path = self.folder_manager.get_study_folder_path(
             resource_id=resource_id,
             bucket_name=self.study_bucket.value,
@@ -138,9 +128,7 @@ class FileSystemObjectWriteRepository(
             object_key=object_key,
         )
         if not exist_ok and dest_path.exists():
-            raise StudyObjectAlreadyExistsError(
-                resource_id, self.study_bucket.value, object_key
-            )
+            raise StudyObjectAlreadyExistsError(resource_id, self.study_bucket.value, object_key)
 
         dest_path.mkdir(parents=True, exist_ok=exist_ok)
         study_object = await self.get_study_object(
@@ -152,9 +140,7 @@ class FileSystemObjectWriteRepository(
         await self.object_created(study_object)
         return True
 
-    async def put_with_local_file_provider(
-        self, source_uri: str, dest_path: pathlib.Path
-    ) -> bool:
+    async def put_with_local_file_provider(self, source_uri: str, dest_path: pathlib.Path) -> bool:
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         source_path = await self._convert_uri_to_path(source_uri)
         return self._copy_file(source_path, dest_path)
@@ -179,17 +165,13 @@ class FileSystemObjectWriteRepository(
             raise UnaccessibleUriError(uri_path)
         return uri_path
 
-    async def put_with_http_file_provider(
-        self, source_uri: str, dest_path: pathlib.Path
-    ) -> bool:
+    async def put_with_http_file_provider(self, source_uri: str, dest_path: pathlib.Path) -> bool:
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if not source_uri or not re.match(r"^https?://", source_uri):
             raise UnsupportedUriError(source_uri)
 
         with dest_path.open("wb") as fs:
-            await self.http_client.stream(
-                fs, HttpRequestType.GET, source_uri, timeout=120
-            )
+            await self.http_client.stream(fs, HttpRequestType.GET, source_uri, timeout=120)
 
         return True
 

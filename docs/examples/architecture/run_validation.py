@@ -29,9 +29,7 @@ def run_validation(  # noqa: PLR0913
     apply_modifiers: bool = True,
     phases: Union[ValidationPhase, None, list[str]] = None,
     serialize_result: bool = True,
-    study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
-        "services.study_metadata_service_factory"
-    ],
+    study_metadata_service_factory: StudyMetadataServiceFactory = Provide["services.study_metadata_service_factory"],
     policy_service: PolicyService = Provide["services.policy_service"],
     **kwargs,
 ) -> AsyncTaskResult:

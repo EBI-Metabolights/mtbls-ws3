@@ -7,6 +7,4 @@ class TransferHealthCheckConfiguration(BaseModel):
 
 
 class SystemHealthCheckConfiguration(BaseModel):
-    transfer_health_check: TransferHealthCheckConfiguration = (
-        TransferHealthCheckConfiguration()
-    )
+    transfer_health_check: TransferHealthCheckConfiguration = TransferHealthCheckConfiguration()

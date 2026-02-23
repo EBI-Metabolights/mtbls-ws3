@@ -38,15 +38,13 @@ class AuthenticationServiceImpl(AuthenticationService):
         if isinstance(config, StandaloneAuthenticationConfiguration):
             self.config = config
         else:
-            self.config: StandaloneAuthenticationConfiguration = (
-                StandaloneAuthenticationConfiguration.model_validate(config)
+            self.config: StandaloneAuthenticationConfiguration = StandaloneAuthenticationConfiguration.model_validate(
+                config
             )
         self.user_read_repository = user_read_repository
 
     @validate_inputs_outputs
-    async def authenticate_with_token(
-        self, token_type: TokenType, token: TokenStr, username: str = None
-    ) -> str:
+    async def authenticate_with_token(self, token_type: TokenType, token: TokenStr, username: str = None) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
         user = await self.user_read_repository.get_user_by_api_token(username, token)
@@ -54,9 +52,7 @@ class AuthenticationServiceImpl(AuthenticationService):
             raise AuthenticationError(f"Invalid API token '{token[:3]}...{token[-3:]}'")
 
         return await self.create_jwt_token(
-            jwt_token_input=JwtTokenInput(
-                sub=user.username, scopes=["login"], role=user.role.name
-            )
+            jwt_token_input=JwtTokenInput(sub=user.username, scopes=["login"], role=user.role.name)
         )
 
     async def authenticate_with_password(self, username: str, password: str) -> str:
@@ -67,9 +63,7 @@ class AuthenticationServiceImpl(AuthenticationService):
             raise AuthenticationError(f"Invalid username or password for '{username}'")
 
         return await self.create_jwt_token(
-            jwt_token_input=JwtTokenInput(
-                sub=user.username, scopes=["login"], role=user.role.name
-            )
+            jwt_token_input=JwtTokenInput(sub=user.username, scopes=["login"], role=user.role.name)
         )
 
     async def create_jwt_token(
@@ -77,9 +71,7 @@ class AuthenticationServiceImpl(AuthenticationService):
         jwt_token_input: JwtTokenInput,
         expires_delta_in_minutes: Union[None, datetime.timedelta] = None,
     ) -> str:
-        jwt_token_content = JwtTokenContent.model_validate(
-            jwt_token_input, from_attributes=True
-        )
+        jwt_token_content = JwtTokenContent.model_validate(jwt_token_input, from_attributes=True)
         now: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
         if expires_delta_in_minutes:
             expire: datetime.datetime = now + expires_delta_in_minutes
@@ -104,16 +96,12 @@ class AuthenticationServiceImpl(AuthenticationService):
         # TODO: implement it
         raise NotImplementedError()
 
-    async def validate_token(
-        self, token_type: TokenType, token: str, username: str = None
-    ) -> str:
+    async def validate_token(self, token_type: TokenType, token: str, username: str = None) -> str:
         if token_type == TokenType.JWT_TOKEN:
             jwt_token = await self.validate_jwt_token(token)
             return jwt_token.sub
         if token_type == TokenType.API_TOKEN:
-            user = await self.user_read_repository.get_user_by_api_token(
-                username, token
-            )
+            user = await self.user_read_repository.get_user_by_api_token(username, token)
             if not user:
                 raise AuthenticationError("Invalid token")
             return user.username

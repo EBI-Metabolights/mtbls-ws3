@@ -28,9 +28,7 @@ class StandaloneSystemHealthCheckService(SystemHealthCheckService):
         self.http_client = http_client
         self.config = config
         if isinstance(self.config, dict):
-            self.config = StandaloneSystemHealthCheckConfiguration.model_validate(
-                config
-            )
+            self.config = StandaloneSystemHealthCheckConfiguration.model_validate(config)
 
     async def check_transfer_services(self) -> TransferStatus:
         config = self.config.transfer_health_check
@@ -82,9 +80,7 @@ class StandaloneSystemHealthCheckService(SystemHealthCheckService):
         except (socket.timeout, ConnectionRefusedError, OSError):
             return False
 
-    def is_ftp_alive_banner(
-        self, host: str, port: int = 21, timeout: float = 3.0
-    ) -> bool:
+    def is_ftp_alive_banner(self, host: str, port: int = 21, timeout: float = 3.0) -> bool:
         """
         Open a TCP socket to the FTP port and check for an "FTP" banner.
         Returns True if the server responds with something like "220 ".

@@ -40,9 +40,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         super().__init__(model, templates, control_lists, "")
         self.new_header_actions: dict[str, list[TsvAddColumnsAction]] = {}
         self.header_update_actions: dict[str, list[TsvUpdateColumnHeaderAction]] = {}
-        self.investigation_modifier = InvestigationFileModifier(
-            self.model, self.templates, self.control_lists
-        )
+        self.investigation_modifier = InvestigationFileModifier(self.model, self.templates, self.control_lists)
         self.modifiers_map: dict[str, BaseIsaModifier] = {}
         self.modifiers_map[model.investigation_file_path] = self.investigation_modifier
         self.config = config
@@ -51,9 +49,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         self.investigation_modifier.modify()
         sample_files: list[SampleFileModifier] = []
         for isa_table_file in self.model.samples.values():
-            modifier = SampleFileModifier(
-                self.model, isa_table_file, self.templates, self.control_lists
-            )
+            modifier = SampleFileModifier(self.model, isa_table_file, self.templates, self.control_lists)
             file_name = isa_table_file.file_path
             self.modifiers_map[file_name] = modifier
             modifier.modify()
@@ -62,9 +58,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         assay_files: list[AssayFileModifier] = []
         for isa_table_file in self.model.assays.values():
             file_name = isa_table_file.file_path
-            modifier = AssayFileModifier(
-                self.model, isa_table_file, self.templates, self.control_lists
-            )
+            modifier = AssayFileModifier(self.model, isa_table_file, self.templates, self.control_lists)
             self.modifiers_map[file_name] = modifier
             modifier.modify()
 
@@ -83,9 +77,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
             maf_files: list[MafFileModifier] = []
             for isa_table_file in self.model.metabolite_assignments.values():
                 file_name = isa_table_file.file_path
-                modifier = MafFileModifier(
-                    self.model, isa_table_file, self.templates, self.control_lists
-                )
+                modifier = MafFileModifier(self.model, isa_table_file, self.templates, self.control_lists)
                 self.modifiers_map[file_name] = modifier
                 modifier.modify()
                 maf_files.append(modifier)
@@ -123,9 +115,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         remove_keys = []
         for file, actions in self.header_update_actions.items():
             updated_actions = [
-                x
-                for x in actions
-                if isinstance(x, TsvUpdateColumnHeaderAction) and len(x.new_headers) > 0
+                x for x in actions if isinstance(x, TsvUpdateColumnHeaderAction) and len(x.new_headers) > 0
             ]
             if updated_actions:
                 self.header_update_actions[file] = updated_actions
@@ -135,20 +125,13 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
                 for idx, current_header in action.current_headers.items():
                     if idx in action.new_headers:
                         for item in isa_table_files[file].table.headers:
-                            if (
-                                item.column_index == idx
-                                and item.column_header == current_header
-                            ):
+                            if item.column_index == idx and item.column_header == current_header:
                                 current_column_name = item.column_name
-                                suffix = item.column_name.replace(
-                                    item.column_header, ""
-                                )
+                                suffix = item.column_name.replace(item.column_header, "")
                                 new_header = action.new_headers[idx]
                                 new_column_name = f"{new_header}{suffix}"
-                                item.column_search_pattern = (
-                                    item.column_search_pattern.replace(
-                                        current_header, new_header
-                                    )
+                                item.column_search_pattern = item.column_search_pattern.replace(
+                                    current_header, new_header
                                 )
 
                                 item.column_name = new_column_name
@@ -171,11 +154,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
         for file, actions in self.new_header_actions.items():
             if file not in isa_table_files:
                 continue
-            updated_actions = [
-                x
-                for x in actions
-                if isinstance(x, TsvAddColumnsAction) and len(x.columns) > 0
-            ]
+            updated_actions = [x for x in actions if isinstance(x, TsvAddColumnsAction) and len(x.columns) > 0]
             if not updated_actions:
                 remove_keys.append(file)
                 continue
@@ -183,9 +162,7 @@ class MetabolightsStudyModelModifier(BaseIsaModifier):
             self.new_header_actions[file] = updated_actions
             action = updated_actions[0]
             sorted_header_actions = [
-                (x, y)
-                for x, y in action.columns.items()
-                if y.header_name not in additional_colums
+                (x, y) for x, y in action.columns.items() if y.header_name not in additional_colums
             ]
             sorted_header_actions.sort(key=lambda x: x[0])
             inserted_columns = 0

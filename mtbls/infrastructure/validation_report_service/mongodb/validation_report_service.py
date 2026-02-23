@@ -32,9 +32,7 @@ class MongoDbValidationReportService(ValidationReportService):
         self.write_repository = validation_report_repository
         self.study_bucket = self.validation_report_repository.study_bucket
         self.validation_history_object_key = (
-            validation_history_object_key.rstrip("/")
-            if validation_history_object_key
-            else "validation-history"
+            validation_history_object_key.rstrip("/") if validation_history_object_key else "validation-history"
         )
         self.parent_object_key = str(Path(validation_history_object_key).parent)
         if self.parent_object_key == ".":
@@ -55,9 +53,7 @@ class MongoDbValidationReportService(ValidationReportService):
         offset: Union[None, ZeroOrPositiveInt] = None,
         limit: Union[None, ZeroOrPositiveInt] = None,
     ):
-        files = self.collection.find(
-            filters, {"data.taskId": 1, "data.startTime": 1}
-        ).sort({"data.startTime": -1})
+        files = self.collection.find(filters, {"data.taskId": 1, "data.startTime": 1}).sort({"data.startTime": -1})
         if offset:
             files = files.skip(skip=offset)
         if limit:
@@ -74,9 +70,7 @@ class MongoDbValidationReportService(ValidationReportService):
     def _format_datetime(self, date_value: datetime.datetime):
         return date_value.strftime("%Y-%m-%d_%H-%M-%S")
 
-    async def find_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> ValidationResultFile:
+    async def find_by_task_id(self, resource_id: str, task_id: str) -> ValidationResultFile:
         filters = {"resourceId": resource_id, "data.taskId": task_id}
         result = await self.find_with_filter(filters=filters)
         if result:
@@ -87,9 +81,7 @@ class MongoDbValidationReportService(ValidationReportService):
             f"validation-history__*__{task_id}.json",
         )
 
-    async def find_by_validation_time(
-        self, resource_id: str, validation_time: str
-    ) -> ValidationResultFile:
+    async def find_by_validation_time(self, resource_id: str, validation_time: str) -> ValidationResultFile:
         filters = {"resourceId": resource_id, "data.startTime": validation_time}
         result = await self.find_with_filter(filters=filters)
         if result:
@@ -118,9 +110,7 @@ class MongoDbValidationReportService(ValidationReportService):
 
         else:
             object_key_path = Path(object_key)
-            numeric_resource_id = int(
-                resource_id.removeprefix("REQ").removeprefix("MTBLS")
-            )
+            numeric_resource_id = int(resource_id.removeprefix("REQ").removeprefix("MTBLS"))
             report = ValidationReport(
                 resource_id=resource_id,
                 numeric_resource_id=numeric_resource_id,
@@ -138,26 +128,18 @@ class MongoDbValidationReportService(ValidationReportService):
 
         study_object = StudyFileOutput.model_validate(report.model_dump(exclude="data"))
         if result:
-            await self.validation_report_repository.object_updated(
-                study_object=study_object
-            )
+            await self.validation_report_repository.object_updated(study_object=study_object)
         else:
-            await self.validation_report_repository.object_created(
-                study_object=study_object
-            )
+            await self.validation_report_repository.object_created(study_object=study_object)
 
         return True
 
-    async def load_validation_report_by_task_id(
-        self, resource_id: str, task_id: str
-    ) -> PolicySummaryResult:
+    async def load_validation_report_by_task_id(self, resource_id: str, task_id: str) -> PolicySummaryResult:
         filters = [
             EntityFilter(key="resourceId", value=resource_id),
             EntityFilter(key="data.taskId", value=task_id),
         ]
-        reports = await self.validation_report_repository.find(
-            query_options=QueryOptions(filters=filters)
-        )
+        reports = await self.validation_report_repository.find(query_options=QueryOptions(filters=filters))
         if reports.data:
             return reports.data[0].data
 
@@ -170,11 +152,7 @@ class MongoDbValidationReportService(ValidationReportService):
             EntityFilter(key="resourceId", value=resource_id),
             EntityFilter(key="data.startTime", value=validation_time),
         ]
-        reports = await self.validation_report_repository.find(
-            query_options=QueryOptions(filters=filters)
-        )
+        reports = await self.validation_report_repository.find(query_options=QueryOptions(filters=filters))
         if reports.data:
             return reports.data[0].data
-        raise StudyObjectNotFoundError(
-            resource_id, self.study_bucket.value, validation_time
-        )
+        raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, validation_time)

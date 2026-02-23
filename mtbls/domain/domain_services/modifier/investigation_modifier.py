@@ -86,9 +86,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         if "" in self.model.assays:
             del self.model.assays[""]
 
-    def update_isa_table_ontology_sources(
-        self, isa_table: IsaTableFile, ontology_sources: set[str]
-    ):
+    def update_isa_table_ontology_sources(self, isa_table: IsaTableFile, ontology_sources: set[str]):
         if not isa_table:
             return
         ontology_columns = {}
@@ -96,10 +94,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             self.update_column_term_sources(isa_table, header, ontology_columns)
 
         for column_name, term_source_column_name in ontology_columns.items():
-            if (
-                column_name in isa_table.table.data
-                and term_source_column_name in isa_table.table.data
-            ):
+            if column_name in isa_table.table.data and term_source_column_name in isa_table.table.data:
                 term_source_data = isa_table.table.data[term_source_column_name]
                 for idx, val in enumerate(isa_table.table.data[column_name]):
                     if val and len(term_source_data) > idx:
@@ -119,36 +114,26 @@ class InvestigationFileModifier(BaseIsaModifier):
         if header.column_structure == ColumnsStructure.ONTOLOGY_COLUMN:
             term_source_column_name = ""
             if len(isa_table.table.columns) > header.column_index + 1:
-                term_source_column_name = isa_table.table.columns[
-                    header.column_index + 1
-                ]
+                term_source_column_name = isa_table.table.columns[header.column_index + 1]
             if term_source_column_name:
                 ontology_columns[header.column_name] = term_source_column_name
-        elif (
-            header.column_structure == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY
-        ):
+        elif header.column_structure == ColumnsStructure.SINGLE_COLUMN_AND_UNIT_ONTOLOGY:
             unit_column_name = ""
             if len(isa_table.table.columns) > header.column_index + 1:
                 unit_column_name = isa_table.table.columns[header.column_index + 1]
             term_source_column_name = ""
             if len(isa_table.table.columns) > header.column_index + 2:
-                term_source_column_name = isa_table.table.columns[
-                    header.column_index + 2
-                ]
+                term_source_column_name = isa_table.table.columns[header.column_index + 2]
             if term_source_column_name and unit_column_name:
                 ontology_columns[unit_column_name] = term_source_column_name
         return ontology_columns
 
     def update_ontology_sources(self):
         referenced_ontology_sources: set[str] = set()
-        self.update_ontology_source_set(
-            [self.model.investigation], referenced_ontology_sources
-        )
+        self.update_ontology_source_set([self.model.investigation], referenced_ontology_sources)
         for files in (self.model.assays, self.model.samples):
             for isa_table_file in files.values():
-                self.update_isa_table_ontology_sources(
-                    isa_table_file, referenced_ontology_sources
-                )
+                self.update_isa_table_ontology_sources(isa_table_file, referenced_ontology_sources)
         current_ontology_source_references: dict[str, OntologySourceReference] = {}
         remove_list: list[OntologySourceReference] = []
         references = self.model.investigation.ontology_source_references.references
@@ -166,9 +151,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         missing_set = referenced_ontology_sources - current_set
         exist_set = referenced_ontology_sources.intersection(current_set)
         if unreferenced_set:
-            remove_list.extend(
-                [current_ontology_source_references[x] for x in unreferenced_set]
-            )
+            remove_list.extend([current_ontology_source_references[x] for x in unreferenced_set])
 
         if remove_list:
             removed_items = ", ".join({f"'{x.source_name}'" for x in remove_list})
@@ -181,8 +164,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             )
             self.modifier_update(
                 source=self.model.investigation_file_path,
-                action="Ontology Source Reference names are removed."
-                f" Removed terms: {removed_items}",
+                action=f"Ontology Source Reference names are removed. Removed terms: {removed_items}",
                 old_value=removed_items,
                 new_value="",
             )
@@ -221,9 +203,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             missing_list.sort()
             for ref in missing_set:
                 template: OntologySourceReference = (
-                    templates[ref]
-                    if ref in templates
-                    else OntologySourceReference(source_name=ref)
+                    templates[ref] if ref in templates else OntologySourceReference(source_name=ref)
                 )
 
                 self.modifier_update(
@@ -274,23 +254,16 @@ class InvestigationFileModifier(BaseIsaModifier):
             if study.file_name in self.model.samples:
                 table = self.model.samples[study.file_name].table
                 for header in table.headers:
-                    is_factor_column = header.column_header.strip().startswith(
-                        "Factor Value["
-                    )
+                    is_factor_column = header.column_header.strip().startswith("Factor Value[")
                     if is_factor_column:
-                        factor = (
-                            header.column_header.strip()
-                            .replace("Factor Value[", "")
-                            .replace("]", "")
-                        )
+                        factor = header.column_header.strip().replace("Factor Value[", "").replace("]", "")
                         cleaned_factor_name = self.first_character_uppercase(factor)
                         sample_sheet_factors.append(cleaned_factor_name)
             for name in sample_sheet_factors:
                 if name not in study_factors:
                     self.modifier_update(
                         source=self.model.investigation_file_path,
-                        action=f"Factor Value in the sample file "
-                        f"is added as a new study factor: {name}",
+                        action=f"Factor Value in the sample file is added as a new study factor: {name}",
                         old_value="",
                         new_value=name,
                     )
@@ -313,14 +286,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if name not in all_protocol_parameters:
                     all_protocol_parameters[name] = set()
                 if params:
-                    all_protocol_parameters[name] = all_protocol_parameters[name].union(
-                        params
-                    )
+                    all_protocol_parameters[name] = all_protocol_parameters[name].union(params)
 
-        study_protocols = {
-            x.name: x
-            for x in self.model.investigation.studies[0].study_protocols.protocols
-        }
+        study_protocols = {x.name: x for x in self.model.investigation.studies[0].study_protocols.protocols}
         unique_params = {}
         for name, protocol in study_protocols.items():
             unique_params[name] = {}
@@ -333,41 +301,24 @@ class InvestigationFileModifier(BaseIsaModifier):
             for item in removed_params:
                 protocol.parameters.remove(item)
             if removed_params:
-                msg = (
-                    f"Invalid and duplicate parameters are "
-                    f"removed from protocol '{name}'"
-                )
+                msg = f"Invalid and duplicate parameters are removed from protocol '{name}'"
                 self.modifier_update(
                     source=self.model.investigation_file_path,
-                    action=f"{msg} {name}: "
-                    f"{', '.join([x.term for x in removed_params])}",
-                    old_value=", ".join(
-                        [
-                            f"{idx + 1}: '{x.term}'"
-                            for idx, x in enumerate(removed_params)
-                        ]
-                    ),
+                    action=f"{msg} {name}: {', '.join([x.term for x in removed_params])}",
+                    old_value=", ".join([f"{idx + 1}: '{x.term}'" for idx, x in enumerate(removed_params)]),
                     new_value="",
                 )
 
         for name, protocol_params in all_protocol_parameters.items():
             if name in study_protocols:
-                study_protocol_params = {
-                    x.term for x in study_protocols[name].parameters
-                }
+                study_protocol_params = {x.term for x in study_protocols[name].parameters}
                 assay_protocol_params = protocol_params
 
                 missing_set = assay_protocol_params - study_protocol_params
                 extra_set = study_protocol_params - assay_protocol_params
-                default_params = (
-                    set(default_protocols[name]) if name in default_protocols else set()
-                )
-                missing_set = (
-                    assay_protocol_params.union(default_params) - study_protocol_params
-                )
-                extra_set = study_protocol_params - assay_protocol_params.union(
-                    default_params
-                )
+                default_params = set(default_protocols[name]) if name in default_protocols else set()
+                missing_set = assay_protocol_params.union(default_params) - study_protocol_params
+                extra_set = study_protocol_params - assay_protocol_params.union(default_params)
                 for item in extra_set:
                     if item.strip() in unique_params[name]:
                         param = unique_params[name][item.strip()]
@@ -444,19 +395,13 @@ class InvestigationFileModifier(BaseIsaModifier):
                     source_label=label,
                 )
             elif not item.term.strip():
-                if (
-                    not item.term_accession_number.strip()
-                    and item.term_source_ref.strip()
-                ):
+                if not item.term_accession_number.strip() and item.term_source_ref.strip():
                     self.override_ontology_term(
                         source=OntologyItem(),
                         target=item,
                         source_label=label,
                     )
-                elif (
-                    not item.term_source_ref.strip()
-                    and item.term_accession_number.strip()
-                ):
+                elif not item.term_source_ref.strip() and item.term_accession_number.strip():
                     acc = item.term_accession_number
                     onto = self.get_term_by_accession_number(
                         acc,
@@ -481,9 +426,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                 val = getattr(item, field)
 
                 extra = item.__class__.model_fields[field].json_schema_extra
-                suffix = (
-                    extra["header_name"] if extra and "header_name" in extra else ""
-                )
+                suffix = extra["header_name"] if extra and "header_name" in extra else ""
 
                 control_name = f"{section_name} {suffix}" if suffix else section_name
                 control_name = control_name.strip()
@@ -495,11 +438,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                         control_name,
                         label_value,
                     )
-                elif (
-                    val
-                    and isinstance(val, list)
-                    and isinstance(val[0], IsaAbstractModel)
-                ):
+                elif val and isinstance(val, list) and isinstance(val[0], IsaAbstractModel):
                     for idx, term in enumerate(val):
                         label_idx = f"{label_name} [{idx + 1}]"
                         self.update_study_ontology_items(
@@ -542,9 +481,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                 self.update_trailing_spaces(obj, label, list_items=True)
 
     def rule_i_100_000_000_00(self):
-        self.update_trailing_spaces(
-            [self.model.investigation], "Investigation", list_items=True
-        )
+        self.update_trailing_spaces([self.model.investigation], "Investigation", list_items=True)
 
     def update_ontologies(self):
         if self.model.investigation and self.model.investigation.studies:
@@ -594,8 +531,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if len(investigation.studies) > 1:
             self.modifier_update(
-                action="First study will be used in i_Investigation.txt file."
-                " Other studies are deleted.",
+                action="First study will be used in i_Investigation.txt file. Other studies are deleted.",
                 old_value="Multiple study",
                 new_value="One study",
                 source=self.model.investigation_file_path,
@@ -629,13 +565,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
 
         if investigation.studies and investigation.studies[0]:
-            title = " ".join(
-                [
-                    x.strip()
-                    for x in investigation.studies[0].title.strip().split()
-                    if x.strip()
-                ]
-            )
+            title = " ".join([x.strip() for x in investigation.studies[0].title.strip().split() if x.strip()])
             if title != investigation.studies[0].title:
                 self.modifier_update(
                     action="Study Title is updated.",
@@ -648,13 +578,7 @@ class InvestigationFileModifier(BaseIsaModifier):
     def rule_i_100_300_003_02(self):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
-            title = " ".join(
-                [
-                    x.strip()
-                    for x in investigation.studies[0].title.strip().split()
-                    if x.strip()
-                ]
-            )
+            title = " ".join([x.strip() for x in investigation.studies[0].title.strip().split() if x.strip()])
 
             if title and title != investigation.title:
                 self.modifier_update(
@@ -703,13 +627,9 @@ class InvestigationFileModifier(BaseIsaModifier):
                 publications = study.study_publications.publications
                 for idx, publication in enumerate(publications):
                     if publication.doi:
-                        new_val = publication.doi.strip().removeprefix(
-                            "https://doi.org/"
-                        )
+                        new_val = publication.doi.strip().removeprefix("https://doi.org/")
                         if publication.doi == new_val:
-                            new_val = publication.doi.strip().removeprefix(
-                                "http://doi.org/"
-                            )
+                            new_val = publication.doi.strip().removeprefix("http://doi.org/")
                         if publication.doi != new_val:
                             self.modifier_update(
                                 action=f"Study Publication [{idx}] DOI is updated.",
@@ -783,21 +703,15 @@ class InvestigationFileModifier(BaseIsaModifier):
                     and self.model.assays[assay.file_name].assay_technique
                     and self.model.assays[assay.file_name].assay_technique.name
                 ):
-                    techniques.add(
-                        self.model.assays[assay.file_name].assay_technique.name
-                    )
-            protocol_params: Dict[str, list[str]] = self.get_protocol_parameters(
-                techniques
-            )
+                    techniques.add(self.model.assays[assay.file_name].assay_technique.name)
+            protocol_params: Dict[str, list[str]] = self.get_protocol_parameters(techniques)
             if not protocol_params:
                 return
             protocols = investigation.studies[0].study_protocols.protocols
             for protocol in protocols:
                 if protocol.name in protocol_params:
                     default_params = set(protocol_params[protocol.name])
-                    missing_params = default_params - {
-                        x.term for x in protocol.parameters
-                    }
+                    missing_params = default_params - {x.term for x in protocol.parameters}
                     if missing_params:
                         self.modifier_update(
                             action=f"Missing '{protocol.name}' protocol "
@@ -879,8 +793,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             remove_list.sort(key=lambda x: x[0], reverse=True)
             for idx, contact in remove_list:
                 self.modifier_update(
-                    action=f"Study Contacts [{idx + 1}] "
-                    "without first name and last name is removed.",
+                    action=f"Study Contacts [{idx + 1}] without first name and last name is removed.",
                     old_value="Empty contact",
                     new_value="",
                     source=self.model.investigation_file_path,
@@ -891,10 +804,8 @@ class InvestigationFileModifier(BaseIsaModifier):
                 if self.db_metadata.submitters:
                     for submitter in self.db_metadata.submitters:
                         if (
-                            contact.first_name.strip().lower()
-                            == submitter.first_name.lower()
-                            and contact.last_name.strip().lower()
-                            == submitter.last_name.lower()
+                            contact.first_name.strip().lower() == submitter.first_name.lower()
+                            and contact.last_name.strip().lower() == submitter.last_name.lower()
                             and (not contact.email or not contact.email.strip())
                         ):
                             self.modifier_update(
@@ -938,8 +849,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                     self.override_ontology_term(
                         source=default_role,
                         target=contact.roles[0],
-                        source_label=f"Study Contacts [{idx + 1}] "
-                        f"({contact.first_name} {contact.last_name}) Role [1]",
+                        source_label=f"Study Contacts [{idx + 1}] ({contact.first_name} {contact.last_name}) Role [1]",
                     )
 
     def update_assay_defaults(self):
@@ -958,9 +868,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                 )
 
                 if assay.file_name in self.model.assays:
-                    main_technique = self.model.assays[
-                        assay.file_name
-                    ].assay_technique.main_technique
+                    main_technique = self.model.assays[assay.file_name].assay_technique.main_technique
 
                     if main_technique == "MS":
                         ms_item: OntologyAnnotation = OntologyItem(
@@ -984,9 +892,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                             target=assay.technology_type,
                             source_label=f"Study Assay [{idx + 1}] Technology Type",
                         )
-                    technique_name = self.model.assays[
-                        assay.file_name
-                    ].assay_technique.name
+                    technique_name = self.model.assays[assay.file_name].assay_technique.name
 
                     self.update_technology_platform(assay, technique_name)
 
@@ -1033,9 +939,7 @@ class InvestigationFileModifier(BaseIsaModifier):
         target: OntologyAnnotation,
         source_label: str,
     ):
-        current = (
-            f"{target.term_source_ref}:{target.term}:{target.term_accession_number}"
-        )
+        current = f"{target.term_source_ref}:{target.term}:{target.term_accession_number}"
         if target.term != source.term:
             target.term = source.term
 
@@ -1044,9 +948,7 @@ class InvestigationFileModifier(BaseIsaModifier):
 
         if target.term_source_ref != source.term_source_ref:
             target.term_source_ref = source.term_source_ref
-        updated = (
-            f"{target.term_source_ref}:{target.term}:{target.term_accession_number}"
-        )
+        updated = f"{target.term_source_ref}:{target.term}:{target.term_accession_number}"
         if current != updated:
             self.modifier_update(
                 action=f"{source_label} is updated.",
@@ -1059,16 +961,10 @@ class InvestigationFileModifier(BaseIsaModifier):
         if not name:
             return ""
         name_parts = name.strip().split()
-        upper_case_parts = [
-            x.upper() if len(x) == 1 else x[0].upper() + x[1:]
-            for x in name_parts
-            if x.strip()
-        ]
+        upper_case_parts = [x.upper() if len(x) == 1 else x[0].upper() + x[1:] for x in name_parts if x.strip()]
         return " ".join(upper_case_parts)
 
-    def update_ontology_source_set(
-        self, item_list: list[Any], ontology_sources: set[str]
-    ):
+    def update_ontology_source_set(self, item_list: list[Any], ontology_sources: set[str]):
         if not item_list:
             return
         for obj in item_list:
@@ -1081,9 +977,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                     v = getattr(obj, k)
                     if isinstance(v, IsaAbstractModel):
                         self.update_ontology_source_set([v], ontology_sources)
-                    elif (
-                        v and isinstance(v, list) and isinstance(v[0], IsaAbstractModel)
-                    ):
+                    elif v and isinstance(v, list) and isinstance(v[0], IsaAbstractModel):
                         self.update_ontology_source_set(v, ontology_sources)
             elif obj and isinstance(obj, list) and isinstance(obj[0], IsaAbstractModel):
                 self.update_ontology_source_set(obj, ontology_sources)

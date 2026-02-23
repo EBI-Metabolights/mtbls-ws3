@@ -42,8 +42,7 @@ class StudyFolderManager:
             StudyBucket.REPORT_FILES: paths.report_files_path,
         }
         self.root_path_bucket_map: dict[str, str] = {
-            x: pathlib.Path(self.root_path_bucket_str_map[x])
-            for x in self.root_path_bucket_str_map
+            x: pathlib.Path(self.root_path_bucket_str_map[x]) for x in self.root_path_bucket_str_map
         }
         self.root_path_bucket_name_map: dict[str, str] = {
             x.value: self.root_path_bucket_map[x] for x in self.root_path_bucket_map
@@ -64,9 +63,7 @@ class StudyFolderManager:
     ) -> pathlib.Path:
         root_path = self.root_path_bucket_name_map[bucket_name]
         subpath = pathlib.Path(
-            pathlib.Path(resource_id) / pathlib.Path(object_key.lstrip("/"))
-            if object_key
-            else resource_id
+            pathlib.Path(resource_id) / pathlib.Path(object_key.lstrip("/")) if object_key else resource_id
         )
         return root_path / subpath
 
@@ -83,9 +80,7 @@ class StudyFolderManager:
             valid_link = True
 
         if not exist_ok and (folder_path.exists() or valid_link):
-            raise StudyObjectAlreadyExistsError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectAlreadyExistsError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if folder_path.is_symlink() and not valid_link:
             folder_path.unlink()
         logger.info("Folder created: %s", str(folder_path))
@@ -127,9 +122,7 @@ class StudyFolderManager:
                 ignore_not_exist=ignore_not_exist,
             )
 
-        raise UnexpectedStudyObjectTypeError(
-            resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-        )
+        raise UnexpectedStudyObjectTypeError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
 
     def delete_study_folder_path(
         self,
@@ -148,21 +141,15 @@ class StudyFolderManager:
             if folder_path.resolve().exists() and folder_path.resolve().is_dir():
                 folder_path.unlink()
                 return True
-            raise StudyObjectIsNotFolderError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectIsNotFolderError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if folder_path.exists():
             if folder_path.is_dir():
                 shutil.rmtree(folder_path, ignore_errors=True)
                 logger.info("Folder deleted: %s", str(folder_path))
                 return True
-            raise StudyObjectIsNotFolderError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectIsNotFolderError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if not ignore_not_exist:
-            raise StudyObjectNotFoundError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectNotFoundError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         return False
 
     def delete_study_folder_file(
@@ -172,9 +159,7 @@ class StudyFolderManager:
         object_key: Union[None, str] = None,
         ignore_not_exist: bool = False,
     ) -> bool:
-        file_path = self.get_study_folder_path(
-            resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-        )
+        file_path = self.get_study_folder_path(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if file_path.is_symlink():
             if not file_path.resolve():
                 file_path.unlink()
@@ -182,19 +167,13 @@ class StudyFolderManager:
             if file_path.resolve().exists() and file_path.resolve().is_file():
                 file_path.unlink()
                 return True
-            raise StudyObjectIsNotFileError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectIsNotFileError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if file_path.exists():
             if file_path.is_file():
                 file_path.unlink(missing_ok=True)
                 logger.info("File deleted: %s", str(file_path))
                 return True
-            raise StudyObjectIsNotFileError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectIsNotFileError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         if not ignore_not_exist:
-            raise StudyObjectNotFoundError(
-                resource_id=resource_id, bucket_name=bucket_name, object_key=object_key
-            )
+            raise StudyObjectNotFoundError(resource_id=resource_id, bucket_name=bucket_name, object_key=object_key)
         return False

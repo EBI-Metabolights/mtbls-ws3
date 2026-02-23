@@ -50,18 +50,14 @@ class MongoDbFileObjectReadRepository(
             collection_name=collection_name,
             output_entity_class=output_entity_class,
         )
-        super(FileObjectWriteRepository, self).__init__(
-            study_bucket=study_bucket, observers=[observer]
-        )
+        super(FileObjectWriteRepository, self).__init__(study_bucket=study_bucket, observers=[observer])
         self.study_bucket = study_bucket
         self.resource_category = resource_category
 
     def get_bucket(self) -> StudyBucket:
         return self.study_bucket
 
-    async def list(
-        self, resource_id: str, object_key: Union[None, str] = None
-    ) -> list[StudyFileOutput]:
+    async def list(self, resource_id: str, object_key: Union[None, str] = None) -> list[StudyFileOutput]:
         result = await self.collection.find(
             {"resourceId": resource_id, "parentObjectId": object_key},
             {"_id": 0, "data": 0},
@@ -97,9 +93,7 @@ class MongoDbFileObjectReadRepository(
         collection = self.collection.name
         return f"mongodb://{cn.host}/{cn.database}/{collection}/{resource_id}/{quote(object_key)}"
 
-    async def download(
-        self, resource_id: str, object_key: str, target_path: str
-    ) -> StudyFileOutput:
+    async def download(self, resource_id: str, object_key: str, target_path: str) -> StudyFileOutput:
         result = await self.collection.find_one(
             {"resourceId": resource_id, "objectId": object_key},
             {"_id": 1},

@@ -84,9 +84,7 @@ class ElasticsearchSampleGateway:
             per_value_clauses.append(
                 {
                     "bool": {
-                        "should": [
-                            {"term": {field: value}} for field in FACTOR_HEADER_FIELDS
-                        ],
+                        "should": [{"term": {field: value}} for field in FACTOR_HEADER_FIELDS],
                         "minimum_should_match": 1,
                     }
                 }

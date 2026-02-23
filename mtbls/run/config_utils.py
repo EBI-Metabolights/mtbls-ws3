@@ -16,19 +16,13 @@ DEFAULT_SECRETS_FILE_PATH = ".mtbls-ws-config-secrets/.secrets.yaml"
 
 
 def get_application_config_files() -> tuple[str, str]:
-    config_file_path = os.environ.get(
-        CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
-    )
-    secrets_file_path = os.environ.get(
-        SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH
-    )
+    config_file_path = os.environ.get(CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH)
+    secrets_file_path = os.environ.get(SECRET_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_SECRETS_FILE_PATH)
 
     return config_file_path, secrets_file_path
 
 
-def render_config_secrets(
-    config: dict[str, Any], secrets: dict[str, Any]
-) -> dict[str, Any]:
+def render_config_secrets(config: dict[str, Any], secrets: dict[str, Any]) -> dict[str, Any]:
     if not secrets:
         logger.warning("Secrets dictionary is empty. Skiping config rendering")
         return config
@@ -72,9 +66,7 @@ def set_application_configuration(
         raise ValueError("Container is not defined")
 
     if not config_file_path:
-        config_file_path = os.environ.get(
-            CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH
-        )
+        config_file_path = os.environ.get(CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME, DEFAULT_CONFIG_FILE_PATH)
 
     if not secrets_file_path:
         secrets_file_path = os.environ.get(

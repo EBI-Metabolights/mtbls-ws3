@@ -27,9 +27,7 @@ class AsyncTaskService:
         async_task_registry: dict[str, dict[str, Callable]] = None,
     ):
         self.default_queue = default_queue if default_queue else "common"
-        self.async_task_registry = (
-            async_task_registry if async_task_registry is not None else {}
-        )
+        self.async_task_registry = async_task_registry if async_task_registry is not None else {}
         self.broker = broker
         self.backend = backend
         self.app_name = app_name

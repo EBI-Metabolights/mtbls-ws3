@@ -12,9 +12,7 @@ class APIBaseModel(CamelCaseModel):
         alias_generator=to_camel,
         populate_by_name=True,
         json_schema_serialization_defaults_required=True,
-        field_title_generator=lambda field_name, field_info: to_pascal(
-            field_name.replace("_", " ").strip()
-        ),
+        field_title_generator=lambda field_name, field_info: to_pascal(field_name.replace("_", " ").strip()),
     )
 
 

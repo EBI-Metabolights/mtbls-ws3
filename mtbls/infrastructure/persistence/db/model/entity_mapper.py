@@ -26,9 +26,7 @@ class EntityMapper:
     }
 
     def __init__(self):
-        self.table_entity_map: dict[str, Entity] = {
-            v.__name__: k for k, v in EntityMapper.entity_table_map.items()
-        }
+        self.table_entity_map: dict[str, Entity] = {v.__name__: k for k, v in EntityMapper.entity_table_map.items()}
         self.mapped_tables: dict[Entity, dict[str, str]] = {}
 
     def get_table_model(self, entity_type: Entity) -> Base:
@@ -41,14 +39,10 @@ class EntityMapper:
         maped_fields = self.get_field_map(output_class, entity_type)
 
         object_dict = db_object.__dict__
-        values = {
-            k: object_dict[v] for k, v in maped_fields.items() if v in object_dict
-        }
+        values = {k: object_dict[v] for k, v in maped_fields.items() if v in object_dict}
         return output_class.model_validate(values)
 
-    async def convert_to_output_type_list(
-        self, db_objects: list[Base], output_class: Type[T]
-    ) -> list[T]:
+    async def convert_to_output_type_list(self, db_objects: list[Base], output_class: Type[T]) -> list[T]:
         if not db_objects:
             return []
         result = []

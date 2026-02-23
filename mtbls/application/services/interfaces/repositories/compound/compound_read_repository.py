@@ -9,9 +9,7 @@ class CompoundReadRepository:
     async def get_compound_by_id(self, id_: str) -> Union[None, Compound]: ...
 
     @abc.abstractmethod
-    async def get_compounds_by_ids(
-        self, ids: List[str]
-    ) -> Tuple[List[Compound], List[str]]:
+    async def get_compounds_by_ids(self, ids: List[str]) -> Tuple[List[Compound], List[str]]:
         """
         Retrieve multiple compounds by their IDs in a single batch query.
 

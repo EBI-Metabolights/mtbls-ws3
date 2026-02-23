@@ -57,9 +57,7 @@ def update_container(
     if not container:
         raise TypeError("Init container is not defined")
 
-    success = set_application_configuration(
-        container, config_file_path, secrets_file_path
-    )
+    success = set_application_configuration(container, config_file_path, secrets_file_path)
     if not success:
         raise Exception("Configuration update task failed.")
     container.init_resources()

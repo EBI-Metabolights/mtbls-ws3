@@ -32,9 +32,7 @@ logger = logging.getLogger(__name__)
 @inject
 def run_isa_metadata_modifier(
     resource_id: str,
-    study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
-        "services.study_metadata_service_factory"
-    ],
+    study_metadata_service_factory: StudyMetadataServiceFactory = Provide["services.study_metadata_service_factory"],
     policy_service: PolicyService = Provide["services.policy_service"],
     **kwargs,
 ) -> AsyncTaskResult:
@@ -76,15 +74,9 @@ async def run_isa_metadata_modifier_task(
             load_db_metadata=True,
         )
 
-        folder_errors = [
-            x
-            for x in modifier_model.folder_reader_messages
-            if x.type == GenericMessageType.ERROR
-        ]
+        folder_errors = [x for x in modifier_model.folder_reader_messages if x.type == GenericMessageType.ERROR]
         if folder_errors:
-            raise Exception(
-                f"Study load error:  {folder_errors[0].short} {folder_errors[0].detail}"
-            )
+            raise Exception(f"Study load error:  {folder_errors[0].short} {folder_errors[0].detail}")
         control_lists: ValidationControls = await policy_service.get_control_lists()
         templates: FileTemplates = await policy_service.get_templates()
         modifier = MetabolightsStudyModelModifier(
@@ -95,9 +87,7 @@ async def run_isa_metadata_modifier_task(
         )
         modifier.modify()
 
-        result = StudyMetadataModifierResult(
-            resource_id=resource_id, logs=modifier.update_logs
-        )
+        result = StudyMetadataModifierResult(resource_id=resource_id, logs=modifier.update_logs)
 
         if modifier.update_logs:
             logger.info(
@@ -108,12 +98,8 @@ async def run_isa_metadata_modifier_task(
             logger.info("Create metadata snapshot for %s", resource_id)
             await metadata_service.create_metadata_snapshot(suffix="VALIDATION")
             logger.info("Override %s metadata files", resource_id)
-            save_result_files = (
-                not validation_run_configuration.skip_result_file_modification
-            )
-            await metadata_service.save_study_model(
-                modifier_model, save_result_files=save_result_files
-            )
+            save_result_files = not validation_run_configuration.skip_result_file_modification
+            await metadata_service.save_study_model(modifier_model, save_result_files=save_result_files)
         else:
             logger.info("There is no modification for %s.", resource_id)
 

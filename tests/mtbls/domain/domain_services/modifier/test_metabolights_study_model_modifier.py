@@ -71,9 +71,7 @@ def ms_base_01_modifier(
 
 class TestNoModification:
     @pytest.mark.asyncio
-    async def test_modify_no_modification_01(
-        self, modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_modify_no_modification_01(self, modifier: MetabolightsStudyModelModifier):
         update_logs = modifier.modify()
 
         from pathlib import Path
@@ -83,9 +81,7 @@ class TestNoModification:
         assert len(update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_modify_no_modification_02(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_modify_no_modification_02(self, ms_modifier: MetabolightsStudyModelModifier):
         ms_modifier.modify()
         from pathlib import Path
 
@@ -96,9 +92,7 @@ class TestNoModification:
 
 class TestUpdateColumnHeaders:
     @pytest.mark.asyncio
-    async def test_update_column_headers_01(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_update_column_headers_01(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
         assay_table = ms_modifier.model.assays[assay_name].table
@@ -127,9 +121,7 @@ class TestUpdateColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_update_column_headers_02(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_update_column_headers_02(self, ms_modifier: MetabolightsStudyModelModifier):
         assay_name = "s_MTBLS1.txt"
 
         ms_modifier.header_update_actions[assay_name] = []
@@ -154,9 +146,7 @@ class TestUpdateColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_update_column_headers_04(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_update_column_headers_04(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
         ms_modifier.header_update_actions[assay_name] = []
@@ -168,9 +158,7 @@ class TestUpdateColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_update_column_headers_05(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_update_column_headers_05(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
         ms_modifier.header_update_actions[assay_name] = []
@@ -184,9 +172,7 @@ class TestUpdateColumnHeaders:
 
 class TestAddColumnHeaders:
     @pytest.mark.asyncio
-    async def test_add_column_headers_01(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_01(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
         assay_table = ms_modifier.model.assays[assay_name].table
@@ -209,9 +195,7 @@ class TestAddColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_add_column_headers_02(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_02(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
         assay_table = ms_modifier.model.assays[assay_name].table
@@ -231,9 +215,7 @@ class TestAddColumnHeaders:
         action.columns[6] = TsvColumnData(header_name="Term Accession Number")
         action.columns[columns_count + 7] = TsvColumnData(header_name=new_header_2)
         action.columns[columns_count + 8] = TsvColumnData(header_name="Term Source REF")
-        action.columns[columns_count + 9] = TsvColumnData(
-            header_name="Term Accession Number"
-        )
+        action.columns[columns_count + 9] = TsvColumnData(header_name="Term Accession Number")
         action.columns[columns_count + 10] = TsvColumnData(header_name="Comment[Test]")
         action.cell_default_values[columns_count + 6] = "Sample Protocol"
 
@@ -247,9 +229,7 @@ class TestAddColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_add_column_headers_03(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_03(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
 
@@ -261,9 +241,7 @@ class TestAddColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_add_column_headers_04(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_04(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
 
@@ -277,9 +255,7 @@ class TestAddColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_add_column_headers_05(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_05(self, ms_modifier: MetabolightsStudyModelModifier):
         assay_name = "s_MTBLS1.txt"
 
         ms_modifier.new_header_actions[assay_name] = []
@@ -290,9 +266,7 @@ class TestAddColumnHeaders:
         assert len(ms_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_add_column_headers_06(
-        self, ms_modifier: MetabolightsStudyModelModifier
-    ):
+    async def test_add_column_headers_06(self, ms_modifier: MetabolightsStudyModelModifier):
         assay = ms_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_name = assay.file_name
 

@@ -100,9 +100,7 @@ def jwt_token(mock_submission_api_client: MockApiClient):
     auth_service.authenticate_with_token = mock_auth
     auth_service.authenticate_with_password = mock_auth
 
-    async def mock_validate_token(
-        token_type: TokenType, token: str, username: str = None
-    ):
+    async def mock_validate_token(token_type: TokenType, token: str, username: str = None):
         return return_value
 
     auth_service.validate_token = mock_validate_token
@@ -231,11 +229,7 @@ def validation_result_01() -> ValidationResult:
 @pytest.fixture
 def policy_result_list_01(validation_result_01: ValidationResult) -> PolicyResultList:
     def get_list(resource_id: str):
-        return PolicyResultList(
-            results=[
-                PolicyResult(resource_id=resource_id, messages=validation_result_01)
-            ]
-        )
+        return PolicyResultList(results=[PolicyResult(resource_id=resource_id, messages=validation_result_01)])
 
     return get_list
 
@@ -250,9 +244,7 @@ class MockIdGenerator(IdGenerator):
 
 class TestGetValidationsV1:
     @pytest.mark.asyncio
-    async def test_validation_not_valid_task_01(
-        self, mock_submission_api_client: MockApiClient, jwt_token: str
-    ):
+    async def test_validation_not_valid_task_01(self, mock_submission_api_client: MockApiClient, jwt_token: str):
         """
         There is no running task
         expected: 404 not found error
@@ -272,18 +264,14 @@ class TestGetValidationsV1:
         await executor.start()
         client = api_client.client
         headers = {"Authorization": f"Bearer {jwt_token}"}
-        response = client.get(
-            f"/submissions/v2/validations/{resource_id}/{task_id}", headers=headers
-        )
+        response = client.get(f"/submissions/v2/validations/{resource_id}/{task_id}", headers=headers)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         json_response = response.json()
         result = APIResponse[GetValidationResponse].model_validate(json_response)
         assert result.status == Status.ERROR
         assert result.error_message
 
-    def test_validation_not_valid_task_02(
-        self, mock_submission_api_client: MockApiClient, jwt_token: str
-    ):
+    def test_validation_not_valid_task_02(self, mock_submission_api_client: MockApiClient, jwt_token: str):
         """
         There is an invalid task id input and there is no running task
         expected: 404 not found error
@@ -302,9 +290,7 @@ class TestGetValidationsV1:
         assert result.error_message
 
     @pytest.mark.asyncio
-    async def test_validation_running_task_01(
-        self, mock_submission_api_client: MockApiClient, jwt_token: str
-    ):
+    async def test_validation_running_task_01(self, mock_submission_api_client: MockApiClient, jwt_token: str):
         """
         There is a running task. Return its status
         expected: task status without content
@@ -439,13 +425,9 @@ class TestGetValidationsV1:
             policy_result_list = policy_result_list_01(resource_id)
             services = mock_submission_api_client.container.services
             cache_service: CacheService = services.cache_service()
-            await cache_service.set_value(
-                key, value=task_id, expiration_time_in_seconds=60
-            )
+            await cache_service.set_value(key, value=task_id, expiration_time_in_seconds=60)
 
-            async_task_service: ThreadingAsyncTaskService = (
-                services.async_task_service()
-            )
+            async_task_service: ThreadingAsyncTaskService = services.async_task_service()
             task_result = Mock(AsyncTaskResult)
             task_result.get_id.return_value = task_id
             task_result.get_status.return_value = "SUCCESS"
@@ -472,9 +454,7 @@ class TestGetValidationsV1:
         finally:
             self.remove_task_results(task_id, target)
 
-    def remove_task_results(
-        self, task_id: str, target: str, fail_if_not_exist: bool = False
-    ):
+    def remove_task_results(self, task_id: str, target: str, fail_if_not_exist: bool = False):
         target_path = Path(target)
         found = False
         for file in target_path.iterdir():
@@ -536,9 +516,7 @@ class TestGetValidationsV1:
             policy_result_list = policy_result_list_01(resource_id)
             services = mock_submission_api_client.container.services
 
-            async_task_service: ThreadingAsyncTaskService = (
-                services.async_task_service()
-            )
+            async_task_service: ThreadingAsyncTaskService = services.async_task_service()
             task_result = Mock(AsyncTaskResult)
             task_result.get_id.return_value = task_id
             task_result.get_status.return_value = "SUCCESS"
@@ -589,9 +567,7 @@ class TestGetValidationsV1:
             policy_result_list = policy_result_list_01(resource_id)
             services = mock_submission_api_client.container.services
 
-            async_task_service: ThreadingAsyncTaskService = (
-                services.async_task_service()
-            )
+            async_task_service: ThreadingAsyncTaskService = services.async_task_service()
             task_result = Mock(AsyncTaskResult)
             task_result.get_id.return_value = task_id
             task_result.get_status.return_value = "SUCCESS"
@@ -639,9 +615,7 @@ class TestPostValidationsV1:
             "override_previous_task_results": False,
         }
 
-        response = client.post(
-            f"/submissions/v2/validations/{resource_id}", headers=headers, params=params
-        )
+        response = client.post(f"/submissions/v2/validations/{resource_id}", headers=headers, params=params)
         assert response.status_code == status.HTTP_200_OK
         json_response = response.json()
         result = APIResponse[StartValidationResponse].model_validate(json_response)
@@ -670,9 +644,7 @@ class TestPostValidationsV1:
             "run_metadata_modifiers": False,
             "override_previous_task_results": False,
         }
-        response = client.post(
-            f"/submissions/v2/validations/{resource_id}", headers=headers, params=params
-        )
+        response = client.post(f"/submissions/v2/validations/{resource_id}", headers=headers, params=params)
         assert response.status_code == status.HTTP_200_OK
         json_response = response.json()
         result = APIResponse[StartValidationResponse].model_validate(json_response)
@@ -695,9 +667,7 @@ class TestPostValidationsV1:
         task_id = "xyz"
         services = mock_submission_api_client.container.services
         cache_service: CacheService = services.cache_service()
-        await cache_service.set_value(
-            key, value=task_id, expiration_time_in_seconds=600
-        )
+        await cache_service.set_value(key, value=task_id, expiration_time_in_seconds=600)
         async_task_service: ThreadingAsyncTaskService = services.async_task_service()
 
         task_result = Mock(AsyncTaskResult)
@@ -712,9 +682,7 @@ class TestPostValidationsV1:
             "run_metadata_modifiers": False,
             "override_previous_task_results": False,
         }
-        response = client.post(
-            f"/submissions/v2/validations/{resource_id}", headers=headers, params=params
-        )
+        response = client.post(f"/submissions/v2/validations/{resource_id}", headers=headers, params=params)
         await cache_service.delete_key(key)
         del async_task_service.async_task_results_dict[task_id]
         assert response.status_code == status.HTTP_400_BAD_REQUEST

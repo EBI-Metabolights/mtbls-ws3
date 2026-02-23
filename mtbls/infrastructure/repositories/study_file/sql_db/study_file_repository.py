@@ -83,15 +83,10 @@ class SqlDbStudyFileRepository(
             sort_options=[SortOption(key="object_key")],
         )
         result = await self.find(query_options=query_options)
-        updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
-            for x in result.data
-        ]
+        updated_data = [SqlDbStudyFileOutput.model_validate(x, from_attributes=True) for x in result.data]
         return PaginatedOutput(data=updated_data)
 
-    async def get_root_object(
-        self, resource_id: str, bucket_name: str
-    ) -> StudyFileOutput:
+    async def get_root_object(self, resource_id: str, bucket_name: str) -> StudyFileOutput:
         query_options = QueryOptions(
             filters=[
                 EntityFilter(
@@ -110,10 +105,7 @@ class SqlDbStudyFileRepository(
             sort_options=SortOption(key="object_key"),
         )
         result = await self.find(query_options=query_options)
-        updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
-            for x in result.data
-        ]
+        updated_data = [SqlDbStudyFileOutput.model_validate(x, from_attributes=True) for x in result.data]
         if updated_data:
             return updated_data[0]
 
@@ -126,9 +118,7 @@ class SqlDbStudyFileRepository(
         results = await self.create_many(db_entities)
         return [str(x.id_ for x in results)]
 
-    async def update_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
+    async def update_object(self, entity: StudyFileOutput) -> Union[None, StudyFileOutput]:
         value = SqlDbStudyFileOutput.model_validate(entity, from_attributes=True)
         # values = value.model_dump(by_alias=False)
         # db_entity = db_models.StudyFile(**values)
@@ -146,9 +136,7 @@ class SqlDbStudyFileRepository(
             result = await self.create(value)
         return SqlDbStudyFileOutput.model_validate(result, from_attributes=True)
 
-    async def delete_object(
-        self, entity: StudyFileOutput
-    ) -> Union[None, StudyFileOutput]:
+    async def delete_object(self, entity: StudyFileOutput) -> Union[None, StudyFileOutput]:
         await self.delete(entity.id_)
 
     async def find_one(self, resource_id: str, bucket_name: str, object_key: str):
@@ -171,10 +159,7 @@ class SqlDbStudyFileRepository(
         )
         result = await self.find(query_options=query_options)
 
-        updated_data = [
-            SqlDbStudyFileOutput.model_validate(x, from_attributes=True)
-            for x in result.data
-        ]
+        updated_data = [SqlDbStudyFileOutput.model_validate(x, from_attributes=True) for x in result.data]
         if updated_data:
             return updated_data[0]
         return None

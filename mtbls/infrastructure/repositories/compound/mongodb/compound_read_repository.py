@@ -35,9 +35,7 @@ class MongoCompoundReadRepository(CompoundReadRepository):
                 logger.exception(ex)
                 return None
 
-    async def get_compounds_by_ids(
-        self, ids: List[str]
-    ) -> Tuple[List[Compound], List[str]]:
+    async def get_compounds_by_ids(self, ids: List[str]) -> Tuple[List[Compound], List[str]]:
         """
         Retrieve multiple compounds by their IDs using MongoDB $in operator.
 
@@ -61,9 +59,7 @@ class MongoCompoundReadRepository(CompoundReadRepository):
 
         for doc in docs:
             try:
-                compound = Compound.from_mongo_with_raw(
-                    doc, include_raw=self.include_raw
-                )
+                compound = Compound.from_mongo_with_raw(doc, include_raw=self.include_raw)
                 found_compounds.append(compound)
                 found_ids.add(doc.get("id", ""))
             except Exception as ex:

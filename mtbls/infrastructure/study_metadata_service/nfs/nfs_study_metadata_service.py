@@ -75,9 +75,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         self.temp_path = temp_path if temp_path else "/tmp/study-metadata-service"
         self.transaction_id = str(uuid.uuid4())
 
-        self.staging_path = (
-            Path(self.temp_path) / Path(self.resource_id) / Path(self.transaction_id)
-        )
+        self.staging_path = Path(self.temp_path) / Path(self.resource_id) / Path(self.transaction_id)
         self.staging_path_str = str(self.staging_path)
         self.staging_path.mkdir(parents=True, exist_ok=True)
         self.operation_actions = {
@@ -98,17 +96,13 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         self.staging_path = None
         self.staging_path_str = None
 
-    def get_study_metadata_path(
-        self, study_id: str, file_relative_path: Union[None, str] = None
-    ) -> str:
+    def get_study_metadata_path(self, study_id: str, file_relative_path: Union[None, str] = None) -> str:
         if file_relative_path:
             file_path = self.staging_path / Path(file_relative_path)
             return str(file_path)
         return self.staging_path_str
 
-    def exists(
-        self, study_id: str, file_relative_path: Union[None, str] = None
-    ) -> bool:
+    def exists(self, study_id: str, file_relative_path: Union[None, str] = None) -> bool:
         if file_relative_path:
             file_path = self.staging_path / Path(file_relative_path)
             return file_path
@@ -127,22 +121,14 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             raise ValueError(f"Invalid operation: {operation}")
         action_method = self.operation_actions[operation]
 
-        investigation: InvestigationItem = await self.load_investigation_file(
-            object_key=object_key
-        )
+        investigation: InvestigationItem = await self.load_investigation_file(object_key=object_key)
         json_model = investigation.model_dump(by_alias=True)
-        expression, result, indices = await self._find_items_with_jsonpath(
-            json_model, target_jsonpath
-        )
+        expression, result, indices = await self._find_items_with_jsonpath(json_model, target_jsonpath)
 
-        updated = await action_method(
-            json_model, input_data, expression, result, indices, field_name=field_name
-        )
+        updated = await action_method(json_model, input_data, expression, result, indices, field_name=field_name)
         if updated:
             updated_investigation = InvestigationItem.model_validate(json_model)
-            await self.save_investigation_file(
-                updated_investigation, object_key=object_key
-            )
+            await self.save_investigation_file(updated_investigation, object_key=object_key)
         elif operation != "get":
             return None, []
         data = []
@@ -293,9 +279,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             field_name=field_name,
         )
 
-    def _copy_mapped_values(
-        self, source: dict[str, Any], target: dict[str, Any], patch_only: bool = False
-    ):
+    def _copy_mapped_values(self, source: dict[str, Any], target: dict[str, Any], patch_only: bool = False):
         for key, value in source.items():
             if patch_only:
                 if key not in target or not value:
@@ -314,17 +298,13 @@ class FileObjectStudyMetadataService(StudyMetadataService):
 
         selected_files = []
         if not source_object_keys:
-            selected_files = [
-                x for x in resources if re.match(r"^[isam]_.+", x.basename)
-            ]
+            selected_files = [x for x in resources if re.match(r"^[isam]_.+", x.basename)]
         else:
             source_set = set(source_object_keys) if source_object_keys else set()
             objects = {file.object_key for file in resources}
             not_exist_files = source_set - objects
             if not_exist_files:
-                raise StudyResourceNotFoundError(
-                    f"Resource not found: {not_exist_files}"
-                )
+                raise StudyResourceNotFoundError(f"Resource not found: {not_exist_files}")
             selected_files = [x for x in resources if x.object_key in source_set]
         for file in selected_files:
             target_file_path = self.staging_path / Path(file.object_key)
@@ -366,9 +346,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
                 object_key=object_key,
                 target_path=str(target_file_path),
             )
-        study_objects = await self.metadata_files_object_repository.list(
-            resource_id=self.resource_id
-        )
+        study_objects = await self.metadata_files_object_repository.list(resource_id=self.resource_id)
 
         for file in study_objects:
             if re.match(r"^[isam]_.+", file.basename):
@@ -460,9 +438,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
                 object_key=object_key,
                 target_path=str(target_file_path),
             )
-        result: InvestigationFileReaderResult = (
-            Reader.get_investigation_file_reader().read(target_file_path)
-        )
+        result: InvestigationFileReaderResult = Reader.get_investigation_file_reader().read(target_file_path)
         return InvestigationItem.get_from_investigation(result.investigation)
 
     async def save_investigation_file(
@@ -491,16 +467,12 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             override=True,
         )
 
-    async def restore_metadata_from_snapshot(
-        self, snapshot_name: str
-    ) -> tuple[str, str]:
+    async def restore_metadata_from_snapshot(self, snapshot_name: str) -> tuple[str, str]:
         files = await self.audit_files_object_repository.list(
             resource_id=self.resource_id,
             object_key="audit",
         )
-        selected_snapshots = [
-            x for x in files if Path(x.object_key).name == snapshot_name
-        ]
+        selected_snapshots = [x for x in files if Path(x.object_key).name == snapshot_name]
         if not selected_snapshots:
             raise StudyResourceNotFoundError(
                 self.resource_id,
@@ -512,24 +484,14 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         selected_snapshot = selected_snapshots[0]
         await self.create_metadata_snapshot(suffix=f"BEFORE_RESTORE_{snapshot_name}")
         try:
-            resources = await self.metadata_files_object_repository.list(
-                resource_id=self.resource_id
-            )
+            resources = await self.metadata_files_object_repository.list(resource_id=self.resource_id)
             snapshot_resources = await self.audit_files_object_repository.list(
                 resource_id=self.resource_id,
                 object_key=selected_snapshot.object_key,
             )
-            selected_files = {
-                x.basename: x for x in resources if re.match(r"^[isam]_.+", x.basename)
-            }
-            snapshot_files = {
-                x.basename: x
-                for x in snapshot_resources
-                if re.match(r"^[isam]_.+", x.basename)
-            }
-            files_to_be_deleted = set(selected_files.keys()) - set(
-                snapshot_files.keys()
-            )
+            selected_files = {x.basename: x for x in resources if re.match(r"^[isam]_.+", x.basename)}
+            snapshot_files = {x.basename: x for x in snapshot_resources if re.match(r"^[isam]_.+", x.basename)}
+            files_to_be_deleted = set(selected_files.keys()) - set(snapshot_files.keys())
             for file in snapshot_files.values():
                 await self.study_resource_write_repository.copy_object(
                     resource_id=self.resource_id,
@@ -545,9 +507,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
                     object_key=file,
                 )
         except Exception as exc:
-            raise StudyResourceError(
-                self.resource_id, snapshot_name, "Restore failed"
-            ) from exc
+            raise StudyResourceError(self.resource_id, snapshot_name, "Restore failed") from exc
 
     def create_audit_folder_name(
         self,
@@ -574,9 +534,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
             timestamp_format=timestamp_format,
         )
         parent_object_key = f"audit/{folder_name}"
-        await self._create_metadata_files_audit_folder(
-            parent_object_key=parent_object_key
-        )
+        await self._create_metadata_files_audit_folder(parent_object_key=parent_object_key)
         return parent_object_key
 
     async def load_isa_table_file(
@@ -610,9 +568,7 @@ class FileObjectStudyMetadataService(StudyMetadataService):
 
         return result.isa_table_file
 
-    async def save_isa_table_file(
-        self, resource_id: str, isa_table_file: IsaTableFile, object_key: str
-    ):
+    async def save_isa_table_file(self, resource_id: str, isa_table_file: IsaTableFile, object_key: str):
         save_path = Path(self.staging_path) / Path(object_key)
         save_path_str = str(save_path)
         await self.dump_isa_table(isa_table_file, save_path_str)

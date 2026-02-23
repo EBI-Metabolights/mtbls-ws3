@@ -19,9 +19,7 @@ async def get_validation_overrides(
     resource_id: str,
     validation_override_service: ValidationOverrideService,
 ) -> ValidationOverrideList:
-    return await validation_override_service.get_validation_overrides(
-        resource_id=resource_id
-    )
+    return await validation_override_service.get_validation_overrides(resource_id=resource_id)
 
 
 async def patch_validation_overrides(
@@ -40,17 +38,11 @@ async def patch_validation_overrides(
         if not new_item.rule_id and not new_item.override_id:
             raise ValueError("rule_id or override_id must be defined.")
 
-        matched_overrides, unmatched_overrides = filter_overrides(
-            overrides_content, new_item
-        )
+        matched_overrides, unmatched_overrides = filter_overrides(overrides_content, new_item)
         now = datetime.datetime.now(datetime.timezone.utc)
         validations = definitions.validations
         if not matched_overrides:
-            validation_definition = (
-                validations[new_item.rule_id]
-                if new_item.rule_id in validations
-                else None
-            )
+            validation_definition = validations[new_item.rule_id] if new_item.rule_id in validations else None
             item = ValidationOverride(
                 override_id=str(uuid.uuid4()),
                 created_at=now,
@@ -63,15 +55,9 @@ async def patch_validation_overrides(
                 enabled=new_item.update.enabled,
                 curator=new_item.update.curator,
                 comment=new_item.update.comment,
-                old_type=(
-                    validation_definition.type
-                    if validation_definition
-                    else PolicyMessageType.ERROR
-                ),
+                old_type=(validation_definition.type if validation_definition else PolicyMessageType.ERROR),
                 title=validation_definition.title if validation_definition else "",
-                description=(
-                    validation_definition.description if validation_definition else ""
-                ),
+                description=(validation_definition.description if validation_definition else ""),
             )
             unmatched_overrides.append(item)
             logger.info(
@@ -84,12 +70,8 @@ async def patch_validation_overrides(
         else:
             for item in matched_overrides:
                 item.enabled = new_item.update.enabled
-                item.curator = (
-                    new_item.update.curator if new_item.update.curator else item.curator
-                )
-                item.comment = (
-                    new_item.update.comment if new_item.update.comment else item.comment
-                )
+                item.curator = new_item.update.curator if new_item.update.curator else item.curator
+                item.comment = new_item.update.comment if new_item.update.comment else item.comment
                 item.new_type = new_item.update.new_type
                 item.modified_at = now
                 if not item.created_at:
@@ -110,14 +92,10 @@ async def patch_validation_overrides(
                 updated_rules,
                 updated_values,
             )
-        unmatched_overrides.sort(
-            key=lambda x: f"{x.rule_id}:{x.source_file}:{x.source_column_header}"
-        )
+        unmatched_overrides.sort(key=lambda x: f"{x.rule_id}:{x.source_file}:{x.source_column_header}")
         overrides_content.validation_overrides = unmatched_overrides
 
-    await repo.save_validation_overrides(
-        resource_id=resource_id, validation_overrides=overrides_content
-    )
+    await repo.save_validation_overrides(resource_id=resource_id, validation_overrides=overrides_content)
     return overrides_content
 
 
@@ -138,19 +116,13 @@ async def delete_validation_override(
         if override.override_id != override_id:
             unmatched_overrides.append(override)
 
-    unmatched_overrides.sort(
-        key=lambda x: f"{x.rule_id}:{x.source_file}:{x.source_column_header}"
-    )
+    unmatched_overrides.sort(key=lambda x: f"{x.rule_id}:{x.source_file}:{x.source_column_header}")
     overrides_content.validation_overrides = unmatched_overrides
-    await repo.save_validation_overrides(
-        resource_id=resource_id, validation_overrides=overrides_content
-    )
+    await repo.save_validation_overrides(resource_id=resource_id, validation_overrides=overrides_content)
     return overrides_content
 
 
-def filter_overrides(
-    overrides_content: ValidationOverrideList, new_item: ValidationOverrideInput
-):
+def filter_overrides(overrides_content: ValidationOverrideList, new_item: ValidationOverrideInput):
     unmatched_overrides: list[ValidationOverride] = []
     matched_overrides: list[ValidationOverride] = []
     for override in overrides_content.validation_overrides:
@@ -162,23 +134,11 @@ def filter_overrides(
         if new_item.source_file:
             checks.append(override.source_file == new_item.source_file)
         if new_item.source_column_header:
-            checks.append(
-                override.source_column_header == new_item.source_column_header
-            )
-        if (
-            isinstance(new_item.source_column_index, str)
-            and new_item.source_column_index
-        ):
-            checks.append(
-                str(override.source_column_index) == new_item.source_column_index
-            )
-        elif (
-            isinstance(new_item.source_column_index, int)
-            and new_item.source_column_index > -1
-        ):
-            checks.append(
-                str(override.source_column_index) == str(new_item.source_column_index)
-            )
+            checks.append(override.source_column_header == new_item.source_column_header)
+        if isinstance(new_item.source_column_index, str) and new_item.source_column_index:
+            checks.append(str(override.source_column_index) == new_item.source_column_index)
+        elif isinstance(new_item.source_column_index, int) and new_item.source_column_index > -1:
+            checks.append(str(override.source_column_index) == str(new_item.source_column_index))
         matches = sum(1 for x in checks if x)
         if len(checks) > 0 and matches == len(checks):
             matched_overrides.append(override)

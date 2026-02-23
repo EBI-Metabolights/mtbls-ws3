@@ -62,8 +62,7 @@ class ElasticsearchAssignmentGateway:
             database_identifiers=database_identifiers or [],
             metabolite_identifications=metabolite_identifications or [],
             database_identifiers_operator=database_identifiers_operator or "any",
-            metabolite_identifications_operator=metabolite_identifications_operator
-            or "any",
+            metabolite_identifications_operator=metabolite_identifications_operator or "any",
         )
 
         es_resp = await self._client.search(
@@ -86,21 +85,11 @@ class ElasticsearchAssignmentGateway:
         should_clauses: list[dict[str, Any]] = []
 
         if database_identifiers:
-            should_clauses.append(
-                {
-                    "terms": {
-                        "fields.database_identifier.value.keyword": database_identifiers
-                    }
-                }
-            )
+            should_clauses.append({"terms": {"fields.database_identifier.value.keyword": database_identifiers}})
 
         if metabolite_identifications:
             should_clauses.append(
-                {
-                    "terms": {
-                        "fields.metabolite_identification.value.keyword": metabolite_identifications
-                    }
-                }
+                {"terms": {"fields.metabolite_identification.value.keyword": metabolite_identifications}}
             )
 
         query: dict[str, Any] = {"match_all": {}}
@@ -120,45 +109,34 @@ class ElasticsearchAssignmentGateway:
         buckets_path: dict[str, str] = {}
         script_parts: list[str] = []
 
-        # Database identifiers: require all when operator == "all"; optionally require any if we need to enforce presence
+        # Database identifiers: require all when operator == "all";
+        # optionally require any if we need to enforce presence
         if database_identifiers:
             if database_identifiers_operator == "all":
                 for idx, value in enumerate(database_identifiers):
                     agg_name = f"db_all_{idx}"
                     aggs["unique_studies"]["aggs"][agg_name] = {
-                        "filter": {
-                            "term": {"fields.database_identifier.value.keyword": value}
-                        }
+                        "filter": {"term": {"fields.database_identifier.value.keyword": value}}
                     }
                     buckets_path[agg_name] = f"{agg_name}>_count"
                     script_parts.append(f"params.{agg_name} > 0")
             else:
                 # Only enforce "any" if this is the sole list or the other list uses "all".
-                if (
-                    not metabolite_identifications
-                    or metabolite_identifications_operator == "all"
-                ):
+                if not metabolite_identifications or metabolite_identifications_operator == "all":
                     aggs["unique_studies"]["aggs"]["db_any"] = {
-                        "filter": {
-                            "terms": {
-                                "fields.database_identifier.value.keyword": database_identifiers
-                            }
-                        }
+                        "filter": {"terms": {"fields.database_identifier.value.keyword": database_identifiers}}
                     }
                     buckets_path["db_any"] = "db_any>_count"
                     script_parts.append("params.db_any > 0")
 
-        # Metabolite identifications: require all when operator == "all"; optionally require any if we need to enforce presence
+        # Metabolite identifications: require all when operator == "all";
+        # optionally require any if we need to enforce presence
         if metabolite_identifications:
             if metabolite_identifications_operator == "all":
                 for idx, value in enumerate(metabolite_identifications):
                     agg_name = f"met_all_{idx}"
                     aggs["unique_studies"]["aggs"][agg_name] = {
-                        "filter": {
-                            "term": {
-                                "fields.metabolite_identification.value.keyword": value
-                            }
-                        }
+                        "filter": {"term": {"fields.metabolite_identification.value.keyword": value}}
                     }
                     buckets_path[agg_name] = f"{agg_name}>_count"
                     script_parts.append(f"params.{agg_name} > 0")
@@ -166,9 +144,7 @@ class ElasticsearchAssignmentGateway:
                 if not database_identifiers or database_identifiers_operator == "all":
                     aggs["unique_studies"]["aggs"]["met_any"] = {
                         "filter": {
-                            "terms": {
-                                "fields.metabolite_identification.value.keyword": metabolite_identifications
-                            }
+                            "terms": {"fields.metabolite_identification.value.keyword": metabolite_identifications}
                         }
                     }
                     buckets_path["met_any"] = "met_any>_count"

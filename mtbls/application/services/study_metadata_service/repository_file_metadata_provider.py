@@ -25,9 +25,7 @@ class RepositoryStudyMetadataFileProvider(AbstractMetadataFileProvider):
             self.download_path = Path("/tmp") / Path(task_name) / Path(self.resource_id)
         self.download_path.mkdir(parents=True, exist_ok=True)
 
-    async def get_study_metadata_path(
-        self, resource_id: str, file_relative_path: Union[None, str] = None
-    ) -> str:
+    async def get_study_metadata_path(self, resource_id: str, file_relative_path: Union[None, str] = None) -> str:
         if self.resource_id != resource_id:
             raise ValueError(f"{resource_id} is not valid. Expected {self.resource_id}")
 
@@ -45,10 +43,6 @@ class RepositoryStudyMetadataFileProvider(AbstractMetadataFileProvider):
             target_file_path = str(downloaded_file_path)
         return target_file_path
 
-    async def exists(
-        self, resource_id: str, file_relative_path: Union[None, str] = None
-    ) -> bool:
-        file_path = Path(
-            await self.get_study_metadata_path(resource_id, file_relative_path)
-        )
+    async def exists(self, resource_id: str, file_relative_path: Union[None, str] = None) -> bool:
+        file_path = Path(await self.get_study_metadata_path(resource_id, file_relative_path))
         return file_path.resolve().exists()

@@ -74,9 +74,7 @@ async def sync_search_index(
     )
 
     db_studies_dict = {
-        x[0]: IndexDocumentInfo(
-            id=x[0], updated_at=max([time for time in x[2:] if time])
-        )
+        x[0]: IndexDocumentInfo(id=x[0], updated_at=max([time for time in x[2:] if time]))
         for x in db_study_metadata.data
     }
 
@@ -87,9 +85,7 @@ async def sync_search_index(
     uncached_documents = set()
     for resource_id in all_studies_in_scope:
         filename = f"{resource_id}.json"
-        if await index_cache_files_object_repository.exists(
-            resource_id=resource_id, object_key=filename
-        ):
+        if await index_cache_files_object_repository.exists(resource_id=resource_id, object_key=filename):
             cached_documents.add(resource_id)
         else:
             uncached_documents.add(resource_id)
@@ -101,8 +97,7 @@ async def sync_search_index(
     will_be_updated = {
         x
         for x in indexed_documents_set
-        if x in db_studies_set
-        and db_studies_dict[x].updated_at > indexed_documents_dict[x].updated_at
+        if x in db_studies_set and db_studies_dict[x].updated_at > indexed_documents_dict[x].updated_at
     }
 
     # reindex updated studies
@@ -127,26 +122,22 @@ async def sync_search_index(
             try:
                 raw_text = target_path.read_text()
                 if not raw_text.strip():
-                    logger.warning(
-                        "Empty cache JSON for %s at %s", resource_id, target_path
-                    )
+                    logger.warning("Empty cache JSON for %s at %s", resource_id, target_path)
                     continue
                 file_content = json.loads(raw_text)
             except json.JSONDecodeError as ex:
-                logger.warning(
-                    "Invalid cache JSON for %s at %s: %s", resource_id, target_path, ex
-                )
+                logger.warning("Invalid cache JSON for %s at %s: %s", resource_id, target_path, ex)
                 continue
             model = PublicStudyLiteIndexModel.model_validate(file_content)
             if debug:
                 for name, f in type(model).model_fields.items():
                     if get_origin(f.annotation) is set:
-                        print("STILL A SET:", name, f.annotation)
+                        logger.info("STILL A SET:", name, f.annotation)
                 for name in type(model).model_fields:
                     try:
                         model.model_dump(by_alias=True, include={name})
                     except Exception as e:
-                        print("Dump fails on field:", name, "->", e)
+                        logger.error("Dump fails on field: %s -> %s", name, e)
 
             try:
                 body = model.model_dump(by_alias=True)
@@ -155,8 +146,6 @@ async def sync_search_index(
 
                 traceback.print_exc()
                 raise ex
-            await index_management_gateway.index_document(
-                index=index_name, id=resource_id, body=body
-            )
+            await index_management_gateway.index_document(index=index_name, id=resource_id, body=body)
 
     pass

@@ -64,9 +64,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """
         Return the ES mapping for the configured index.
         """
-        mapping = await self._client.get_mapping(
-            self.config.index_name, api_key_name=self.config.api_key_name
-        )
+        mapping = await self._client.get_mapping(self.config.index_name, api_key_name=self.config.api_key_name)
         return mapping.get(self.config.index_name, mapping)
 
     async def search(
@@ -92,9 +90,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         resolved_query = await self._resolve_sample_filters(resolved_query)
 
         # Capture the resolved study_ids if cross-index filters were applied
-        if (
-            had_chemical_filters or had_assay_filters or had_sample_filters
-        ) and resolved_query.study_ids:
+        if (had_chemical_filters or had_assay_filters or had_sample_filters) and resolved_query.study_ids:
             # Filter out the sentinel value used for "no matches"
             if resolved_query.study_ids != ["__NO_MATCHING_STUDIES__"]:
                 chemical_filter_study_ids = resolved_query.study_ids
@@ -113,9 +109,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
 
         results = [self._map_hit(h) for h in es_resp.get("hits", {}).get("hits", [])]
         total = self._extract_total(es_resp)
-        facets = self._map_aggs_to_searchui(
-            es_resp.get("aggregations") or {}, STUDY_FACET_CONFIG
-        )
+        facets = self._map_aggs_to_searchui(es_resp.get("aggregations") or {}, STUDY_FACET_CONFIG)
 
         # Fetch all matching study IDs if requested and there's a meaningful query/filter
         all_study_ids: Optional[List[str]] = None
@@ -228,15 +222,9 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             return False
 
         # Only cross-index filters remain
-        return (
-            self._has_chemical_filters(req)
-            or self._has_assay_filters(req)
-            or self._has_sample_filters(req)
-        )
+        return self._has_chemical_filters(req) or self._has_assay_filters(req) or self._has_sample_filters(req)
 
-    async def _resolve_chemical_filters(
-        self, req: StudySearchInput
-    ) -> StudySearchInput:
+    async def _resolve_chemical_filters(self, req: StudySearchInput) -> StudySearchInput:
         """
         If chemical filters are present, query the assignment gateway to get matching study IDs,
         then add them as study_ids filter on the request.
@@ -279,9 +267,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         if req.study_ids:
             # Intersect: only keep study IDs that are in both lists
             existing_set = set(req.study_ids)
-            combined_study_ids = [
-                sid for sid in matching_study_ids if sid in existing_set
-            ]
+            combined_study_ids = [sid for sid in matching_study_ids if sid in existing_set]
             if not combined_study_ids:
                 # No intersection - return impossible filter
                 combined_study_ids = ["__NO_MATCHING_STUDIES__"]
@@ -300,9 +286,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         """Check if the request has MS assay filters."""
         if not req.ms:
             return False
-        return bool(
-            req.ms.column_type or req.ms.chromatography_instrument or req.ms.instrument
-        )
+        return bool(req.ms.column_type or req.ms.chromatography_instrument or req.ms.instrument)
 
     async def _resolve_assay_filters(self, req: StudySearchInput) -> StudySearchInput:
         """
@@ -374,11 +358,9 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             return req
 
         logger.debug("Study search sample lookup starting")
-        matching_study_ids = (
-            await self._sample_gateway.find_study_ids_by_factor_headers(
-                values=req.factor_header_names,
-                operator=req.factor_header_names_operator or "and",
-            )
+        matching_study_ids = await self._sample_gateway.find_study_ids_by_factor_headers(
+            values=req.factor_header_names,
+            operator=req.factor_header_names_operator or "and",
         )
         logger.debug(
             "Study search sample lookup completed (matches=%s)",
@@ -425,12 +407,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 }
             )
             # prefix match (fast) on non-nested fields
-            should_clauses.extend(
-                [
-                    {"prefix": {field: req.query.lower()}}
-                    for field in self.config.search_fields
-                ]
-            )
+            should_clauses.extend([{"prefix": {field: req.query.lower()}} for field in self.config.search_fields])
             # nested-aware search to keep simple queries working across nested docs
             should_clauses.extend(self._nested_search_clauses(req.query))
             must.append(
@@ -461,9 +438,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 if f.operator == "none":
                     must_not.extend(range_queries)
                 elif f.operator == "any":
-                    filter_clauses.append(
-                        {"bool": {"should": range_queries, "minimum_should_match": 1}}
-                    )
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
                 else:  # "all"
                     filter_clauses.extend(range_queries)
                 continue
@@ -473,18 +448,12 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 continue
             operator = f.operator or "all"
             if operator == "none":
-                must_not.append(
-                    self._build_filter_clause(field, f.values, nested_path, operator)
-                )
+                must_not.append(self._build_filter_clause(field, f.values, nested_path, operator))
             elif operator == "any":
-                filter_clauses.append(
-                    self._build_filter_clause(field, f.values, nested_path, operator)
-                )
+                filter_clauses.append(self._build_filter_clause(field, f.values, nested_path, operator))
             else:  # "all"
                 # For nested fields we deliberately pool across nested docs by adding one clause per value.
-                clauses = self._build_filter_clause(
-                    field, f.values, nested_path, operator
-                )
+                clauses = self._build_filter_clause(field, f.values, nested_path, operator)
                 if isinstance(clauses, list):
                     filter_clauses.extend(clauses)
                 else:
@@ -586,12 +555,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                     }
                 }
             )
-            should_clauses.extend(
-                [
-                    {"prefix": {field: req.query.lower()}}
-                    for field in self.config.search_fields
-                ]
-            )
+            should_clauses.extend([{"prefix": {field: req.query.lower()}} for field in self.config.search_fields])
             should_clauses.extend(self._nested_search_clauses(req.query))
             must.append(
                 {
@@ -619,9 +583,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 if f.operator == "none":
                     must_not.extend(range_queries)
                 elif f.operator == "any":
-                    filter_clauses.append(
-                        {"bool": {"should": range_queries, "minimum_should_match": 1}}
-                    )
+                    filter_clauses.append({"bool": {"should": range_queries, "minimum_should_match": 1}})
                 else:
                     filter_clauses.extend(range_queries)
                 continue
@@ -631,17 +593,11 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 continue
             operator = f.operator or "all"
             if operator == "none":
-                must_not.append(
-                    self._build_filter_clause(field, f.values, nested_path, operator)
-                )
+                must_not.append(self._build_filter_clause(field, f.values, nested_path, operator))
             elif operator == "any":
-                filter_clauses.append(
-                    self._build_filter_clause(field, f.values, nested_path, operator)
-                )
+                filter_clauses.append(self._build_filter_clause(field, f.values, nested_path, operator))
             else:
-                clauses = self._build_filter_clause(
-                    field, f.values, nested_path, operator
-                )
+                clauses = self._build_filter_clause(field, f.values, nested_path, operator)
                 if isinstance(clauses, list):
                     filter_clauses.extend(clauses)
                 else:
@@ -700,9 +656,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         return field, None
 
     @staticmethod
-    def _find_facet_spec(
-        field: str, facet_config: Dict[str, Any] | None = None
-    ) -> Dict[str, Any] | None:
+    def _find_facet_spec(field: str, facet_config: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
         """Return the facet spec for a given UI field or underlying field."""
         config = facet_config or STUDY_FACET_CONFIG
         if field in config:
@@ -796,12 +750,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
             elif ftype == "range":
                 ranges = spec.get("ranges") or []
                 aggs[facet_name] = {
-                    "filters": {
-                        "filters": {
-                            self._range_key(r): self._range_query(field, r)
-                            for r in ranges
-                        }
-                    }
+                    "filters": {"filters": {self._range_key(r): self._range_query(field, r) for r in ranges}}
                 }
 
             else:
@@ -834,9 +783,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
         return q
 
     @staticmethod
-    def _range_query_from_value(
-        field: str, ranges: List[Dict[str, Any]], value: Any
-    ) -> Dict[str, Any] | None:
+    def _range_query_from_value(field: str, ranges: List[Dict[str, Any]], value: Any) -> Dict[str, Any] | None:
         """
         Map a selected bucket name back to its range query.
         Matches either the explicit 'name' or the derived _range_key form.
@@ -847,9 +794,7 @@ class ElasticsearchStudyGateway(BaseElasticSearchGateway):
                 return BaseElasticSearchGateway._range_query(field, r)  # noqa: SLF001
         return None
 
-    def _map_aggs_to_searchui(
-        self, aggs: Dict[str, Any], config: Dict[str, Any] | None = None
-    ) -> Dict[str, Any]:
+    def _map_aggs_to_searchui(self, aggs: Dict[str, Any], config: Dict[str, Any] | None = None) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
         nested_bucket_name = "values"
         facet_config = config or STUDY_FACET_CONFIG

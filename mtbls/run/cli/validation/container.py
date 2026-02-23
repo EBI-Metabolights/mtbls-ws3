@@ -57,18 +57,14 @@ class GatewaysContainer(containers.DeclarativeContainer):
         db_connection=config.database.postgresql.connection,
         db_pool_size=runtime_config.db_pool_size,
     )
-    http_client: HttpClient = providers.Singleton(
-        HttpxClient, max_timeount_in_seconds=60
-    )
+    http_client: HttpClient = providers.Singleton(HttpxClient, max_timeount_in_seconds=60)
 
 
 class RepositoriesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     entity_mapper: EntityMapper = providers.Singleton(EntityMapper)
 
-    alias_generator: AliasGenerator = providers.Singleton(
-        DbTableAliasGeneratorImpl, entity_mapper
-    )
+    alias_generator: AliasGenerator = providers.Singleton(DbTableAliasGeneratorImpl, entity_mapper)
 
     gateways = providers.DependenciesContainer()
     study_read_repository: StudyReadRepository = providers.Singleton(
@@ -123,14 +119,8 @@ class MtblsCliApplicationContainer(containers.DeclarativeContainer):
         config=config,
     )
 
-    gateways = providers.Container(
-        GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 0}
-    )
+    gateways = providers.Container(GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 0})
 
-    services = providers.Container(
-        MtblsCliServicesContainer, config=config.services, gateways=gateways
-    )
+    services = providers.Container(MtblsCliServicesContainer, config=config.services, gateways=gateways)
 
-    repositories = providers.Container(
-        RepositoriesContainer, config=config, gateways=gateways
-    )
+    repositories = providers.Container(RepositoriesContainer, config=config, gateways=gateways)

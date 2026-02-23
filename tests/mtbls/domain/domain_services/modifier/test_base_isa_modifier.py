@@ -46,9 +46,7 @@ all_technique_names = [
 class TestGetProtocolTemplate:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("technique", all_technique_names)
-    async def test_get_protocol_template_01(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_protocol_template_01(self, sample_modifier: SampleFileModifier, technique: str):
         template = sample_modifier.get_protocol_template(technique_name=technique)
         assert template
 
@@ -57,9 +55,7 @@ class TestGetProtocolTemplate:
         "technique",
         ["", None, "Invalid Technique"],
     )
-    async def test_get_protocol_template_02(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_protocol_template_02(self, sample_modifier: SampleFileModifier, technique: str):
         template = sample_modifier.get_protocol_template(technique_name=technique)
         assert not template
 
@@ -67,9 +63,7 @@ class TestGetProtocolTemplate:
 class TestOrderedProtocolNames:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("technique", all_technique_names)
-    async def test_get_ordered_protocol_names_01(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_ordered_protocol_names_01(self, sample_modifier: SampleFileModifier, technique: str):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
         assert template
 
@@ -78,9 +72,7 @@ class TestOrderedProtocolNames:
         "technique",
         ["", None, "Invalid Technique"],
     )
-    async def test_get_ordered_protocol_names_02(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_ordered_protocol_names_02(self, sample_modifier: SampleFileModifier, technique: str):
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
         assert not template
 
@@ -89,9 +81,7 @@ class TestOrderedProtocolNames:
         "technique",
         ["LC-MS"],
     )
-    async def test_get_ordered_protocol_names_03(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_ordered_protocol_names_03(self, sample_modifier: SampleFileModifier, technique: str):
         sample_modifier.templates = {}
         template = sample_modifier.get_ordered_protocol_names(technique_name=technique)
         assert not template
@@ -99,18 +89,14 @@ class TestOrderedProtocolNames:
 
 class TestGetProtocolParametersInAssay:
     @pytest.mark.asyncio
-    async def test_get_protocol_parameters_in_assay_01(
-        self, sample_modifier: SampleFileModifier
-    ):
+    async def test_get_protocol_parameters_in_assay_01(self, sample_modifier: SampleFileModifier):
         assay = sample_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_file = sample_modifier.model.assays[assay.file_name]
         result = sample_modifier.get_protocol_parameters_in_assay(assay_file)
         assert len(result) > 0
 
     @pytest.mark.asyncio
-    async def test_get_protocol_parameters_in_assay_02(
-        self, sample_modifier: SampleFileModifier
-    ):
+    async def test_get_protocol_parameters_in_assay_02(self, sample_modifier: SampleFileModifier):
         assay = sample_modifier.model.investigation.studies[0].study_assays.assays[0]
         assay_file = sample_modifier.model.assays[assay.file_name]
         assay_file.assay_technique.name = ""
@@ -128,9 +114,7 @@ class TestGetProtocolParametersInAssay:
 class TestGetProtocolParameters:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("technique", all_technique_names)
-    async def test_get_protocol_parameters_01(
-        self, sample_modifier: SampleFileModifier, technique: str
-    ):
+    async def test_get_protocol_parameters_01(self, sample_modifier: SampleFileModifier, technique: str):
         result_1 = sample_modifier.get_protocol_parameters(techniques=[technique])
         result_2 = sample_modifier.get_protocol_parameters(techniques=[technique])
 
@@ -140,17 +124,13 @@ class TestGetProtocolParameters:
 
 class DetectFileParseUpdates:
     @pytest.mark.asyncio
-    async def test_detect_file_parse_updates_01(
-        self, sample_modifier: SampleFileModifier
-    ):
+    async def test_detect_file_parse_updates_01(self, sample_modifier: SampleFileModifier):
         sample_modifier.update_from_parser_messages()
 
         assert len(sample_modifier.update_logs) == 0
 
     @pytest.mark.asyncio
-    async def test_detect_file_parse_updates_02(
-        self, sample_modifier: SampleFileModifier
-    ):
+    async def test_detect_file_parse_updates_02(self, sample_modifier: SampleFileModifier):
         file_name = sample_modifier.model.investigation.studies[0].file_name
 
         sample_modifier.model.parser_messages[file_name] = [

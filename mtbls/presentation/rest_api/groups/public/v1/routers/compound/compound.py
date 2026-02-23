@@ -86,9 +86,7 @@ async def get_compound_by_id(
         default=False,
         description="Include raw MongoDB document in response",
     ),
-    compound_read_repository: CompoundReadRepository = Depends(
-        Provide["repositories.compound_read_repository"]
-    ),
+    compound_read_repository: CompoundReadRepository = Depends(Provide["repositories.compound_read_repository"]),
     compound_similarity_repository: CompoundSimilarityRepository = Depends(
         Provide["repositories.compound_similarity_repository"]
     ),
@@ -102,9 +100,7 @@ async def get_compound_by_id(
     similar_compounds = None
     if include_similar and compound:
         try:
-            similar_compounds = await compound_similarity_repository.find_similar_by_id(
-                compound_id
-            )
+            similar_compounds = await compound_similarity_repository.find_similar_by_id(compound_id)
         except ValueError as e:
             logger.warning("Could not find similar compounds for %s: %s", compound_id, e)
             similar_compounds = []
@@ -130,18 +126,14 @@ async def get_similar_compounds(
     ),
 ):
     try:
-        similar_compounds = await compound_similarity_repository.find_similar_by_id(
-            compound_id
-        )
+        similar_compounds = await compound_similarity_repository.find_similar_by_id(compound_id)
         result = SimilarCompoundsResult(
             query_compound_id=compound_id,
             similar_compounds=similar_compounds,
             threshold=0.7,  # TODO: get from config
             total_found=len(similar_compounds),
         )
-        response: APIResponse[SimilarCompoundsResult] = APIResponse[
-            SimilarCompoundsResult
-        ]()
+        response: APIResponse[SimilarCompoundsResult] = APIResponse[SimilarCompoundsResult]()
         response.content = result
         return response
     except ValueError as e:
@@ -161,7 +153,7 @@ async def get_similar_compounds(
     "/batch",
     summary="Get multiple compounds by IDs.",
     description=f"Retrieve multiple compounds in a single request by providing a list of compound IDs. "
-    f"Maximum {BATCH_SIZE_LIMIT} compounds per request. Returns found compounds and a list of any IDs that were not found.",
+    f"Maximum {BATCH_SIZE_LIMIT} compounds per request. Returns found compounds and a list of any IDs that were not found.",  # noqa: E501
     response_model=APIResponse[BatchCompoundResult],
 )
 @inject
@@ -171,9 +163,7 @@ async def get_compounds_batch(
         default=False,
         description="Include raw MongoDB document in response for each compound",
     ),
-    compound_read_repository: CompoundReadRepository = Depends(
-        Provide["repositories.compound_read_repository"]
-    ),
+    compound_read_repository: CompoundReadRepository = Depends(Provide["repositories.compound_read_repository"]),
 ):
     """
     Batch retrieve compounds by their IDs.
@@ -184,9 +174,7 @@ async def get_compounds_batch(
     # Deduplicate IDs while preserving order
     unique_ids = list(dict.fromkeys(request.compound_ids))
 
-    compounds, missing_ids = await compound_read_repository.get_compounds_by_ids(
-        unique_ids
-    )
+    compounds, missing_ids = await compound_read_repository.get_compounds_by_ids(unique_ids)
 
     # Strip raw field if not requested
     if not include_raw:

@@ -35,39 +35,28 @@ async def search_study_index(
         default=False,
         description="Include all matching study IDs in response (only populated when query or filters are applied)",
     ),
-    elasticsearch_study_search_service=Depends(
-        Provide["gateways.elasticsearch_study_gateway"]
-    ),
+    elasticsearch_study_search_service=Depends(Provide["gateways.elasticsearch_study_gateway"]),
 ):
     if not q:
         response.status_code = status.HTTP_400_BAD_REQUEST
         response_message = APIErrorResponse(error="Search query is not valid.")
         return response_message
-    result = await elasticsearch_study_search_service.search(
-        query=q, include_all_ids=include_all_ids
-    )
-    response: APIResponse[IndexSearchResult] = APIResponse[IndexSearchResult](
-        content=result
-    )
+    result = await elasticsearch_study_search_service.search(query=q, include_all_ids=include_all_ids)
+    response: APIResponse[IndexSearchResult] = APIResponse[IndexSearchResult](content=result)
     return response
 
 
 @router.post(
     "/search/raw",
     summary="MetaboLights Study Search from public study index. (Raw ES Response)",
-    description=(
-        "MetaboLights Statistics from public study index"
-        "Raw Elasticsearch Response format for APIConnectors."
-    ),
+    description=("MetaboLights Statistics from public study indexRaw Elasticsearch Response format for APIConnectors."),
     response_model=APIResponse[Any],
 )
 @inject
 async def search_study_index_raw(
     response: Response,
     q: Annotated[StudySearchInput, Body()],
-    elasticsearch_study_search_service=Depends(
-        Provide["gateways.elasticsearch_study_gateway"]
-    ),
+    elasticsearch_study_search_service=Depends(Provide["gateways.elasticsearch_study_gateway"]),
 ):
     if not q:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -86,9 +75,7 @@ async def search_study_index_raw(
 )
 @inject
 async def get_study_index_mapping(
-    elasticsearch_study_search_service=Depends(
-        Provide["gateways.elasticsearch_study_gateway"]
-    ),
+    elasticsearch_study_search_service=Depends(Provide["gateways.elasticsearch_study_gateway"]),
 ):
     mapping = await elasticsearch_study_search_service.get_index_mapping()
     return APIResponse[Any](content=mapping)
@@ -111,9 +98,7 @@ async def get_study_index_mapping(
 @inject
 async def export_study_search(
     q: Annotated[StudySearchInput, Body()],
-    elasticsearch_study_search_service=Depends(
-        Provide["gateways.elasticsearch_study_gateway"]
-    ),
+    elasticsearch_study_search_service=Depends(Provide["gateways.elasticsearch_study_gateway"]),
 ):
     async def generate():
         metadata = q.model_dump(exclude_none=True)

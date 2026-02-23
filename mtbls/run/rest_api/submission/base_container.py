@@ -201,18 +201,14 @@ class GatewaysContainer(containers.DeclarativeContainer):
 
     pub_sub_backend: PubSubConnection = pub_sub_broker
 
-    http_client: HttpClient = providers.Singleton(
-        HttpxClient, max_timeount_in_seconds=60
-    )
+    http_client: HttpClient = providers.Singleton(HttpxClient, max_timeount_in_seconds=60)
 
 
 class RepositoriesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     entity_mapper: EntityMapper = providers.Singleton(EntityMapper)
 
-    alias_generator: AliasGenerator = providers.Singleton(
-        DbTableAliasGeneratorImpl, entity_mapper
-    )
+    alias_generator: AliasGenerator = providers.Singleton(DbTableAliasGeneratorImpl, entity_mapper)
 
     gateways = providers.DependenciesContainer()
     services = providers.DependenciesContainer()
@@ -261,13 +257,11 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         database_client=gateways.document_database_client,
         config=None,  # Uses default CompoundSimilarityConfig
     )
-    mtbls_data_reuse_read_repository: MtblsDataReuseReadRepository = (
-        providers.Singleton(
-            SqlDbMtblsDataReuseReadRepository,
-            entity_mapper=entity_mapper,
-            alias_generator=alias_generator,
-            database_client=gateways.database_client,
-        )
+    mtbls_data_reuse_read_repository: MtblsDataReuseReadRepository = providers.Singleton(
+        SqlDbMtblsDataReuseReadRepository,
+        entity_mapper=entity_mapper,
+        alias_generator=alias_generator,
+        database_client=gateways.database_client,
     )
 
     # study_file_repository: StudyFileRepository = providers.Singleton(
@@ -283,9 +277,7 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     #     database_client=gateways.database_client,
     # )
 
-    folder_manager = providers.Singleton(
-        StudyFolderManager, config=config.repositories.study_folders
-    )
+    folder_manager = providers.Singleton(StudyFolderManager, config=config.repositories.study_folders)
 
     internal_files_object_repository: FileObjectWriteRepository = providers.Singleton(
         FileSystemObjectWriteRepository,

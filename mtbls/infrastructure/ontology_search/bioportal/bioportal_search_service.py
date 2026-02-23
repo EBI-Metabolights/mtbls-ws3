@@ -42,9 +42,7 @@ class BioPortalOntologySearchService(OntologySearchService):
         elif isinstance(self.config, dict):
             self.config = BioPortalConfiguration.model_validate(config)
         if not self.config.api_token:
-            logger.warning(
-                "BioPortal API token is not defined. Bioportal search queries may fail."
-            )
+            logger.warning("BioPortal API token is not defined. Bioportal search queries may fail.")
 
     async def search(
         self,
@@ -55,17 +53,11 @@ class BioPortalOntologySearchService(OntologySearchService):
         exact_match: bool = False,
     ) -> OntologyTermSearchResult:
         if not rule or not rule.validation_type:
-            return OntologyTermSearchResult(
-                success=False, message="Invalid rule definition"
-            )
-        if (
-            not rule.ontologies
-            and rule.validation_type == OntologyValidationType.SELECTED_ONTOLOGY
-        ):
+            return OntologyTermSearchResult(success=False, message="Invalid rule definition")
+        if not rule.ontologies and rule.validation_type == OntologyValidationType.SELECTED_ONTOLOGY:
             return OntologyTermSearchResult(
                 success=False,
-                message=f"Ontology list is not defined for "
-                f"{OntologyValidationType.SELECTED_ONTOLOGY}",
+                message=f"Ontology list is not defined for {OntologyValidationType.SELECTED_ONTOLOGY}",
             )
 
         if not rule.allowed_parent_ontology_terms:
@@ -114,22 +106,12 @@ class BioPortalOntologySearchService(OntologySearchService):
             result = exact_match_result
         else:
             validation_type = rule.validation_type
-            is_child_ontology_search = (
-                validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
-            )
-            is_selected_ontology_search = (
-                validation_type == OntologyValidationType.SELECTED_ONTOLOGY
-            )
-            is_selected_ontology_terms = (
-                validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM
-            )
-            has_parent_terms = (
-                rule.allowed_parent_ontology_terms
-                and rule.allowed_parent_ontology_terms.parents
-            )
+            is_child_ontology_search = validation_type == OntologyValidationType.CHILD_ONTOLOGY_TERM
+            is_selected_ontology_search = validation_type == OntologyValidationType.SELECTED_ONTOLOGY
+            is_selected_ontology_terms = validation_type == OntologyValidationType.SELECTED_ONTOLOGY_TERM
+            has_parent_terms = rule.allowed_parent_ontology_terms and rule.allowed_parent_ontology_terms.parents
             if (
-                not rule.allowed_parent_ontology_terms
-                or not rule.allowed_parent_ontology_terms.parents
+                not rule.allowed_parent_ontology_terms or not rule.allowed_parent_ontology_terms.parents
             ) and is_child_ontology_search:
                 message = (
                     f"Parent ontology terms are not defined for "
@@ -140,10 +122,7 @@ class BioPortalOntologySearchService(OntologySearchService):
 
             validation_type = rule.validation_type
             if not rule.ontologies and is_selected_ontology_search:
-                message = (
-                    f"Ontologies are not defined for "
-                    f"{OntologyValidationType.SELECTED_ONTOLOGY}: {keyword}",
-                )
+                message = (f"Ontologies are not defined for {OntologyValidationType.SELECTED_ONTOLOGY}: {keyword}",)
                 logger.debug(message)
                 return OntologyTermSearchResult(success=False, message=message)
 
@@ -155,12 +134,7 @@ class BioPortalOntologySearchService(OntologySearchService):
             rule.ontologies = rule.ontologies or []
             if has_parent_terms:
                 parent_sources = list(
-                    OrderedDict.fromkeys(
-                        [
-                            x.term_source_ref
-                            for x in rule.allowed_parent_ontology_terms.parents
-                        ]
-                    )
+                    OrderedDict.fromkeys([x.term_source_ref for x in rule.allowed_parent_ontology_terms.parents])
                 )
                 for item in parent_sources:
                     if item not in rule.ontologies:
@@ -168,9 +142,7 @@ class BioPortalOntologySearchService(OntologySearchService):
             (
                 exact_match_response,
                 exact_match_result,
-            ) = await self.search_by_validation_type(
-                validation_type, keyword, rule, page, size, True
-            )
+            ) = await self.search_by_validation_type(validation_type, keyword, rule, page, size, True)
             if exact_match:
                 response = exact_match_response
                 result = exact_match_result
@@ -179,13 +151,9 @@ class BioPortalOntologySearchService(OntologySearchService):
                     validation_type, keyword, rule, page, size, False
                 )
         if not response:
-            return OntologyTermSearchResult(
-                success=False, message="No response. Check validation type.", result=[]
-            )
+            return OntologyTermSearchResult(success=False, message="No response. Check validation type.", result=[])
         if response.error:
-            return OntologyTermSearchResult(
-                success=False, message=response.error_message or "", result=[]
-            )
+            return OntologyTermSearchResult(success=False, message=response.error_message or "", result=[])
         if not exact_match and exact_match_result:
             terms = {(x.term_source_ref, x.term_accession_number) for x in result}
             for item in exact_match_result:
@@ -241,9 +209,7 @@ class BioPortalOntologySearchService(OntologySearchService):
         response = result = None
 
         if validation_type == OntologyValidationType.ANY_ONTOLOGY_TERM:
-            response, result = await self.search_term(
-                keyword, page=page, size=size, exact_match_only=exact_match
-            )
+            response, result = await self.search_term(keyword, page=page, size=size, exact_match_only=exact_match)
         elif validation_type == OntologyValidationType.SELECTED_ONTOLOGY:
             response, result = await self.search_term(
                 keyword,
@@ -272,9 +238,7 @@ class BioPortalOntologySearchService(OntologySearchService):
 
         return response, result
 
-    def position_rank(
-        self, term: str, keyword: str, synonym_set: set[str] = None
-    ) -> int:
+    def position_rank(self, term: str, keyword: str, synonym_set: set[str] = None) -> int:
         """Return rank based on position of search term in string."""
         if not synonym_set:
             synonym_set = set()
@@ -319,9 +283,7 @@ class BioPortalOntologySearchService(OntologySearchService):
 
         ontology_filter_set = set()
         if ontology_filter:
-            ontology_filter_set = {
-                x.lower() for x in ontology_filter if x and x.strip()
-            }
+            ontology_filter_set = {x.lower() for x in ontology_filter if x and x.strip()}
 
         if parents:
             params.update({"subtree_root_id": ",".join([x for x in parents if x])})

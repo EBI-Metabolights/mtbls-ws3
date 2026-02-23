@@ -82,9 +82,7 @@ class DefaultRepositoryProvider(RepositoryProvider):
         return self.isa_table_row_object_repository
 
     @abc.abstractmethod
-    async def get_file_object_repository(
-        self, bucket_name: str
-    ) -> FileObjectWriteRepository:
+    async def get_file_object_repository(self, bucket_name: str) -> FileObjectWriteRepository:
         if bucket_name not in self.file_object_repositories:
             raise NotImplementedError(bucket_name, "not implemented")
         return self.file_object_repositories[bucket_name]
