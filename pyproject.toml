@@ -128,6 +128,9 @@ target-version = "py313"
 extend-select = ["E4", "E7", "E9", "F", "I", "G", "SLF", "PTH", "Q"]
 fixable = ["ALL"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["SLF001"]
+
 [tool.importlinter]
 include_external_packages = true
 root_packages = ["mtbls"]
