@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME = "MTBLS_WS_CONFIG_FILE"
 DEFAULT_CONFIG_FILE_PATH = "mtbls-ws-config.yaml"
 SECRET_FILE_ENVIRONMENT_VARIABLE_NAME = "MTBLS_WS_SECRET_FILE"
-DEFAULT_SECRETS_FILE_PATH = ".mtbls-ws-config-secrets/.secrets.yaml"
+DEFAULT_SECRETS_FILE_PATH = ".secrets/ws3-secrets.yaml"
 
 
 def get_application_config_files() -> tuple[str, str]:
