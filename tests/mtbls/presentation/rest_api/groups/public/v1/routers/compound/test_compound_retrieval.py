@@ -7,26 +7,23 @@ from mtbls.presentation.rest_api.core.responses import APIResponse
 from mtbls.presentation.rest_api.groups.public.v1.routers.compound.compound import (
     BATCH_SIZE_LIMIT,
     BatchCompoundResult,
+    CompoundWithSimilar,
 )
 
 
 def test_get_compound_by_id(public_api_client: TestClient, submission_api_container):
     url = "/public/v2/compound/MTBLC123"
-    mock_compound = Compound(
-        id="MTBLC123",
-        name="aspirin",
-        inchiKey="ABC",
-    )
+    mock_compound = Compound(id="MTBLC123", name="aspirin", inchiKey="ABC")
     mock_repo = AsyncMock()
     mock_repo.get_compound_by_id.return_value = mock_compound
     submission_api_container.repositories.compound_read_repository.override(mock_repo)
 
     response = public_api_client.get(url)
-
+    print(response.json())
     assert response.status_code == 200
-    result = APIResponse[Compound].model_validate(response.json())
-    assert result.content.id == "MTBLC123"
-    assert result.content.name == "aspirin"
+    result = APIResponse[CompoundWithSimilar].model_validate(response.json())
+    assert result.content.compound.id == "MTBLC123"
+    assert result.content.compound.name == "aspirin"
 
 
 class TestBatchCompoundRetrieval:

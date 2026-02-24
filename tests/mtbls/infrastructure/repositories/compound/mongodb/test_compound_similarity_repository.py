@@ -137,7 +137,7 @@ class TestCompoundSimilarityConfig:
 
     def test_default_values(self):
         config = CompoundSimilarityConfig()
-        assert config.threshold == 0.7
+        assert config.threshold == 0.5
         assert config.limit == 10
         assert config.max_screening_bits == 20
         assert config.fingerprint_radius == 2
