@@ -1,5 +1,3 @@
-from logging import config as logging_config
-
 from dependency_injector import containers, providers
 
 from mtbls.application.context.request_tracker import RequestTracker
@@ -38,13 +36,14 @@ from mtbls.infrastructure.repositories.study.db.study_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_read_repository import (
     SqlDbUserReadRepository,
 )
+from mtbls.run.cli.logging_config import configure_cli_logging
 
 
 class MtblsCliCoreContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     logging_config = providers.Resource(
-        logging_config.dictConfig,
+        configure_cli_logging,
         config=config.run.cli.logging,
     )
 

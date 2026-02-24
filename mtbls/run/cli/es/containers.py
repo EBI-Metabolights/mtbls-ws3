@@ -1,5 +1,3 @@
-from logging import config as logging_config
-
 from dependency_injector import containers, providers
 
 from mtbls.application.context.request_tracker import RequestTracker
@@ -36,13 +34,14 @@ from mtbls.infrastructure.repositories.study.db.study_read_repository import (
 from mtbls.infrastructure.search.es.manager.es_index_manager import (
     ElasticsearchIndexManagementGateway,
 )
+from mtbls.run.cli.logging_config import configure_cli_logging
 
 
 class CoreContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     logging_config = providers.Resource(
-        logging_config.dictConfig,
+        configure_cli_logging,
         config=config.run.cli.logging,
     )
 

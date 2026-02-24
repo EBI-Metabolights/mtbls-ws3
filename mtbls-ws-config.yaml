@@ -34,8 +34,8 @@ gateways:
         replica_set: "metabolightsdevrs114"
     elasticsearch:
       connection:
-        hosts: {{ elasticsearch.host }}
-        port: {{ elasticsearch.port }}
+        hosts: "{{ elasticsearch.host }}"
+        port: 32096
         username: elastic
         password: "{{ elasticsearch.password }}"
         scheme: https
