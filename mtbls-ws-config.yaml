@@ -37,16 +37,15 @@ gateways:
         hosts: https://hh-rke-wp-webadmin-33-worker-1.caas.ebi.ac.uk
         port: 32096
         username: elastic
-        password: "{{ elastic.password }}"
+        password: "{{ elasticsearch.password }}"
         scheme: https
         verify_certs : false
-        api_key: "{{ elastic.api_key }}"
         api_keys:
-          study: "{{ elastic.api_keys.study }}"
-          compound: "{{ elastic.api_keys.compound }}"
-          assignment: "{{ elastic.api_keys.assignment }}"
-          assay: "{{ elastic.api_keys.assay }}"
-          sample: "{{ elastic.api_keys.sample }}"
+          study: "{{ elasticsearch.api_keys.study }}"
+          compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
+          assay: "{{ elasticsearch.api_keys.assay }}"
+          sample: "{{ elasticsearch.api_keys.sample }}"
         request_timeout_in_seconds: 15.0
 services:
   authentication:
@@ -56,13 +55,12 @@ services:
       base_context_path: /metabolights/ws
       scheme: http
     standalone:
-      application_secret_key: "{{ standalone_authentication.application_secret_key }}"
+      application_secret_key: "{{ authentication.standalone.application_secret_key }}"
     keycloak:
-      application_secret_key: "{{ standalone_authentication.application_secret_key }}"
       host: "http://keycloak.keycloak.svc.cluster.local:8080/metabolights/test/iam/"
       realm_name: "metabolights"
       client_id: "mtblsws-py-test"
-      client_secret: "{{ keycloak_authentication.client_secret }}"
+      client_secret: "{{ authentication.keycloak.client_secret }}"
     active_authentication_service: mtbls_ws2
   policy_service:
     opa:

@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 class ElasticsearchClientConfig(BaseModel):
     hosts: List[str] | str = Field(default_factory=list, description="List of Elasticsearch host URLs")
-    api_key: Optional[str] = Field(None, description="Deprecated single API key for Elasticsearch authentication")
     api_keys: Optional[Dict[str, str]] = Field(
         default=None,
         description="Named API keys for Elasticsearch authentication",
