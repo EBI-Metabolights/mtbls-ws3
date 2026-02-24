@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
@@ -10,6 +11,8 @@ from mtbls.presentation.rest_api.groups.public.v1.routers.compound.compound impo
     CompoundWithSimilar,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def test_get_compound_by_id(public_api_client: TestClient, submission_api_container):
     url = "/public/v2/compound/MTBLC123"
@@ -19,7 +22,7 @@ def test_get_compound_by_id(public_api_client: TestClient, submission_api_contai
     submission_api_container.repositories.compound_read_repository.override(mock_repo)
 
     response = public_api_client.get(url)
-    print(response.json())
+    logger.info("Response content: %s", response.json())
     assert response.status_code == 200
     result = APIResponse[CompoundWithSimilar].model_validate(response.json())
     assert result.content.compound.id == "MTBLC123"
