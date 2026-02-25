@@ -10,7 +10,7 @@ class ElasticsearchConfiguration(BaseModel):
 
 class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
     api_key_name: str = "study"
-    index_name: str = "public-study-search-index"
+    index_name: str = "completed-study-search-index"
     search_fields: Tuple[str, ...] = (
         "studyId^8",
         "title^3",
