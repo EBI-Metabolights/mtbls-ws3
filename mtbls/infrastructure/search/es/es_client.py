@@ -1,211 +1,167 @@
 import logging
-from typing import Any, Dict, List, Optional, Self
+import time
+from typing import Any, Dict, List, Optional
 
 from elasticsearch import ApiError, AsyncElasticsearch
-from pydantic import BaseModel, Field, model_validator
 
-from mtbls.application.services.interfaces.data_index_client import DataIndexClient
+from mtbls.infrastructure.search.es.es_client_config import ElasticsearchClientConfig
 
 logger = logging.getLogger(__name__)
 
 
-class ElasticsearchClientConfig(BaseModel):
-    hosts: List[str] | str = Field(
-        default_factory=list, description="List of Elasticsearch host URLs"
-    )
-    api_key: Optional[str] = Field(
-        None, description="API key for Elasticsearch authentication"
-    )
-    request_timeout: Optional[float] = Field(
-        5.0, description="Request timeout in seconds"
-    )
-    verify_certs: bool = Field(
-        default=True, description="Verify SSL certificates for HTTPS connections"
-    )
-    port: int
-    username: str
-    password: str
-
-    @staticmethod
-    def append_port_to_hosts(hosts, port) -> str:
-        if not hosts or port in (None, "", 0):
-            return hosts
-
-        try:
-            port_str = str(int(port))
-        except (TypeError, ValueError):
-            return hosts
-
-        def _format(host: str) -> str:
-            if not host:
-                return host
-            host_str = str(host)
-            scheme_split = host_str.split("://", 1)
-            host_body = scheme_split[-1]
-            if ":" in host_body:
-                return host_str  # already has a port
-            return f"{host_str}:{port_str}"
-
-        if isinstance(hosts, (list, tuple)):
-            return [_format(h) for h in hosts]
-        return _format(hosts)
-
-    @model_validator(mode="wrap")
-    @classmethod
-    def validate_model(cls, v: Any, handler) -> Self:
-        if isinstance(v, ElasticsearchClientConfig):
-            v.hosts = ElasticsearchClientConfig.append_port_to_hosts(v.hosts, v.port)
-        elif isinstance(v, dict):
-            v["hosts"] = ElasticsearchClientConfig.append_port_to_hosts(
-                v.get("hosts"), v.get("port")
-            )
-
-        return handler(v)
-
-
-class ElasticsearchClient(DataIndexClient):
-    def __init__(
-        self,
-        config: None | ElasticsearchClientConfig | dict[str, Any],
-        auth_method: None | str = None,
-        api_key: None | str = None,
-    ):
+class ElasticsearchClient:
+    def __init__(self, config: None | ElasticsearchClientConfig | dict[str, Any]):
         self._config = config
-        self.auth_method = auth_method
-        self.api_key = api_key
         if not self._config:
             self._config = ElasticsearchClientConfig()
         elif isinstance(self._config, dict):
             self._config = ElasticsearchClientConfig.model_validate(config)
-        self._es: Optional[AsyncElasticsearch] = None
+        self._clients: Dict[Optional[str], AsyncElasticsearch] = {}
 
-    async def start(self) -> None:
-        if self._es is not None:
-            return  # Already started
-        logger.info(
-            "Connecting to Elasticsearch hosts: %s (timeout=%s, verify_certs=%s)",
-            self._config.hosts,
-            self._config.request_timeout,
-            self._config.verify_certs,
+    def _configured_api_key_names(self) -> List[Optional[str]]:
+        if self._config.api_keys:
+            return list(self._config.api_keys.keys())
+        return [None]
+
+    def _effective_api_key_name(self, api_key_name: Optional[str]) -> Optional[str]:
+        if api_key_name is not None:
+            return api_key_name
+        if self._config.api_keys:
+            return next(iter(self._config.api_keys.keys()))
+        return None
+
+    def _resolve_api_key_value(self, api_key_name: Optional[str]) -> Optional[str]:
+        if api_key_name:
+            if self._config.api_keys and api_key_name in self._config.api_keys:
+                return self._config.api_keys[api_key_name]
+            raise ValueError(
+                f"API key '{api_key_name}' is not configured; available keys: {list(self._config.api_keys or {})}"
+            )
+
+    async def start(self, api_key_name: Optional[str] = None) -> None:
+        target_keys = (
+            [api_key_name]
+            if api_key_name is not None
+            else self._configured_api_key_names()
         )
-        basic_auth = None
-        if self.auth_method == "basic_auth":
-            basic_auth = (
-                self._config.username,
-                self._config.password,
-            )
 
-            self._es = AsyncElasticsearch(
-                hosts=self._config.hosts or None,
-                basic_auth=basic_auth,
-                # request_timeout=self._config.request_timeout,
-                request_timeout=60,  # default is often too small for heavy ops
-                max_retries=3,
-                retry_on_timeout=True,
-                verify_certs=self._config.verify_certs,
+        for key_name in target_keys:
+            if key_name in self._clients:
+                continue
+
+            api_key_value = self._resolve_api_key_value(key_name)
+            logger.info(
+                "Connecting to Elasticsearch hosts: %s (using configured API key, timeout=%s, verify_certs=%s)",
+                self._config.hosts,
+                self._config.request_timeout,
+                self._config.verify_certs,
             )
-        else:
-            self._es = AsyncElasticsearch(
+            es = AsyncElasticsearch(
                 hosts=self._config.hosts or None,
-                api_key=self.api_key,
+                api_key=api_key_value,
                 request_timeout=self._config.request_timeout,
                 verify_certs=self._config.verify_certs,
             )
-        try:
-            ok = await self._es.info(human=True, pretty=True)
-            if not ok:
-                logger.exception(
-                    "Elasticsearch hosts %s reachable but ping returned False.",
-                    self._config.hosts,
-                )
-                raise ConnectionError("Elasticsearch ping failed")
-            logger.info("Elasticsearch connection established successfully.")
-        except ApiError as e:
-            logger.exception("Elasticsearch API error during startup: %s", e)
-            raise RuntimeError(f"Elasticsearch connection error: {e}") from e
-        except Exception as exc:
-            logger.exception("Unexpected Elasticsearch connection failure: %s", exc)
-            raise
+            try:
+                ok = await es.ping()
+                if not ok:
+                    # Likely a restricted API key without cluster privileges; keep client and proceed.
+                    logger.warning(
+                        "Elasticsearch ping failed; proceeding anyway (restricted key or connectivity issue)."
+                    )
+                self._clients[key_name] = es
+                if ok:
+                    logger.info(
+                        "Elasticsearch connection established successfully using a configured API key."
+                    )
+            except ApiError as e:
+                status = getattr(e, "status_code", None)
+                if status in (401, 403):
+                    # Restricted API key cannot ping cluster; keep client and continue.
+                    logger.warning(
+                        "Elasticsearch ping unauthorized for a configured API key (status=%s); continuing.",
+                        status,
+                    )
+                    self._clients[key_name] = es
+                    continue
+                await es.close()
+                logger.exception("Elasticsearch API error during startup: %s", e)
+                raise RuntimeError(f"Elasticsearch connection error: {e}") from e
+            except Exception as exc:
+                await es.close()
+                logger.exception("Unexpected Elasticsearch connection failure: %s", exc)
+                raise
 
-    async def ensure_started(self) -> None:
-        if self._es is None:
-            await self.start()
+    async def ensure_started(self, api_key_name: Optional[str] = None) -> None:
+        target_keys = (
+            [api_key_name]
+            if api_key_name is not None
+            else self._configured_api_key_names()
+        )
+        for key_name in target_keys:
+            if key_name in self._clients:
+                continue
+            await self.start(key_name)
+
+    async def _get_started_client(
+        self, api_key_name: Optional[str]
+    ) -> AsyncElasticsearch:
+        effective_name = self._effective_api_key_name(api_key_name)
+        await self.ensure_started(effective_name)
+        assert effective_name in self._clients, (
+            "Elasticsearch client not connected. Has start() been called?"
+        )
+        return self._clients[effective_name]
 
     async def close(self) -> None:
-        if self._es is not None:
-            await self._es.close()
-            self._es = None
+        for client in self._clients.values():
+            await client.close()
+        self._clients.clear()
 
-    async def search(self, index, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
-        await self.ensure_started()
-        assert self._es is not None, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
-        return await self._es.search(index=index, body=body, **kwargs)
+    async def search(
+        self, index, body: Dict[str, Any], api_key_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        client = await self._get_started_client(api_key_name)
+        started = time.monotonic()
+        try:
+            return await client.search(index=index, body=body)
+        finally:
+            elapsed_ms = int((time.monotonic() - started) * 1000)
+            effective_key = api_key_name or self._effective_api_key_name(api_key_name)
+            logger.debug(
+                "Elasticsearch search completed in %sms (index=%s, api_key=%s)",
+                elapsed_ms,
+                index,
+                effective_key,
+            )
+            if elapsed_ms > 2000:
+                logger.debug(
+                    "Slow Elasticsearch search (>2s) details: index=%s api_key=%s body=%s",
+                    index,
+                    effective_key,
+                    body,
+                )
 
     # no current usecase for multiple search, but adding for completeness / the future.
-    async def msearch(self, index, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
-        await self.ensure_started()
-        assert self._es is not None, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
-        return await self._es.msearch(index=index, body=body, **kwargs)
+    async def msearch(
+        self, index, body: Dict[str, Any], api_key_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        client = await self._get_started_client(api_key_name)
+        return await client.msearch(index=index, body=body)
 
-    async def count(self, index, body: Optional[Dict[str, Any]]) -> int:
-        await self.ensure_started()
-        assert self._es is not None, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
-        resp = await self._es.count(index=index, body=body or {})
+    async def count(
+        self, index, body: Optional[Dict[str, Any]], api_key_name: Optional[str] = None
+    ) -> int:
+        client = await self._get_started_client(api_key_name)
+        resp = await client.count(index=index, body=body or {})
         return int(resp.get("count", 0))
 
-    async def get_info(self) -> Dict[str, Any]:
-        await self.ensure_started()
-        assert self._es is not None, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
-        return await self._es.info()
+    async def get_info(self, api_key_name: Optional[str] = None) -> Dict[str, Any]:
+        client = await self._get_started_client(api_key_name)
+        return await client.info()
 
-    async def get_mapping(self, index: str) -> Dict[str, Any]:
-        await self.ensure_started()
-        assert self._es is not None, (
-            "Elasticsearch client not connected. Has start() been called?"
-        )
-        return await self._es.indices.get_mapping(index=index)
-
-    async def bulk(self, index: str, operations: Any, **kwargs) -> dict[str, Any]:
-        await self.ensure_started()
-        return await self._es.bulk(index=index, operations=operations, **kwargs)
-
-    async def delete(
-        self, index: str, ignore_status: bool = False, **kwargs
-    ) -> dict[str, Any]:
-        await self.ensure_started()
-        return await self._es.options(ignore_status=ignore_status).indices.delete(
-            index=index, **kwargs
-        )
-
-    async def exists(self, index: str, **kwargs) -> bool:
-        await self.ensure_started()
-        result = await self._es.indices.exists(index=index, **kwargs)
-        return result.raw
-
-    async def delete_by_query(
-        self, index: str, body: dict[str, Any] = False, **kwargs
-    ) -> dict[str, Any]:
-        await self.ensure_started()
-        return await self._es.delete_by_query(
-            index=index, body=body, refresh=True, **kwargs
-        )
-
-    async def delete_by_id(self, index: str, id: str, **kwargs) -> dict[str, Any]:
-        await self.ensure_started()
-        return await self._es.delete(index=index, id=id, refresh=True, **kwargs)
-
-    async def create(
-        self, index: str, mappings: dict[str, Any], max_retries: int = 1, **kwargs
-    ) -> dict[str, Any]:
-        await self.ensure_started()
-        return await self._es.options(max_retries=max_retries).indices.create(
-            index=index, mappings=mappings, **kwargs
-        )
+    async def get_mapping(
+        self, index: str, api_key_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        client = await self._get_started_client(api_key_name)
+        return await client.indices.get_mapping(index=index)

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class ValidationApp:
-    def __init__(self, config_file: str, secrets_file: str):
+    def __init__(self, config_file: None | str, secrets_file: None | str):
         self.container: ValidationApplicationContainer = (
             ValidationApplicationContainer()
         )

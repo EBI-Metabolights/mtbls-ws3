@@ -1,3 +1,4 @@
+
 gateways:
   cache:
     redis:
@@ -11,8 +12,8 @@ gateways:
   database:
     sqlite:
       connection:
-        file_path: .test-temp/sqlite_test.db
-        url_scheme: sqlite+aiosqlite
+        file_path: "{{ sqlite.file_path }}"
+        url_scheme: "{{ sqlite.url_scheme }}"
     postgresql:
       connection:
         host: "{{ postgresql.host }}"
@@ -20,15 +21,16 @@ gateways:
         user: "{{ postgresql.user }}"
         password: "{{ postgresql.password }}"
         database: "{{ postgresql.database }}"
-        url_scheme: postgresql+asyncpg
+        url_scheme: "{{ postgresql.url_scheme }}"
     mongodb:
       connection:
-        host: "{{ mongodb.host }}"
+        hosts: "{{ mongodb.hosts }}"
         port: "{{ mongodb.port }}"
         user: "{{ mongodb.user }}"
         password: "{{ mongodb.password }}"
         database: "{{ mongodb.database }}"
-        url_scheme: mongodb
+        url_scheme: "{{ mongodb.url_scheme }}"
+        replica_set: "{{ mongodb.replica_set }}"
     elasticsearch:
       connection:
         hosts: "{{ elasticsearch.host}}"
@@ -36,7 +38,7 @@ gateways:
         username: "{{ elasticsearch.username }}"
         password: "{{ elasticsearch.password }}"
         verify_certs: "{{ elasticsearch.verify_certs }}"
-        api_key: "{{ elasticsearch.api_key }}"
+        scheme: "{{ elasticsearch.scheme }}"
         api_keys:
           study: "{{ elasticsearch.api_keys.study }}"
           compound: "{{ elasticsearch.api_keys.compound }}"
@@ -46,7 +48,6 @@ gateways:
         request_timeout_in_seconds: 15.0
 services:
   authentication:
-    active_authentication_service: "standalone"
     mtbls_ws2:
       host: "{{ authentication.mtbls_ws2.host }}"
       port: "{{ authentication.mtbls_ws2.port }}"
@@ -59,6 +60,7 @@ services:
       realm_name: "{{ authentication.keycloak.realm_name }}"
       client_id: "{{ authentication.keycloak.client_id }}"
       client_secret: "{{ authentication.keycloak.client_secret }}"
+    active_authentication_service: mtbls_ws2
   policy_service:
     opa:
       validate_schema: false
@@ -102,9 +104,9 @@ repositories:
 run:
   submission:
     mhd:
-      public_study_base_url: "http://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public"
       api_key: "{{ mhd.api_key }}"
-      mhd_webservice_base_url: "https://www.metabolomicshub.org/api/submission/v0_1"
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
     default_dataset_license:
       name: "CC0 1.0 Universal"
       version: "1.0"
@@ -114,9 +116,6 @@ run:
       - mtbls.presentation.rest_api.groups.auth.v1
       - mtbls.presentation.rest_api.groups.public.v1
       - mtbls.presentation.rest_api.groups.submission.v1.routers.validation_tasks
-      - mtbls.presentation.rest_api.groups.submission.v1.routers.metadata_files
-      - mtbls.presentation.rest_api.groups.submission.v1.routers.isa_table_files
-      - mtbls.presentation.rest_api.groups.submission.v1.routers.investigation_files
       - mtbls.presentation.rest_api.groups.submission.v1.routers.dataset_license
       - mtbls.presentation.rest_api.groups.curation.v1
       - mtbls.presentation.rest_api.groups.system.v1
@@ -141,9 +140,6 @@ run:
         enabled: true
         router_paths:
         - mtbls/presentation/rest_api/groups/submission/v1/routers/validation_tasks
-        - mtbls/presentation/rest_api/groups/submission/v1/routers/metadata_files
-        - mtbls/presentation/rest_api/groups/submission/v1/routers/isa_table_files
-        - mtbls/presentation/rest_api/groups/submission/v1/routers/investigation_files
         - mtbls/presentation/rest_api/groups/submission/v1/routers/dataset_license
       - config_name: "curation"
         enabled: true
@@ -162,7 +158,7 @@ run:
         - .+
         - http(s*)://.*\.ebi\.ac\.uk(:\d{1,5})?
       server_info:
-        root_path: "{{ run.submission.server_info.root_path }}"
+        root_path: "{{ run.submission.root_path }}"
         title: "EMBL-EBI MetaboLights Submission API"
         description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
         summary: Open MetaboLights Submission REST API
@@ -219,6 +215,9 @@ run:
         httpcore:
           level: WARNING
           propogate: yes
+        __main__:
+          level: INFO
+          propogate: yes
       filters:
         correlation_id:
           (): "asgi_correlation_id.CorrelationIdFilter"
@@ -227,9 +226,9 @@ run:
           (): "{{ run.submission.logging.default_filter_class }}"
   common_worker:
     mhd:
-      public_study_base_url: "http://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public"
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
       api_key: "{{ mhd.api_key }}"
-      mhd_webservice_base_url: "https://www.metabolomicshub.org/api/submission/v0_1"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
     module_config:
       loaded_sub_package_names: []
     logging:
@@ -237,9 +236,9 @@ run:
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s", "client": "%(client)s", "route_path": "%(route_path)s", "resource_id": "%(resource_id)s", "user_id": %(user_id)d, "request_id": "%(request_id)s", "task_id": "%(task_id)s", "thread_name": "%(threadName)s",  "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(task_id)s %(threadName)s, %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"
@@ -304,6 +303,9 @@ run:
           propogate: yes
         httpcore:
           level: WARNING
+          propogate: yes
+        __main__:
+          level: INFO
           propogate: yes
       filters:
         default_filter:

@@ -1,5 +1,3 @@
-from logging import config as logging_config
-
 from dependency_injector import containers, providers
 
 from mtbls.application.context.request_tracker import RequestTracker
@@ -57,13 +55,14 @@ from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
 )
+from mtbls.run.cli.logging_config import configure_cli_logging
 
 
 class ValidationCoreContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     logging_config = providers.Resource(
-        logging_config.dictConfig,
+        configure_cli_logging,
         config=config.run.cli.logging,
     )
 

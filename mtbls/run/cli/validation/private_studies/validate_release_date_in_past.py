@@ -30,8 +30,14 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--secrets-file",
     "-s",
-    default=".mtbls-ws-config-secrets/.secrets.yaml",
+    default=".secrets/ws3-secrets.yaml",
     help="config secrets file path.",
+)
+@click.option(
+    "--selected-studies-file",
+    "-f",
+    default=".temp-validations",
+    help="Validation report root path. ",
 )
 @click.option(
     "--validation-reports-root-path",
@@ -55,6 +61,7 @@ def check_release_date_in_past_studies_cli(
     summary_file: Union[None, str] = None,
     config_file: Union[None, str] = None,
     secrets_file: Union[None, str] = None,
+    selected_studies_file: Union[None, str] = None,
 ):
     reports_path = Path(validation_reports_root_path)
     reports_path.mkdir(parents=True, exist_ok=True)
@@ -70,6 +77,7 @@ def check_release_date_in_past_studies_cli(
             validation_reports_root_path=reports_path,
             summary_file=Path(summary_file) if summary_file else None,
             apply_modifiers=apply_modifiers,
+            selected_studies_file=selected_studies_file,
         )
     )
 
@@ -79,25 +87,43 @@ async def check_release_date_in_past_studies(
     validation_reports_root_path: Path,
     summary_file: None | Path,
     apply_modifiers: bool = False,
+    selected_studies_file: None | str = None,
 ) -> PolicySummaryResult:
     if not summary_file:
         summary_file = "summary_file.txt"
     summary_file_path = validation_reports_root_path / Path(summary_file)
-    now = datetime.datetime.now()
 
-    result = await validation_app.study_read_repository.select_fields(
-        query_field_options=QueryFieldOptions(
-            filters=[
-                EntityFilter(key="status", value=StudyStatus.PRIVATE),
-                EntityFilter(key="release_date", operand=FilterOperand.LE, value=now),
-            ],
-            selected_fields=["accession_number", "release_date", "update_date"],
+    if selected_studies_file:
+        selected_studies_file_path = Path(selected_studies_file)
+        if not selected_studies_file_path.exists():
+            click(f"Selected studies file '{selected_studies_file}' not found")
+            exit(1)
+        resource_ids = [
+            x.strip()
+            for x in Path(selected_studies_file).readtext().split("\n")
+            if x and x.strip()
+        ]
+    else:
+        now = datetime.datetime.now()
+
+        result = await validation_app.study_read_repository.select_fields(
+            query_field_options=QueryFieldOptions(
+                filters=[
+                    EntityFilter(key="status", value=StudyStatus.PRIVATE),
+                    EntityFilter(
+                        key="release_date", operand=FilterOperand.LE, value=now
+                    ),
+                ],
+                selected_fields=["accession_number", "release_date", "update_date"],
+            )
         )
-    )
-    resources_map = {x[0]: x for x in result.data}
-    resource_ids: list[str] = list(resources_map.keys())
-    resource_ids.sort(key=sort_by_study_id, reverse=True)
-    resource_ids = [resource_ids[0]]
+        resources_map = {x[0]: x for x in result.data}
+        resource_ids: list[str] = list(resources_map.keys())
+        resource_ids.sort(key=sort_by_study_id, reverse=True)
+        resource_ids = [resource_ids[0]]
+    if not resource_ids:
+        click("There is no study to run validation")
+        exit(0)
 
     await run_validation_and_save_report(
         validation_app=validation_app,

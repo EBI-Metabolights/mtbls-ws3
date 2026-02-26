@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "rebuilt_whitespace": {
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "whitespace"
+        }
+      }
+    }
+  }
+}

@@ -80,6 +80,7 @@ async def create_validation_run_configuration(
     db_connection: dict,
     temp_folder: Union[None, str] = None,
     apply_modifiers: bool = True,
+    ignore_cv_term_validation: None | bool = None,
 ):
     if not temp_folder:
         temp_folder_path = pathlib.Path(f"/tmp/validation/{uuid.uuid4()}").resolve()
@@ -114,6 +115,7 @@ async def create_validation_run_configuration(
             mhd_configuration=mhd_config,
             metadata_files_root_path=private_metadata_files_root_path,
             db_connection=DbConfiguration.model_validate(db_connection),
+            ignore_cv_term_validation=ignore_cv_term_validation,
         )
         if total_result_file_lines > 4000:
             logger.warning(
@@ -169,6 +171,7 @@ def run_validation(  # noqa: PLR0913
     resource_id: str,
     apply_modifiers: bool = True,
     serialize_result: bool = True,
+    ignore_cv_term_validation: None | bool = None,
     study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
         "services.study_metadata_service_factory"
     ],
@@ -938,9 +941,7 @@ async def post_process_validation_messages(
             new_violations.append(violation)
         else:
             logger.debug(
-                "Terms in violation are validated "
-                "and the violation is removed: "
-                "%s %s %s",
+                "Terms in violation are validated and the violation is removed: %s %s %s",
                 violation.identifier,
                 violation.source_file,
                 ", ".join(violation.values),

@@ -19,7 +19,6 @@ gateways:
         username: elastic
         password: change_me
         verify_certs: false
-        api_key: not_
         api_keys:
           study: changeme
           compound: changeme

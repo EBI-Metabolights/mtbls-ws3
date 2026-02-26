@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Union
 
 import click
+from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -20,7 +21,7 @@ from mtbls.run.cli.validation.validation_app import ValidationApp
 @click.option(
     "--secrets-file",
     "-s",
-    default=".mtbls-ws-config-secrets/.secrets.yaml",
+    default=".secrets/ws3-secrets.yaml",
     help="config secrets file path.",
 )
 @click.option(
@@ -35,7 +36,7 @@ def create_input_json_cli(
     target_path: Union[None, str] = None,
     config_file: Union[None, str] = None,
     secrets_file: Union[None, str] = None,
-):
+) -> MetabolightsStudyModel:
     app = ValidationApp(config_file=config_file, secrets_file=secrets_file)
     if not resource_id:
         click.echo("Resource Id is not valid")
@@ -46,7 +47,7 @@ def create_input_json_cli(
         target = Path(target_path)
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
-        asyncio.run(
+        model = asyncio.run(
             create_input_json(
                 resource_id=resource_id,
                 target_path=target,
@@ -54,6 +55,7 @@ def create_input_json_cli(
             )
         )
         click.echo(f"'{target}' validation input file is created.")
+        return model
     except Exception as ex:
         click.echo(f"Error: {ex}")
         exit(1)
@@ -63,7 +65,7 @@ async def create_input_json(
     resource_id: str,
     target_path: Path,
     study_metadata_service_factory: StudyMetadataServiceFactory,
-):
+) -> MetabolightsStudyModel:
     service = await study_metadata_service_factory.create_service(resource_id)
     with service:
         model = await service.load_study_model(
@@ -76,6 +78,7 @@ async def create_input_json(
 
     with target_path.open("w") as f:
         f.write(model.model_dump_json(indent=4, by_alias=True))
+    return model
 
 
 if __name__ == "__main__":

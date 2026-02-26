@@ -1,12 +1,14 @@
 import logging
 
-from mtbls.application.services.interfaces.data_index_client import DataIndexClient
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
+)
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    SearchIndexManagementGateway,
 )
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -41,7 +43,7 @@ class IndexApp:
         self.study_metadata_service_factory: StudyMetadataServiceFactory = (
             self.container.services.study_metadata_service_factory()
         )
-        self.data_index_client: DataIndexClient = (
-            self.container.gateways.data_index_client()
+        self.search_index_management_gateway: SearchIndexManagementGateway = (
+            self.container.gateways.search_index_management_gateway()
         )
         logger.info("CLI container started")

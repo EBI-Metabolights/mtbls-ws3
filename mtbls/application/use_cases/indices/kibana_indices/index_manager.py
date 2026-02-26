@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 import time
-from collections import OrderedDict
 from logging import getLogger
 from typing import Any, Dict, List, Set, Tuple
 
@@ -11,9 +10,12 @@ from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from metabolights_utils.models.parser.enums import ParserMessageType
 from pydantic import BaseModel
 
-from mtbls.application.services.interfaces.data_index_client import DataIndexClient
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
     StudyReadRepository,
+)
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    IndexClientResponse,
+    SearchIndexManagementGateway,
 )
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -48,8 +50,10 @@ from mtbls.application.use_cases.indices.kibana_indices.models.study_index impor
 from mtbls.application.use_cases.indices.kibana_indices.utils import (
     camel_case,
     create_study_index,
+    find_studies_will_be_processed,
     get_isa_table_index_items,
     get_ontology_item,
+    get_study_ids,
     get_text_value,
     is_selected_sample,
     load_json_file,
@@ -66,17 +70,9 @@ from mtbls.domain.shared.repository.query_options import QueryFieldOptions
 logger = getLogger(__name__)
 
 
-# urllib3.disable_warnings()
-
-
 class ActionPair(BaseModel):
     action: Dict[str, Any] = {}
     data: Dict[str, Any] = {}
-
-
-class IndexClientResponse(BaseModel):
-    raw: dict[str, Any]
-    body: dict[str, Any]
 
 
 class DataIndexConfiguration(BaseModel):
@@ -103,7 +99,7 @@ class DataIndexConfiguration(BaseModel):
 class StudyModelEsIndexManager:
     def __init__(
         self,
-        data_index_client: DataIndexClient,
+        search_index_management_gateway: SearchIndexManagementGateway,
         study_metadata_service_factory: StudyMetadataServiceFactory,
         study_read_repository: StudyReadRepository,
         data_index_configuration: None | DataIndexConfiguration = None,
@@ -126,7 +122,7 @@ class StudyModelEsIndexManager:
         if not data_index_configuration:
             data_index_configuration = DataIndexConfiguration()
 
-        self.data_index_client = data_index_client
+        self.search_index_management_gateway = search_index_management_gateway
         self.study_read_repository = study_read_repository
         self.index_config = data_index_configuration
         self.study_metadata_service_factory = study_metadata_service_factory
@@ -178,144 +174,19 @@ class StudyModelEsIndexManager:
             ),
         ]:
             if recreate_index:
-                await self.data_index_client.delete(index_name, ignore_status=True)
+                await self.search_index_management_gateway.delete_index(
+                    index_name, ignore_status=True
+                )
                 await asyncio.sleep(1)
-            exist = await self.data_index_client.exists(index=index_name)
+            exist = await self.search_index_management_gateway.exists(index=index_name)
 
             if recreate_index or not exist:
-                await self.data_index_client.create(
+                await self.search_index_management_gateway.create_index(
                     index=index_name,
                     mappings=load_json_file(index_mapping_file),
                     max_retries=2,
                 )
                 logger.info("%s index is recreated.", index_name)
-
-    async def get_study_ids(
-        self,
-        target_study_status_list: None | list[StudyStatus] = None,
-        exclude_studies: None | list[str] = None,
-        min_last_update_date: datetime.datetime = None,
-        max_last_update_date: datetime.datetime = None,
-    ) -> List[str]:
-        try:
-            excluded_set = set(exclude_studies)
-            if not exclude_studies:
-                exclude_studies = set()
-            if not target_study_status_list:
-                target_study_status_list = [StudyStatus.PUBLIC]
-            filters = [
-                EntityFilter(
-                    key="status",
-                    operand=FilterOperand.IN,
-                    value=target_study_status_list,
-                )
-            ]
-            if min_last_update_date:
-                filters.append(
-                    EntityFilter(
-                        key="status_date",
-                        operand=FilterOperand.GE,
-                        value=min_last_update_date,
-                    )
-                )
-            if max_last_update_date:
-                filters.append(
-                    EntityFilter(
-                        key="status_date",
-                        operand=FilterOperand.LE,
-                        value=max_last_update_date,
-                    )
-                )
-            result = await self.study_read_repository.select_fields(
-                query_field_options=QueryFieldOptions(
-                    filters=filters, selected_fields=["accession_number"]
-                )
-            )
-
-            study_ids = [x[0] for x in result.data if x and x[0] not in excluded_set]
-            study_ids.sort(key=sort_by_study_id, reverse=True)
-            logger.info("%s studies are selected.", len(study_ids))
-            return study_ids
-        except Exception as ex:
-            raise ex
-
-    async def find_studies_will_be_processed(
-        self, target_study_status_list: None | list[StudyStatus] = None
-    ) -> Tuple[List[str], List[str], List[str]]:
-        filters = [
-            EntityFilter(
-                key="status",
-                operand=FilterOperand.IN,
-                value=target_study_status_list,
-            )
-        ]
-        if not target_study_status_list:
-            target_study_status_list = [StudyStatus.PUBLIC]
-        result = await self.study_read_repository.select_fields(
-            query_field_options=QueryFieldOptions(
-                filters=filters, selected_fields=["accession_number", "update_date"]
-            )
-        )
-
-        all_db_study_ids = {
-            x[0]: datetime.datetime.fromtimestamp(
-                x[1].timestamp(), tz=datetime.timezone.utc
-            )
-            for x in result.data
-            if x
-        }
-
-        db_study_ids = {x for x in all_db_study_ids}
-
-        query = (
-            '{ "from": 0, "size": 10000, "query": {  "match_all": {} }, '
-            '"fields": ["lastUpdateDatetime"], "_source": false }'
-        )
-
-        result = await self.data_index_client.search(
-            index=self.index_config.study_index_name, body=query, _source=False
-        )
-        es_study_ids = {
-            x["_id"]: datetime.datetime.fromisoformat(
-                x["fields"]["lastUpdateDatetime"][0]
-            )
-            for x in result.raw["hits"]["hits"]
-        }
-        study_ids = {x for x in es_study_ids}
-
-        new_studies = db_study_ids - study_ids
-        deleted_studies = study_ids - db_study_ids
-        current_studies = study_ids.intersection(db_study_ids)
-        updated_studies = {
-            x: f"{es_study_ids[x]} -> {all_db_study_ids[x]}"
-            for x in current_studies
-            if all_db_study_ids[x] - es_study_ids[x] > datetime.timedelta(seconds=0.1)
-        }
-
-        updated_study_ids = [x for x in updated_studies]
-        updated_study_ids.sort(key=sort_by_study_id)
-        updated_study_id_dict = OrderedDict(
-            [(x, updated_studies[x]) for x in updated_study_ids]
-        )
-        logger.info("Deleted studies: %s", len(deleted_studies))
-        deleted_study_ids = list(deleted_studies)
-        if deleted_study_ids:
-            deleted_study_ids.sort(key=sort_by_study_id)
-            logger.info("Deleted studies: %s", deleted_study_ids)
-
-        logger.info("New studies: %s", len(new_studies))
-        new_study_ids = list(new_studies)
-        if new_studies:
-            new_study_ids.sort(key=sort_by_study_id)
-            logger.info("New studies: %s", new_studies)
-
-        logger.info("Updated studies: %s", len(updated_studies))
-        if updated_study_id_dict:
-            logger.info(
-                "\n".join([f"{x}\t{updated_studies[x]}" for x in updated_study_id_dict])
-            )
-
-        return new_study_ids, updated_study_ids, deleted_study_ids
 
     async def filter_selected_ids(
         self,
@@ -369,6 +240,11 @@ class StudyModelEsIndexManager:
                 load_maf_files=self.reindex_assignments,
                 load_sample_file=True,
             )
+            if not study_model.investigation.studies:
+                raise ValueError(
+                    f"{study_id} definition (investigation.studies)"
+                    " not found in investigation file."
+                )
             errors = [
                 x.detail
                 for x in study_model.db_reader_messages
@@ -461,7 +337,7 @@ class StudyModelEsIndexManager:
         for idx, batch in enumerate(
             self.chunk_list(action_list, batch_size=batch_size * 2)
         ):
-            result = await self.data_index_client.bulk(
+            result = await self.search_index_management_gateway.bulk(
                 index=index_name, operations=batch
             )
             self.evaluate_results(result)
@@ -922,13 +798,13 @@ class StudyModelEsIndexManager:
         else:
             await self.delete_index_documents(deleted_study_ids)
 
-        if len(updated_study_ids) == 0:
+        study_ids = updated_study_ids
+        study_ids.extend(new_study_ids or [])
+        if len(study_ids) == 0:
             return
         await self.update_indices()
 
-        study_ids = updated_study_ids
-        study_ids.extend(new_study_ids or [])
-        logger.info("Number of studies: %s", len(study_ids))
+        logger.info("Number of indexed studies: %s", len(study_ids))
         try:
             max_concurrent = min(len(study_ids), self.concurrent)
 
@@ -956,50 +832,38 @@ class StudyModelEsIndexManager:
 
     async def delete_index_documents(self, deleted_study_ids: set[str]):
         for study_id in deleted_study_ids:
-            deleted_docs = await self.data_index_client.delete_by_query(
+            response = await self.search_index_management_gateway.delete_by_query(
                 self.index_config.assignment_index_name,
                 body={"query": {"match": {"studyId": study_id}}},
-            )
-            response = IndexClientResponse.model_validate(
-                deleted_docs, from_attributes=True
             )
             logger.debug(
                 "Deleted %s assignment documents: %s",
                 study_id,
                 response.raw.get("deleted", 0),
             )
-            deleted_docs = await self.data_index_client.delete_by_query(
+            response = await self.search_index_management_gateway.delete_by_query(
                 self.index_config.assay_index_name,
                 body={"query": {"match": {"studyId": study_id}}},
-            )
-            response = IndexClientResponse.model_validate(
-                deleted_docs, from_attributes=True
             )
             logger.debug(
                 "Deleted %s assay documents: %s",
                 study_id,
                 response.raw.get("deleted", 0),
             )
-            deleted_docs = await self.data_index_client.delete_by_query(
+            response = await self.search_index_management_gateway.delete_by_query(
                 self.index_config.sample_index_name,
                 body={"query": {"match": {"studyId": study_id}}},
             )
-            response = IndexClientResponse.model_validate(
-                deleted_docs, from_attributes=True
-            )
+
             logger.debug(
                 "Deleted %s sample documents: %s",
                 study_id,
                 response.raw.get("deleted", 0),
             )
-            deleted_docs = await self.data_index_client.delete_by_query(
+            response = await self.search_index_management_gateway.delete_by_query(
                 self.index_config.study_index_name,
                 body={"query": {"match": {"reservedAccession": study_id}}},
             )
-            response = IndexClientResponse.model_validate(
-                deleted_docs, from_attributes=True
-            )
-
             if response.raw.get("deleted", 0) == 0:
                 logger.warning(
                     "%s study document is not deleted. There is no index %s or document",
@@ -1030,7 +894,7 @@ async def log_result(indexer: StudyModelEsIndexManager):
 
 
 async def reindex_all(
-    data_index_client: DataIndexClient,
+    search_index_management_gateway: SearchIndexManagementGateway,
     study_metadata_service_factory: StudyMetadataServiceFactory,
     study_read_repository: StudyReadRepository,
     data_index_configuration: None | DataIndexConfiguration = None,
@@ -1038,9 +902,8 @@ async def reindex_all(
     max_last_update_date: None | datetime.datetime = None,
     exclude_studies: None | list[str] = None,
 ):
-    await data_index_client.ensure_started()
     indexer = StudyModelEsIndexManager(
-        data_index_client=data_index_client,
+        search_index_management_gateway=search_index_management_gateway,
         study_metadata_service_factory=study_metadata_service_factory,
         data_index_configuration=data_index_configuration,
         study_read_repository=study_read_repository,
@@ -1060,7 +923,7 @@ async def reindex_all(
         delete_ignore_status=[],
         create_ignore_status=[],
     )
-    study_ids = await indexer.get_study_ids(
+    study_ids = await get_study_ids(
         target_study_status_list=indexer.index_config.target_study_status_list,
         exclude_studies=exclude_studies,
         min_last_update_date=min_last_update_date,
@@ -1072,14 +935,13 @@ async def reindex_all(
 
 
 async def maintain_indices(
-    data_index_client: DataIndexClient,
+    search_index_management_gateway: SearchIndexManagementGateway,
     study_metadata_service_factory: StudyMetadataServiceFactory,
     study_read_repository: StudyReadRepository,
     data_index_configuration: None | DataIndexConfiguration = None,
 ):
-    await data_index_client.ensure_started()
     indexer = StudyModelEsIndexManager(
-        data_index_client=data_index_client,
+        search_index_management_gateway=search_index_management_gateway,
         study_metadata_service_factory=study_metadata_service_factory,
         data_index_configuration=data_index_configuration,
         study_read_repository=study_read_repository,
@@ -1103,8 +965,13 @@ async def maintain_indices(
         new_study_ids,
         updated_study_ids,
         deleted_study_ids,
-    ) = await indexer.find_studies_will_be_processed(
-        indexer.index_config.target_study_status_list
+    ) = await find_studies_will_be_processed(
+        study_read_repository=study_read_repository,
+        search_index_management_gateway=search_index_management_gateway,
+        index_name=indexer.index_config.study_index_name,
+        index_update_field="lastUpdateDatetime",
+        db_update_field="update_date",
+        target_study_status_list=indexer.index_config.target_study_status_list,
     )
 
     await indexer.reindex_study_models(
@@ -1117,14 +984,13 @@ async def maintain_indices(
 
 async def reindex_selected_studies(
     selected_studies: List[str],
-    data_index_client: DataIndexClient,
+    search_index_management_gateway: SearchIndexManagementGateway,
     study_metadata_service_factory: StudyMetadataServiceFactory,
     study_read_repository: StudyReadRepository,
     data_index_configuration: None | DataIndexConfiguration = None,
 ):
-    await data_index_client.ensure_started()
     indexer = StudyModelEsIndexManager(
-        data_index_client=data_index_client,
+        search_index_management_gateway=search_index_management_gateway,
         study_metadata_service_factory=study_metadata_service_factory,
         data_index_configuration=data_index_configuration,
         study_read_repository=study_read_repository,

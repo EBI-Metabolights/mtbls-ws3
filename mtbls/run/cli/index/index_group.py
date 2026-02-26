@@ -2,7 +2,7 @@ import sys
 
 import click
 
-from mtbls.run.cli.index.kibana_public_indices.kibana_indices_group import (
+from mtbls.run.cli.index.kibana_indices.kibana_indices_group import (
     kibana_indices_group,
 )
 

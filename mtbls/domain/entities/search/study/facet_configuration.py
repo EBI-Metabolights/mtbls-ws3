@@ -37,60 +37,54 @@ GB = 1024**3
 YEAR_RANGES = build_year_ranges(2012)
 
 VALUE_FACETS = {
+    # Nested ontology-style fields
     "technologyTypes": {
         "type": "value",
-        "field": "technologyTypes",
+        "field": "technologyTypes.term",
     },
     "assayTechniques": {
         "type": "value",
-        "field": "assayTechniques",
+        "field": "assayTechniques.main",
+    },
+    "factors": {
+        "type": "value",
+        "field": "factors.term",
+    },
+    "designDescriptors": {
+        "type": "value",
+        "field": "designDescriptors.term",
+    },
+    "organisms": {
+        "type": "value",
+        "field": "organisms.term",
+    },
+    "organismParts": {
+        "type": "value",
+        "field": "organismParts.term",
+    },
+    "variants": {
+        "type": "value",
+        "field": "variants.term",
+    },
+    "sampleTypes": {
+        "type": "value",
+        "field": "sampleTypes.term",
     },
     "submitters_country": {
         "type": "value",
         "field": "submitters.country.keyword",
     },
-    "studyTypes": {
+    # Top-level keyword facets
+    "status": {
         "type": "value",
-        "field": "studyTypes",
+        "field": "status",
     },
-    "factors": {
+    "curationRequest": {
         "type": "value",
-        "field": "factors",
-    },
-    "designDescriptors": {
-        "type": "value",
-        "field": "designDescriptors",
-    },
-    "organisms": {
-        "type": "value",
-        "field": "organisms.keyword",
-    },
-    "organismParts": {
-        "type": "value",
-        "field": "organismParts.keyword",
-    },
-    "variants": {
-        "type": "value",
-        "field": "variants",
-    },
-    "sampleTypes": {
-        "type": "value",
-        "field": "sampleTypes",
-    },
-    "organismKingdom": {
-        "type": "value",
-        "field": "organismKingdom",
-    },
-    "organismPhylum": {
-        "type": "value",
-        "field": "organismPhylum",
-    },
-    "organismClass": {
-        "type": "value",
-        "field": "organismClass",
+        "field": "curationRequest",
     },
 }
-FACET_CONFIG = {
+STUDY_FACET_CONFIG = {
     **VALUE_FACETS,
     "sizeInBytes": {
         "type": "range",

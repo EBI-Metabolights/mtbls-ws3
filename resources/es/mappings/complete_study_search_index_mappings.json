@@ -1,0 +1,533 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "rebuilt_whitespace": {
+          "tokenizer": "whitespace",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "annotations": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "assayTechniques": {
+        "properties": {
+          "main": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "name": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "sub": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "technique": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "assays": {
+        "properties": {
+          "assignmentFiles": {
+            "type": "keyword",
+            "index": false
+          },
+          "filePath": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "measurementType": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "technique": {
+            "properties": {
+              "main": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "name": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "sub": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "technique": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "technologyPlatform": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "technologyType": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "contacts": {
+        "properties": {
+          "address": {
+            "type": "text"
+          },
+          "affiliation": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "email": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "rebuilt_whitespace"
+          },
+          "firstName": {
+            "type": "text"
+          },
+          "lastName": {
+            "type": "text"
+          },
+          "midInitials": {
+            "type": "text"
+          },
+          "orcid": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "roles": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "curationRequest": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "curatorAnnotations": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "description": {
+        "type": "text"
+      },
+      "designDescriptors": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "factors": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "fundings": {
+        "properties": {
+          "fundRefId": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "funder": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "grantIdentifier": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "investigationFilePath": {
+        "type": "keyword",
+        "index": false
+      },
+      "modifiedTime": {
+        "type": "date"
+      },
+      "organismParts": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "organisms": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "protocols": {
+        "properties": {
+          "components": {
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "type": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "description": {
+            "type": "text"
+          },
+          "name": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "parameters": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "protocolType": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "uri": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "version": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "publicReleaseDate": {
+        "type": "date"
+      },
+      "publications": {
+        "properties": {
+          "authorList": {
+            "type": "text"
+          },
+          "doi": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "rebuilt_whitespace"
+          },
+          "pubMedId": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "rebuilt_whitespace"
+          },
+          "status": {
+            "properties": {
+              "term": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termAccessionNumber": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "termSourceRef": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "title": {
+            "type": "text"
+          }
+        }
+      },
+      "sampleFilePath": {
+        "type": "keyword",
+        "index": false
+      },
+      "sampleTypes": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "sizeInBytes": {
+        "type": "long"
+      },
+      "sizeInText": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "status": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "studyId": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "submissionDate": {
+        "type": "date"
+      },
+      "submitters": {
+        "properties": {
+          "address": {
+            "type": "text"
+          },
+          "affiliation": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "country": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "email": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "rebuilt_whitespace"
+          },
+          "fullname": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "orcid": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "roles": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "technologyTypes": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "title": {
+        "type": "text"
+      },
+      "variants": {
+        "properties": {
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termAccessionNumber": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "termSourceRef": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}

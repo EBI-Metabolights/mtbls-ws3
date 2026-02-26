@@ -2,6 +2,12 @@ from dependency_injector import containers, providers
 
 from mtbls.application.services.interfaces.async_task.conection import PubSubConnection
 from mtbls.application.services.interfaces.http_client import HttpClient
+from mtbls.application.services.interfaces.repositories.compound.compound_read_repository import (
+    CompoundReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.compound.compound_similarity_repository import (
+    CompoundSimilarityRepository,
+)
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
 )
@@ -37,6 +43,9 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
 )
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    SearchIndexManagementGateway,
+)
 from mtbls.application.services.interfaces.search_port import SearchPort
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
@@ -47,15 +56,20 @@ from mtbls.infrastructure.persistence.db.model.alias_generator import (
     DbTableAliasGeneratorImpl,
 )
 from mtbls.infrastructure.persistence.db.model.entity_mapper import EntityMapper
-
-# from mtbls.infrastructure.persistence.db.mongodb.config import (
-#     MongoDbConnection,
-# )
 from mtbls.infrastructure.persistence.db.mongodb.config import MongoDbConnection
+from mtbls.infrastructure.persistence.db.mongodb.db_client import (
+    MongoDatabaseClientImpl,
+)
 from mtbls.infrastructure.persistence.db.postgresql.db_client_impl import (
     DatabaseClientImpl,
 )
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
+from mtbls.infrastructure.repositories.compound.mongodb.compound_read_repository import (
+    MongoCompoundReadRepository,
+)
+from mtbls.infrastructure.repositories.compound.mongodb.compound_similarity_repository import (
+    MongoCompoundSimilarityRepository,
+)
 from mtbls.infrastructure.repositories.file_object.default.nfs.file_object_write_repository import (  # noqa: E501
     FileSystemObjectWriteRepository,
 )
@@ -101,9 +115,22 @@ from mtbls.infrastructure.repositories.user.db.user_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_write_repository import (
     SqlDbUserWriteRepository,
 )
-from mtbls.infrastructure.search.es.es_client import (
-    ElasticsearchClient,
-    ElasticsearchClientConfig,
+from mtbls.infrastructure.search.es.assay.es_assay_search_gateway import (
+    ElasticsearchAssayGateway,
+)
+from mtbls.infrastructure.search.es.assignment.es_assignment_search_gateway import (
+    ElasticsearchAssignmentGateway,
+)
+from mtbls.infrastructure.search.es.compound.es_compound_search_gateway import (
+    ElasticsearchCompoundGateway,
+)
+from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
+from mtbls.infrastructure.search.es.es_client_config import ElasticsearchClientConfig
+from mtbls.infrastructure.search.es.manager.es_index_manager import (
+    EsIndexManagementGateway,
+)
+from mtbls.infrastructure.search.es.sample.es_sample_search_gateway import (
+    ElasticsearchSampleGateway,
 )
 from mtbls.infrastructure.search.es.study.es_study_search_gateway import (
     ElasticsearchStudyGateway,
@@ -123,11 +150,44 @@ class GatewaysContainer(containers.DeclarativeContainer):
         ElasticsearchClientConfig,
         config.database.elasticsearch.connection,
     )
-    elasticsearch_client: ElasticsearchClient = providers.Singleton(
-        ElasticsearchClient, config=elastic_config
+
+    index_management_gateway: SearchIndexManagementGateway = providers.Singleton(
+        EsIndexManagementGateway, config=elastic_config
     )
+    elasticsearch_client: ElasticsearchClient = providers.Singleton(
+        ElasticsearchClient,
+        config=elastic_config,
+    )
+    elasticsearch_assignment_gateway = providers.Singleton(
+        ElasticsearchAssignmentGateway,
+        client=elasticsearch_client,
+        config=None,
+    )
+
+    elasticsearch_assay_gateway = providers.Singleton(
+        ElasticsearchAssayGateway,
+        client=elasticsearch_client,
+        config=None,
+    )
+
+    elasticsearch_sample_gateway = providers.Singleton(
+        ElasticsearchSampleGateway,
+        client=elasticsearch_client,
+        config=None,
+    )
+
     elasticsearch_study_gateway: SearchPort = providers.Singleton(
         ElasticsearchStudyGateway,
+        client=elasticsearch_client,
+        assignment_gateway=elasticsearch_assignment_gateway,
+        assay_gateway=elasticsearch_assay_gateway,
+        sample_gateway=elasticsearch_sample_gateway,
+        config=None,  # rely on default gateway config; adjust
+        # if custom search settings are added
+    )
+
+    elasticsearch_compound_gateway: SearchPort = providers.Singleton(
+        ElasticsearchCompoundGateway,
         client=elasticsearch_client,
         config=None,  # rely on default gateway config;
         # adjust if custom search settings are added
@@ -137,6 +197,10 @@ class GatewaysContainer(containers.DeclarativeContainer):
         create_config_from_dict,
         MongoDbConnection,
         config.database.mongodb.connection,
+    )
+    document_database_client = providers.Singleton(
+        MongoDatabaseClientImpl,
+        db_connection=mongodb_connection,
     )
 
     pub_sub_broker: PubSubConnection = providers.Singleton(
@@ -194,6 +258,16 @@ class RepositoriesContainer(containers.DeclarativeContainer):
         database_client=gateways.database_client,
     )
 
+    compound_read_repository: CompoundReadRepository = providers.Singleton(
+        MongoCompoundReadRepository,
+        database_client=gateways.document_database_client,
+    )
+
+    compound_similarity_repository: CompoundSimilarityRepository = providers.Singleton(
+        MongoCompoundSimilarityRepository,
+        database_client=gateways.document_database_client,
+        config=None,  # Uses default CompoundSimilarityConfig
+    )
     mtbls_data_reuse_read_repository: MtblsDataReuseReadRepository = (
         providers.Singleton(
             SqlDbMtblsDataReuseReadRepository,
@@ -201,6 +275,20 @@ class RepositoriesContainer(containers.DeclarativeContainer):
             alias_generator=alias_generator,
             database_client=gateways.database_client,
         )
+    )
+    study_data_file_repository: StudyDataFileRepository = providers.Selector(
+        selector=config.repositories.active_target_repository.study_data_files,
+        mongodb=providers.Singleton(
+            MongoDbStudyDataFileRepository,
+            connection=gateways.mongodb_connection,
+            study_objects_collection_name="study_data_files",
+        ),
+        sql_db=providers.Singleton(
+            SqlDbStudyDataFileRepository,
+            entity_mapper=entity_mapper,
+            alias_generator=alias_generator,
+            database_client=gateways.database_client,
+        ),
     )
 
     study_data_file_repository: StudyDataFileRepository = providers.Selector(

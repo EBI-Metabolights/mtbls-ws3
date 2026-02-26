@@ -1,9 +1,6 @@
-from logging import config as logging_config
-
 from dependency_injector import containers, providers
 
 from mtbls.application.context.request_tracker import RequestTracker
-from mtbls.application.services.interfaces.data_index_client import DataIndexClient
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
     FileObjectWriteRepository,
@@ -13,6 +10,9 @@ from mtbls.application.services.interfaces.repositories.study.study_read_reposit
 )
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
+)
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    SearchIndexManagementGateway,
 )
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
@@ -41,9 +41,9 @@ from mtbls.infrastructure.repositories.study.db.study_read_repository import (
 from mtbls.infrastructure.repositories.user.db.user_read_repository import (
     SqlDbUserReadRepository,
 )
-from mtbls.infrastructure.search.es.es_client import (
-    ElasticsearchClient,
-    ElasticsearchClientConfig,
+from mtbls.infrastructure.search.es.es_client_config import ElasticsearchClientConfig
+from mtbls.infrastructure.search.es.manager.es_index_manager import (
+    EsIndexManagementGateway,
 )
 from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_service_factory import (  # noqa: E501
     MongoDbStudyMetadataServiceFactory,
@@ -51,13 +51,14 @@ from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
 )
+from mtbls.run.cli.logging_config import configure_cli_logging
 
 
 class CoreContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     logging_config = providers.Resource(
-        logging_config.dictConfig,
+        configure_cli_logging,
         config=config.run.cli.logging,
     )
 
@@ -78,8 +79,8 @@ class GatewaysContainer(containers.DeclarativeContainer):
         ElasticsearchClientConfig,
         config.database.elasticsearch.connection,
     )
-    data_index_client: DataIndexClient = providers.Singleton(
-        ElasticsearchClient, config=elastic_config, auth_method="basic_auth"
+    search_index_management_gateway: SearchIndexManagementGateway = providers.Singleton(
+        EsIndexManagementGateway, config=elastic_config
     )
 
 
@@ -153,7 +154,7 @@ class ServicesContainer(containers.DeclarativeContainer):
         selector=repository_config.active_target_repository.study_metadata,
         mongodb=providers.Singleton(
             MongoDbStudyMetadataServiceFactory,
-            study_file_repository=repositories.study_file_repository,
+            study_data_file_repository=repositories.study_file_repository,
             investigation_object_repository=repositories.investigation_object_repository,
             isa_table_object_repository=repositories.isa_table_object_repository,
             isa_table_row_object_repository=repositories.isa_table_row_object_repository,
@@ -163,7 +164,7 @@ class ServicesContainer(containers.DeclarativeContainer):
         ),
         nfs=providers.Singleton(
             FileObjectStudyMetadataServiceFactory,
-            study_file_repository=None,
+            study_data_file_repository=None,
             metadata_files_object_repository=repositories.metadata_files_object_repository,
             audit_files_object_repository=repositories.audit_files_object_repository,
             internal_files_object_repository=repositories.internal_files_object_repository,

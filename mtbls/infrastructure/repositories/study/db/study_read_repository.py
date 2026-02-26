@@ -115,7 +115,7 @@ class SqlDbStudyReadRepository(
         filters: Union[None, list[EntityFilter]],
         include_revisions: bool = False,
         include_submitters: bool = False,
-    ) -> list[str]:
+    ) -> list[StudyOutput]:
         query_filters = self.build_filters(Study, filters)
 
         if not query_filters:
@@ -141,7 +141,7 @@ class SqlDbStudyReadRepository(
 
     async def _get_studies_by_filter(
         self, filter_, include_revisions, include_submitters
-    ) -> None | StudyOutput:
+    ) -> None | list[StudyOutput]:
         async with self.database_client.session() as session:
             stmt = select(Study).where(filter_())
             if include_submitters:

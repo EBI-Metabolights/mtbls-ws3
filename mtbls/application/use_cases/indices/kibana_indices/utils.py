@@ -1,9 +1,10 @@
 import datetime
 import json
 import logging
+from collections import OrderedDict
 from pathlib import Path
 from re import sub
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 from metabolights_utils.models.isa.common import (
     IsaTableColumn,
@@ -14,6 +15,12 @@ from metabolights_utils.models.isa.common import (
 from metabolights_utils.models.isa.enums import ColumnsStructure
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+    StudyReadRepository,
+)
+from mtbls.application.services.interfaces.search_index_management_gateway import (
+    SearchIndexManagementGateway,
+)
 from mtbls.application.use_cases.indices.kibana_indices.models.common import (
     BaseIsaTableIndexItem,
     Country,
@@ -29,11 +36,152 @@ from mtbls.application.use_cases.indices.kibana_indices.models.study_index impor
     StudyIndexItem,
     StudySampleFileItem,
 )
+from mtbls.application.utils.sort_utils import (
+    sort_by_study_id,
+)
+from mtbls.domain.enums.filter_operand import FilterOperand
+from mtbls.domain.enums.study_status import StudyStatus
 from mtbls.domain.shared.models import COUNTRIES
+from mtbls.domain.shared.repository.entity_filter import EntityFilter
+from mtbls.domain.shared.repository.query_options import QueryFieldOptions
 
 logger = logging.getLogger(__name__)
 
 EMPTY_VALUE_KEYWORDS = {"-", "na", "n/a", "null", "none", "unknown", "none"}
+
+
+async def get_study_ids(
+    study_read_repository: StudyReadRepository,
+    target_study_status_list: None | list[StudyStatus] = None,
+    exclude_studies: None | list[str] = None,
+    min_last_update_date: datetime.datetime = None,
+    max_last_update_date: datetime.datetime = None,
+    db_update_field: str = "update_date",
+) -> List[str]:
+    try:
+        excluded_set = set(exclude_studies) if exclude_studies else set()
+        if not exclude_studies:
+            exclude_studies = set()
+        if not target_study_status_list:
+            target_study_status_list = [StudyStatus.PUBLIC]
+        filters = [
+            EntityFilter(
+                key="status",
+                operand=FilterOperand.IN,
+                value=target_study_status_list,
+            )
+        ]
+        if min_last_update_date:
+            filters.append(
+                EntityFilter(
+                    key=db_update_field,
+                    operand=FilterOperand.GE,
+                    value=min_last_update_date,
+                )
+            )
+        if max_last_update_date:
+            filters.append(
+                EntityFilter(
+                    key=db_update_field,
+                    operand=FilterOperand.LE,
+                    value=max_last_update_date,
+                )
+            )
+        result = await study_read_repository.select_fields(
+            query_field_options=QueryFieldOptions(
+                filters=filters, selected_fields=["accession_number"]
+            )
+        )
+
+        study_ids = [x[0] for x in result.data if x and x[0] not in excluded_set]
+        study_ids.sort(key=sort_by_study_id, reverse=True)
+        logger.info("%s studies are selected.", len(study_ids))
+        return study_ids
+    except Exception as ex:
+        raise ex
+
+
+async def find_studies_will_be_processed(
+    study_read_repository: StudyReadRepository,
+    search_index_management_gateway: SearchIndexManagementGateway,
+    index_name: str,
+    index_update_field: str = "lastUpdateDatetime",
+    db_update_field: str = "update_date",
+    target_study_status_list: None | list[StudyStatus] = None,
+) -> Tuple[List[str], List[str], List[str]]:
+    filters = [
+        EntityFilter(
+            key="status",
+            operand=FilterOperand.IN,
+            value=target_study_status_list,
+        )
+    ]
+    if not target_study_status_list:
+        target_study_status_list = [StudyStatus.PUBLIC]
+    result = await study_read_repository.select_fields(
+        query_field_options=QueryFieldOptions(
+            filters=filters, selected_fields=["accession_number", db_update_field]
+        )
+    )
+
+    all_db_study_ids = {
+        x[0]: datetime.datetime.fromtimestamp(
+            x[1].timestamp(), tz=datetime.timezone.utc
+        )
+        for x in result.data
+        if x
+    }
+
+    db_study_ids = {x for x in all_db_study_ids}
+
+    query = (
+        '{ "from": 0, "size": 10000, "query": {  "match_all": {} }, '
+        f'"fields": ["{index_update_field}"], '
+        '"_source": false }'
+    )
+
+    result = await search_index_management_gateway.search(
+        index=index_name, body=query, _source=False
+    )
+    es_study_ids = {
+        x["_id"]: datetime.datetime.fromisoformat(x["fields"][index_update_field][0])
+        for x in result.raw["hits"]["hits"]
+    }
+    study_ids = {x for x in es_study_ids}
+
+    new_studies = db_study_ids - study_ids
+    deleted_studies = study_ids - db_study_ids
+    current_studies = study_ids.intersection(db_study_ids)
+    updated_studies = {
+        x: f"{es_study_ids[x]} -> {all_db_study_ids[x]}"
+        for x in current_studies
+        if all_db_study_ids[x] - es_study_ids[x] > datetime.timedelta(seconds=0.1)
+    }
+
+    updated_study_ids = [x for x in updated_studies]
+    updated_study_ids.sort(key=sort_by_study_id)
+    updated_study_id_dict = OrderedDict(
+        [(x, updated_studies[x]) for x in updated_study_ids]
+    )
+    logger.info("Deleted studies: %s", len(deleted_studies))
+    deleted_study_ids = list(deleted_studies)
+    if deleted_study_ids:
+        deleted_study_ids.sort(key=sort_by_study_id)
+        logger.info("Deleted studies: %s", deleted_study_ids)
+
+    logger.info("New studies: %s", len(new_studies))
+    new_study_ids = list(new_studies)
+    if new_studies:
+        new_study_ids.sort(key=sort_by_study_id)
+        logger.info("New studies: %s", new_studies)
+
+    logger.info("Updated studies: %s", len(updated_studies))
+    if updated_study_id_dict:
+        logger.info(
+            "\n".join([f"{x}\t{updated_studies[x]}" for x in updated_study_id_dict])
+        )
+
+    return new_study_ids, updated_study_ids, deleted_study_ids
 
 
 def camel_case(s):

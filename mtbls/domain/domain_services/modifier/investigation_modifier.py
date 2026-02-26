@@ -108,6 +108,11 @@ class InvestigationFileModifier(BaseIsaModifier):
                             source: str = term_source_data[idx]
                             if source in default_source_references:
                                 ontology_sources.add(source)
+                            else:
+                                try:
+                                    float(source)
+                                except Exception:
+                                    ontology_sources.add(term_source_data[idx])
 
     def update_column_term_sources(
         self,

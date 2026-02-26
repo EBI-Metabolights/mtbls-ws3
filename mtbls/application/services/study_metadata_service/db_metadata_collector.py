@@ -1,3 +1,5 @@
+import datetime
+
 from metabolights_utils.models.common import ErrorMessage
 from metabolights_utils.models.metabolights import model
 from metabolights_utils.models.metabolights import model as mtbls_utils_model
@@ -120,12 +122,15 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
             )
             submitters: list[UserOutput] = study.submitters if study.submitters else []
             for submitter in submitters:
+                join_date = ""
+                if isinstance(submitter.join_date, datetime.datetime):
+                    join_date = submitter.join_date.strftime("%Y-%m-%d")
                 metadata.submitters.append(
                     model.Submitter(
                         db_id=submitter.id_,
                         orcid=submitter.orcid or "",
                         address=submitter.address or "",
-                        join_date=submitter.join_date.isoformat(),
+                        join_date=join_date,
                         user_name=submitter.username or "",
                         first_name=submitter.first_name or "",
                         last_name=submitter.last_name or "",

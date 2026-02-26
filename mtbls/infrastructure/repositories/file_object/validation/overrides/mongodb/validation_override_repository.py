@@ -48,8 +48,7 @@ class MongoDbValidationOverrideRepository(
             f"{cn.url_scheme}://{cn.user}:***@{cn.host}:{cn.port}/{cn.database}"
         )
         logger.info(
-            "MongoDB Validation Override Repository initialized "
-            "with collection %s at %s",
+            "MongoDB Validation Override Repository initialized with collection %s at %s",
             collection_name,
             self.db_url_repr,
         )

@@ -22,6 +22,9 @@ from mtbls.application.services.interfaces.validation_report_service import (
 )
 from mtbls.domain.shared.repository.query_options import QueryOptions
 from mtbls.infrastructure.persistence.db.db_client import DatabaseClient
+from mtbls.infrastructure.persistence.db.document_db_client import (
+    DocumentDatabaseClient,
+)
 from mtbls.infrastructure.search.es.es_client import ElasticsearchClient
 
 logger = logging.getLogger(__name__)
@@ -30,6 +33,12 @@ logger = logging.getLogger(__name__)
 @inject
 async def init_application(  # noqa: PLR0913
     database_client: DatabaseClient = Provide["gateways.database_client"],
+    document_database_client: DocumentDatabaseClient = Provide[
+        "gateways.document_database_client"
+    ],
+    elasticsearch_client: ElasticsearchClient = Provide[
+        "gateways.elasticsearch_client"
+    ],
     cache_service: CacheService = Provide["services.cache_service"],
     async_task_service: AsyncTaskService = Provide["services.async_task_service"],
     validation_report_service: ValidationReportService = Provide[
@@ -47,6 +56,8 @@ async def init_application(  # noqa: PLR0913
     test_async_task_service: bool = True,
     test_database_table: bool = True,
     test_policy_service: bool = False,
+    test_elasticsearch_client: bool = True,
+    test_document_database_client: bool = True,
     test_ontology_search_service: bool = True,
     test_validation_report_service: bool = True,
 ):
@@ -60,6 +71,10 @@ async def init_application(  # noqa: PLR0913
         await init_user_repository(user_read_repository)
     if test_policy_service:
         await init_policy_service(policy_service)
+    if test_elasticsearch_client:
+        await init_elasticsearch_client(elasticsearch_client)
+    if test_document_database_client:
+        await init_database_client(document_database_client)
     if test_ontology_search_service:
         await init_ontology_search_service(ontology_search_service)
     if test_validation_report_service:
