@@ -60,7 +60,7 @@ services:
       realm_name: "{{ authentication.keycloak.realm_name }}"
       client_id: "{{ authentication.keycloak.client_id }}"
       client_secret: "{{ authentication.keycloak.client_secret }}"
-    active_authentication_service: mtbls_ws2
+    active_authentication_service:  "{{ authentication.active_authentication_service }}"
   policy_service:
     opa:
       validate_schema: false
@@ -75,6 +75,7 @@ services:
       timeout_in_seconds: 10
       default_search_result_size: 30
   system_health_check:
+    active_health_check_service: "{{ system_health_check.active_health_check_service }}"
     remote:
       transfer_health_check:
         health_check_url: "{{ system_health_check.remote.transfer_health_check.health_check_url }}"

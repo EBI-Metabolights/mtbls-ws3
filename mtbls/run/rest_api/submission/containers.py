@@ -61,6 +61,9 @@ from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_
 from mtbls.infrastructure.system_health_check_service.remote.remote_system_health_check_service import (  # noqa: E501
     RemoteSystemHealthCheckService,
 )
+from mtbls.infrastructure.system_health_check_service.standalone.standalone_system_health_check_service import (
+    StandaloneSystemHealthCheckService,
+)
 from mtbls.infrastructure.validation_override_service.mongodb.validation_override_service import (  # noqa: E501
     MongoDbValidationOverrideService,
 )
@@ -125,10 +128,18 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         config=config.ontology_search_service.ols,
     )
 
-    system_health_check_service: SystemHealthCheckService = providers.Singleton(
-        RemoteSystemHealthCheckService,
-        config.system_health_check.remote,
-        http_client=gateways.http_client,
+    system_health_check_service: SystemHealthCheckService = providers.Selector(
+        selector=config.system_health_check.active_health_check_service,
+        remote=providers.Singleton(
+            RemoteSystemHealthCheckService,
+            config.system_health_check.remote,
+            http_client=gateways.http_client,
+        ),
+        standalone=providers.Singleton(
+            StandaloneSystemHealthCheckService,
+            config.system_health_check.standalone,
+            http_client=gateways.http_client,
+        ),
     )
 
     async_task_service: AsyncTaskService = providers.Singleton(
