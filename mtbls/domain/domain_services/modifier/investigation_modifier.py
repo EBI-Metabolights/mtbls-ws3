@@ -17,6 +17,9 @@ from metabolights_utils.models.isa.investigation_file import (
 )
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from metabolights_utils.provider.utils import assay_technique_labels, assay_techniques
+from mhd_model.model.v0_1.rules.managed_cv_terms import (
+    COMMON_MEASUREMENT_TYPES,
+)
 from pydantic import BaseModel
 
 from mtbls.domain.domain_services.modifier.base_isa_modifier import BaseIsaModifier
@@ -641,7 +644,7 @@ class InvestigationFileModifier(BaseIsaModifier):
                     for x in investigation.studies[0].title.strip().split()
                     if x.strip()
                 ]
-            )
+            ).strip(".")
             if title != investigation.studies[0].title:
                 self.modifier_update(
                     action="Study Title is updated.",
@@ -952,16 +955,28 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
-                # item: OntologyAnnotation = OntologyItem(
-                #     term="metabolite profiling assay",
-                #     term_source_ref="OBI",
-                #     term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
-                # )
-                # self.override_ontology_term(
-                #     source=item,
-                #     target=assay.measurement_type,
-                #     source_label=f"Study Assay [{idx + 1}] Measurement Type",
-                # )
+                item: OntologyAnnotation = OntologyItem(
+                    term="metabolite profiling assay",
+                    term_source_ref="OBI",
+                    term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
+                )
+
+                measurement_type = assay.measurement_type.term.lower()
+                source = None
+                if measurement_type in COMMON_MEASUREMENT_TYPES["untargeted"]:
+                    source = COMMON_MEASUREMENT_TYPES["untargeted"]
+                elif measurement_type in COMMON_MEASUREMENT_TYPES["targeted"]:
+                    source = COMMON_MEASUREMENT_TYPES["targeted"]
+                elif measurement_type in COMMON_MEASUREMENT_TYPES["semi-targeted"]:
+                    source = COMMON_MEASUREMENT_TYPES["semi-targeted"]
+                else:
+                    source = item
+
+                self.override_ontology_term(
+                    source=source,
+                    target=assay.measurement_type,
+                    source_label=f"Study Assay [{idx + 1}] Measurement Type",
+                )
 
                 if assay.file_name in self.model.assays:
                     main_technique = self.model.assays[
