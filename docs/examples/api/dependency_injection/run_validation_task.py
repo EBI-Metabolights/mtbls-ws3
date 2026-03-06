@@ -16,6 +16,9 @@ from mtbls.application.services.interfaces.ontology_search_service import (
     OntologySearchService,
 )
 from mtbls.application.services.interfaces.policy_service import PolicyService
+from mtbls.application.services.interfaces.repositories.file_object.file_object_write_repository import (  # noqa: E501
+    FileObjectWriteRepository,
+)
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
@@ -35,7 +38,7 @@ def run_validation(  # noqa: PLR0913
     study_metadata_service_factory: StudyMetadataServiceFactory = Provide[
         "services.study_metadata_service_factory"
     ],
-    internal_files_object_repository: StudyMetadataServiceFactory = Provide[
+    internal_files_object_repository: FileObjectWriteRepository = Provide[
         "repositories.internal_files_object_repository"
     ],
     policy_service: PolicyService = Provide["services.policy_service"],
