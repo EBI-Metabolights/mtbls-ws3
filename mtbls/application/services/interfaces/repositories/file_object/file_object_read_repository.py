@@ -45,3 +45,10 @@ class FileObjectReadRepository(BaseFileObjectRepository, abc.ABC):
         object_key: Union[None, str],
         target_path: str,
     ) -> str: ...
+
+    @abc.abstractmethod
+    async def get_content(
+        self,
+        resource_id: str,
+        object_key: Union[None, str],
+    ) -> bytes: ...
