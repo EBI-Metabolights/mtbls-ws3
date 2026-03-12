@@ -18,7 +18,7 @@ dependencies = [
     "jsonschema>4.21.1",
     "email-validator>2.1.1",
     "python-multipart>=0.0.9",
-    "metabolights-utils>=1.4.15",
+    "metabolights-utils>=1.4.21",
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
     "elasticsearch>=9.2.1",

@@ -585,7 +585,7 @@ class InvestigationFileModifier(BaseIsaModifier):
             self.modifier_update(
                 action="Empty study is defined in i_Investigation.txt file",
                 old_value="",
-                new_value="New enpty study",
+                new_value="New empty study",
                 source=self.model.investigation_file_path,
             )
             investigation.studies = [Study()]
