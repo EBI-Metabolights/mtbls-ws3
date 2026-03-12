@@ -51,7 +51,7 @@ ws3 = [
     "elasticsearch[async]>=8.0.0,<9",
     "mtbls-mhd-integration",
     "mhd-model",
-    "metabolights-utils>=1.4.19",
+    "metabolights-utils>=1.4.21",
     "authlib==1.6.5",
     "beartype==0.22.7",
 ]
