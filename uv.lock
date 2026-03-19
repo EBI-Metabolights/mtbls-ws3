@@ -263,14 +263,14 @@ wheels = [
 
 [[package]]
 name = "authlib"
-version = "1.6.5"
+version = "1.6.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/3f/1d3bbd0bf23bdd99276d4def22f29c27a914067b4cf66f753ff9b8bbd0f3/authlib-1.6.5.tar.gz", hash = "sha256:6aaf9c79b7cc96c900f0b284061691c5d4e61221640a948fe690b556a6d6d10b", size = 164553, upload-time = "2025-10-02T13:36:09.489Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/98/00d3dd826d46959ad8e32af2dbb2398868fd9fd0683c26e56d0789bd0e68/authlib-1.6.9.tar.gz", hash = "sha256:d8f2421e7e5980cc1ddb4e32d3f5fa659cfaf60d8eaf3281ebed192e4ab74f04", size = 165134, upload-time = "2026-03-02T07:44:01.998Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/aa/5082412d1ee302e9e7d80b6949bc4d2a8fa1149aaab610c5fc24709605d6/authlib-1.6.5-py2.py3-none-any.whl", hash = "sha256:3e0e0507807f842b02175507bdee8957a1d5707fd4afb17c32fb43fee90b6e3a", size = 243608, upload-time = "2025-10-02T13:36:07.637Z" },
+    { url = "https://files.pythonhosted.org/packages/53/23/b65f568ed0c22f1efacb744d2db1a33c8068f384b8c9b482b52ebdbc3ef6/authlib-1.6.9-py2.py3-none-any.whl", hash = "sha256:f08b4c14e08f0861dc18a32357b33fbcfd2ea86cfe3fe149484b4d764c4a0ac3", size = 244197, upload-time = "2026-03-02T07:44:00.307Z" },
 ]
 
 [[package]]
@@ -1735,8 +1735,8 @@ wheels = [
 
 [[package]]
 name = "mhd-model"
-version = "0.1.50"
-source = { git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev#bc4feb3a7786d70c3d34b43ed2d45be143168ea7" }
+version = "0.1.53"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bioregistry" },
     { name = "charset-normalizer" },
@@ -1751,6 +1751,10 @@ dependencies = [
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "reachable" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/48/84/b30dfafce2bfb39355d20e90003c2bb120c001dabaed0c6086457458adda/mhd_model-0.1.53.tar.gz", hash = "sha256:fb209cbe9d4a9f513a1903ab9597bd067428e94d71905321e89f5317c4f03840", size = 110234, upload-time = "2026-03-18T06:57:48.423Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/a3/5dc89466c98424018c1b669bdc9ec00630b3b752a01145a0f13a20c61302/mhd_model-0.1.53-py3-none-any.whl", hash = "sha256:5aa886fd6dac6d8e9f48e18a308017d5716c37570c12b45ac9cabe84e2a4dec2", size = 141960, upload-time = "2026-03-18T06:57:47.214Z" },
 ]
 
 [[package]]
@@ -1845,8 +1849,8 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.20"
-source = { git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev#fd056481500d6b10ebddbf32c7ad4007abf8cd7f" }
+version = "0.0.21"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
     { name = "metabolights-utils" },
@@ -1856,6 +1860,10 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/be/fe0e8c35009d868722177b368e47aecda9df19425784ccf8b71f82f83bbb/mtbls_mhd_integration-0.0.21.tar.gz", hash = "sha256:9f95540aee8a647212d9f4377cbf30de469575dcd94c840315b839bd69dab816", size = 43686, upload-time = "2026-03-19T23:01:15.53Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bb/8d/a711a8e97f4d6a969d34ed2084adb5e25139388b51e3de7c6a352dc2bb44/mtbls_mhd_integration-0.0.21-py3-none-any.whl", hash = "sha256:2b9c8384508b5e3f168f3541b735d1c976daeb11626d591476c9d0de530de4dd", size = 47531, upload-time = "2026-03-19T23:01:14.372Z" },
 ]
 
 [[package]]
@@ -1934,7 +1942,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.3" },
     { name = "asgi-correlation-id", marker = "extra == 'ws3'", specifier = ">=4.3.4,<5" },
     { name = "asyncpg", marker = "extra == 'ws3'", specifier = ">=0.30.0" },
-    { name = "authlib", marker = "extra == 'ws3'", specifier = "==1.6.5" },
+    { name = "authlib", marker = "extra == 'ws3'", specifier = ">=1.6.9" },
     { name = "beartype", marker = "extra == 'ws3'", specifier = "==0.22.7" },
     { name = "cachetools", specifier = ">=6.2.2" },
     { name = "cachetools-async", specifier = ">=0.0.5" },
@@ -1944,7 +1952,7 @@ requires-dist = [
     { name = "email-validator", specifier = ">2.1.1" },
     { name = "fastapi", specifier = ">=0.128.0" },
     { name = "fastapi", marker = "extra == 'ws3'", specifier = ">=0.115.5" },
-    { name = "fastmcp", marker = "extra == 'ws3'", specifier = ">=3.0.0b2" },
+    { name = "fastmcp", marker = "extra == 'ws3'", specifier = ">=3.1.0" },
     { name = "flower", marker = "extra == 'ws3'", specifier = ">=2.0.1,<3" },
     { name = "greenlet", marker = "extra == 'ws3'", specifier = ">=3.2.4" },
     { name = "gunicorn", marker = "extra == 'ws3'", specifier = ">=23.0.0" },
@@ -1953,13 +1961,13 @@ requires-dist = [
     { name = "jsonpath-ng", specifier = ">=1.7.0,<2" },
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", marker = "extra == 'ws3'", specifier = ">=1.4.21" },
-    { name = "mhd-model", marker = "extra == 'ws3'", git = "https://github.com/MetabolomicsHub/mhd-model.git?rev=dev" },
-    { name = "mtbls-mhd-integration", marker = "extra == 'ws3'", git = "https://github.com/MetabolomicsHub/mtbls-mhd-integration.git?rev=dev" },
+    { name = "mhd-model", marker = "extra == 'ws3'", specifier = ">=0.1.53" },
+    { name = "mtbls-mhd-integration", marker = "extra == 'ws3'", specifier = ">=0.0.21" },
     { name = "numpy", marker = "extra == 'ws3'", specifier = ">=2.1,<3" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.10.2,<3" },
-    { name = "pyjwt", marker = "extra == 'ws3'", specifier = ">=2.9.0" },
+    { name = "pyjwt", marker = "extra == 'ws3'", specifier = ">=2.12.0" },
     { name = "pymongo", marker = "extra == 'ws3'", specifier = ">=4.10.1,<5" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0,<3" },
     { name = "python-keycloak", marker = "extra == 'ws3'", specifier = ">=5.8.1" },
@@ -1969,7 +1977,7 @@ requires-dist = [
     { name = "rdkit", marker = "extra == 'ws3'", specifier = ">=2024.3.1" },
     { name = "redis", marker = "extra == 'ws3'", specifier = ">=5.2.1" },
     { name = "sqlalchemy", marker = "extra == 'ws3'", specifier = ">=2.0.43" },
-    { name = "ujson", specifier = ">=5.10.0,<6" },
+    { name = "ujson", specifier = ">=5.12.0,<6" },
     { name = "uvicorn", marker = "extra == 'ws3'", specifier = ">0.29.0" },
     { name = "uvloop", marker = "extra == 'ws3'", specifier = ">=0.21.0" },
 ]
