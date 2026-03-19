@@ -1,18 +1,17 @@
 import logging
 from typing import Any, Union
 
-from keycloak import KeycloakOpenID
+from keycloak import KeycloakAdmin, KeycloakOpenID
 
 from mtbls.application.decorators.validate import validate_inputs_outputs
 from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
+    UserProfileService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
-from mtbls.application.services.interfaces.http_client import HttpClient
-from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
-    UserReadRepository,
-)
+from mtbls.domain.entities.user import UserProfile
 from mtbls.domain.enums.token_type import TokenType
+from mtbls.domain.enums.user_role import UserRole
 from mtbls.domain.shared.data_types import TokenStr
 from mtbls.infrastructure.auth.keycloak.keycloak_authentication_config import (
     KeycloakAuthenticationConfiguration,
@@ -21,28 +20,31 @@ from mtbls.infrastructure.auth.keycloak.keycloak_authentication_config import (
 logger = logging.getLogger(__name__)
 
 
-class KeycloakAuthenticationService(AuthenticationService):
+class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
     def __init__(
         self,
         config: Union[dict[str, Any], KeycloakAuthenticationConfiguration],
         cache_service: CacheService,
-        user_read_repository: UserReadRepository,
-        http_client: HttpClient,
     ) -> None:
         self.cache_service = cache_service
-        self.http_client = http_client
         if isinstance(config, KeycloakAuthenticationConfiguration):
             self.config = config
         else:
             self.config: KeycloakAuthenticationConfiguration = (
                 KeycloakAuthenticationConfiguration.model_validate(config)
             )
-        self.user_read_repository = user_read_repository
         self.keycloak_openid = KeycloakOpenID(
             server_url=self.config.host,
             realm_name=self.config.realm_name,
             client_id=self.config.client_id,
             client_secret_key=self.config.client_secret,
+        )
+        self._keycloak_admin = KeycloakAdmin(
+            server_url=self.config.host,
+            realm_name=self.config.realm_name,
+            username=self.config.admin_username,
+            password=self.config.admin_password,
+            verify=True,
         )
 
     @validate_inputs_outputs
@@ -51,29 +53,33 @@ class KeycloakAuthenticationService(AuthenticationService):
     ) -> str:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
-        keycloak_openid: KeycloakOpenID = KeycloakOpenID(
-            server_url=self.config.host,
-            realm_name=self.config.realm_name,
-            client_id=f"api_user-{username}",
-            client_secret_key=token,
-        )
 
-        jwt_token = keycloak_openid.token(
+        jwt_token = self.keycloak_openid.token(
             grant_type="client_credentials",
         )
         return jwt_token.get("access_token")
 
-    async def authenticate_with_password(self, username: str, password: str) -> str:
+    async def refresh(self, refresh_token: str) -> tuple[str, None | str]:
+        if not refresh_token:
+            raise NotImplementedError()
+        token = self.keycloak_openid.refresh_token(
+            grant_type="client_credentials",
+        )
+        return token.get("access_token"), token.get("refresh_token")
+
+    async def authenticate_with_password(
+        self, username: str, password: str
+    ) -> tuple[str, None | str]:
         try:
             token = self.keycloak_openid.token(username, password)
-            return token.get("access_token", "")
+            return token.get("access_token", ""), token.get("refresh_token", "")
         except Exception as ex:
             logger.error("error: %s %s", username, str(ex))
             raise ex
 
-    async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
+    async def revoke_jwt_token(self, refresh_token: str) -> bool:
         try:
-            self.keycloak_openid.logout(refresh_jwt_token)
+            self.keycloak_openid.logout(refresh_token)
             return True
         except Exception as ex:
             logger.warning("error: %s", str(ex))
@@ -91,3 +97,66 @@ class KeycloakAuthenticationService(AuthenticationService):
         except Exception as ex:
             logger.warning("error: %s", str(ex))
             raise ex
+
+    async def get_user_profile(self, username: str = None) -> None | UserProfile:
+        try:
+            user_id = self._keycloak_admin.get_user_id(username=username)
+            if not user_id:
+                return None
+            user = self._keycloak_admin.get_user(
+                user_id=user_id, user_profile_metadata=True
+            )
+            if user:
+                roles = self._keycloak_admin.get_composite_realm_roles_of_user(user_id)
+                return self.convert_auth_user_info_from_dict(user, roles)
+        except Exception as ex:
+            raise ex
+        return None
+
+    def convert_auth_user_info_from_dict(
+        self, dict_data: dict, roles: list[dict]
+    ) -> UserProfile:
+        user = UserProfile()
+        if not dict_data:
+            return user
+        realm_roles = {x["name"] for x in roles} if roles else set()
+        if "study_curation" in realm_roles or "system_maintenance" in realm_roles:
+            role = UserRole.CURATOR
+        elif "study_submission" in realm_roles:
+            role = UserRole.SUBMITTER
+        elif "study_review" in realm_roles:
+            role = UserRole.REVIEWER
+        else:
+            role = UserRole.ANONYMOUS
+        partner = "partner" in realm_roles
+        payload = dict_data
+        attributes: dict = dict_data.get("attributes", {})
+        orcid = attributes.get("orcid") or [""]
+        orcid = orcid[0].replace("https://orcid.org/", "") or ""
+        user.email = payload.get("email")
+        user.email_verified = payload.get("emailVerified")
+        user.first_name = payload.get("firstName")
+        user.last_name = payload.get("lastName")
+        user.orcid = orcid
+        user.role = role
+        user.country = (attributes.get("country") or [""])[0]
+        user.affiliation = (attributes.get("affiliation") or [""])[0]
+        user.affiliation_url = (attributes.get("affiliationUrl") or [""])[0]
+        user.globus_username = (attributes.get("globusUserName") or [""])[0]
+        user.partner = partner
+        return user
+
+    async def get_users_by_query(self, key_value: dict[str, Any]) -> list[UserProfile]:
+        users = []
+        if not key_value:
+            return users
+        try:
+            users = self._keycloak_admin.get_users(
+                {"q": " ".join([f"{k}:{v}" for k, v in key_value.items()])}
+            )
+        except Exception as ex:
+            logger.error("%s", ex)
+
+        if users:
+            return [self.convert_auth_user_info_from_dict(x) for x in users]
+        return users

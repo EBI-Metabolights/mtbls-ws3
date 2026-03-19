@@ -60,6 +60,8 @@ services:
       realm_name: "{{ authentication.keycloak.realm_name }}"
       client_id: "{{ authentication.keycloak.client_id }}"
       client_secret: "{{ authentication.keycloak.client_secret }}"
+      admin_username: "{{ authentication.keycloak.admin_username }}"
+      admin_password: "{{ authentication.keycloak.admin_password }}"
     active_authentication_service:  "{{ authentication.active_authentication_service }}"
   policy_service:
     opa:

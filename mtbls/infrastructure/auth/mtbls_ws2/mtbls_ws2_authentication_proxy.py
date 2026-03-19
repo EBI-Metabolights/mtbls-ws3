@@ -64,7 +64,9 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
             logger.warning("error: %s", str(ex))
             raise ex
 
-    async def authenticate_with_password(self, username: str, password: str) -> str:
+    async def authenticate_with_password(
+        self, username: str, password: str
+    ) -> tuple[str, None | str]:
         url = f"{self.backend_ws_base_url}/auth/login"
         try:
             logger.info("Login request from: %s", username)
@@ -76,7 +78,30 @@ class MtblsWs2AuthenticationProxy(AuthenticationService):
                 timeout=5,
             )
             if response and response.headers and response.headers.get("jwt"):
-                return response.headers["jwt"]
+                return response.headers.get("jwt", ""), response.headers.get(
+                    "refresh-token", ""
+                )
+
+            raise Exception("Invalid response from backend")
+        except Exception as ex:
+            logger.warning("error: %s %s", url, str(ex))
+            raise ex
+
+    async def refresh(self, username, refresh_token: str) -> tuple[str, None | str]:
+        url = f"{self.backend_ws_base_url}/auth/refresh-token"
+        try:
+            logger.info("Login request from: %s", username)
+            response: HttpResponse = await self.http_client.send_request(
+                HttpRequestType.POST,
+                url,
+                headers={"Content-Type": "application/json"},
+                json={"email": username, "jwt": refresh_token},
+                timeout=5,
+            )
+            if response and response.headers.get("jwt"):
+                return response.headers.get("jwt", ""), response.headers.get(
+                    "refresh-token", ""
+                )
 
             raise Exception("Invalid response from backend")
         except Exception as ex:

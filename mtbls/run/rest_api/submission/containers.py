@@ -11,6 +11,7 @@ from mtbls.application.services.interfaces.async_task.utils import (
 )
 from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
+    UserProfileService,
 )
 from mtbls.application.services.interfaces.auth.authorization_service import (
     AuthorizationService,
@@ -152,7 +153,11 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
     )
 
     oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
-
+    user_profile_service: UserProfileService = providers.Singleton(
+        KeycloakAuthenticationService,
+        config=config.authentication.keycloak,
+        cache_service=cache_service,
+    )
     authentication_service: AuthenticationService = providers.Selector(
         config.authentication.active_authentication_service,
         standalone=providers.Singleton(
@@ -172,8 +177,6 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
             KeycloakAuthenticationService,
             config=config.authentication.keycloak,
             cache_service=cache_service,
-            http_client=gateways.http_client,
-            user_read_repository=repositories.user_read_repository,
         ),
     )
     request_tracker: RequestTracker = providers.Singleton(RequestTracker)
@@ -246,8 +249,7 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
     )
 
     gateways = providers.Container(
-        GatewaysContainer,
-        config=config.gateways,
+        GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 4}
     )
 
     repositories = providers.Container(

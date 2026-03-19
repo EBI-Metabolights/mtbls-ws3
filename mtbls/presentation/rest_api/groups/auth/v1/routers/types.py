@@ -15,6 +15,10 @@ class OAuth2TokenRequestModel(BaseModel):
     client_secret: Union[None, str] = None
 
 
+class RefreshTokenRequestModel(BaseModel):
+    refresh_token: str = ""
+
+
 class AuthenticationMessage(BaseModel):
     authenticated: bool = False
     message: str = ""

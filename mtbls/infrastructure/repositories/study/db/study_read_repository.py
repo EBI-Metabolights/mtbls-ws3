@@ -6,12 +6,15 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 from typing_extensions import OrderedDict
 
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
 from mtbls.domain.entities.study import StudyOutput
 from mtbls.domain.entities.study_revision import StudyRevisionOutput
-from mtbls.domain.entities.user import UserOutput
+from mtbls.domain.entities.user import UserOutput, UserProfile
 from mtbls.domain.enums.entity import Entity
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
 from mtbls.domain.shared.repository.query_options import QueryOptions
@@ -34,10 +37,15 @@ class SqlDbStudyReadRepository(
         entity_mapper: EntityMapper,
         alias_generator: AliasGenerator,
         database_client: DatabaseClient,
+        user_profile_service: None | UserProfileService = None,
     ) -> None:
-        super().__init__(entity_mapper, alias_generator, database_client)
+        super().__init__(
+            entity_mapper=entity_mapper,
+            alias_generator=alias_generator,
+            database_client=database_client,
+        )
+        self.set_user_profile_service(user_profile_service)
         self.user_repository = None
-
         self.user_type_alias_dict = OrderedDict()
         for field in UserOutput.model_fields:
             entity_type: Entity = UserOutput.model_config.get("entity_type")
@@ -94,8 +102,22 @@ class SqlDbStudyReadRepository(
                             study.submitters, UserOutput
                         )
                     )
+                    if self.user_profile_service:
+                        for submitter in study_entity.submitters:
+                            await self.update_from_user_profile(submitter)
 
         return study_entity
+
+    async def update_from_user_profile(self, submitter: User):
+        user: UserProfile = await self.user_profile_service.get_user_profile(
+            username=submitter.username
+        )
+        if not user:
+            # keep current values. reset profile fields in future
+            return
+        for name, _ in UserOutput.model_fields.items():
+            if name in UserProfile.model_fields:
+                setattr(submitter, name, getattr(user, name))
 
     @validate_call(validate_return=True, config=ConfigDict(strict=True))
     async def get_study_by_obfuscation_code(
@@ -152,7 +174,8 @@ class SqlDbStudyReadRepository(
             studies: None | Study = result.scalars().all()
             study_entities = []
             if studies:
-                for study in studies:
+                for study_item in studies:
+                    study: Study = study_item
                     study_entity: StudyOutput = (
                         await self.entity_mapper.convert_to_output_type(
                             study, StudyOutput
@@ -170,11 +193,16 @@ class SqlDbStudyReadRepository(
                                 study.submitters, UserOutput
                             )
                         )
+                        if self.user_profile_service:
+                            for submitter in study_entity.submitters:
+                                await self.update_from_user_profile(submitter)
                     study_entities.append(study_entity)
 
         return study_entities
 
-    async def _get_submitter_studies(self, filter_) -> None | StudyOutput:
+    async def _get_submitter_studies(
+        self, filter_, user_profile: None | UserProfile = None
+    ) -> None | StudyOutput:
         async with self.database_client.session() as session:
             stmt = select(User).where(filter_()).options(selectinload(User.studies))
 
@@ -189,11 +217,15 @@ class SqlDbStudyReadRepository(
     async def get_studies_by_username(self, username: str) -> list[StudyOutput]:
         return await self._get_submitter_studies(lambda: User.username == username)
 
-    async def get_studies_by_email(self, email: str) -> list[StudyOutput]:
-        return await self._get_submitter_studies(lambda: User.email == email)
-
     async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]:
-        return await self._get_submitter_studies(lambda: User.orcid == orcid)
+        users = await self.keycloak_authentication_service.get_users_by_query(
+            {"q", f"orcid:{orcid}"}
+        )
+
+        username = users[0].username if users else None
+        if not username:
+            return None
+        return await self._get_submitter_studies(lambda: User.username == username)
 
     async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]:
         return await self._get_submitter_studies(lambda: User.id == id_)

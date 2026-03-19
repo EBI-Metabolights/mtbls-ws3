@@ -79,7 +79,7 @@ class AuthBackend(AuthenticationBackend):
         except (ValueError, UnicodeDecodeError, binascii.Error) as exc:
             raise AuthenticationError("Invalid auth credentials") from exc
         if scheme.lower() == "basic" and username:
-            username = await self.authentication_service.authenticate_with_password(
+            await self.authentication_service.authenticate_with_password(
                 username, password
             )
         elif scheme.lower() == "bearer" and jwt:

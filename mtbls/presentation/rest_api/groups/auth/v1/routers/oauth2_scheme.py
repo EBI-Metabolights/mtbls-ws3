@@ -11,6 +11,7 @@ class OAuth2ClientCredentials(OAuth2):
     def __init__(
         self,
         tokenUrl: str,
+        refreshUrl: None | str = None,
         scheme_name: str = None,
         scopes: dict = None,
         auto_error: bool = True,
@@ -18,7 +19,10 @@ class OAuth2ClientCredentials(OAuth2):
     ):
         if not scopes:
             scopes = {}
-        flows = OAuthFlowsModel(password={"tokenUrl": tokenUrl, "scopes": scopes})
+        password = {"tokenUrl": tokenUrl, "scopes": scopes}
+        if refreshUrl:
+            password["refreshUrl"] = refreshUrl
+        flows = OAuthFlowsModel(password=password)
         super().__init__(
             flows=flows,
             scheme_name=scheme_name,
@@ -56,6 +60,7 @@ class OAuth2ClientCredentials(OAuth2):
 
 oauth2_scheme = OAuth2ClientCredentials(
     tokenUrl="auth/v1/token",
+    refreshUrl="auth/v1/refresh",
     description="Please login to use web services that require authorization.",
 )
 
@@ -69,5 +74,6 @@ oauth2_scheme = OAuth2ClientCredentials(
 def get_oauth2_scheme() -> OAuth2ClientCredentials:
     return OAuth2ClientCredentials(
         tokenUrl="auth/v1/token",
+        refreshUrl="auth/v1/refresh",
         description="Please login to use web services that require authorization.",
     )

@@ -25,7 +25,6 @@ from mtbls.domain.enums.mhd_share_status import MhdShareStatus
 from mtbls.domain.enums.study_category import StudyCategory
 from mtbls.domain.enums.study_revision_status import StudyRevisionStatus
 from mtbls.domain.enums.study_status import StudyStatus
-from mtbls.domain.enums.user_role import UserRole
 from mtbls.domain.enums.user_status import UserStatus
 
 
@@ -127,30 +126,31 @@ class User(Base):
     __field_alias_exceptions__: dict[str, str] = {
         "id_": "id",
         "api_token": "apitoken",
-        "affiliation_url": "affiliationurl",
-        "first_name": "firstname",
-        "last_name": "lastname",
+        # "affiliation_url": "affiliationurl",
+        # "first_name": "firstname",
+        # "last_name": "lastname",
         "join_date": "joindate",
-        "password_hash": "password",
+        # "password_hash": "password",
     }
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    address: Mapped[str] = mapped_column(String(255), nullable=True)
-    affiliation: Mapped[str] = mapped_column(String(255), nullable=True)
-    affiliationurl: Mapped[str] = mapped_column(String(255), nullable=True)
     apitoken: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    firstname: Mapped[str] = mapped_column(String(255), nullable=False)
+    username: Mapped[str] = mapped_column(String(255), nullable=False)
     joindate: Mapped[datetime.datetime] = mapped_column(
         server_default=func.now(), nullable=False
     )
-    lastname: Mapped[str] = mapped_column(String(255), nullable=False)
-    password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
     status: Mapped[UserStatus] = mapped_column(IntEnum(UserStatus), nullable=False)
-    username: Mapped[str] = mapped_column(String(255), nullable=False)
-    orcid: Mapped[str] = mapped_column(String(255), nullable=True)
-    metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
+    # TODO: KEYCLOAK
+    # email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    # firstname: Mapped[str] = mapped_column(String(255), nullable=False)
+    # lastname: Mapped[str] = mapped_column(String(255), nullable=False)
+    # password: Mapped[str] = mapped_column(String(255), nullable=False)
+    # address: Mapped[str] = mapped_column(String(255), nullable=True)
+    # affiliation: Mapped[str] = mapped_column(String(255), nullable=True)
+    # affiliationurl: Mapped[str] = mapped_column(String(255), nullable=True)
+    # orcid: Mapped[str] = mapped_column(String(255), nullable=True)
+    # role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
+    # metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
 
     studies = relationship("Study", secondary="study_user", back_populates="submitters")
 

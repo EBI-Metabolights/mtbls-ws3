@@ -6,3 +6,5 @@ class KeycloakAuthenticationConfiguration(BaseModel):
     realm_name: str
     client_id: str
     client_secret: str
+    admin_username: str
+    admin_password: str

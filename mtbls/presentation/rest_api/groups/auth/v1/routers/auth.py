@@ -2,7 +2,7 @@ from logging import getLogger
 from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, Form, Response, status
+from fastapi import APIRouter, Body, Depends, Form, Response, status
 
 from mtbls.application.services.interfaces.auth.authentication_service import (
     AuthenticationService,
@@ -14,6 +14,7 @@ from mtbls.presentation.rest_api.core.responses import APIResponse, Status
 from mtbls.presentation.rest_api.groups.auth.v1.routers import oauth2_scheme
 from mtbls.presentation.rest_api.groups.auth.v1.routers.types import (
     OAuth2TokenRequestModel,
+    RefreshTokenRequestModel,
 )
 
 logger = getLogger(__name__)
@@ -37,6 +38,8 @@ async def get_oauth2_token(
     client_secret = form_data.client_secret
     access_token = None
     response.status_code = status.HTTP_401_UNAUTHORIZED
+    refresh_token = None
+    access_token = None
     if username and password:
         if client_secret:
             return JwtToken(
@@ -45,7 +48,10 @@ async def get_oauth2_token(
             )
 
         try:
-            access_token = await authentication_service.authenticate_with_password(
+            (
+                access_token,
+                refresh_token,
+            ) = await authentication_service.authenticate_with_password(
                 username, password
             )
             if access_token:
@@ -84,7 +90,29 @@ async def get_oauth2_token(
         return JwtToken(message="Invalid username or password / api token")
 
     response.status_code = status.HTTP_200_OK
-    return JwtToken(access_token=access_token, token_type="bearer")
+    return JwtToken(
+        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
+    )
+
+
+@router.post("/refresh", response_model=JwtToken, summary="Create JWT Token")
+@inject
+async def refresh_token(
+    response: Response,
+    refresh_token: Annotated[
+        RefreshTokenRequestModel, Body(description="Refresh token.")
+    ],
+    authentication_service: AuthenticationService = Depends(  # noqa: FAST002
+        Provide["services.authentication_service"]
+    ),
+):
+    access_token, refresh_token = authentication_service.refresh(
+        refresh_token.refresh_token
+    )
+    response.status_code = status.HTTP_200_OK
+    return JwtToken(
+        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
+    )
 
 
 @router.delete("/token", summary="Revoke JWT Token", include_in_schema=False)
