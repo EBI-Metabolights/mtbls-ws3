@@ -3,15 +3,19 @@ from logging import getLogger
 from typing import Annotated, Union
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from fastapi.params import Param
 from fastapi.responses import JSONResponse, StreamingResponse
+from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
 from pydantic import Field
 
 from mtbls.application.services.interfaces.async_task.async_task_service import (
     AsyncTaskService,
 )
 from mtbls.application.services.interfaces.cache_service import CacheService
+from mtbls.application.services.interfaces.study_metadata_service_factory import (
+    StudyMetadataServiceFactory,
+)
 from mtbls.application.services.interfaces.validation_override_service import (
     ValidationOverrideService,
 )
@@ -107,6 +111,48 @@ async def get_validation_history(
             f"{len(validation_history)} validation result(s) in history."
         )
     return response
+
+
+@router.get(
+    "/{resource_id}/metabolights-model",
+    summary="Get MetaboLights model json ",
+    description="Get MetaboLights model json that contains "
+    "content of ISA-METADATA files, database metadata and data file index",
+    response_model=APIResponse[MetabolightsStudyModel],
+)
+@inject
+async def get_metabolights_model(  # noqa: PLR0913
+    response: Response,
+    resource_id: Annotated[str, Depends(get_resource_id)],
+    context: Annotated[StudyPermissionContext, Depends(check_read_permission)],
+    study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
+        Provide["services.study_metadata_service_factory"]
+    ),
+):
+    resource_id = context.study.accession_number
+    result = APIResponse[MetabolightsStudyModel]()
+    try:
+        with await study_metadata_service_factory.create_service(
+            resource_id
+        ) as service:
+            model = await service.load_study_model(
+                load_assay_files=True,
+                load_db_metadata=True,
+                load_folder_metadata=True,
+                load_maf_files=True,
+                load_sample_file=True,
+            )
+        result.success_message = (
+            f"MetaboLists study model is created for {resource_id}."
+        )
+        result.content = model
+
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        result.error_message = f"Failed: {ex}"
+        result.status = Status.ERROR
+
+    return result
 
 
 @router.post(

@@ -22,13 +22,22 @@
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  "editor.defaultFormatter": "charliermarsh.ruff",
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingModuleSource": "warning",
+    "reportUndefinedVariable": "warning"
   },
-  "python-envs.defaultEnvManager": "ms-python.python:system",
-  "python-envs.pythonProjects": [],
-  "[sql]": {
-    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-  }
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "python.analysis.exclude": [
+    "${workspaceFolder}/.old/**",
+    ".venv/**",
+    ".old/**",
+    ".temp*/**",
+    "**/__pycache__",
+    "**/.*",
+    ".*/**",
+    "**/node_modules",
+    ".git",
+    ".poc/**"
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:venv"
 }
