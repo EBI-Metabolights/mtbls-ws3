@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Callable, Union
 
 from sqlalchemy import and_, select
@@ -87,15 +88,35 @@ class SqlDbUserReadRepository(
         orcid: str,
         include_studies: bool = False,
     ) -> Union[None, UserOutput]:
-        users = await self.keycloak_authentication_service.get_users_by_query(
-            {"q": f"orcid:{orcid}"}
-        )
-        username = users[0].username if users else None
+        if not orcid:
+            return None
+        orcid = re.sub(r"https?://orcid\.org/", "", orcid.lower())
+        username = None
+        if self.user_profile_service:
+            users = await self.user_profile_service.get_users_by_query(
+                {"q": f"orcid:{orcid}"}
+            )
+            username = users[0].username if users else None
+        else:
+            async with self.database_client.session() as session:
+                stmt = select(User).where(User.orcid == orcid)
+                result = await session.execute(stmt)
+                users: None | list[User] = result.scalars().all()
+
+                if users:
+                    username = users[0].username
+                    if len(users) > 1:
+                        logger.warning(
+                            "Multiple users with orcid %s. %s is selected",
+                            orcid,
+                            users[0].username,
+                        )
         if not username:
             return None
         result = await self._get_users_by_filter(
             lambda: User.username == username, include_studies=include_studies
         )
+
         return result[0] if result else None
 
     async def get_user_by_email(

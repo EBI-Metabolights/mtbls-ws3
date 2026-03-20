@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, Union
 
 from keycloak import KeycloakAdmin, KeycloakOpenID
@@ -131,8 +132,8 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
         partner = "partner" in realm_roles
         payload = dict_data
         attributes: dict = dict_data.get("attributes", {})
-        orcid = attributes.get("orcid") or [""]
-        orcid = orcid[0].replace("https://orcid.org/", "") or ""
+        orcid = attributes.get("orcid")
+        orcid = re.sub(r"https?://orcid\.org/", "", (orcid[0] or "").lower())
         user.email = payload.get("email")
         user.email_verified = payload.get("emailVerified")
         user.first_name = payload.get("firstName")

@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Union
 
 from pydantic import ConfigDict, validate_call
@@ -218,13 +219,28 @@ class SqlDbStudyReadRepository(
         return await self._get_submitter_studies(lambda: User.username == username)
 
     async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]:
-        users = await self.keycloak_authentication_service.get_users_by_query(
-            {"q", f"orcid:{orcid}"}
-        )
+        if not orcid:
+            return []
+        orcid = re.sub(r"https?://orcid\.org/", "", orcid.lower())
+        username = None
+        if self.user_profile_service:
+            users = await self.user_profile_service.get_users_by_query(
+                {"q", f"orcid:{orcid}"}
+            )
 
-        username = users[0].username if users else None
-        if not username:
-            return None
+            username = users[0].username if users else None
+            if not username:
+                return []
+        else:
+            async with self.database_client.session() as session:
+                stmt = select(User).where(User.orcid == orcid)
+                result = await session.execute(stmt)
+                users: None | list[User] = result.scalars().all()
+                if users:
+                    username = users[0].username
+                if not username:
+                    return []
+
         return await self._get_submitter_studies(lambda: User.username == username)
 
     async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]:

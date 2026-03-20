@@ -25,6 +25,7 @@ from mtbls.domain.enums.mhd_share_status import MhdShareStatus
 from mtbls.domain.enums.study_category import StudyCategory
 from mtbls.domain.enums.study_revision_status import StudyRevisionStatus
 from mtbls.domain.enums.study_status import StudyStatus
+from mtbls.domain.enums.user_role import UserRole
 from mtbls.domain.enums.user_status import UserStatus
 
 
@@ -140,17 +141,17 @@ class User(Base):
         server_default=func.now(), nullable=False
     )
     status: Mapped[UserStatus] = mapped_column(IntEnum(UserStatus), nullable=False)
-    # TODO: KEYCLOAK
-    # email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    # firstname: Mapped[str] = mapped_column(String(255), nullable=False)
-    # lastname: Mapped[str] = mapped_column(String(255), nullable=False)
-    # password: Mapped[str] = mapped_column(String(255), nullable=False)
-    # address: Mapped[str] = mapped_column(String(255), nullable=True)
-    # affiliation: Mapped[str] = mapped_column(String(255), nullable=True)
-    # affiliationurl: Mapped[str] = mapped_column(String(255), nullable=True)
-    # orcid: Mapped[str] = mapped_column(String(255), nullable=True)
-    # role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
-    # metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
+    # TODO: ONLY FOR STANDALONE USAGE
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    firstname: Mapped[str] = mapped_column(String(255), nullable=False)
+    lastname: Mapped[str] = mapped_column(String(255), nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=True)
+    affiliation: Mapped[str] = mapped_column(String(255), nullable=True)
+    affiliationurl: Mapped[str] = mapped_column(String(255), nullable=True)
+    orcid: Mapped[str] = mapped_column(String(255), nullable=True)
+    role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
+    metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
 
     studies = relationship("Study", secondary="study_user", back_populates="submitters")
 
