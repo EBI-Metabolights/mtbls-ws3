@@ -15,9 +15,7 @@ from cachetools import TTLCache
 from cachetools_async import cached
 from dependency_injector.wiring import Provide, inject
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
-from mhd_model.convertors.announcement.v0_1.legacy.mhd2announce import (
-    create_announcement_file,
-)
+from mhd_model.convertors.announcement.convertor import create_announcement_file
 from mhd_model.model.v0_1.announcement.validation.validator import (
     MhdAnnouncementFileValidator,
 )
@@ -453,8 +451,6 @@ async def process_mhd_study(
             if profile_info:
                 schema_uri = profile_info.file_schema
                 profile_uri = profile_info.mhd_file_profile
-                announcement_file_schema_uri = profile_info.announcement_file_schema
-                announcement_file_profile_uri = profile_info.announcement_file_profile
                 config = validation_run_configuration
                 mtbls2mhd_config = Mtbls2MhdConfiguration(
                     database_name=config.db_connection.database,
@@ -480,8 +476,6 @@ async def process_mhd_study(
                     mhd_accession,
                     schema_uri,
                     profile_uri,
-                    announcement_file_schema_uri,
-                    announcement_file_profile_uri,
                     mhd_filename=f"{resource_id}.mhd.json",
                     annoucement_filename=f"{resource_id}.announcement.json",
                     config=mtbls2mhd_config,
@@ -537,8 +531,6 @@ async def validate_mhd_study(
     mhd_accession: None | str,
     schema_uri: str,
     profile_uri: str,
-    announcement_file_schema_uri: str,
-    annoucement_file_profile_uri: str,
     mhd_output_root_path: None | Path = None,
     mhd_filename: None | str = None,
     annoucement_filename: None | str = None,
@@ -607,8 +599,6 @@ async def validate_mhd_study(
                 file_content,
                 f"{config.public_http_base_url}/{resource_id}/{mhd_filename}",
                 str(announcement_file_path),
-                announcement_schema_name=announcement_file_schema_uri,
-                announcement_profile_uri=annoucement_file_profile_uri,
             )
             if announcement_file_path.exists():
                 file_content = json.loads(announcement_file_path.read_text())
