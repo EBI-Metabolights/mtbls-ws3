@@ -64,6 +64,3 @@ class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
 
     @abc.abstractmethod
     async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]: ...
-
-    @abc.abstractmethod
-    async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]: ...

@@ -242,6 +242,3 @@ class SqlDbStudyReadRepository(
                     return []
 
         return await self._get_submitter_studies(lambda: User.username == username)
-
-    async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]:
-        return await self._get_submitter_studies(lambda: User.id == id_)

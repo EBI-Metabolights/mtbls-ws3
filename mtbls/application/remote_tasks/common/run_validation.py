@@ -15,9 +15,7 @@ from cachetools import TTLCache
 from cachetools_async import cached
 from dependency_injector.wiring import Provide, inject
 from metabolights_utils.models.metabolights.model import MetabolightsStudyModel
-from mhd_model.convertors.announcement.v0_1.legacy.mhd2announce import (
-    create_announcement_file,
-)
+from mhd_model.convertors.announcement.convertor import create_announcement_file
 from mhd_model.model.v0_1.announcement.validation.validator import (
     MhdAnnouncementFileValidator,
 )

@@ -1,3 +1,4 @@
+import datetime
 import logging
 import re
 from typing import Any, Union
@@ -13,6 +14,7 @@ from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.domain.entities.user import UserProfile
 from mtbls.domain.enums.token_type import TokenType
 from mtbls.domain.enums.user_role import UserRole
+from mtbls.domain.enums.user_status import UserStatus
 from mtbls.domain.shared.data_types import TokenStr
 from mtbls.infrastructure.auth.keycloak.keycloak_authentication_config import (
     KeycloakAuthenticationConfiguration,
@@ -131,15 +133,28 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
             role = UserRole.ANONYMOUS
         partner = "partner" in realm_roles
         payload = dict_data
+        enabled = payload.get("enabled", False)
+        email_verified = payload.get("emailVerified")
+        if enabled:
+            status = UserStatus.ACTIVE if email_verified else UserStatus.NEW
+        else:
+            status = UserStatus.FROZEN
+        join_date = datetime.datetime.fromtimestamp(
+            payload.get("createdTimestamp") / 1000.0
+        )
+
         attributes: dict = dict_data.get("attributes", {})
         orcid = attributes.get("orcid")
         orcid = re.sub(r"https?://orcid\.org/", "", (orcid[0] or "").lower())
         user.email = payload.get("email")
-        user.email_verified = payload.get("emailVerified")
+        user.email_verified = email_verified
         user.first_name = payload.get("firstName")
         user.last_name = payload.get("lastName")
         user.orcid = orcid
         user.role = role
+        user.enabled = enabled
+        user.status = status
+        user.join_date = join_date
         user.country = (attributes.get("country") or [""])[0]
         user.affiliation = (attributes.get("affiliation") or [""])[0]
         user.affiliation_url = (attributes.get("affiliationUrl") or [""])[0]

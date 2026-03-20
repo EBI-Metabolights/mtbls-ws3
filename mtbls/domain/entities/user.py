@@ -16,6 +16,7 @@ class UserProfile(BaseUser):
     username: Union[None, str] = None
     email: Union[None, str] = None
     role: Union[None, UserRole, int] = UserRole.ANONYMOUS
+    status: Union[None, UserStatus, int] = UserStatus.FROZEN
     first_name: Union[None, str] = None
     last_name: Union[None, str] = None
     orcid: Union[None, str] = None
@@ -26,6 +27,8 @@ class UserProfile(BaseUser):
     country: Union[None, str] = None
     email_verified: Union[None, bool] = None
     partner: Union[None, bool] = None
+    enabled: Union[None, bool] = None
+    join_date: Union[None, datetime.datetime] = None
 
     @field_validator("role")
     @classmethod
@@ -36,6 +39,17 @@ class UserProfile(BaseUser):
             return value
         if isinstance(value, int):
             return UserRole(value)
+        return None
+
+    @field_validator("status")
+    @classmethod
+    def status_validator(cls, value):
+        if value is None:
+            return None
+        if isinstance(value, UserStatus):
+            return value
+        if isinstance(value, int):
+            return UserStatus(value)
         return None
 
 

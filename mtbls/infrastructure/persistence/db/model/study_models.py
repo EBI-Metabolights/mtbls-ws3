@@ -127,20 +127,17 @@ class User(Base):
     __field_alias_exceptions__: dict[str, str] = {
         "id_": "id",
         "api_token": "apitoken",
-        # "affiliation_url": "affiliationurl",
-        # "first_name": "firstname",
-        # "last_name": "lastname",
+        "affiliation_url": "affiliationurl",
+        "first_name": "firstname",
+        "last_name": "lastname",
         "join_date": "joindate",
-        # "password_hash": "password",
+        "password_hash": "password",
     }
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     apitoken: Mapped[str] = mapped_column(String(255), nullable=False)
     username: Mapped[str] = mapped_column(String(255), nullable=False)
-    joindate: Mapped[datetime.datetime] = mapped_column(
-        server_default=func.now(), nullable=False
-    )
-    status: Mapped[UserStatus] = mapped_column(IntEnum(UserStatus), nullable=False)
+
     # TODO: ONLY FOR STANDALONE USAGE
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     firstname: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -152,6 +149,10 @@ class User(Base):
     orcid: Mapped[str] = mapped_column(String(255), nullable=True)
     role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
     metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
+    joindate: Mapped[datetime.datetime] = mapped_column(
+        server_default=func.now(), nullable=False
+    )
+    status: Mapped[UserStatus] = mapped_column(IntEnum(UserStatus), nullable=False)
 
     studies = relationship("Study", secondary="study_user", back_populates="submitters")
 
