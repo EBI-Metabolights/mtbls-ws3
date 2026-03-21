@@ -144,7 +144,7 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
         )
 
         attributes: dict = dict_data.get("attributes", {})
-        orcid = attributes.get("orcid")
+        orcid = attributes.get("orcid") or [""]
         orcid = re.sub(r"https?://orcid\.org/", "", (orcid[0] or "").lower())
         user.email = payload.get("email")
         user.email_verified = email_verified
@@ -156,6 +156,7 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
         user.status = status
         user.join_date = join_date
         user.country = (attributes.get("country") or [""])[0]
+        user.address = (attributes.get("affiliationAddress") or [""])[0]
         user.affiliation = (attributes.get("affiliation") or [""])[0]
         user.affiliation_url = (attributes.get("affiliationUrl") or [""])[0]
         user.globus_username = (attributes.get("globusUserName") or [""])[0]
