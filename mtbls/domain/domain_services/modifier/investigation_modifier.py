@@ -44,6 +44,7 @@ class InvestigationFileModifier(BaseIsaModifier):
 
         self.db_metadata = model.study_db_metadata
         self.update_methods = [
+            self.rule___100_100_001_02,
             self.rule___100_300_001_10,
             self.rule_i_100_340_009_01,
             self.rule_i_100_000_000_00,
@@ -70,6 +71,38 @@ class InvestigationFileModifier(BaseIsaModifier):
         for method in self.update_methods:
             method()
         return self.update_logs
+
+    def rule___100_100_001_02(self):
+        investigation = self.model.investigation
+        if investigation.studies and investigation.studies[0]:
+            study = investigation.studies[0]
+            for factor in study.study_factors.factors:
+                value_format = factor.value_format
+                new_format = factor.value_format.lower() if factor.value_format else ""
+
+                if value_format != new_format:
+                    factor.value_format = new_format or ""
+                    self.modifier_update(
+                        source=self.model.investigation_file_path,
+                        action=f"Factor {factor.name or ''} value format is updated.",
+                        old_value=value_format,
+                        new_value=new_format,
+                    )
+            for protocol in study.study_protocols.protocols:
+                for param in protocol.parameters:
+                    value_format = param.value_format or ""
+                    new_format = (
+                        param.value_format.lower() if param.value_format else ""
+                    )
+
+                    if value_format != new_format:
+                        param.value_format = new_format
+                        self.modifier_update(
+                            source=self.model.investigation_file_path,
+                            action=f"Parameter {param.term or ''} value format is updated.",
+                            old_value=value_format,
+                            new_value=new_format,
+                        )
 
     def rule___100_300_001_10(self):
         investigation = self.model.investigation
