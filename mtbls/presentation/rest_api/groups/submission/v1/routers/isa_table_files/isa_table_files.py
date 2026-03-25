@@ -8,6 +8,7 @@ from mtbls.application.services.interfaces.study_metadata_service_factory import
     StudyMetadataServiceFactory,
 )
 from mtbls.application.services.study_metadata_service.models import (
+    IsaTableDataRowDelete,
     IsaTableDataUpdates,
 )
 from mtbls.domain.entities.isa_table import (
@@ -117,6 +118,45 @@ def update_isa_file_items(data_type: str, filename_regex: str):
     return update_isa_table_row
 
 
+def delete_isa_file_items(data_type: str, filename_regex: str):
+    file_name_description = f"{data_type} file name"
+
+    @inject
+    async def delete_isa_table_row(
+        resource_id: Annotated[str, RESOURCE_ID_IN_PATH],
+        file_name: Annotated[
+            str, Query(description=file_name_description, pattern=filename_regex)
+        ],
+        context: Annotated[StudyPermissionContext, Depends(check_update_permission)],
+        study_metadata_service_factory: StudyMetadataServiceFactory = Depends(
+            Provide["services.study_metadata_service_factory"]
+        ),
+        deleted_rows: Annotated[
+            IsaTableDataRowDelete, Body(description="Deleted Rows")
+        ] = None,
+    ):
+        if not file_name:
+            file_name = f"s_{resource_id}.txt"
+        metadata_service = await study_metadata_service_factory.create_service(
+            resource_id
+        )
+        with metadata_service:
+            isa_table_data = await metadata_service.update_isa_table_rows(
+                object_key=file_name, updates=deleted_rows
+            )
+
+        response = APIListResponse[IsaTableRow](
+            success_message=f"{resource_id}", content=isa_table_data
+        )
+        if not isa_table_data:
+            response.success_message = "There is no data that matches the criteria."
+        else:
+            response.success_message = f"{len(isa_table_data)} samples."
+        return response
+
+    return delete_isa_table_row
+
+
 def get_isa_file_headers(data_type: str, filename_regex: str):
     file_name_description = f"{data_type} file name"
 
@@ -175,7 +215,7 @@ def pub_isa_file_headers(data_type: str, filename_regex: str):
 
 filename_regex_map = {
     "sample": r"s_(.+)\.txt",
-    "assay": r"s_(.+)\.txt",
+    "assay": r"a_(.+)\.txt",
     "assignment": r"m_(.+)\.tsv",
 }
 
@@ -203,6 +243,15 @@ def add_api_routes(router: APIRouter):
             summary=f"Update {tag.lower()}",
             methods=["PATCH"],
             description=f"Update {tag.lower()}",
+            response_model=APIListResponse[IsaTableRow],
+        )
+        router.add_api_route(
+            path="/" + item + "-files/{resource_id}",
+            endpoint=delete_isa_file_items(item, filename_regex_map[item]),
+            tags=[tag],
+            summary=f"Delete {tag.lower()}",
+            methods=["DELETE"],
+            description=f"Delete {tag.lower()}",
             response_model=APIListResponse[IsaTableRow],
         )
 

@@ -5,7 +5,7 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
     FileObjectObserver,
     FileObjectRepositorySource,
 )
-from mtbls.domain.entities.study_file import StudyFileInput, StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileInput, StudyDataFileOutput
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 
 
@@ -35,14 +35,14 @@ class BaseFileObjectRepository(
         self._observers.remove(observer)
         await observer.repository_unregistered(self)
 
-    async def object_updated(self, study_object: StudyFileOutput):
+    async def object_updated(self, study_object: StudyDataFileOutput):
         for observer in self._observers:
             await observer.object_updated(study_object)
 
-    async def object_created(self, study_object: StudyFileInput):
+    async def object_created(self, study_object: StudyDataFileInput):
         for observer in self._observers:
             await observer.object_created(study_object)
 
-    async def object_deleted(self, study_object: StudyFileOutput):
+    async def object_deleted(self, study_object: StudyDataFileOutput):
         for observer in self._observers:
             await observer.object_deleted(study_object)

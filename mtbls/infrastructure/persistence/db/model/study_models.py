@@ -361,8 +361,8 @@ class StudyTasks(Base):
     (UniqueConstraint("study_acc", "task_name"),)
 
 
-class StudyFile(Base):
-    __tablename__ = "study_files"
+class StudyDataFile(Base):
+    __tablename__ = "study_data_files"
     __table_args__ = {"sqlite_autoincrement": True}
     __excluded_fields__: set[str] = set()
     __field_alias_exceptions__: dict[str, str] = {
@@ -371,7 +371,6 @@ class StudyFile(Base):
     id = Column(Integer, hibernate_sequence, primary_key=True)
     bucket_name = Column(String(255), nullable=False)
     resource_id = Column(String(255), nullable=False)
-    numeric_resource_id = Column(Integer, nullable=True)
     basename = Column(String(512), nullable=False)
     object_key = Column(String(1024), nullable=False)
     parent_object_key = Column(String(1024), nullable=False)

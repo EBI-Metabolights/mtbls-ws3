@@ -1,3 +1,4 @@
+
 gateways:
   cache:
     redis:
@@ -11,8 +12,8 @@ gateways:
   database:
     sqlite:
       connection:
-        file_path: .test-temp/sqlite_test.db
-        url_scheme: sqlite+aiosqlite
+        file_path: "{{ sqlite.file_path }}"
+        url_scheme: "{{ sqlite.url_scheme }}"
     postgresql:
       connection:
         host: "{{ postgresql.host }}"
@@ -20,15 +21,16 @@ gateways:
         user: "{{ postgresql.user }}"
         password: "{{ postgresql.password }}"
         database: "{{ postgresql.database }}"
-        url_scheme: postgresql+asyncpg
-    # mongodb:
-    #   connection:
-    #     url_scheme: mongodb
-    #     host: "{{ mongodb.host }}"
-    #     port: {{ mongodb.port }}
-    #     user: "{{ mongodb.user }}"
-    #     password: "{{ mongodb.password }}"
-    #     database: "{{ mongodb.database }}"
+        url_scheme: "{{ postgresql.url_scheme }}"
+    mongodb:
+      connection:
+        hosts: "{{ mongodb.hosts }}"
+        port: "{{ mongodb.port }}"
+        user: "{{ mongodb.user }}"
+        password: "{{ mongodb.password }}"
+        database: "{{ mongodb.database }}"
+        url_scheme: "{{ mongodb.url_scheme }}"
+        replica_set: "{{ mongodb.replica_set }}"
     elasticsearch:
       connection:
         hosts: "{{ elasticsearch.host}}"
@@ -36,11 +38,16 @@ gateways:
         username: "{{ elasticsearch.username }}"
         password: "{{ elasticsearch.password }}"
         verify_certs: "{{ elasticsearch.verify_certs }}"
-        api_key: "{{ elasticsearch.api_key }}"
-        request_timeout_in_seconds: 5.0
+        scheme: "{{ elasticsearch.scheme }}"
+        api_keys:
+          study: "{{ elasticsearch.api_keys.study }}"
+          compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
+          assay: "{{ elasticsearch.api_keys.assay }}"
+          sample: "{{ elasticsearch.api_keys.sample }}"
+        request_timeout_in_seconds: 15.0
 services:
   authentication:
-    active_authentication_service: "standalone"
     mtbls_ws2:
       host: "{{ authentication.mtbls_ws2.host }}"
       port: "{{ authentication.mtbls_ws2.port }}"
@@ -53,6 +60,7 @@ services:
       realm_name: "{{ authentication.keycloak.realm_name }}"
       client_id: "{{ authentication.keycloak.client_id }}"
       client_secret: "{{ authentication.keycloak.client_secret }}"
+    active_authentication_service:  "{{ authentication.active_authentication_service }}"
   policy_service:
     opa:
       validate_schema: false
@@ -67,6 +75,7 @@ services:
       timeout_in_seconds: 10
       default_search_result_size: 30
   system_health_check:
+    active_health_check_service: "{{ system_health_check.active_health_check_service }}"
     remote:
       transfer_health_check:
         health_check_url: "{{ system_health_check.remote.transfer_health_check.health_check_url }}"
@@ -76,6 +85,11 @@ services:
         test: "{{ system_health_check.standalone.transfer_health_check.test }}"
         test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
 repositories:
+  active_target_repository:
+    validation_overrides: nfs
+    validation_reports: nfs
+    study_metadata: nfs
+    study_data_files: nfs
   study_folders:
     mounted_paths:
       private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
@@ -90,6 +104,10 @@ repositories:
       indices_cache_root_path: "{{ mounted_paths.indices_cache_root_path }}"
 run:
   submission:
+    mhd:
+      api_key: "{{ mhd.api_key }}"
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
     default_dataset_license:
       name: "CC0 1.0 Universal"
       version: "1.0"
@@ -141,7 +159,7 @@ run:
         - .+
         - http(s*)://.*\.ebi\.ac\.uk(:\d{1,5})?
       server_info:
-        root_path: "{{ run.submission.server_info.root_path }}"
+        root_path: "{{ run.submission.root_path }}"
         title: "EMBL-EBI MetaboLights Submission API"
         description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
         summary: Open MetaboLights Submission REST API
@@ -198,6 +216,9 @@ run:
         httpcore:
           level: WARNING
           propogate: yes
+        __main__:
+          level: INFO
+          propogate: yes
       filters:
         correlation_id:
           (): "asgi_correlation_id.CorrelationIdFilter"
@@ -205,6 +226,10 @@ run:
         default_filter:
           (): "{{ run.submission.logging.default_filter_class }}"
   common_worker:
+    mhd:
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
+      api_key: "{{ mhd.api_key }}"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
     module_config:
       loaded_sub_package_names: []
     logging:
@@ -212,9 +237,9 @@ run:
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s", "client": "%(client)s", "route_path": "%(route_path)s", "resource_id": "%(resource_id)s", "user_id": %(user_id)d, "request_id": "%(request_id)s", "task_id": "%(task_id)s", "thread_name": "%(threadName)s",  "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(task_id)s %(threadName)s, %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"
@@ -255,7 +280,7 @@ run:
         json_formatter:
           format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(client)s %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"
@@ -279,6 +304,9 @@ run:
           propogate: yes
         httpcore:
           level: WARNING
+          propogate: yes
+        __main__:
+          level: INFO
           propogate: yes
       filters:
         default_filter:

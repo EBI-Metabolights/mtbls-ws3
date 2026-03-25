@@ -7,7 +7,7 @@ from mtbls.infrastructure.persistence.db.model.study_models import (
     MtblsDataReuse,
     Statistic,
     Study,
-    StudyFile,
+    StudyDataFile,
     StudyRevision,
     User,
 )
@@ -21,7 +21,7 @@ class EntityMapper:
         Entity.Study: Study,
         Entity.Statistic: Statistic,
         Entity.MtblsDataReuse: MtblsDataReuse,
-        Entity.StudyFile: StudyFile,
+        Entity.StudyDataFile: StudyDataFile,
         Entity.StudyRevision: StudyRevision,
     }
 

@@ -5,11 +5,12 @@
       "name": "Run mtbls-ws3 FastAPI",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/mtbls/run/rest_api/submission/main.py",
       "console": "integratedTerminal",
       "cwd": "${cwd}",
       "env": {
-        "PYTHONPATH": "${cwd}",
+        "PYTHONPATH": "${workspaceFolder}",
         "PYDEVD_DISABLE_FILE_VALIDATION": "1"
       },
       "justMyCode": false
@@ -18,11 +19,12 @@
       "name": "Run mtbls-ws3 Celery Worker",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/mtbls/run/worker/common/main.py",
       "console": "integratedTerminal",
       "cwd": "${cwd}",
       "env": {
-        "PYTHONPATH": "${cwd}"
+        "PYTHONPATH": "${workspaceFolder}"
       },
       "jinja": true,
       "justMyCode": false
@@ -31,6 +33,7 @@
       "name": "Run Celery Flower Monitor",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/mtbls/run/worker/monitor/flower/main.py",
       "console": "integratedTerminal",
       "cwd": "${cwd}",
@@ -44,6 +47,7 @@
       "name": "Run LOCAL mtbls-ws3 FastAPI",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/tests/run/rest_api/submission/main_local.py",
       "console": "integratedTerminal",
       "cwd": "${cwd}",
@@ -57,6 +61,7 @@
       "name": "Python: Run Current file",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${file}",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
@@ -69,7 +74,58 @@
       "name": "Python: Run Submission MCP Server",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/mtbls/run/mcp/submission/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Run Maintain ES Public Search Index CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/mtbls/run/cli/index/study_search_indices/maintain.py",
+      "args": [
+        "test-public-study-search-index",
+        "public"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Run Maintain ES Complete Search Index CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/mtbls/run/cli/index/study_search_indices/maintain.py",
+      "args": [
+        "test-complete-study-search-index",
+        "completed"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${cwd}"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Run Maintain Kibana Indices CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/mtbls/run/cli/index/kibana_indices/maintain.py",
+      "args": [
+        "public"
+      ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "env": {

@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 
-from mtbls.domain.entities.search.study.index_search import IndexSearchResult
+from mtbls.domain.entities.search.index_search import IndexSearchResult
 from mtbls.presentation.rest_api.core.responses import APIResponse
 
 

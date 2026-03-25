@@ -1,3 +1,5 @@
+import datetime
+
 from metabolights_utils.models.common import ErrorMessage
 from metabolights_utils.models.metabolights import model
 from metabolights_utils.models.metabolights import model as mtbls_utils_model
@@ -61,7 +63,17 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
         self, resource_id: str, connection
     ) -> tuple[model.StudyDBMetadata, list[ErrorMessage]]:
         try:
-            study = await self.study_read_repository.get_study_by_accession(resource_id)
+            study = await self.study_read_repository.get_study_by_accession(
+                resource_id, include_revisions=True, include_submitters=True
+            )
+
+            revisions = [
+                x
+                for x in study.revisions
+                if x.accession_number == resource_id
+                and study.revision_number == x.revision_number
+            ]
+            revision = revisions[0] if revisions else None
             metadata = model.StudyDBMetadata(
                 db_id=study.id_,
                 study_id=study.accession_number,
@@ -85,6 +97,7 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                     study.study_category.value
                 ),
                 sample_template=study.sample_type or "",
+                study_template=study.study_template or "",
                 template_version=study.template_version or "",
                 reserved_mhd_accession=study.mhd_accession or "",
                 reserved_accession=study.reserved_accession or "",
@@ -102,23 +115,22 @@ class DefaultAsyncDbMetadataCollector(AbstractDbMetadataCollector):
                 revision_date=study.revision_datetime.isoformat()
                 if study.revision_datetime
                 else "",
+                revision_comment=revision.revision_comment
+                if revision and revision.revision_comment
+                else "",
                 created_at=study.created_at.isoformat() if study.created_at else "",
             )
-            submitters: list[
-                UserOutput
-            ] = await self.user_read_repository.get_study_submitters_by_accession(
-                resource_id
-            )
-
+            submitters: list[UserOutput] = study.submitters if study.submitters else []
             for submitter in submitters:
+                join_date = ""
+                if isinstance(submitter.join_date, datetime.datetime):
+                    join_date = submitter.join_date.strftime("%Y-%m-%d")
                 metadata.submitters.append(
                     model.Submitter(
                         db_id=submitter.id_,
                         orcid=submitter.orcid or "",
                         address=submitter.address or "",
-                        join_date=submitter.join_date.isoformat()
-                        if submitter.join_date
-                        else "",
+                        join_date=join_date,
                         user_name=submitter.username or "",
                         first_name=submitter.first_name or "",
                         last_name=submitter.last_name or "",

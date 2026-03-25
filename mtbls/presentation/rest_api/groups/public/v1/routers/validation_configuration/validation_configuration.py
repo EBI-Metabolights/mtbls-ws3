@@ -10,9 +10,7 @@ from mtbls.domain.entities.validation.validation_configuration import (
     ValidationConfiguration,
     ValidationControls,
 )
-from mtbls.presentation.rest_api.core.responses import (
-    APIResponse,
-)
+from mtbls.presentation.rest_api.core.responses import APIResponse
 
 logger = getLogger(__name__)
 

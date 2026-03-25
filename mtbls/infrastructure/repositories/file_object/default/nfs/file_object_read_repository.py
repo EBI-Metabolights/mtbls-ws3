@@ -13,7 +13,7 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.utils.size_utils import get_size_in_str
 from mtbls.domain.entities.study_file import (
     ResourceCategory,
-    StudyFileOutput,
+    StudyDataFileOutput,
 )
 from mtbls.domain.exceptions.repository import (
     StudyBucketNotFoundError,
@@ -47,7 +47,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
 
     async def list(
         self, resource_id: str, object_key: Union[None, str] = None
-    ) -> list[StudyFileOutput]:
+    ) -> list[StudyDataFileOutput]:
         resources = []
 
         study_path, directory_path = await self._get_directory_path(
@@ -87,7 +87,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         ):
             return False
 
-    async def get_info(self, resource_id: str, object_key: str) -> StudyFileOutput:
+    async def get_info(self, resource_id: str, object_key: str) -> StudyDataFileOutput:
         _, object_path = await self._get_object_path(resource_id, object_key)
         return await self.get_study_object(
             resource_id=resource_id,
@@ -104,7 +104,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
 
     async def download(
         self, resource_id: str, object_key: str, target_path: str
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         _, object_path = await self._get_object_path(resource_id, object_key)
         shutil.copy(object_path, target_path)
 
@@ -129,7 +129,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         object_path: pathlib.Path,
         resource_id: str,
         max_suffix_length: int = 6,
-    ) -> StudyFileOutput:
+    ) -> StudyDataFileOutput:
         # Get file or directory metadata
         object_key = str(object_path).replace(str(study_path), "", 1).lstrip("/")
         return self.get_study_object(
@@ -149,7 +149,7 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         resource_category: ResourceCategory = ResourceCategory.UNKNOWN_RESOURCE,
         tags: dict = None,
         max_suffix_length: int = 6,
-    ) -> Union[None, StudyFileOutput]:
+    ) -> Union[None, StudyDataFileOutput]:
         object_path = dest_path
         if not object_path.exists():
             logger.warning("File does not exist: %s", object_path)
@@ -179,11 +179,9 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
                 suffix = object_path.suffix if object_path.suffix else ""
 
         permission_in_oct = oct(stat.st_mode & 0o777)
-        numeric_resource_id = int(resource_id.removeprefix("MTBLS").removeprefix("REQ"))
-        return StudyFileOutput(
+        return StudyDataFileOutput(
             bucket_name=bucket_name,
             resource_id=resource_id,
-            numeric_resource_id=numeric_resource_id,
             object_key=object_key,
             parent_object_key=parent_object_key,
             created_at=created_at,

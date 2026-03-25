@@ -44,7 +44,7 @@ from mtbls.domain.entities.isa_table import (
     IsaTableFileObject,
     IsaTableRow,
 )
-from mtbls.domain.entities.study_file import ResourceCategory, StudyFileOutput
+from mtbls.domain.entities.study_file import ResourceCategory, StudyDataFileOutput
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.data_types import JsonPathOperation
 from mtbls.domain.shared.repository.entity_filter import EntityFilter
@@ -60,8 +60,8 @@ from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_ta
 from mtbls.infrastructure.repositories.file_object.study_metadata.mongodb.isa_table_file_row_repository import (  # noqa: E501
     MongoDbIsaTableRowObjectRepository,
 )
-from mtbls.infrastructure.repositories.study_file.mongodb.study_file_repository import (
-    MongoDbStudyFileRepository,
+from mtbls.infrastructure.repositories.study_data_file.mongodb.study_data_file_repository import (  # noqa: E501
+    MongoDbStudyDataFileRepository,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
         self,
         resource_id: str,
         study_read_repository: StudyReadRepository,
-        study_file_repository: MongoDbStudyFileRepository,
+        study_data_file_repository: MongoDbStudyDataFileRepository,
         investigation_object_repository: MongoDbInvestigationObjectRepository,
         isa_table_object_repository: MongoDbIsaTableObjectRepository,
         isa_table_row_object_repository: MongoDbIsaTableRowObjectRepository,
@@ -84,18 +84,18 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             study_read_repository=study_read_repository,
             user_read_repository=user_read_repository,
         )
-        self.study_file_repository = study_file_repository
+        self.study_data_file_repository = study_data_file_repository
         self.investigation_object_repository = investigation_object_repository
         self.isa_table_object_repository = isa_table_object_repository
         self.isa_table_row_object_repository = isa_table_row_object_repository
         self.investigation_file_collection_name = (
-            self.investigation_object_repository.collection_name
+            self.investigation_object_repository.collection.name
         )
         self.isa_table_files_collection_name = (
-            self.isa_table_object_repository.collection_name
+            self.isa_table_object_repository.collection.name
         )
         self.isa_table_items_collection_name = (
-            isa_table_row_object_repository.collection_name
+            self.isa_table_row_object_repository.collection.name
         )
         self.study_bucket = (
             study_bucket if study_bucket else StudyBucket.PRIVATE_METADATA_FILES
@@ -108,9 +108,6 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             self.investigation_object_repository.collection
         )
         self.resource_id = resource_id
-        self.numeric_resource_id = int(
-            resource_id.removeprefix("REQ").removeprefix("MTBLS")
-        )
         self.temp_path = temp_path if temp_path else "/tmp/study-metadata-service"
         self.transaction_id = str(uuid.uuid4())
         self.staging_path = (
@@ -208,7 +205,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             folder_metadata_collector=(
                 RepositoryInfoCollector(
                     resource_id=self.resource_id,
-                    study_file_repository=self.study_file_repository,
+                    study_data_file_repository=self.study_data_file_repository,
                 )
                 if load_folder_metadata
                 else None
@@ -612,7 +609,6 @@ class MongoDbStudyMetadataService(StudyMetadataService):
                     parent_object_key="",
                     bucket_name=self.study_bucket.value,
                     resource_id=self.resource_id,
-                    numeric_resource_id=self.numeric_resource_id,
                     created_at=now,
                     basename=object_key,
                     category=ResourceCategory.METADATA_RESOURCE,
@@ -653,7 +649,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
 
     async def list_isa_files(
         self,
-    ) -> list[StudyFileOutput]:
+    ) -> list[StudyDataFileOutput]:
         isa_table_json = self.isa_table_collection.find(
             {
                 "resourceId": self.resource_id,
@@ -661,7 +657,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             },
             {"_id": 0, "data": 0},
         )
-        isa_files = [StudyFileOutput.model_validate(x) for x in isa_table_json]
+        isa_files = [StudyDataFileOutput.model_validate(x) for x in isa_table_json]
         investigation_files = self.investigation_file_collection.find(
             {
                 "resourceId": self.resource_id,
@@ -670,7 +666,7 @@ class MongoDbStudyMetadataService(StudyMetadataService):
             {"_id": 0, "data": 0},
         )
         isa_files.extend(
-            [StudyFileOutput.model_validate(x) for x in investigation_files]
+            [StudyDataFileOutput.model_validate(x) for x in investigation_files]
         )
         return isa_files
 

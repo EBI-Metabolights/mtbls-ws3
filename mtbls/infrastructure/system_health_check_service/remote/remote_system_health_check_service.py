@@ -47,7 +47,9 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
             ts = content.get("transfer_status", {})
 
             if not ts:
-                raise HealthCheckError("Remote service response is not valid.")
+                raise HealthCheckError(
+                    f"Remote service '{config.health_check_url}' response is not valid. {content}"
+                )
 
             transfer_status = TransferStatus(
                 aspera=ProtocolServerStatus(
@@ -65,4 +67,8 @@ class RemoteSystemHealthCheckService(SystemHealthCheckService):
         except Exception as exc:
             # If we can’t reach the service or it returned a bad status
             err_msg = str(exc)
-            raise HealthCheckError("Could not fetch remote health status", err_msg)
+            raise HealthCheckError(
+                "Could not fetch remote health status from %s: %s",
+                config.health_check_url,
+                err_msg,
+            )

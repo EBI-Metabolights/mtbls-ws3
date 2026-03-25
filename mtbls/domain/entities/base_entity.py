@@ -70,15 +70,15 @@ class BaseStatistic(BaseOutputEntity):
     )
 
 
-class BaseStudyFileInput(BaseInputEntity):
+class BaseStudyDataFileInput(BaseInputEntity):
     model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyFile
+        from_attributes=True, strict=True, entity_type=Entity.StudyDataFile
     )
 
 
-class BaseStudyFile(BaseOutputEntity):
+class BaseStudyDataFile(BaseOutputEntity):
     model_config = ConfigDict(
-        from_attributes=True, strict=True, entity_type=Entity.StudyFile
+        from_attributes=True, strict=True, entity_type=Entity.StudyDataFile
     )
 
 
@@ -91,4 +91,10 @@ class BaseStudyRevisionInput(BaseInputEntity):
 class BaseStudyRevision(BaseOutputEntity):
     model_config = ConfigDict(
         from_attributes=True, strict=True, entity_type=Entity.StudyRevision
+    )
+
+
+class BaseCompound(BaseInputEntity):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.Compound
     )

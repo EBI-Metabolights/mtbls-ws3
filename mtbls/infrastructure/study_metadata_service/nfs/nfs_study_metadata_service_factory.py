@@ -6,8 +6,8 @@ from mtbls.application.services.interfaces.repositories.file_object.file_object_
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (  # noqa: E501
     StudyReadRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
@@ -26,7 +26,7 @@ from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service 
 class FileObjectStudyMetadataServiceFactory(StudyMetadataServiceFactory):
     def __init__(
         self,
-        study_file_repository: StudyFileRepository,
+        study_data_file_repository: StudyDataFileRepository,
         metadata_files_object_repository: FileObjectWriteRepository,
         audit_files_object_repository: FileObjectWriteRepository,
         internal_files_object_repository: FileObjectWriteRepository,
@@ -36,7 +36,7 @@ class FileObjectStudyMetadataServiceFactory(StudyMetadataServiceFactory):
     ):
         self.user_read_repository = user_read_repository
         self.internal_files_object_repository = internal_files_object_repository
-        self.study_file_repository = study_file_repository
+        self.study_data_file_repository = study_data_file_repository
         self.metadata_files_object_repository = metadata_files_object_repository
         self.audit_files_object_repository = audit_files_object_repository
         self.study_read_repository = study_read_repository
@@ -48,7 +48,7 @@ class FileObjectStudyMetadataServiceFactory(StudyMetadataServiceFactory):
     ) -> StudyMetadataService:
         return FileObjectStudyMetadataService(
             resource_id=resource_id,
-            study_file_repository=self.study_file_repository,
+            study_data_file_repository=self.study_data_file_repository,
             metadata_files_object_repository=self.metadata_files_object_repository,
             audit_files_object_repository=self.audit_files_object_repository,
             internal_files_object_repository=self.internal_files_object_repository,

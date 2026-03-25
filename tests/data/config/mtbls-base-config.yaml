@@ -1,48 +1,113 @@
+
 gateways:
+  cache:
+    redis:
+      connection:
+        password: "{{ redis.password }}"
+        db: "{{ redis.db }}"
+        redis_service:
+          host: "{{ redis.host }}"
+          port: "{{ redis.port }}"
+        socket_timeout: 0.4
   database:
     sqlite:
       connection:
-        file_path: .test-temp/sqlite_test.db
-        url_scheme: sqlite+aiosqlite
-    # mongodb:
-    #   connection:
-    #     url_scheme: mongodb
-    #     host: hh-rke-wp-webadmin-33-worker-4.caas.ebi.ac.uk
-    #     port: 32068
-    #     user: root
-    #     password: example
-    #     database: test
+        file_path: "{{ sqlite.file_path }}"
+        url_scheme: "{{ sqlite.url_scheme }}"
+    postgresql:
+      connection:
+        host: "{{ postgresql.host }}"
+        port: "{{ postgresql.port }}"
+        user: "{{ postgresql.user }}"
+        password: "{{ postgresql.password }}"
+        database: "{{ postgresql.database }}"
+        url_scheme: "{{ postgresql.url_scheme }}"
+    mongodb:
+      connection:
+        hosts: "{{ mongodb.hosts }}"
+        port: "{{ mongodb.port }}"
+        user: "{{ mongodb.user }}"
+        password: "{{ mongodb.password }}"
+        database: "{{ mongodb.database }}"
+        url_scheme: "{{ mongodb.url_scheme }}"
+        replica_set: "{{ mongodb.replica_set }}"
+    elasticsearch:
+      connection:
+        hosts: "{{ elasticsearch.host}}"
+        port: "{{ elasticsearch.port }}"
+        username: "{{ elasticsearch.username }}"
+        password: "{{ elasticsearch.password }}"
+        verify_certs: "{{ elasticsearch.verify_certs }}"
+        scheme: "{{ elasticsearch.scheme }}"
+        api_keys:
+          study: "{{ elasticsearch.api_keys.study }}"
+          compound: "{{ elasticsearch.api_keys.compound }}"
+          assignment: "{{ elasticsearch.api_keys.assignment }}"
+          assay: "{{ elasticsearch.api_keys.assay }}"
+          sample: "{{ elasticsearch.api_keys.sample }}"
+        request_timeout_in_seconds: 15.0
 services:
   authentication:
+    mtbls_ws2:
+      host: "{{ authentication.mtbls_ws2.host }}"
+      port: "{{ authentication.mtbls_ws2.port }}"
+      base_context_path: "{{ authentication.mtbls_ws2.base_context_path }}"
+      scheme: "{{ authentication.mtbls_ws2.scheme }}"
     standalone:
-      application_secret_key: test_123
+      application_secret_key: "{{ authentication.standalone.application_secret_key }}"
+    keycloak:
+      host: "{{ authentication.keycloak.host }}"
+      realm_name: "{{ authentication.keycloak.realm_name }}"
+      client_id: "{{ authentication.keycloak.client_id }}"
+      client_secret: "{{ authentication.keycloak.client_secret }}"
+    active_authentication_service: mtbls_ws2
   policy_service:
     opa:
-      version_url: http://localhost:8181/v1/data/metabolights/validation/v2/configuration/version
-      validation_url: http://localhost:8181/v1/data/metabolights/validation/v2/report/complete_report?pretty=true
-      templates_url: http://localhost:8181/v1/data/metabolights/validation/v2/templates
-      control_lists_url: http://localhost:8181/v1/data/metabolights/validation/v2/controlLists
-      rule_definitions_url: http://localhost:8181/v1/data/metabolights/validation/v2/configuration/rules
+      validate_schema: false
+      timeout_in_seconds: 600
+      version_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/version"
+      validation_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/report/complete_report?pretty=true"
+      templates_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/templates"
+      control_lists_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/controls"
+      rule_definitions_url: "{{ policy_service.opa.host_url }}/v1/data/metabolights/validation/v2/configuration/rules"
+  ontology_search_service:
+    ols:
+      timeout_in_seconds: 10
+      default_search_result_size: 30
   system_health_check:
+    active_health_check_service: "{{ system_health_check.active_health_check_service }}"
+    remote:
+      transfer_health_check:
+        health_check_url: "{{ system_health_check.remote.transfer_health_check.health_check_url }}"
+        timeout_in_seconds: 5
     standalone:
       transfer_health_check:
-        test: true
-        test_response: true
+        test: "{{ system_health_check.standalone.transfer_health_check.test }}"
+        test_response: "{{ system_health_check.standalone.transfer_health_check.test_response }}"
 repositories:
+  active_target_repository:
+    validation_overrides: nfs
+    validation_reports: nfs
+    study_metadata: nfs
+    study_data_files: nfs
   study_folders:
     mounted_paths:
-      private_metadata_files_root_path: tests/data/storages/rw/studies/metadata-files
-      deleted_private_metadata_files_root_path: tests/data/storages/rw/studies/deleted-files
-      audit_files_root_path: tests/data/storages/rw/studies/audit-files
-      internal_files_root_path: tests/data/storages/rw/studies/internal-files
-      private_data_files_root_path: tests/data/storages/private-ftp/studies/data-files
-      deleted_private_data_files_root_path: tests/data/storages/rw/studies/deleted-files
-      report_files_root_path: tests/data/storages/rw/report-files
-      public_studies_root_path: "tests/data/storages/public-ftp/study-files"
-      deleted_public_studies_root_path: "tests/data/storages/public-ftp/deleted-study-files"
-      indices_cache_root_path: tests/data/storages/rw/indices-cache
+      private_metadata_files_root_path: "{{ mounted_paths.private_metadata_files_root_path }}"
+      deleted_private_metadata_files_root_path: "{{ mounted_paths.deleted_private_metadata_files_root_path }}"
+      audit_files_root_path: "{{ mounted_paths.audit_files_root_path }}"
+      internal_files_root_path: "{{ mounted_paths.internal_files_root_path }}"
+      private_data_files_root_path: "{{ mounted_paths.private_data_files_root_path }}"
+      deleted_private_data_files_root_path: "{{ mounted_paths.deleted_private_data_files_root_path }}"
+      report_files_root_path: "{{ mounted_paths.report_files_root_path }}"
+      public_studies_root_path: "{{ mounted_paths.public_studies_root_path }}"
+      deleted_public_studies_root_path: "{{ mounted_paths.deleted_public_studies_root_path }}"
+      indices_cache_root_path: "{{ mounted_paths.indices_cache_root_path }}"
 run:
   submission:
+    mhd:
+      api_key: "{{ mhd.api_key }}"
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
     default_dataset_license:
       name: "CC0 1.0 Universal"
       version: "1.0"
@@ -64,8 +129,9 @@ run:
     - prefix: "/curation/"
       scopes:
       - curator
+      - submitter
     api_server_config:
-      port: 7077
+      port: "{{ run.submission.port }}"
       api_groups:
       - config_name: "public"
         enabled: true
@@ -90,12 +156,10 @@ run:
         - mtbls/presentation/rest_api/groups/system/v1
       cors:
         origins:
+        - .+
         - http(s*)://.*\.ebi\.ac\.uk(:\d{1,5})?
-        - http(s*)://localhost(:.\d{1,5})?
-        - http(s*)://.*\.docker\.internal(:.+)?
-        - http(s*)://127\.0\.0\.1(:\d{1,5})?
       server_info:
-        root_path: ""
+        root_path: "{{ run.submission.root_path }}"
         title: "EMBL-EBI MetaboLights Submission API"
         description: EMBL European Bioinformatics Institute (EBI) - MetaboLights Submission OpenAPI Schema
         summary: Open MetaboLights Submission REST API
@@ -116,6 +180,10 @@ run:
           description: "Study curation endpoints (curators only)"
         - name: "Public"
           description: "Public MetaboLights studies and statistics"
+        - name: "Auth"
+          description: "Identity & Authentication & Authorization"
+        - name: "System"
+          description: "System configuration and status"
     logging:
       version: 1
       disable_existing_loggers: true
@@ -127,17 +195,65 @@ run:
       handlers:
         console:
           class: "logging.StreamHandler"
-          level: DEBUG
-          formatter: "text_formatter"
+          level: "{{ run.submission.logging.level }}"
+          formatter: "{{ run.submission.logging.selected_formatter }}"
           stream: "ext://sys.stdout"
           filters: [ default_filter, correlation_id ]
       root:
-        level: DEBUG
+        level: "{{ run.submission.logging.level }}"
         handlers: [ "console" ]
         propogate: true
       loggers:
         mtbls:
-          level: DEBUG
+          level: "{{ run.submission.logging.level }}"
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+        __main__:
+          level: INFO
+          propogate: yes
+      filters:
+        correlation_id:
+          (): "asgi_correlation_id.CorrelationIdFilter"
+          default_value: "-"
+        default_filter:
+          (): "{{ run.submission.logging.default_filter_class }}"
+  common_worker:
+    mhd:
+      public_study_base_url: "{{ mhd.public_study_base_url }}"
+      api_key: "{{ mhd.api_key }}"
+      mhd_webservice_base_url: "{{ mhd.mhd_webservice_base_url }}"
+    module_config:
+      loaded_sub_package_names: []
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s", "client": "%(client)s", "route_path": "%(route_path)s", "resource_id": "%(resource_id)s", "user_id": %(user_id)d, "request_id": "%(request_id)s", "task_id": "%(task_id)s", "thread_name": "%(threadName)s",  "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(task_id)s %(threadName)s, %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: "{{ run.common_worker.logging.level }}"
+          formatter: "{{ run.common_worker.logging.selected_formatter }}"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter, correlation_id ]
+      root:
+        level: "{{ run.common_worker.logging.level }}"
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: "{{ run.common_worker.logging.level }}"
           propogate: yes
         uvicorn:
           level: INFO
@@ -153,4 +269,45 @@ run:
           (): "asgi_correlation_id.CorrelationIdFilter"
           default_value: "-"
         default_filter:
-          (): "mtbls.run.rest_api.submission.log_filter.DefaultLogFilter"
+          (): "{{ run.common_worker.logging.default_filter_class }}"
+  monitor:
+    port: "{{ run.monitor.port }}"
+  cli:
+    logging:
+      version: 1
+      disable_existing_loggers: true
+      formatters:
+        json_formatter:
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+        text_formatter:
+          format: '%(levelname)-8s %(asctime)s %(client)s %(name)s "%(message)s"'
+      handlers:
+        console:
+          class: "logging.StreamHandler"
+          level: "{{ run.cli.logging.level }}"
+          formatter: "{{ run.cli.logging.selected_formatter }}"
+          stream: "ext://sys.stdout"
+          filters: [ default_filter ]
+      root:
+        level: "{{ run.cli.logging.level }}"
+        handlers: [ "console" ]
+        propogate: true
+      loggers:
+        mtbls:
+          level: "{{ run.cli.logging.level }}"
+          propogate: yes
+        uvicorn:
+          level: INFO
+          propogate: yes
+        celery:
+          level: INFO
+          propogate: yes
+        httpcore:
+          level: WARNING
+          propogate: yes
+        __main__:
+          level: INFO
+          propogate: yes
+      filters:
+        default_filter:
+          (): "{{ run.cli.logging.default_filter_class }}"

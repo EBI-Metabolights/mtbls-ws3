@@ -107,8 +107,8 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
             user_read_repository=container.repositories.user_read_repository(),
         )
     )
-    # container.repositories.study_file_repository.override(
-    #     FileSystemStudyFileRepository()
+    # container.repositories.study_data_file_repository.override(
+    #     FileSystemStudyDataFileRepository()
     # )
     container.services.policy_service.override(MockPolicyService())
 
@@ -119,11 +119,13 @@ def submission_api_container(local_env_container) -> Ws3ApplicationContainer:
 def submission_api_client(
     submission_api_container, local_config_file, local_secrets_file
 ):
-    app, _ = create_app(
-        config_file_path=local_config_file,
-        secrets_file_path=local_secrets_file,
-        container=submission_api_container,
-        db_connection_pool_size=3,
+    app, _ = asyncio.run(
+        create_app(
+            config_file_path=local_config_file,
+            secrets_file_path=local_secrets_file,
+            container=submission_api_container,
+            db_connection_pool_size=3,
+        )
     )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
@@ -144,11 +146,13 @@ def submission_api_client(
 
 @pytest.fixture(scope="module")
 def public_api_client(submission_api_container, local_config_file, local_secrets_file):
-    app, _ = create_app(
-        config_file_path=local_config_file,
-        secrets_file_path=local_secrets_file,
-        container=submission_api_container,
-        db_connection_pool_size=3,
+    app, _ = asyncio.run(
+        create_app(
+            config_file_path=local_config_file,
+            secrets_file_path=local_secrets_file,
+            container=submission_api_container,
+            db_connection_pool_size=3,
+        )
     )
     # Override async task service
     async_task_registry = submission_api_container.core.async_task_registry()
@@ -170,13 +174,13 @@ def public_api_client(submission_api_container, local_config_file, local_secrets
 @pytest.fixture(scope="session")
 def templates_json() -> dict[str, Any]:
     with Path("tests/data/json/templates.json").open("r") as f:
-        return json.load(f)["result"]
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")
 def control_lists_json() -> dict[str, Any]:
     with Path("tests/data/json/control_lists.json").open("r") as f:
-        return json.load(f)["result"]
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")

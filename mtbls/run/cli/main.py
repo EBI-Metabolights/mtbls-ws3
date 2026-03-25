@@ -3,22 +3,22 @@ import sys
 import click
 
 from mtbls import __version__
-from mtbls.run.cli.es.index_studies import run_es_cli
-from mtbls.run.cli.validation.validate_studies import run_validation_cli
+from mtbls.run.cli.index.index_group import index_group
+from mtbls.run.cli.validation.validation_group import validation_group
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(__version__)
-def mtbls_tool():
-    """MeteboLights CLI tool with subcommands."""
+def mtbls_cli():
+    """MetaboLights CLI tool with subcommands."""
     pass
 
 
-mtbls_tool.add_command(run_es_cli)
-mtbls_tool.add_command(run_validation_cli)
+mtbls_cli.add_command(index_group)
+mtbls_cli.add_command(validation_group)
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        mtbls_tool(["--help"])
+        mtbls_cli(["--help"])
     else:
-        mtbls_tool()
+        mtbls_cli()

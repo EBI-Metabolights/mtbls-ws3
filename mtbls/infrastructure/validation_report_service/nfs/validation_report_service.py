@@ -8,7 +8,7 @@ from typing import Union
 from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.exceptions.repository import StudyObjectNotFoundError
 from mtbls.domain.shared.data_types import ZeroOrPositiveInt
 from mtbls.domain.shared.validation_result_file import ValidationResultFile
@@ -49,7 +49,7 @@ class FileSystemValidationReportService(ValidationReportService):
         limit: Union[None, ZeroOrPositiveInt],
     ) -> list[ValidationResultFile]:
         await self._initiate_validation_history_folder(resource_id=resource_id)
-        items: list[StudyFileOutput] = await self.file_object_repository.list(
+        items: list[StudyDataFileOutput] = await self.file_object_repository.list(
             resource_id=resource_id,
             object_key=self.validation_history_object_key,
         )
@@ -73,7 +73,7 @@ class FileSystemValidationReportService(ValidationReportService):
         self, resource_id: str, task_id: str
     ) -> ValidationResultFile:
         await self._initiate_validation_history_folder(resource_id=resource_id)
-        items: list[StudyFileOutput] = await self.file_object_repository.list(
+        items: list[StudyDataFileOutput] = await self.file_object_repository.list(
             resource_id=resource_id,
             object_key=self.validation_history_object_key,
         )
@@ -95,7 +95,7 @@ class FileSystemValidationReportService(ValidationReportService):
         self, resource_id: str, validation_time: str
     ) -> ValidationResultFile:
         await self._initiate_validation_history_folder(resource_id=resource_id)
-        items: list[StudyFileOutput] = await self.file_object_repository.list(
+        items: list[StudyDataFileOutput] = await self.file_object_repository.list(
             resource_id=resource_id,
             object_key=self.validation_history_object_key,
         )

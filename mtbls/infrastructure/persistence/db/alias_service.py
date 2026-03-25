@@ -83,7 +83,7 @@ class AliasService:
     @classmethod
     def find_modules(cls, path: str) -> list[pkgutil.ModuleInfo]:
         modules = []
-        data = list(pkgutil.walk_packages([path]))
+        data = list(pkgutil.iter_modules([path]))
 
         if data:
             for module in data:

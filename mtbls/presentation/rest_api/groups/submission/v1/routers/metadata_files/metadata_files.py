@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.shared.permission import StudyPermissionContext
 from mtbls.presentation.rest_api.core.responses import (
     APIListResponse,
@@ -26,7 +26,7 @@ router = APIRouter(tags=["Metadata Files"], prefix="/submissions/v2/metadata-fil
     "/{resource_id}",
     summary="Get ISA metadata files",
     description="Get ISA metadata files",
-    response_model=APIListResponse[StudyFileOutput],
+    response_model=APIListResponse[StudyDataFileOutput],
 )
 @inject
 async def get_isa_table_files_wrapper(
@@ -41,5 +41,5 @@ async def get_isa_table_files_wrapper(
     with metadata_service:
         isa_files = await metadata_service.list_isa_files()
 
-    response = APIListResponse[StudyFileOutput](content=isa_files)
+    response = APIListResponse[StudyDataFileOutput](content=isa_files)
     return response

@@ -28,7 +28,7 @@ def async_task(
                         asyncio.set_event_loop(worker_loop)
 
             except Exception as ex:
-                logger.error(ex)
+                logger.debug("Failed to run task: %s", ex)
                 if worker_loop:
                     asyncio.set_event_loop(worker_loop)
                 else:

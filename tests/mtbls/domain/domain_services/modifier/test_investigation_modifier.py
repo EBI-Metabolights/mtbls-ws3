@@ -599,17 +599,14 @@ class TestUpdateAssayDefaults:
         metabolights_model = modifier.model
         study = metabolights_model.investigation.studies[0]
         assay = study.study_assays.assays[0]
-        measurement_type = assay.measurement_type.term
         technology_type = assay.technology_type.term
         technology_platform = assay.technology_platform
         assay.technology_platform = "Bruker"
         assay.technology_type.term = ""
-        assay.measurement_type.term = ""
         modifier.update_assay_defaults()
         assert technology_platform == assay.technology_platform
         assert technology_type == assay.technology_type.term
-        assert measurement_type == assay.measurement_type.term
-        expected_logs_count = 3
+        expected_logs_count = 2
 
         assert len(modifier.update_logs) == expected_logs_count
 

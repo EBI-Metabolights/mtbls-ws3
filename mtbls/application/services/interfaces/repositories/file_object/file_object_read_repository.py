@@ -4,7 +4,7 @@ from typing import Union
 from mtbls.application.services.interfaces.repositories.file_object.base import (
     BaseFileObjectRepository,
 )
-from mtbls.domain.entities.study_file import StudyFileOutput
+from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
 
 
@@ -17,7 +17,7 @@ class FileObjectReadRepository(BaseFileObjectRepository, abc.ABC):
         self,
         resource_id: str,
         object_key: Union[None, str] = None,
-    ) -> list[StudyFileOutput]: ...
+    ) -> list[StudyDataFileOutput]: ...
 
     @abc.abstractmethod
     async def exists(
@@ -27,7 +27,9 @@ class FileObjectReadRepository(BaseFileObjectRepository, abc.ABC):
     ) -> bool: ...
 
     @abc.abstractmethod
-    async def get_info(self, resource_id: str, object_key: str) -> StudyFileOutput: ...
+    async def get_info(
+        self, resource_id: str, object_key: str
+    ) -> StudyDataFileOutput: ...
 
     @abc.abstractmethod
     async def get_uri(

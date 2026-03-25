@@ -5,47 +5,54 @@ from pydantic import BaseModel
 
 class ElasticsearchConfiguration(BaseModel):
     origin_url: str = ""  # do we want this to be a secret?
+    api_key_name: Optional[str] = None
 
 
 class StudyElasticSearchConfiguration(ElasticsearchConfiguration):
-    index_name: str = "public-study-search-index"
+    api_key_name: str = "study"
+    index_name: str = "completed-study-search-index"
     search_fields: Tuple[str, ...] = (
+        "studyId^8",
         "title^3",
         "description",
-        "organisms",
-        "organismParts",
-        "studyId^10",
-        "submitters.fullname",
-        "submitters.email",
-        "submitters.orcid",
-        "protocolDescriptions",
-        "country",
         "annotations",
+        "curatorAnnotations",
         "publications.title",
         "publications.authorList",
         "publications.doi^5",
-        "publications.pubmedId^2",
-        "contactFullnames^2",
-        "contactEmails^2",
+        "publications.pubMedId^2",
     )
+    # Nested search fields grouped by path; the gateway will add nested queries for these
+    nested_search_fields: Tuple[Tuple[str, Tuple[str, ...]], ...] = ()
     facet_size: int = 25
 
     source_includes: Optional[Tuple[str, ...]] = (
         "studyId",
         "title",
         "description",
+        "status",
+        "curationRequest",
         "publicReleaseDate",
         "modifiedTime",
+        "sizeInBytes",
+        "sizeInText",
+        "publications",
+        "protocols",
         "organisms",
         "organismParts",
+        "variants",
+        "sampleTypes",
         "assayTechniques",
         "technologyTypes",
-        "country",
         "designDescriptors",
-        "sizeInBytes",
-        "publications",
-        "submitters",
-        "url",
         "factors",
-        "sampleTypes",
+        "submitters",
+        "contacts",
+        "assays",
+        "fundings",
+        "curatorAnnotations",
+        "annotations",
+        "submissionDate",
+        "investigationFilePath",
+        "sampleFilePath",
     )

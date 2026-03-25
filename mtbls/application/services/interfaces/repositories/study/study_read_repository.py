@@ -37,7 +37,7 @@ class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
         filters: Union[None, list[EntityFilter]],
         include_revisions: bool = False,
         include_submitters: bool = False,
-    ) -> list[str]: ...
+    ) -> list[StudyOutput]: ...
 
     @abc.abstractmethod
     async def get_study_by_obfuscation_code(

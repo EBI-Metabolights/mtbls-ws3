@@ -17,8 +17,8 @@ from mtbls.application.services.interfaces.repositories.file_object.validation.v
 from mtbls.application.services.interfaces.repositories.study.study_write_repository import (  # noqa: E501
     StudyWriteRepository,
 )
-from mtbls.application.services.interfaces.repositories.study_file.study_file_write_repository import (  # noqa: E501
-    StudyFileRepository,
+from mtbls.application.services.interfaces.repositories.study_data_file.study_data_file_write_repository import (  # noqa: E501
+    StudyDataFileRepository,
 )
 from mtbls.application.services.interfaces.repositories.user.user_write_repository import (  # noqa: E501
     UserWriteRepository,
@@ -27,7 +27,7 @@ from mtbls.application.services.interfaces.repositories.user.user_write_reposito
 
 class RepositoryProvider:
     @abc.abstractmethod
-    async def get_study_file_repository(self) -> StudyFileRepository: ...
+    async def get_study_data_file_repository(self) -> StudyDataFileRepository: ...
 
     @abc.abstractmethod
     async def get_study_repository(self) -> StudyWriteRepository: ...

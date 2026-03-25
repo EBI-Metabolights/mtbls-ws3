@@ -5,14 +5,14 @@ from typing import Any
 
 import yaml
 from dependency_injector import containers
-from jinja2 import Template
+from jinja2 import Environment
 
 logger = logging.getLogger(__name__)
 
 CONFIG_FILE_ENVIRONMENT_VARIABLE_NAME = "MTBLS_WS_CONFIG_FILE"
 DEFAULT_CONFIG_FILE_PATH = "mtbls-ws-config.yaml"
 SECRET_FILE_ENVIRONMENT_VARIABLE_NAME = "MTBLS_WS_SECRET_FILE"
-DEFAULT_SECRETS_FILE_PATH = ".mtbls-ws-config-secrets/.secrets.yaml"
+DEFAULT_SECRETS_FILE_PATH = ".secrets/ws3-secrets.yaml"
 
 
 def get_application_config_files() -> tuple[str, str]:
@@ -32,14 +32,35 @@ def render_config_secrets(
     if not secrets:
         logger.warning("Secrets dictionary is empty. Skiping config rendering")
         return config
-    rendered_config = {}
-    for key, value in config.items():
-        template = Template(str(value))
-        rendered_data = template.render(secrets)
-        rendered_config[key] = eval(rendered_data)
-    for key, value in rendered_config.items():
-        config[key] = value
-    return config
+    env = Environment()
+
+    def _split(value: Any, sep: str = ",") -> list[str]:
+        if isinstance(value, (list, tuple)):
+            return [str(part).strip() for part in value if str(part).strip()]
+        return [part.strip() for part in str(value).split(sep) if part.strip()]
+
+    env.filters["split"] = _split
+
+    def _render_value(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {k: _render_value(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [_render_value(v) for v in value]
+        if isinstance(value, str):
+            rendered = env.from_string(value).render(secrets)
+            if rendered == "":
+                return ""
+            stripped = rendered.lstrip()
+            # Only parse structured outputs (lists/dicts); keep scalars as strings
+            if stripped.startswith("[") or stripped.startswith("{"):
+                try:
+                    return yaml.safe_load(rendered)
+                except Exception:
+                    return rendered
+            return rendered
+        return value
+
+    return _render_value(config)
 
 
 def set_application_configuration(

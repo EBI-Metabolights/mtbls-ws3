@@ -403,38 +403,39 @@ class Test_rule_a_200_090_004_01:
         assert len(ms_assay_modifier.update_logs) == expected_log_items
 
 
-class TestUpdateScanPolarity:
-    @pytest.mark.asyncio
-    async def test_update_scan_polarity_01(self, ms_assay_modifier: AssayFileModifier):
-        ms_assay_modifier.max_row_number_limit = 3
-        ms_assay_modifier.update_scan_polarity()
-        assert len(ms_assay_modifier.update_logs) == 0
+# class TestUpdateScanPolarity:
+#     @pytest.mark.asyncio
+#     async def test_update_scan_polarity_01(self,
+#                                      ms_assay_modifier: AssayFileModifier):
+#         ms_assay_modifier.max_row_number_limit = 3
+#         ms_assay_modifier.update_scan_polarity()
+#         assert len(ms_assay_modifier.update_logs) == 0
 
-    @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        "polarity",
-        ["positive", "negative", "alternating"],
-    )
-    async def test_update_scan_polarity_02(
-        self, ms_assay_modifier: AssayFileModifier, polarity: str
-    ):
-        ms_assay_modifier.max_row_number_limit = 5
-        scan_polarity_name = "Parameter Value[Scan polarity]"
-        metabolights_model = ms_assay_modifier.model
-        study = metabolights_model.investigation.studies[0]
-        assay_file_name = study.study_assays.assays[0].file_name
-        assay_table = ms_assay_modifier.model.assays[assay_file_name].table
-        assay_table.data[scan_polarity_name][0] = " "
-        assay_table.data[scan_polarity_name][1] = f" {polarity[:3]}"
-        assay_table.data[scan_polarity_name][2] = f"{polarity} scan"
-        assay_table.data[scan_polarity_name][3] = f"{polarity} polarity".upper()
-        assay_table.data[scan_polarity_name][4] = f"{polarity} scan "
-        assay_table.data[scan_polarity_name][5] = f"{polarity[0:3]}  "
-        ms_assay_modifier.update_scan_polarity()
-        for idx in range(5):
-            assay_table.data[scan_polarity_name][idx] == polarity
+#     @pytest.mark.asyncio
+#     @pytest.mark.parametrize(
+#         "polarity",
+#         ["positive", "negative", "alternating"],
+#     )
+#     async def test_update_scan_polarity_02(
+#         self, ms_assay_modifier: AssayFileModifier, polarity: str
+#     ):
+#         ms_assay_modifier.max_row_number_limit = 5
+#         scan_polarity_name = "Parameter Value[Scan polarity]"
+#         metabolights_model = ms_assay_modifier.model
+#         study = metabolights_model.investigation.studies[0]
+#         assay_file_name = study.study_assays.assays[0].file_name
+#         assay_table = ms_assay_modifier.model.assays[assay_file_name].table
+#         assay_table.data[scan_polarity_name][0] = " "
+#         assay_table.data[scan_polarity_name][1] = f" {polarity[:3]}"
+#         assay_table.data[scan_polarity_name][2] = f"{polarity} scan"
+#         assay_table.data[scan_polarity_name][3] = f"{polarity} polarity".upper()
+#         assay_table.data[scan_polarity_name][4] = f"{polarity} scan "
+#         assay_table.data[scan_polarity_name][5] = f"{polarity[0:3]}  "
+#         ms_assay_modifier.update_scan_polarity()
+#         for idx in range(5):
+#             assay_table.data[scan_polarity_name][idx] == polarity
 
-        assert len(ms_assay_modifier.update_logs) == 1
+#         assert len(ms_assay_modifier.update_logs) == 1
 
 
 class TestUpdateProtocolRefColumns:

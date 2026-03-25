@@ -30,6 +30,7 @@ from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
+from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.infrastructure.auth.mtbls_ws2.mtbls_ws2_authentication_proxy import (
     MtblsWs2AuthenticationProxy,
 )
@@ -42,11 +43,20 @@ from mtbls.infrastructure.ontology_search.ols.ols_search_service import (
 )
 from mtbls.infrastructure.policy_service.opa.opa_service import OpaPolicyService
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
+from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_service_factory import (  # noqa: E501
+    MongoDbStudyMetadataServiceFactory,
+)
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
 )
+from mtbls.infrastructure.validation_override_service.mongodb.validation_override_service import (  # noqa: E501
+    MongoDbValidationOverrideService,
+)
 from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (  # noqa: E501
     FileSystemValidationOverrideService,
+)
+from mtbls.infrastructure.validation_report_service.mongodb.validation_report_service import (  # noqa: E501
+    MongoDbValidationReportService,
 )
 from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (  # noqa: E501
     FileSystemValidationReportService,
@@ -75,23 +85,23 @@ class Ws3WorkerCoreContainer(containers.DeclarativeContainer):
 
 class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
+    repository_config = providers.Configuration()
+    cache_config = providers.Configuration()
     core = providers.DependenciesContainer()
-
     repositories = providers.DependenciesContainer()
     gateways = providers.DependenciesContainer()
-    cache_config = providers.Configuration()
 
     cache_service: CacheService = providers.Singleton(
         RedisCacheImpl,
         config=cache_config,
     )
-    policy_service: PolicyService = providers.Singleton(
+    policy_service: PolicyService = providers.Factory(
         OpaPolicyService,
         http_client=gateways.http_client,
         config=config.policy_service.opa,
     )
 
-    ontology_search_service: OntologySearchService = providers.Singleton(
+    ontology_search_service: OntologySearchService = providers.Factory(
         OlsOntologySearchService,
         http_client=gateways.http_client,
         cache_service=cache_service,
@@ -121,28 +131,58 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         study_read_repository=repositories.study_read_repository,
     )
 
-    validation_override_service: ValidationOverrideService = providers.Singleton(
-        FileSystemValidationOverrideService,
-        file_object_repository=repositories.internal_files_object_repository,
-        policy_service=policy_service,
-        validation_overrides_object_key="validation-overrides/validation-overrides.json",
-        temp_directory="/tmp/validation-overrides-tmp",
+    validation_override_service: ValidationOverrideService = providers.Selector(
+        selector=repository_config.active_target_repository.validation_overrides,
+        mongodb=providers.Singleton(
+            MongoDbValidationOverrideService,
+            validation_override_repository=repositories.validation_override_repository,
+            policy_service=policy_service,
+            validation_overrides_object_key="validation-overrides/validation-overrides.json",  # noqa: E501
+        ),
+        nfs=providers.Singleton(
+            FileSystemValidationOverrideService,
+            file_object_repository=repositories.internal_files_object_repository,
+            policy_service=policy_service,
+            validation_overrides_object_key="validation-overrides/validation-overrides.json",
+            temp_directory="/tmp/validation-overrides-tmp",
+        ),
     )
-    validation_report_service: ValidationReportService = providers.Singleton(
-        FileSystemValidationReportService,
-        file_object_repository=repositories.internal_files_object_repository,
-        validation_history_object_key="validation-history",
+    validation_report_service: ValidationReportService = providers.Selector(
+        selector=repository_config.active_target_repository.validation_reports,
+        mongodb=providers.Singleton(
+            MongoDbValidationReportService,
+            validation_report_repository=repositories.validation_report_repository,
+            validation_history_object_key="validation-history",
+        ),
+        nfs=providers.Singleton(
+            FileSystemValidationReportService,
+            file_object_repository=repositories.internal_files_object_repository,
+            validation_history_object_key="validation-history",
+        ),
     )
 
-    study_metadata_service_factory: StudyMetadataServiceFactory = providers.Singleton(
-        FileObjectStudyMetadataServiceFactory,
-        study_file_repository=None,
-        metadata_files_object_repository=repositories.metadata_files_object_repository,
-        audit_files_object_repository=repositories.audit_files_object_repository,
-        internal_files_object_repository=repositories.internal_files_object_repository,
-        study_read_repository=repositories.study_read_repository,
-        user_read_repository=repositories.user_read_repository,
-        temp_path="/tmp/study-metadata-service",
+    study_metadata_service_factory: StudyMetadataServiceFactory = providers.Selector(
+        selector=repository_config.active_target_repository.study_metadata,
+        mongodb=providers.Singleton(
+            MongoDbStudyMetadataServiceFactory,
+            study_data_file_repository=None,
+            investigation_object_repository=repositories.investigation_object_repository,
+            isa_table_object_repository=repositories.isa_table_object_repository,
+            isa_table_row_object_repository=repositories.isa_table_row_object_repository,
+            study_read_repository=repositories.study_read_repository,
+            user_read_repository=repositories.user_read_repository,
+            temp_path="/tmp/study-metadata-service",
+        ),
+        nfs=providers.Singleton(
+            FileObjectStudyMetadataServiceFactory,
+            study_data_file_repository=None,
+            metadata_files_object_repository=repositories.metadata_files_object_repository,
+            audit_files_object_repository=repositories.audit_files_object_repository,
+            internal_files_object_repository=repositories.internal_files_object_repository,
+            study_read_repository=repositories.study_read_repository,
+            user_read_repository=repositories.user_read_repository,
+            temp_path="/tmp/study-metadata-service",
+        ),
     )
 
 
@@ -161,13 +201,12 @@ class Ws3WorkerApplicationContainer(containers.DeclarativeContainer):
     )
 
     repositories = providers.Container(
-        RepositoriesContainer,
-        config=config,
-        gateways=gateways,
+        RepositoriesContainer, config=config, gateways=gateways
     )
     services = providers.Container(
         Ws3WorkerServicesContainer,
         config=config.services,
+        repository_config=config.repositories,
         cache_config=config.gateways.cache.redis.connection,
         core=core,
         repositories=repositories,
@@ -178,4 +217,9 @@ class Ws3WorkerApplicationContainer(containers.DeclarativeContainer):
         create_config_from_dict,
         ModuleConfiguration,
         config.run.common_worker.module_config,
+    )
+    mhd_configuration: MhdConfiguration = providers.Resource(
+        create_config_from_dict,
+        MhdConfiguration,
+        config.run.common_worker.mhd,
     )

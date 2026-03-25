@@ -35,7 +35,7 @@ from tests.mtbls.mocks.policy_service.mock_policy_service import MockPolicyServi
 if __name__ == "__main__":
     container = Ws3ApplicationContainer()
     config_file_path = "mtbls-ws-config.yaml"
-    secrets_file_path = "mtbls-ws-config-secrets.yaml"
+    secrets_file_path = ".secrets/ws3-secrets.yaml"
 
     set_application_configuration(
         container,
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     #     MongoDbIsaTableRowObjectRepository(mongodb_connection)
     # )
     # container.repositories.file_registry.override(
-    #     MongoDbStudyFileRepository(
+    #     MongoDbStudyDataFileRepository(
     #         connection=mongodb_connection,
     #     )
     # )

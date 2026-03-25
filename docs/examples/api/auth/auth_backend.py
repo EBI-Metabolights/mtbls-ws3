@@ -46,8 +46,7 @@ class AuthBackend(AuthenticationBackend):
         )
         if not user:
             logger.error(
-                "User role check failure. "
-                "User %s details are not fetched by from database.",
+                "User role check failure. User %s details are not fetched by from database.",
                 username,
             )
             raise AuthenticationError("User details are not fetched from database")
