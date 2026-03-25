@@ -127,7 +127,7 @@ class ElasticsearchClient:
             return await client.search(index=index, body=body)
         finally:
             elapsed_ms = int((time.monotonic() - started) * 1000)
-            effective_key = api_key_name or self._effective_api_key_name(api_key_name)
+            api_key_name or self._effective_api_key_name(api_key_name)
             logger.debug(
                 "Elasticsearch search completed in %sms (index=%s)",
                 elapsed_ms,
