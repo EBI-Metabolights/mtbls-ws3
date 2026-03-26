@@ -1753,7 +1753,7 @@ wheels = [
 
 [[package]]
 name = "mhd-model"
-version = "0.1.68"
+version = "0.1.70"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bioregistry" },
@@ -1771,9 +1771,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "reachable" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b7/d6/239e502bfdd9b2a3e0480455fd38c9e44229d45deef58dcb0b389f00f8b7/mhd_model-0.1.68.tar.gz", hash = "sha256:9c3fb986ec9ec9c18a91730ef9c09e59cca965815ec2eb68509ac307fbad7ec4", size = 111586, upload-time = "2026-03-25T16:23:05.433Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/a9/97107a1263fea117579009bbb31e2b502cabc6576022e765270c49435b0d/mhd_model-0.1.70.tar.gz", hash = "sha256:649fd3e1bf3c62f587b1244fd86e031b8230a18d32fb0db1c5c5c192374fd182", size = 111684, upload-time = "2026-03-26T15:15:10.56Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/1d/329e81beb009abb24ced0b612553f5b799d64d341d057c71559ccec02881/mhd_model-0.1.68-py3-none-any.whl", hash = "sha256:49300b7df76b5f0419195e1c5a698842dc1a3ef3af0c057f62a13e2302198719", size = 143668, upload-time = "2026-03-25T16:23:06.497Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/8d/55b851407e6f51baf38babcd5f776e0703c9bfed5ddfcb6596b8cbfc96bb/mhd_model-0.1.70-py3-none-any.whl", hash = "sha256:9e43eb8a34f647dd1a9c340a697d915d1a658ef11b77cf681240194d3f0b2e4d", size = 143780, upload-time = "2026-03-26T15:15:11.727Z" },
 ]
 
 [[package]]
@@ -1868,7 +1868,7 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.24"
+version = "0.0.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
@@ -1878,11 +1878,12 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
+    { name = "requests" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a7/f1/b24cc8c8e3ac1b148a220911e8e14d5d29b014f85360a7607dc3675721d9/mtbls_mhd_integration-0.0.24.tar.gz", hash = "sha256:82013153ba210d3f1a577ed654196307dfa0eb19870ded756274ce97af1304ba", size = 44853, upload-time = "2026-03-25T21:13:21.907Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/0a/14e525db152d82dafe270ee6641156952cf030d0d95081790e2e9aac7625/mtbls_mhd_integration-0.0.26.tar.gz", hash = "sha256:f55d16fadc260a3e8725d0ac06055b8fa382201cefc2881aba5bda112c4f1c8d", size = 45004, upload-time = "2026-03-26T15:19:45.357Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/7c/e37a08daada3c64bc2ae9db87576c8a3fd893e4a1cfb6103e6e9d675288c/mtbls_mhd_integration-0.0.24-py3-none-any.whl", hash = "sha256:a6b8797427d827f41d3e43f73d7944e28fd84770a8944601e46e4331218310e8", size = 49383, upload-time = "2026-03-25T21:13:22.714Z" },
+    { url = "https://files.pythonhosted.org/packages/12/39/e8ed2b6427f3bb1bde0f44f912aa428b35ecda3c8ea3617f8cde0515fa37/mtbls_mhd_integration-0.0.26-py3-none-any.whl", hash = "sha256:456a2cad132bdee06e5530b8886ab06d118bcdf6b9c2e5ca2af3a47e0e508d97", size = 49511, upload-time = "2026-03-26T15:19:46.458Z" },
 ]
 
 [[package]]
@@ -1980,8 +1981,8 @@ requires-dist = [
     { name = "jsonpath-ng", specifier = ">=1.7.0,<2" },
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", specifier = ">=1.4.21" },
-    { name = "mhd-model", specifier = ">=0.1.68" },
-    { name = "mtbls-mhd-integration", specifier = ">=0.0.24" },
+    { name = "mhd-model", specifier = ">=0.1.70" },
+    { name = "mtbls-mhd-integration", specifier = ">=0.0.26" },
     { name = "numpy", marker = "extra == 'ws3'", specifier = ">=2.1,<3" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
