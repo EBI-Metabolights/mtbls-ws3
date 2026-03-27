@@ -2,6 +2,7 @@ import logging
 import re
 from typing import Any, Dict
 
+import bioregistry
 from metabolights_utils.models.isa.assay_file import AssayFile
 from metabolights_utils.models.isa.common import IsaTableColumn, IsaTableFile
 from metabolights_utils.models.isa.enums import ColumnsStructure
@@ -988,19 +989,24 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
-                item: OntologyAnnotation = COMMON_MEASUREMENT_TYPES["untargeted"]
-
                 measurement_type = assay.measurement_type.term.lower()
                 source = None
                 if "untargeted" in measurement_type:
-                    source = COMMON_MEASUREMENT_TYPES["untargeted"]
+                    selected = COMMON_MEASUREMENT_TYPES["untargeted"]
                 elif "targeted" in measurement_type:
-                    source = COMMON_MEASUREMENT_TYPES["targeted"]
+                    selected = COMMON_MEASUREMENT_TYPES["targeted"]
                 elif "semi-targeted" in measurement_type:
-                    source = COMMON_MEASUREMENT_TYPES["semi-targeted"]
+                    selected = COMMON_MEASUREMENT_TYPES["semi-targeted"]
                 else:
-                    source = item
-
+                    selected = COMMON_MEASUREMENT_TYPES["untargeted"]
+                parts = selected.accession.split(":")
+                prefix, identifier = parts[0], parts[1]
+                accession = bioregistry.get_default_iri(prefix, identifier)
+                source: OntologyAnnotation = OntologyItem(
+                    term=selected.name,
+                    term_source_ref=selected.source,
+                    term_accession_number=accession,
+                )
                 self.override_ontology_term(
                     source=source,
                     target=assay.measurement_type,
