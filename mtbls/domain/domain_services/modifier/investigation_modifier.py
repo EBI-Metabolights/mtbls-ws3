@@ -988,19 +988,15 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
-                item: OntologyAnnotation = OntologyItem(
-                    term="metabolite profiling assay",
-                    term_source_ref="OBI",
-                    term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
-                )
+                item: OntologyAnnotation = COMMON_MEASUREMENT_TYPES["untargeted"]
 
                 measurement_type = assay.measurement_type.term.lower()
                 source = None
-                if measurement_type in COMMON_MEASUREMENT_TYPES["untargeted"]:
+                if "untargeted" in measurement_type:
                     source = COMMON_MEASUREMENT_TYPES["untargeted"]
-                elif measurement_type in COMMON_MEASUREMENT_TYPES["targeted"]:
+                elif "targeted" in measurement_type:
                     source = COMMON_MEASUREMENT_TYPES["targeted"]
-                elif measurement_type in COMMON_MEASUREMENT_TYPES["semi-targeted"]:
+                elif "semi-targeted" in measurement_type:
                     source = COMMON_MEASUREMENT_TYPES["semi-targeted"]
                 else:
                     source = item
