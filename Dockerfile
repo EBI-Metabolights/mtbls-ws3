@@ -18,6 +18,7 @@ ENV PYTHONPATH=/app-root
 EXPOSE 7077
 COPY uv.lock uv.lock
 COPY README.md README.md
+COPY pyproject.toml pyproject.toml
 RUN uv sync --locked
 COPY . .
 CMD ["uv", "run", "--no-project",  "/app-root/mtbls/run/rest_api/submission/main.py"]
