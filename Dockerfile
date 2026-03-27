@@ -7,9 +7,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app-root
-COPY . .
-RUN uv sync --locked --extra ws3
-
 ARG GROUP1_ID=2222
 ARG GROUP2_ID=2223
 ARG USER_ID=2222
@@ -19,4 +16,8 @@ RUN groupadd group1 -g $GROUP1_ID \
 USER metabolights
 ENV PYTHONPATH=/app-root
 EXPOSE 7077
+COPY uv.lock uv.lock
+COPY README.md README.md
+RUN uv sync --locked
+COPY . .
 CMD ["uv", "run", "--no-project",  "/app-root/mtbls/run/rest_api/submission/main.py"]

@@ -2,6 +2,7 @@ import logging
 import re
 from typing import Any, Dict
 
+import bioregistry
 from metabolights_utils.models.isa.assay_file import AssayFile
 from metabolights_utils.models.isa.common import IsaTableColumn, IsaTableFile
 from metabolights_utils.models.isa.enums import ColumnsStructure
@@ -44,6 +45,7 @@ class InvestigationFileModifier(BaseIsaModifier):
 
         self.db_metadata = model.study_db_metadata
         self.update_methods = [
+            self.rule___100_100_001_02,
             self.rule___100_300_001_10,
             self.rule_i_100_340_009_01,
             self.rule_i_100_000_000_00,
@@ -70,6 +72,38 @@ class InvestigationFileModifier(BaseIsaModifier):
         for method in self.update_methods:
             method()
         return self.update_logs
+
+    def rule___100_100_001_02(self):
+        investigation = self.model.investigation
+        if investigation.studies and investigation.studies[0]:
+            study = investigation.studies[0]
+            for factor in study.study_factors.factors:
+                value_format = factor.value_format
+                new_format = factor.value_format.lower() if factor.value_format else ""
+
+                if value_format != new_format:
+                    factor.value_format = new_format or ""
+                    self.modifier_update(
+                        source=self.model.investigation_file_path,
+                        action=f"Factor {factor.name or ''} value format is updated.",
+                        old_value=value_format,
+                        new_value=new_format,
+                    )
+            for protocol in study.study_protocols.protocols:
+                for param in protocol.parameters:
+                    value_format = param.value_format or ""
+                    new_format = (
+                        param.value_format.lower() if param.value_format else ""
+                    )
+
+                    if value_format != new_format:
+                        param.value_format = new_format
+                        self.modifier_update(
+                            source=self.model.investigation_file_path,
+                            action=f"Parameter {param.term or ''} value format is updated.",
+                            old_value=value_format,
+                            new_value=new_format,
+                        )
 
     def rule___100_300_001_10(self):
         investigation = self.model.investigation
@@ -112,10 +146,12 @@ class InvestigationFileModifier(BaseIsaModifier):
                             if source in default_source_references:
                                 ontology_sources.add(source)
                             else:
-                                try:
-                                    float(source)
-                                except Exception:
-                                    ontology_sources.add(term_source_data[idx])
+                                # ignore ontology sources not on OLS
+                                pass
+                                # try:
+                                #     float(source)
+                                # except Exception:
+                                #     ontology_sources.add(term_source_data[idx])
 
     def update_column_term_sources(
         self,
@@ -955,23 +991,24 @@ class InvestigationFileModifier(BaseIsaModifier):
         investigation = self.model.investigation
         if investigation.studies and investigation.studies[0]:
             for idx, assay in enumerate(investigation.studies[0].study_assays.assays):
-                item: OntologyAnnotation = OntologyItem(
-                    term="metabolite profiling assay",
-                    term_source_ref="OBI",
-                    term_accession_number="http://purl.obolibrary.org/obo/OBI_0000366",
-                )
-
                 measurement_type = assay.measurement_type.term.lower()
                 source = None
-                if measurement_type in COMMON_MEASUREMENT_TYPES["untargeted"]:
-                    source = COMMON_MEASUREMENT_TYPES["untargeted"]
-                elif measurement_type in COMMON_MEASUREMENT_TYPES["targeted"]:
-                    source = COMMON_MEASUREMENT_TYPES["targeted"]
-                elif measurement_type in COMMON_MEASUREMENT_TYPES["semi-targeted"]:
-                    source = COMMON_MEASUREMENT_TYPES["semi-targeted"]
+                if "untargeted" in measurement_type:
+                    selected = COMMON_MEASUREMENT_TYPES["untargeted"]
+                elif "targeted" in measurement_type:
+                    selected = COMMON_MEASUREMENT_TYPES["targeted"]
+                elif "semi-targeted" in measurement_type:
+                    selected = COMMON_MEASUREMENT_TYPES["semi-targeted"]
                 else:
-                    source = item
-
+                    selected = COMMON_MEASUREMENT_TYPES["untargeted"]
+                parts = selected.accession.split(":")
+                prefix, identifier = parts[0], parts[1]
+                accession = bioregistry.get_default_iri(prefix, identifier)
+                source: OntologyAnnotation = OntologyItem(
+                    term=selected.name,
+                    term_source_ref=selected.source,
+                    term_accession_number=accession,
+                )
                 self.override_ontology_term(
                     source=source,
                     target=assay.measurement_type,

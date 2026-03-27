@@ -36,9 +36,12 @@ class AuthBackend(AuthenticationBackend):
             return AuthCredentials({"unauthenticated"}), UnauthenticatedUser()
 
         auth = conn.headers["Authorization"]
-
-        username = await self.validate_credential(auth)
-
+        username = None
+        try:
+            username = await self.validate_credential(auth)
+        except Exception as ex:
+            logger.info(ex)
+            pass
         if not username:
             return AuthCredentials({"unauthenticated"}), UnauthenticatedUser()
         user: UserOutput = await self.user_read_repository.get_user_by_username(
