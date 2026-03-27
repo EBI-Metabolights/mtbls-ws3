@@ -1,6 +1,5 @@
 ARG CONTAINER_REGISTRY_PREFIX=docker.io/
-
-FROM ${CONTAINER_REGISTRY_PREFIX}astral/uv:0.9-python3.13-trixie-slim AS builder
+FROM ${CONTAINER_REGISTRY_PREFIX}astral/uv:python3.13-trixie AS builder
 
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -13,12 +12,14 @@ ARG USER_ID=2222
 RUN groupadd group1 -g $GROUP1_ID \
     && groupadd group2 -g $GROUP2_ID \
     && useradd -ms /bin/bash -u $USER_ID -g group1 -G group1,group2 metabolights
-USER metabolights
 ENV PYTHONPATH=/app-root
+ENV PATH=/app-root/.venv/bin:$PATH
+ENV UV_LOCKED=1
 EXPOSE 7077
-COPY uv.lock uv.lock
 COPY README.md README.md
 COPY pyproject.toml pyproject.toml
-RUN uv sync --locked
+COPY uv.lock uv.lock
+RUN uv sync
 COPY . .
-CMD ["uv", "run", "--no-project",  "/app-root/mtbls/run/rest_api/submission/main.py"]
+USER metabolights
+CMD ["python",  "/app-root/mtbls/run/rest_api/submission/main.py"]
