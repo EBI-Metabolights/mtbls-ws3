@@ -35,6 +35,8 @@ class DatabaseClientImpl(DatabaseClient):
                 future=True,
                 pool_size=db_pool_size,
                 max_overflow=db_pool_size * 2,
+                pool_pre_ping=True,
+                pool_recycle=1800,
             )
         else:
             logger.warning(
@@ -45,6 +47,8 @@ class DatabaseClientImpl(DatabaseClient):
                 self.db_url,
                 future=True,
                 poolclass=NullPool,
+                pool_pre_ping=True,
+                pool_recycle=1800,
             )
         self._async_session_factory = async_sessionmaker(
             self.engine,
