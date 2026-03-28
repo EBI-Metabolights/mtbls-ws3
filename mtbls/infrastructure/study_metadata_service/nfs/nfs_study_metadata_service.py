@@ -38,6 +38,7 @@ from mtbls.application.services.study_metadata_service.db_metadata_collector imp
 from mtbls.application.services.study_metadata_service.default_study_provider import (
     DataFileIndexMetabolightsStudyProvider,
 )
+from mtbls.application.services.study_metadata_service.models import IsaTableDataUpdates
 from mtbls.domain.entities.investigation import InvestigationItem
 from mtbls.domain.entities.isa_table import (
     ColumnDefinition,
@@ -104,6 +105,20 @@ class FileObjectStudyMetadataService(StudyMetadataService):
         self.transaction_id = None
         self.staging_path = None
         self.staging_path_str = None
+
+    async def update_isa_table_file(
+        self,
+        input_data: Union[None, list[IsaTableRow]] = None,
+        object_key: Union[int, None] = None,
+    ) -> tuple[Union[list[str], list[CamelCaseModel]], list[int]]:
+        raise NotImplementedError()
+
+    async def update_isa_table_rows(
+        self,
+        object_key: str,
+        updates: None | IsaTableDataUpdates = None,
+    ) -> list[IsaTableRow]:
+        raise NotImplementedError()
 
     def get_study_metadata_path(
         self, study_id: str, file_relative_path: Union[None, str] = None
