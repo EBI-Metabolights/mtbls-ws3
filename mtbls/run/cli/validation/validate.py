@@ -109,7 +109,7 @@ async def run_validation_and_save_report(
     fw = summary_file.open("w") if summary_file else None
     try:
         if fw:
-            fw.write("STUDY_ID\tRELEASE_DATE\tSTATUS\tRESULT\tERROR\n")
+            fw.write("STUDY_ID\tCREATED_AT\tRELEASE_DATE\tSTATUS\tRESULT\tERROR\n")
         for resource_id in resource_ids:
             report_path = validation_reports_root_path / Path(
                 f"{resource_id}_validation.tsv"
@@ -121,6 +121,7 @@ async def run_validation_and_save_report(
                     )
                 )
                 release_date_str = study.release_date.strftime("%Y-%m-%d")
+                created_at_str = study.created_at.strftime("%Y-%m-%d")
                 config = await create_validation_run_configuration(
                     resource_id=resource_id,
                     temp_folder=None,
@@ -183,6 +184,7 @@ async def run_validation_and_save_report(
                 if fw:
                     fw.write(
                         f"{resource_id}\t"
+                        f"{created_at_str}\t"
                         f"{release_date_str}\t"
                         f"{study.status.name}\t"
                         f"{validation_result}\t"
@@ -194,6 +196,7 @@ async def run_validation_and_save_report(
                 if fw:
                     fw.write(
                         f"{resource_id}\t"
+                        f"{created_at_str}\t"
                         f"{release_date_str}\t"
                         f"{study.status.name}\t"
                         f"Failed to validate\t"

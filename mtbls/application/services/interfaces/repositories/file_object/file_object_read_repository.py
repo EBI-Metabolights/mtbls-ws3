@@ -47,8 +47,4 @@ class FileObjectReadRepository(BaseFileObjectRepository, abc.ABC):
     ) -> str: ...
 
     @abc.abstractmethod
-    async def get_content(
-        self,
-        resource_id: str,
-        object_key: Union[None, str],
-    ) -> bytes: ...
+    async def get_content(self, resource_id: str, object_key: str) -> bytes: ...

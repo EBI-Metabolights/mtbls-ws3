@@ -117,19 +117,14 @@ class MongoDbFileObjectWriteRepository(
             return StudyDataFileOutput.model_validate(result)
         raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, object_key)
 
-    async def get_content(
-        self,
-        resource_id: str,
-        object_key: Union[None, str],
-    ) -> bytes:
+    async def get_content(self, resource_id: str, object_key: str) -> bytes:
         result = await self.collection.find_one(
             {"resourceId": resource_id, "objectId": object_key},
             {"_id": 1},
         )
-
         if result:
             return bytes(json.dumps(result["data"]))
-        return b""
+        raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, object_key)
 
     async def put_object(
         self,
