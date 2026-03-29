@@ -2,7 +2,9 @@
 es_study_index
 .pytest*
 .old
+.*tem*/
 .*secrets*
+!.vscode
 ./config.yaml
 ./config-secrets.yaml
 dist*/

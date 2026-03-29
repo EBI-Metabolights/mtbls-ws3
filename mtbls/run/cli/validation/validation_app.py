@@ -62,4 +62,10 @@ class ValidationApp:
         self.db_connection = (
             self.container.config.gateways.database.postgresql.connection()
         )
+        self.validation_override_service = (
+            self.container.services.validation_override_service()
+        )
+        self.validation_report_service = (
+            self.container.services.validation_report_service()
+        )
         logger.info("Validation CLI container started")
