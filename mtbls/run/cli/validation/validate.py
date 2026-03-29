@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 from pathlib import Path
 from typing import Union
 
@@ -9,6 +10,9 @@ from mtbls.application.remote_tasks.common.run_validation import (
     create_validation_run_configuration,
     run_validation_task,
     run_validation_task_with_modifiers,
+)
+from mtbls.application.use_cases.validation.validation_reports import (
+    override_and_save_validation_report,
 )
 from mtbls.application.use_cases.validation.validation_task import (
     convert_to_summary_result,
@@ -114,6 +118,13 @@ async def run_validation_and_save_report(
             report_path = validation_reports_root_path / Path(
                 f"{resource_id}_validation.tsv"
             )
+            if report_path.exists():
+                continue
+            logger.info(
+                "Start validation for study: %s. Report will be saved to: %s",
+                resource_id,
+                report_path,
+            )
             try:
                 study = (
                     await validation_app.study_read_repository.get_study_by_accession(
@@ -155,6 +166,15 @@ async def run_validation_and_save_report(
                 summary_result: PolicySummaryResult = await convert_to_summary_result(
                     resource_id=resource_id, result_list=result_list
                 )
+                task_id = uuid.uuid4().hex
+                await override_and_save_validation_report(
+                    resource_id=resource_id,
+                    task_id=task_id,
+                    validation_result=summary_result,
+                    validation_report_service=validation_app.validation_report_service,
+                    validation_override_service=validation_app.validation_override_service,
+                )
+
                 summary_report = await get_report_content_from_summary_report(
                     summary_result=summary_result,
                     min_violation_level=None,

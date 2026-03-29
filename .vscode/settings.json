@@ -8,6 +8,8 @@
   "editor.scrollbar.vertical": "visible",
   "files.associations": {
     "*.json": "json",
+    "*.json.j2": "json",
+    "*.yaml.j2": "yaml",
     "*.py": "python"
   },
   "[python]": {
@@ -30,14 +32,15 @@
   "python.analysis.exclude": [
     "${workspaceFolder}/.old/**",
     ".venv/**",
-    ".old/**",
-    ".temp*/**",
     "**/__pycache__",
     "**/.*",
     ".*/**",
     "**/node_modules",
     ".git",
-    ".poc/**"
+    "dist/**",
+    ".poc/**",
+    "docs/**",
+    "site/**"
   ],
   "python-envs.defaultEnvManager": "ms-python.python:venv"
 }

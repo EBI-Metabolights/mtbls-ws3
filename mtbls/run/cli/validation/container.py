@@ -19,6 +19,12 @@ from mtbls.application.services.interfaces.repositories.user.user_read_repositor
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
+from mtbls.application.services.interfaces.validation_override_service import (
+    ValidationOverrideService,
+)
+from mtbls.application.services.interfaces.validation_report_service import (
+    ValidationReportService,
+)
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
@@ -54,6 +60,18 @@ from mtbls.infrastructure.study_metadata_service.mongodb.mongodb_study_metadata_
 )
 from mtbls.infrastructure.study_metadata_service.nfs.nfs_study_metadata_service_factory import (  # noqa: E501
     FileObjectStudyMetadataServiceFactory,
+)
+from mtbls.infrastructure.validation_override_service.mongodb.validation_override_service import (
+    MongoDbValidationOverrideService,
+)
+from mtbls.infrastructure.validation_override_service.nfs.validation_override_service import (
+    FileSystemValidationOverrideService,
+)
+from mtbls.infrastructure.validation_report_service.mongodb.validation_report_service import (
+    MongoDbValidationReportService,
+)
+from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (
+    FileSystemValidationReportService,
 )
 from mtbls.run.cli.logging_config import configure_cli_logging
 
@@ -177,6 +195,36 @@ class ValidationServicesContainer(containers.DeclarativeContainer):
         http_client=gateways.http_client,
         cache_service=cache_service,
         config=config.ontology_search_service.ols,
+    )
+
+    validation_override_service: ValidationOverrideService = providers.Selector(
+        selector=repository_config.active_target_repository.validation_overrides,
+        mongodb=providers.Singleton(
+            MongoDbValidationOverrideService,
+            validation_override_repository=repositories.validation_override_repository,
+            policy_service=policy_service,
+            validation_overrides_object_key="validation-overrides/validation-overrides.json",  # noqa: E501
+        ),
+        nfs=providers.Singleton(
+            FileSystemValidationOverrideService,
+            file_object_repository=repositories.internal_files_object_repository,
+            policy_service=policy_service,
+            validation_overrides_object_key="validation-overrides/validation-overrides.json",
+            temp_directory="/tmp/validation-overrides-tmp",
+        ),
+    )
+    validation_report_service: ValidationReportService = providers.Selector(
+        selector=repository_config.active_target_repository.validation_reports,
+        mongodb=providers.Singleton(
+            MongoDbValidationReportService,
+            validation_report_repository=repositories.validation_report_repository,
+            validation_history_object_key="validation-history",
+        ),
+        nfs=providers.Singleton(
+            FileSystemValidationReportService,
+            file_object_repository=repositories.internal_files_object_repository,
+            validation_history_object_key="validation-history",
+        ),
     )
 
 
