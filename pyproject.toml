@@ -7,7 +7,7 @@ requires-python = ">=3.12,<4"
 readme = "README.md"
 license = "Apache-2.0"
 dependencies = [
-    "dependency-injector>=4.48.2,<5",
+    "dependency-injector>=4.49.0,<5",
     "pydantic>=2.10.2,<3",
     "python-dateutil>=2.9.0.post0,<3",
     "pytz>=2025.2",
@@ -22,20 +22,17 @@ dependencies = [
     "cachetools-async>=0.0.5",
     "aiohttp>=3.13.3",
     "psycopg[binary,pool]>=3.3.2",
-    "fastapi>=0.128.0",
-    "jinja2>=3.1.6",
-    "mtbls-mhd-integration>=0.0.26",
-    "mhd-model>=0.1.70",
-    "metabolights-utils>=1.4.21",
+    "fastapi>=0.135.2",
+    "jinja2>=3.1.6"
 ]
 
 [dependency-groups]
 ws3 = [
     "flower>=2.0.1,<3",
     "pymongo>=4.10.1,<5",
-    "gunicorn>=23.0.0",
+    "gunicorn>=25.3.0",
     "uvloop>=0.21.0",
-    "celery[redis]>=5.5.3",
+    "celery[redis]>=5.6.3",
     "httpx>=0.27.0",
     "sqlalchemy>=2.0.43",
     "asyncpg>=0.30.0",
@@ -45,22 +42,23 @@ ws3 = [
     "pyjwt>=2.12.0",
     "asgi-correlation-id>=4.3.4,<5",
     "greenlet>=3.2.4",
-    "fastmcp>=3.1.0",
+    "fastmcp>=3.1.1",
     "python-keycloak>=5.8.1",
     "pandas>=2.3.3",
     "numpy>=2.1,<3",
     "rdkit>=2024.3.1",
     "elasticsearch[async]>=8.0.0,<9",
+    "mtbls-mhd-integration>=0.0.21",
+    "mhd-model>=0.1.71",
+    "metabolights-utils>=1.4.21",
     "authlib>=1.6.9",
     "beartype==0.22.7",
 ]
 dev = [
     "import-linter>=2.5.2",
-    "ruff>=0.14.14",
+    "ruff>=0.15.8",
     "commitizen>=4.9.1",
     "pre-commit>=4.0.1,<5",
-]
-test = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",

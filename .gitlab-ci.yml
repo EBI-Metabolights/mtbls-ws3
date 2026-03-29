@@ -51,12 +51,11 @@ lint_and_test:
   - git status
   - ls -al
   - echo "install dependencies"
-  - uv sync --locked --group test --group dev
+  - uv sync --locked --group dev
   - echo "Run pre-commit tools"
-  - uv run ruff format
+  - uv run ruff format --check
   - uv run ruff check
   - uv run lint-imports
-  - uv run pre-commit run --all-files
   - echo "Run unit tests"
   - uv run pytest
   cache:

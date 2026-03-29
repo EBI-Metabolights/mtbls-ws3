@@ -127,18 +127,16 @@ class ElasticsearchClient:
             return await client.search(index=index, body=body)
         finally:
             elapsed_ms = int((time.monotonic() - started) * 1000)
-            effective_key = api_key_name or self._effective_api_key_name(api_key_name)
+            api_key_name or self._effective_api_key_name(api_key_name)
             logger.debug(
-                "Elasticsearch search completed in %sms (index=%s, api_key=%s)",
+                "Elasticsearch search completed in %sms (index=%s)",
                 elapsed_ms,
                 index,
-                effective_key,
             )
             if elapsed_ms > 2000:
                 logger.debug(
-                    "Slow Elasticsearch search (>2s) details: index=%s api_key=%s body=%s",
+                    "Slow Elasticsearch search (>2s) details: index=%s body=%s",
                     index,
-                    effective_key,
                     body,
                 )
 

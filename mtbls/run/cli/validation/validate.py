@@ -231,10 +231,11 @@ async def run_validation_and_save_report(
 if __name__ == "__main__":
     run_validation_cli(
         [
-            "--input-file",
-            ".temp-validations/validated_studies.txt",
+            # "--input-file",
+            # ".temp-validations/validated_studies.txt",
+            "--selected-studies=MTBLS10112",
             "--summary-file",
-            ".temp-validations/summary.txt",
+            ".temp-validations/x-summary.txt",
             "--apply-modifiers",
         ]
     )
