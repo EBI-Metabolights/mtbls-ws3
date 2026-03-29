@@ -33,6 +33,7 @@ class RequestsClient(HttpClient):
             if timeout is not None and timeout > 0
             else self.max_timeount_in_seconds
         )
+        response = None
         try:
             response: requests.Response = requests.request(
                 method.value,
