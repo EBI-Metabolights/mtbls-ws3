@@ -18,6 +18,7 @@ stages:
 - build
 - deploy-ws-worker
 - deploy-ws
+- deploy-mcp
 
 lint_and_test:
   stage: lint
@@ -110,6 +111,18 @@ deploy_ws:
     - mtbls
   variables:
     CHART_NAME: mtbls-ws3-worker
+  extends: .kube_deploy_script
+
+deploy_mcp:
+  stage: deploy-mcp
+  image:
+    name: ${CICD_GITLAB_REGISTRY}alpine/k8s:1.23.17
+    pull_policy: if-not-present
+  tags:
+    - docker
+    - mtbls
+  variables:
+    CHART_NAME: mtbls-ws3-mcp
   extends: .kube_deploy_script
 
 .kube_deploy_script:
