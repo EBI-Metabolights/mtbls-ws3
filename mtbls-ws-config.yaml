@@ -133,6 +133,8 @@ run:
       - curator
       - submitter
     api_server_config:
+      swagger_client_id: "{{ authentication.keycloak.swagger_client_id }}"
+      swagger_auth_host: "{{ authentication.keycloak.swagger_auth_host }}"
       port: "{{ run.submission.port }}"
       api_groups:
       - config_name: "public"

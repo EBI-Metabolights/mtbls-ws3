@@ -151,8 +151,6 @@ class Ws3ServicesContainer(containers.DeclarativeContainer):
         queue_names=["common", "validation", "datamover", "compute", ""],
         async_task_registry=core.async_task_registry,
     )
-
-    oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
     user_profile_service: UserProfileService = providers.Singleton(
         KeycloakAuthenticationService,
         config=config.authentication.keycloak,
@@ -247,7 +245,11 @@ class Ws3ApplicationContainer(containers.DeclarativeContainer):
         Ws3CoreContainer,
         config=config,
     )
-
+    oauth2_scheme: OAuth2ClientCredentials = providers.Resource(
+        get_oauth2_scheme,
+        auth_service_url=config.run.submission.api_server_config.swagger_auth_host,
+        realm_name=config.services.authentication.keycloak.realm_name,
+    )
     gateways = providers.Container(
         GatewaysContainer, config=config.gateways, runtime_config={"db_pool_size": 4}
     )

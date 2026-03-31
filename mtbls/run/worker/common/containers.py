@@ -68,10 +68,6 @@ from mtbls.infrastructure.validation_report_service.mongodb.validation_report_se
 from mtbls.infrastructure.validation_report_service.nfs.validation_report_service import (  # noqa: E501
     FileSystemValidationReportService,
 )
-from mtbls.presentation.rest_api.groups.auth.v1.routers.oauth2_scheme import (
-    OAuth2ClientCredentials,
-    get_oauth2_scheme,
-)
 from mtbls.run.config import ModuleConfiguration
 from mtbls.run.rest_api.submission.base_container import (
     GatewaysContainer,
@@ -122,7 +118,6 @@ class Ws3WorkerServicesContainer(containers.DeclarativeContainer):
         queue_names=["common", "validation", "datamover", "compute", ""],
         async_task_registry=core.async_task_registry,
     )
-    oauth2_scheme: OAuth2ClientCredentials = providers.Resource(get_oauth2_scheme)
     user_profile_service: UserProfileService = providers.Singleton(
         KeycloakAuthenticationService,
         config=config.authentication.keycloak,
