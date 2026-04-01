@@ -7,7 +7,7 @@ from celery.signals import setup_logging, worker_process_init, worker_process_sh
 from dependency_injector.wiring import Provide, inject
 
 import mtbls
-from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
+from mtbls.application import get_worker_loop, set_worker_loop
 from mtbls.application.services.interfaces.async_task.utils import (
     get_async_task_registry,
 )

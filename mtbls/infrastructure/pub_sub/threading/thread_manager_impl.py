@@ -5,6 +5,7 @@ import threading
 from asyncio import Task
 from typing import Any, Callable, OrderedDict, Union
 
+from mtbls.application import get_worker_loop, set_worker_loop
 from mtbls.application.context.async_task_registry import AsyncTaskRegistry
 from mtbls.application.context.request_tracker import (
     RequestTrackerModel,
@@ -142,13 +143,17 @@ class ThreadingAsyncTaskExecutor(AsyncTaskExecutor):
 
         def run():
             try:
-                loop = asyncio.get_running_loop()
-                if loop.is_running():
+                loop = get_worker_loop()
+                if not loop:
+                    loop = asyncio.get_running_loop()
+                if loop and loop.is_running():
                     result = asyncio.ensure_future(run_task())
                 else:
                     result = loop.run_until_complete(run_task())
             except RuntimeError:
-                result = asyncio.run(run_task())
+                loop = asyncio.new_event_loop()
+                set_worker_loop(loop)
+                result = loop.run_until_complete(run_task())
             return result
 
         try:

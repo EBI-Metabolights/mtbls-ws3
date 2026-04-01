@@ -45,8 +45,8 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
         self._keycloak_admin = KeycloakAdmin(
             server_url=self.config.host,
             realm_name=self.config.realm_name,
-            username=self.config.admin_username,
-            password=self.config.admin_password,
+            client_id=self.config.client_id,
+            client_secret_key=self.config.client_secret,
             verify=True,
         )
 

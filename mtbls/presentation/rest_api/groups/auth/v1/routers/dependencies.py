@@ -31,15 +31,15 @@ async def check_read_permission(
         if not context or not context.study or not context.permissions.read:
             logger.warning(
                 "User %s is not granted to view resource %s",
-                context.user.id_,
+                context.user.username,
                 resource_id,
             )
             raise AuthorizationError(
-                f"User {context.user.id_} is not granted to view resource {resource_id}"
+                f"User {context.user.username} is not granted to view resource {resource_id}"
             )
         logger.debug(
             "User %s is granted to view resource %s",
-            context.user.id_,
+            context.user.username,
             resource_id,
         )
         return context
@@ -75,13 +75,13 @@ async def check_update_permission(
             )
         if not context.permissions.update:
             raise AuthorizationError(
-                context.user.id_,
+                context.user.username,
                 resource_id,
-                f"User {context.user.id_} is not granted to update resource {resource_id}",  # noqa: E501
+                f"User {context.user.username} is not granted to update resource {resource_id}",  # noqa: E501
             )
         logger.debug(
             "User %s is granted to update resource %s",
-            context.user.id_,
+            context.user.username,
             resource_id,
         )
         return context
@@ -99,7 +99,7 @@ async def check_curator_role(
         user = request.user.user_detail
         if not user or user.role not in [UserRole.CURATOR, UserRole.SYSTEM_ADMIN]:
             raise AuthorizationError("User does not have curation permission.")
-        logger.debug("User %s has curator role.", user.id_)
+        logger.debug("User %s has curator role.", user.username)
         return user
 
     raise AuthenticationError("User has not authenticated.")

@@ -1,6 +1,6 @@
 import asyncio
 
-from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
+from mtbls.application import get_worker_loop, set_worker_loop
 
 
 def run_coroutine(coroutine):

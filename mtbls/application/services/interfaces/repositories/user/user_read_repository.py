@@ -24,7 +24,6 @@ class UserReadRepository(AbstractReadRepository[UserOutput, int]):
     async def get_user_by_id(
         self,
         id_: int,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod
@@ -32,28 +31,24 @@ class UserReadRepository(AbstractReadRepository[UserOutput, int]):
         self,
         username: str,
         api_token: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod
     async def get_user_by_orcid(
         self,
         orcid: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod
     async def get_user_by_email(
         self,
         email: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod
     async def get_user_by_username(
         self,
         username: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]: ...
 
     @abc.abstractmethod

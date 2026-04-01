@@ -11,7 +11,6 @@ from mtbls.application.services.interfaces.auth.authentication_service import (
 from mtbls.application.services.interfaces.repositories.user.user_read_repository import (  # noqa: E501
     UserReadRepository,
 )
-from mtbls.domain.entities.study import StudyOutput
 from mtbls.domain.entities.user import UserOutput, UserProfile
 from mtbls.domain.enums.entity import Entity
 from mtbls.infrastructure.persistence.db.alias_generator import AliasGenerator
@@ -43,13 +42,9 @@ class SqlDbUserReadRepository(
             Entity.StudyRevision
         )
 
-    async def _get_users_by_filter(
-        self, filter_, include_studies: bool = False
-    ) -> None | UserOutput:
+    async def _get_users_by_filter(self, filter_) -> None | UserOutput:
         async with self.database_client.session() as session:
             stmt = select(User).where(filter_())
-            if include_studies:
-                stmt = stmt.options(selectinload(User.studies))
 
             result = await session.execute(stmt)
             users: None | list[User] = result.scalars().all()
@@ -61,14 +56,9 @@ class SqlDbUserReadRepository(
                             user, UserOutput
                         )
                     )
+                    user_entity.id_ = user.id
                     if self.user_profile_service:
                         await self.update_from_user_profile(user_entity)
-                    if include_studies and user.studies:
-                        user_entity.studies = (
-                            await self.entity_mapper.convert_to_output_type_list(
-                                user_entity.studies, StudyOutput
-                            )
-                        )
                     user_entities.append(user_entity)
 
         return user_entities
@@ -76,17 +66,13 @@ class SqlDbUserReadRepository(
     async def get_user_by_id(
         self,
         id_: int,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]:
-        result = await self._get_users_by_filter(
-            lambda: User.id == id_, include_studies=include_studies
-        )
+        result = await self._get_users_by_filter(lambda: User.id == id_)
         return result[0] if result else None
 
     async def get_user_by_orcid(
         self,
         orcid: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]:
         if not orcid:
             return None
@@ -113,41 +99,25 @@ class SqlDbUserReadRepository(
                         )
         if not username:
             return None
-        result = await self._get_users_by_filter(
-            lambda: User.username == username, include_studies=include_studies
-        )
+        result = await self._get_users_by_filter(lambda: User.username == username)
 
         return result[0] if result else None
 
-    async def get_user_by_email(
-        self,
-        email: str,
-        include_studies: bool = False,
-    ) -> Union[None, UserOutput]:
-        result = await self._get_users_by_filter(
-            lambda: User.email == email, include_studies=include_studies
-        )
+    async def get_user_by_email(self, email: str) -> Union[None, UserOutput]:
+        result = await self._get_users_by_filter(lambda: User.email == email)
         return result[0] if result else None
 
-    async def get_user_by_username(
-        self,
-        username: str,
-        include_studies: bool = False,
-    ) -> Union[None, UserOutput]:
-        result = await self._get_users_by_filter(
-            lambda: User.username == username, include_studies=include_studies
-        )
+    async def get_user_by_username(self, username: str) -> Union[None, UserOutput]:
+        result = await self._get_users_by_filter(lambda: User.username == username)
         return result[0] if result else None
 
     async def get_user_by_api_token(
         self,
         username: str,
         api_token: str,
-        include_studies: bool = False,
     ) -> Union[None, UserOutput]:
         result = await self._get_users_by_filter(
             lambda: and_(User.apitoken == api_token, User.username == username),
-            include_studies=include_studies,
         )
         return result[0] if result else None
 
@@ -178,8 +148,9 @@ class SqlDbUserReadRepository(
         if not user:
             # keep current values. reset profile fields in future
             return
+        exclude = {"id_", "username"}
         for name, _ in UserOutput.model_fields.items():
-            if name in UserProfile.model_fields:
+            if name not in exclude and name in UserProfile.model_fields:
                 setattr(submitter, name, getattr(user, name))
 
     async def get_study_submitters_by_accession(

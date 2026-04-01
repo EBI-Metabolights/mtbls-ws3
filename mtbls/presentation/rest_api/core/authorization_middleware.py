@@ -67,7 +67,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
 
             if user.is_authenticated:
                 access_request_message = (
-                    f"User {user.user_detail.id_} requests "
+                    f"User {user.user_detail.username} requests "
                     f"{method} {route_path} from host/IP {client_host}."
                 )
                 if resource_id:
@@ -109,9 +109,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         except AuthorizationError as ex:
             if user.is_authenticated:
-                message = (
-                    f"Authorization error for user {user.user_detail.id_}: {str(ex)}"
-                )
+                message = f"Authorization error for user {user.user_detail.username}: {str(ex)}"
             else:
                 message = f"Authorization error: {str(ex)}"
             logger.debug(message)
@@ -121,13 +119,17 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             )
         except AuthenticationError as ex:
             if user.is_authenticated:
-                message = (
-                    f"Authentication error for user {user.user_detail.id_}: {str(ex)}"
-                )
+                message = f"Authentication error for user {user.user_detail.username}: {str(ex)}"
                 logger.debug(message)
             else:
                 message = f"Authentication error for unauthenticated user: {str(ex)}"
                 logger.error(message)
+            return JSONResponse(
+                content=APIErrorResponse(error_message=f"{str(ex)}").model_dump(),
+                status_code=status.HTTP_403_FORBIDDEN,
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        except Exception as ex:
             return JSONResponse(
                 content=APIErrorResponse(error_message=f"{str(ex)}").model_dump(),
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -149,7 +151,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             and permission.update
         ):
             error_log_message = (
-                f"User {context.user.id_} from host {client_host} "
+                f"User {context.user.username} from host {client_host} "
                 f"has no permission to access {route_path}",
             )
             logger.error(error_log_message)
@@ -174,7 +176,7 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         if authorized_path and not scope_match:
             if user.is_authenticated:
                 error_log_message = (
-                    f"User {user.user_detail.id_} from host {client_host} "
+                    f"User {user.user_detail.username} from host {client_host} "
                     f"has no permission to access {route_path}",
                 )
                 logger.error(error_log_message)
@@ -199,9 +201,9 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
         self.request_tracker.client_var.set(client_host)
 
         if user.is_authenticated:
-            self.request_tracker.user_id_var.set(user.user_detail.id_)
+            self.request_tracker.user_id_var.set(user.user_detail.username)
         else:
-            self.request_tracker.user_id_var.set(0)
+            self.request_tracker.user_id_var.set("-")
 
         self.request_tracker.resource_id_var.set(resource_id if resource_id else "-")
         self.request_tracker.task_id_var.set("-")

@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import json
 import logging
@@ -191,7 +190,7 @@ def run_validation(  # noqa: PLR0913
     db_connection: dict = Provide["config.gateways.database.postgresql.connection"],
     **kwargs,
 ) -> AsyncTaskResult:
-    validation_run_configuration = asyncio.run(
+    validation_run_configuration = run_coroutine(
         create_validation_run_configuration(
             resource_id=resource_id,
             temp_folder=temp_folder,
