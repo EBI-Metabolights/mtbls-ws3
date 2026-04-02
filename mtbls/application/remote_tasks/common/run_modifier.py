@@ -2,8 +2,6 @@ import logging
 from typing import Any, Dict
 
 from dependency_injector.wiring import Provide, inject
-from metabolights_utils.models.enums import GenericMessageType
-from metabolights_utils.models.parser.enums import ParserMessageType
 
 from mtbls.application.decorators.async_task import async_task
 from mtbls.application.remote_tasks.common.utils import run_coroutine
@@ -14,6 +12,7 @@ from mtbls.application.services.interfaces.policy_service import PolicyService
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
+from mtbls.application.use_cases.validation.utils import evaulate_mtbls_model
 from mtbls.domain.domain_services.modifier.metabolights_study_model_modifier import (
     MetabolightsStudyModelModifier,
 )
@@ -77,23 +76,7 @@ async def run_isa_metadata_modifier_task(
             load_db_metadata=True,
         )
         result = StudyMetadataModifierResult(resource_id=resource_id)
-        folder_errors = [
-            x
-            for x in modifier_model.folder_reader_messages
-            if x.type == GenericMessageType.ERROR
-        ]
-        if folder_errors:
-            result.error_message = (
-                "Study folder load error:  "
-                f"{folder_errors[0].short} {folder_errors[0].detail}"
-            )
-        parse_errors = []
-        for _, messages in modifier_model.parser_messages.items():
-            parse_errors.extend(
-                [x for x in messages if x.type in (ParserMessageType.CRITICAL,)]
-            )
-        if parse_errors:
-            result.error_message = f"Study file parse errors:  {parse_errors}"
+        errors = evaulate_mtbls_model(modifier_model)
 
         control_lists: ValidationControls = await policy_service.get_control_lists()
         templates: FileTemplates = await policy_service.get_templates()
@@ -101,7 +84,7 @@ async def run_isa_metadata_modifier_task(
         if config_load_failure:
             result.error_message = "Control lists or templates are not fetched"
 
-        if parse_errors or folder_errors or config_load_failure:
+        if errors or config_load_failure:
             result.has_error = True
             if serialize_result:
                 return result.model_dump(by_alias=True)

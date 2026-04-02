@@ -116,8 +116,9 @@ class SqlDbStudyReadRepository(
         if not user:
             # keep current values. reset profile fields in future
             return
+        exclude = {"id_", "username"}
         for name, _ in UserOutput.model_fields.items():
-            if name in UserProfile.model_fields:
+            if name not in exclude and name in UserProfile.model_fields:
                 setattr(submitter, name, getattr(user, name))
 
     @validate_call(validate_return=True, config=ConfigDict(strict=True))
