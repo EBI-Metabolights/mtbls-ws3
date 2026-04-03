@@ -357,7 +357,7 @@ class OlsOntologySearchService(OntologySearchService):
     ) -> tuple[HttpResponse, list[OntologyTermHit]]:
         if not size or size <= 0:
             size = self.config.default_search_result_size
-        url = f"{self.config.origin_url}/api/search"
+        url = f"{self.config.origin_url}/api/select"
         if not query_fields:
             query_fields_str = "label,synonym"
         else:

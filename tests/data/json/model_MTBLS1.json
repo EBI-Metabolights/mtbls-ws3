@@ -55,6 +55,12 @@
           "sourceDescription": "Molecular Interactions Controlled Vocabulary"
         },
         {
+          "sourceName": "MS",
+          "sourceFile": "http://purl.obolibrary.org/obo/ms.owl",
+          "sourceVersion": "",
+          "sourceDescription": "Mass spectrometry ontology"
+        },
+        {
           "sourceName": "MTBLS",
           "sourceFile": "https://github.com/EBI-Metabolights/MtblsWS-Py/blob/main/resources/Metabolights.owl",
           "sourceVersion": "",
@@ -252,9 +258,9 @@
             {
               "fileName": "a_MTBLS1_metabolite_profiling_NMR_spectroscopy.txt",
               "measurementType": {
-                "term": "metabolite profiling assay",
-                "termAccessionNumber": "http://purl.obolibrary.org/obo/OBI_0000366",
-                "termSourceRef": "OBI"
+                "term": "untargeted analysis",
+                "termAccessionNumber": "http://purl.obolibrary.org/obo/MS_1003904",
+                "termSourceRef": "MS"
               },
               "technologyType": {
                 "term": "NMR spectroscopy assay",

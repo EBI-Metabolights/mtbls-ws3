@@ -24,7 +24,9 @@ dependencies = [
     "psycopg[binary,pool]>=3.3.2",
     "fastapi>=0.128.0",
     "jinja2>=3.1.6",
-    "mhd-model>=0.1.56",
+    "mtbls-mhd-integration>=0.0.26",
+    "mhd-model>=0.1.70",
+    "metabolights-utils>=1.4.21",
 ]
 
 [project.optional-dependencies]
@@ -49,9 +51,6 @@ ws3 = [
     "numpy>=2.1,<3",
     "rdkit>=2024.3.1",
     "elasticsearch[async]>=8.0.0,<9",
-    "mtbls-mhd-integration>=0.0.21",
-    "mhd-model>=0.1.56",
-    "metabolights-utils>=1.4.21",
     "authlib>=1.6.9",
     "beartype==0.22.7",
 ]
