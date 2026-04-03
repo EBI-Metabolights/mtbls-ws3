@@ -64,13 +64,13 @@ class RepositoryInfoCollector(AbstractFolderMetadataCollector):
             file_path=f"{subfolder}/{source.object_key}"
             if subfolder
             else source.object_key,
-            created_at=source.created_at,
-            updated_at=source.updated_at,
+            created_at=source.created_at or 0,
+            updated_at=source.updated_at or 0,
             is_directory=source.is_directory,
             parent_directory=parent_directory,
             is_link=source.is_link,
             mode=source.permission_in_oct,
-            size_in_bytes=source.size_in_bytes,
+            size_in_bytes=source.size_in_bytes or 0,
             base_name=source.basename,
             file_extension=source.extension,
         )
