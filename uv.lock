@@ -1932,6 +1932,7 @@ ws3 = [
     { name = "authlib" },
     { name = "beartype" },
     { name = "celery", extra = ["redis"] },
+    { name = "cryptography" },
     { name = "elasticsearch", extra = ["async"] },
     { name = "fastapi" },
     { name = "fastmcp" },
@@ -1957,7 +1958,7 @@ ws3 = [
 [package.metadata]
 requires-dist = [
     { name = "aiofiles", specifier = ">=23.2.1" },
-    { name = "aiohttp", specifier = ">=3.13.4" },
+    { name = "aiohttp", specifier = ">=3.13.5" },
     { name = "cachetools", specifier = ">=6.2.2" },
     { name = "cachetools-async", specifier = ">=0.0.5" },
     { name = "cryptography", specifier = ">=46.0.6" },
@@ -1995,6 +1996,7 @@ ws3 = [
     { name = "authlib", specifier = ">=1.6.9" },
     { name = "beartype", specifier = "==0.22.7" },
     { name = "celery", extras = ["redis"], specifier = ">=5.6.3" },
+    { name = "cryptography", specifier = ">=46.0.6" },
     { name = "elasticsearch", extras = ["async"], specifier = ">=8.0.0,<9" },
     { name = "fastapi", specifier = ">=0.115.5" },
     { name = "fastmcp", specifier = ">=3.2.0" },

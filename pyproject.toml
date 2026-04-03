@@ -20,7 +20,7 @@ dependencies = [
     "python-multipart>=0.0.9",
     "cachetools>=6.2.2",
     "cachetools-async>=0.0.5",
-    "aiohttp>=3.13.4",
+    "aiohttp>=3.13.5",
     "psycopg[binary,pool]>=3.3.2",
     "fastapi>=0.135.2",
     "jinja2>=3.1.6",
@@ -56,6 +56,8 @@ ws3 = [
     "metabolights-utils>=1.4.23",
     "authlib>=1.6.9",
     "beartype==0.22.7",
+    #security related
+    "cryptography>=46.0.6"
 ]
 dev = [
     "import-linter>=2.5.2",

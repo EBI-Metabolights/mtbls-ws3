@@ -156,8 +156,10 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
                 parent_directory=file_descriptor.parent_relative_path,
                 extension=file_descriptor.extension,
                 is_directory=file_descriptor.is_dir,
-                modified_at=int(file_descriptor.modified_time),
-                size_in_bytes=file_descriptor.file_size,
+                modified_at=int(file_descriptor.modified_time)
+                if file_descriptor.modified_time
+                else 0,
+                size_in_bytes=file_descriptor.file_size or 0,
             )
             metadata[relative_path] = descriptor
         metadata_files = await self.metadata_files_object_repository.list(
@@ -180,8 +182,8 @@ class DataFileIndexMetadataCollector(AbstractFolderMetadataCollector):
                 parent_directory="",
                 extension=file.extension,
                 is_directory=file.is_directory,
-                modified_at=updated_at,
-                size_in_bytes=file.size_in_bytes,
+                modified_at=updated_at or 0,
+                size_in_bytes=file.size_in_bytes or 0,
             )
             metadata[file.basename] = descriptor
         return metadata
