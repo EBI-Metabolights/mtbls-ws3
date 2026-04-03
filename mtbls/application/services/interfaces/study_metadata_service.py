@@ -34,6 +34,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None: ...
 
+    @abc.abstractmethod
     async def load_study_model(  # noqa: PLR0913
         self,
         load_sample_file: bool = False,
@@ -51,6 +52,7 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         calculate_metadata_size: bool = False,
     ) -> MetabolightsStudyModel: ...
 
+    @abc.abstractmethod
     async def save_study_model(
         self,
         model: MetabolightsStudyModel,
@@ -58,11 +60,13 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         save_result_files: bool = True,
     ) -> bool: ...
 
+    @abc.abstractmethod
     async def load_investigation_file(
         self,
         object_key: Union[int, None] = None,
     ) -> InvestigationItem: ...
 
+    @abc.abstractmethod
     async def process_investigation_file(
         self,
         operation: JsonPathOperation,
@@ -73,18 +77,21 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         object_key: Union[int, None] = None,
     ) -> tuple[Union[list[str], list[CamelCaseModel]], list[int]]: ...
 
+    @abc.abstractmethod
     async def update_isa_table_file(
         self,
         input_data: Union[None, list[IsaTableRow]] = None,
         object_key: Union[int, None] = None,
     ) -> tuple[Union[list[str], list[CamelCaseModel]], list[int]]: ...
 
+    @abc.abstractmethod
     async def save_investigation_file(
         self,
         model: InvestigationItem,
         object_key: Union[int, None] = None,
     ) -> bool: ...
 
+    @abc.abstractmethod
     async def load_isa_table_file(
         self,
         object_key: str,
@@ -92,10 +99,12 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         limit: Union[int, None] = None,
     ) -> IsaTableData: ...
 
+    @abc.abstractmethod
     async def list_isa_files(
         self,
     ) -> list[StudyDataFileOutput]: ...
 
+    @abc.abstractmethod
     async def get_isa_table_rows(
         self,
         object_key: str,
@@ -103,27 +112,32 @@ class StudyMetadataService(AbstractMetadataFileProvider, abc.ABC):
         limit: Union[int, None] = None,
     ) -> list[IsaTableRow]: ...
 
+    @abc.abstractmethod
     async def get_isa_table_data_columns(
         self,
         object_key: str,
     ) -> IsaTableFileObject: ...
 
+    @abc.abstractmethod
     async def update_isa_table_rows(
         self,
         object_key: str,
         updates: None | IsaTableDataUpdates = None,
     ) -> list[IsaTableRow]: ...
 
+    @abc.abstractmethod
     async def save_isa_table_file(
         self, isa_table_file: IsaTableFile, object_key: str
     ) -> None: ...
 
+    @abc.abstractmethod
     async def create_metadata_snapshot(
         self,
         prefix: Union[None, str] = None,
         suffix: Union[None, str] = None,
     ) -> tuple[str, str]: ...
 
+    @abc.abstractmethod
     async def restore_metadata_from_snapshot(
         self, snapshot_name: str
     ) -> tuple[str, str]: ...

@@ -36,8 +36,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--selected-studies-file",
     "-f",
-    default=".temp-validations",
-    help="Validation report root path. ",
+    help="File lists the selected study ids.",
 )
 @click.option(
     "--validation-reports-root-path",
@@ -100,7 +99,7 @@ async def check_release_date_in_past_studies(
             exit(1)
         resource_ids = [
             x.strip()
-            for x in Path(selected_studies_file).readtext().split("\n")
+            for x in Path(selected_studies_file).read_text().split("\n")
             if x and x.strip()
         ]
     else:
@@ -120,7 +119,7 @@ async def check_release_date_in_past_studies(
         resources_map = {x[0]: x for x in result.data}
         resource_ids: list[str] = list(resources_map.keys())
         resource_ids.sort(key=sort_by_study_id, reverse=True)
-        resource_ids = [resource_ids[0]]
+        # resource_ids = [resource_ids[0]]
     if not resource_ids:
         click("There is no study to run validation")
         exit(0)

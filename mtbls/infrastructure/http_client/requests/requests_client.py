@@ -33,32 +33,48 @@ class RequestsClient(HttpClient):
             if timeout is not None and timeout > 0
             else self.max_timeount_in_seconds
         )
-        response: requests.Response = requests.request(
-            method.value,
-            url,
-            params=params,
-            headers=headers,
-            follow_redirects=follow_redirects,
-            timeout=timeout,
-            json=json,
-        )
-        if response.status_code == 404:
-            return HttpResponse(
-                status_code=response.status_code,
-                headers=dict(response.headers),
-                json_data={},
+        response = None
+        try:
+            response: requests.Response = requests.request(
+                method.value,
+                url,
+                params=params,
+                headers=headers,
+                follow_redirects=follow_redirects,
+                timeout=timeout,
+                json=json,
             )
-        if raise_error_for_status:
-            response.raise_for_status()
+            if response.status_code == 404:
+                return HttpResponse(
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    json_data={},
+                )
+            if raise_error_for_status:
+                response.raise_for_status()
+        except Exception as ex:
+            logger.exception(ex)
+            status_code = response.status_code if response else 500
+            headers = dict(response.headers) if response else {}
+            return HttpResponse(
+                status_code=status_code,
+                headers=headers,
+                error=True,
+                error_message=str(ex),
+            )
         try:
             return HttpResponse(
                 status_code=response.status_code,
                 headers=dict(response.headers),
                 json_data=json_utils.loads(response.text),
             )
-        except Exception:
+        except Exception as ex:
+            logger.exception(ex)
             return HttpResponse(
-                status_code=response.status_code, headers=dict(response.headers)
+                status_code=response.status_code if response else 500,
+                headers=dict(response.headers) if response else {},
+                error=True,
+                error_message=str(ex),
             )
 
     async def stream(

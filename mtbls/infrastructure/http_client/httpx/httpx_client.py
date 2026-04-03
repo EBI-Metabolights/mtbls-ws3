@@ -33,6 +33,7 @@ class HttpxClient(HttpClient):
             if timeout is not None and timeout > 0
             else self.max_timeount_in_seconds
         )
+        response = None
         async with httpx.AsyncClient() as client:
             try:
                 response: httpx.Response = await client.request(
@@ -54,9 +55,11 @@ class HttpxClient(HttpClient):
                     response.raise_for_status()
             except Exception as ex:
                 logger.exception(ex)
+                status_code = response.status_code if response else 500
+                headers = dict(response.headers) if response else {}
                 return HttpResponse(
-                    status_code=response.status_code,
-                    headers=dict(response.headers),
+                    status_code=status_code,
+                    headers=headers,
                     error=True,
                     error_message=str(ex),
                 )
@@ -69,8 +72,8 @@ class HttpxClient(HttpClient):
             except Exception as ex:
                 logger.exception(ex)
                 return HttpResponse(
-                    status_code=response.status_code,
-                    headers=dict(response.headers),
+                    status_code=response.status_code if response else 500,
+                    headers=dict(response.headers) if response else {},
                     error=True,
                     error_message=str(ex),
                 )

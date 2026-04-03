@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 from pathlib import Path
 from typing import Union
 
@@ -9,6 +10,9 @@ from mtbls.application.remote_tasks.common.run_validation import (
     create_validation_run_configuration,
     run_validation_task,
     run_validation_task_with_modifiers,
+)
+from mtbls.application.use_cases.validation.validation_reports import (
+    override_and_save_validation_report,
 )
 from mtbls.application.use_cases.validation.validation_task import (
     convert_to_summary_result,
@@ -109,10 +113,17 @@ async def run_validation_and_save_report(
     fw = summary_file.open("w") if summary_file else None
     try:
         if fw:
-            fw.write("STUDY_ID\tRELEASE_DATE\tSTATUS\tRESULT\tERROR\n")
+            fw.write("STUDY_ID\tCREATED_AT\tRELEASE_DATE\tSTATUS\tRESULT\tERROR\n")
         for resource_id in resource_ids:
             report_path = validation_reports_root_path / Path(
                 f"{resource_id}_validation.tsv"
+            )
+            if report_path.exists():
+                continue
+            logger.info(
+                "Start validation for study: %s. Report will be saved to: %s",
+                resource_id,
+                report_path,
             )
             try:
                 study = (
@@ -121,6 +132,7 @@ async def run_validation_and_save_report(
                     )
                 )
                 release_date_str = study.release_date.strftime("%Y-%m-%d")
+                created_at_str = study.created_at.strftime("%Y-%m-%d")
                 config = await create_validation_run_configuration(
                     resource_id=resource_id,
                     temp_folder=None,
@@ -154,6 +166,15 @@ async def run_validation_and_save_report(
                 summary_result: PolicySummaryResult = await convert_to_summary_result(
                     resource_id=resource_id, result_list=result_list
                 )
+                task_id = uuid.uuid4().hex
+                await override_and_save_validation_report(
+                    resource_id=resource_id,
+                    task_id=task_id,
+                    validation_result=summary_result,
+                    validation_report_service=validation_app.validation_report_service,
+                    validation_override_service=validation_app.validation_override_service,
+                )
+
                 summary_report = await get_report_content_from_summary_report(
                     summary_result=summary_result,
                     min_violation_level=None,
@@ -183,6 +204,7 @@ async def run_validation_and_save_report(
                 if fw:
                     fw.write(
                         f"{resource_id}\t"
+                        f"{created_at_str}\t"
                         f"{release_date_str}\t"
                         f"{study.status.name}\t"
                         f"{validation_result}\t"
@@ -194,6 +216,7 @@ async def run_validation_and_save_report(
                 if fw:
                     fw.write(
                         f"{resource_id}\t"
+                        f"{created_at_str}\t"
                         f"{release_date_str}\t"
                         f"{study.status.name}\t"
                         f"Failed to validate\t"
@@ -208,10 +231,11 @@ async def run_validation_and_save_report(
 if __name__ == "__main__":
     run_validation_cli(
         [
-            "--input-file",
-            ".temp-validations/validated_studies.txt",
+            # "--input-file",
+            # ".temp-validations/validated_studies.txt",
+            "--selected-studies=MTBLS10112",
             "--summary-file",
-            ".temp-validations/summary.txt",
+            ".temp-validations/x-summary.txt",
             "--apply-modifiers",
         ]
     )

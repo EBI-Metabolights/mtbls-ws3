@@ -108,6 +108,12 @@ class FileSystemObjectReadRepository(FileObjectReadRepository):
         _, object_path = await self._get_object_path(resource_id, object_key)
         shutil.copy(object_path, target_path)
 
+    async def get_content(self, resource_id: str, object_key: str) -> bytes:
+        _, object_path = await self._get_object_path(resource_id, object_key)
+        if object_path and object_path.exists():
+            return object_path.read_bytes()
+        raise StudyObjectNotFoundError(resource_id, self.study_bucket.value, object_key)
+
     async def _does_path_exist(self, object_path: pathlib.Path) -> bool:
         if not object_path:
             return False
