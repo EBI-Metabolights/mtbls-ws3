@@ -26,7 +26,8 @@ dependencies = [
     "jinja2>=3.1.6",
     # security fix related dependencies
     "Pygments>=2.20.0",
-    "cryptography>=46.0.6"
+    "cryptography>=46.0.6",
+    "mtbls-mhd-integration>=0.0.28",
 ]
 
 [dependency-groups]
@@ -52,7 +53,7 @@ ws3 = [
     "rdkit>=2024.3.1",
     "elasticsearch[async]>=8.0.0,<9",
     "mtbls-mhd-integration>=0.0.28",
-    "mhd-model>=0.1.73",
+    "mhd-model>=0.1.74",
     "metabolights-utils>=1.4.23",
     "authlib>=1.6.9",
     "beartype==0.22.7",
