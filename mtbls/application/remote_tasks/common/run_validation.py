@@ -887,7 +887,7 @@ async def post_process_validation_messages(
 
             elif accession and source:
                 search = await ontology_search_service.search(
-                    term,
+                    accession,
                     rule=BaseOntologyValidation(
                         rule_name="exact-term-search-01",
                         field_name="generic",
