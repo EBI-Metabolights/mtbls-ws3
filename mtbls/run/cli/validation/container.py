@@ -1,6 +1,9 @@
 from dependency_injector import containers, providers
 
 from mtbls.application.context.request_tracker import RequestTracker
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
 from mtbls.application.services.interfaces.cache_service import CacheService
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.ontology_search_service import (
@@ -28,6 +31,9 @@ from mtbls.application.services.interfaces.validation_report_service import (
 from mtbls.domain.domain_services.configuration_generator import create_config_from_dict
 from mtbls.domain.shared.mhd_configuration import MhdConfiguration
 from mtbls.domain.shared.repository.study_bucket import StudyBucket
+from mtbls.infrastructure.auth.keycloak.keycloak_authentication import (
+    KeycloakAuthenticationService,
+)
 from mtbls.infrastructure.caching.redis.redis_impl import RedisCacheImpl
 from mtbls.infrastructure.http_client.httpx.httpx_client import HttpxClient
 from mtbls.infrastructure.ontology_search.ols.ols_search_service import (
@@ -196,7 +202,11 @@ class ValidationServicesContainer(containers.DeclarativeContainer):
         cache_service=cache_service,
         config=config.ontology_search_service.ols,
     )
-
+    user_profile_service: UserProfileService = providers.Singleton(
+        KeycloakAuthenticationService,
+        config=config.authentication.keycloak,
+        cache_service=cache_service,
+    )
     validation_override_service: ValidationOverrideService = providers.Selector(
         selector=repository_config.active_target_repository.validation_overrides,
         mongodb=providers.Singleton(

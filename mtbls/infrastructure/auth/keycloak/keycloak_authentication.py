@@ -1,7 +1,7 @@
 import datetime
 import logging
 import re
-from typing import Any, Union
+from typing import Any, List, Union
 
 from keycloak import KeycloakAdmin, KeycloakOpenID
 
@@ -106,23 +106,84 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
             user_id = self._keycloak_admin.get_user_id(username=username)
             if not user_id:
                 return None
-            user = self._keycloak_admin.get_user(
+            user = await self._keycloak_admin.a_get_user(
                 user_id=user_id, user_profile_metadata=True
             )
             if user:
-                roles = self._keycloak_admin.get_composite_realm_roles_of_user(user_id)
+                roles = await self._keycloak_admin.a_get_composite_realm_roles_of_user(
+                    user_id
+                )
                 return self.convert_auth_user_info_from_dict(user, roles)
         except Exception as ex:
             raise ex
         return None
 
+    def _find_group_by_name(self, groups: list[dict], target_name: str) -> None | dict:
+        for group in groups:
+            if group["name"] == target_name:
+                return group
+
+            # search subgroups
+            if group.get("subGroups"):
+                found = self._find_group_by_name(group["subGroups"], target_name)
+                if found:
+                    return found
+
+        return None
+
+    async def get_all_users(
+        self,
+        page_size: int = 1000,
+        fetch_roles: bool = False,
+        group_name: None | str = None,
+    ) -> list[UserProfile]:
+        users: List[UserProfile] = []
+        first = 0
+        group_id = None
+        if group_name:
+            groups = await self._keycloak_admin.a_get_groups(full_hierarchy=True)
+            group = self._find_group_by_name(groups, group_name)
+            if not group:
+                logger.error("Group %s is not found.", group_name)
+                raise Exception(f"Group {group_name} is not found.")
+            group_id = group.get("id")
+
+        while True:
+            if group_id:
+                batch = await self._keycloak_admin.a_get_group_members(
+                    group_id, {"first": first, "max": page_size}
+                )
+            else:
+                batch = await self._keycloak_admin.a_get_users(
+                    {"first": first, "max": page_size}
+                )
+
+            if not batch:
+                break
+            if fetch_roles:
+                for user in batch:
+                    user_id = user.get("id")
+                    roles = (
+                        await self._keycloak_admin.a_get_composite_realm_roles_of_user(
+                            user_id
+                        )
+                    )
+                    users.append(self.convert_auth_user_info_from_dict(user, roles))
+            else:
+                users.extend(
+                    [self.convert_auth_user_info_from_dict(x, None) for x in batch]
+                )
+            first += page_size
+
+        return users
+
     def convert_auth_user_info_from_dict(
-        self, dict_data: dict, roles: list[dict]
+        self, dict_data: dict, roles: None | list[dict]
     ) -> UserProfile:
         user = UserProfile()
         if not dict_data:
             return user
-        realm_roles = {x["name"] for x in roles} if roles else set()
+        realm_roles = {x["name"] for x in roles} if roles or [] else set()
         if "study_curation" in realm_roles or "system_maintenance" in realm_roles:
             role = UserRole.CURATOR
         elif "study_submission" in realm_roles:
@@ -146,7 +207,9 @@ class KeycloakAuthenticationService(AuthenticationService, UserProfileService):
         attributes: dict = dict_data.get("attributes", {})
         orcid = attributes.get("orcid") or [""]
         orcid = re.sub(r"https?://orcid\.org/", "", (orcid[0] or "").lower())
+        user.id_ = payload.get("id")
         user.email = payload.get("email")
+        user.username = payload.get("username")
         user.email_verified = email_verified
         user.first_name = payload.get("firstName")
         user.last_name = payload.get("lastName")

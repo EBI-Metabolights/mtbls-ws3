@@ -14,6 +14,12 @@ class UserProfileService(abc.ABC):
     async def get_users_by_query(self, key_value: dict[str, Any]) -> list[UserProfile]:
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    async def get_all_users(
+        self, page_size: int = 1000, fetch_roles: bool = False
+    ) -> list[UserProfile]:
+        raise NotImplementedError()
+
 
 class AuthenticationService(abc.ABC):
     @abc.abstractmethod
