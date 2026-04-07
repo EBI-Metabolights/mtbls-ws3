@@ -49,7 +49,15 @@ class SampleFileModifier(IsaTableModifier):
                 action = self.header_update_actions[self.isa_table_file.file_path][0]
         if not action:
             action = TsvUpdateColumnHeaderAction()
-
+        assay_factors = set()
+        for assay_file in self.model.assays.values():
+            assay_factors.update(
+                [
+                    x.column_header
+                    for x in assay_file.table.headers
+                    if x.column_header.startswith("Factor Value[")
+                ]
+            )
         for header in self.isa_table_file.table.headers:
             if header.column_structure not in (
                 ColumnsStructure.ONTOLOGY_COLUMN,
@@ -66,6 +74,8 @@ class SampleFileModifier(IsaTableModifier):
 
                 cleaned_factor_value = self.first_character_uppercase(factor_value)
                 cleaned_column_header = f"Factor Value[{cleaned_factor_value}]"
+                if cleaned_column_header in assay_factors:
+                    continue
                 if header.column_header != cleaned_column_header:
                     action.new_headers[column_index] = cleaned_column_header
                     action.current_headers[column_index] = column_header
