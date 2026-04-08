@@ -118,15 +118,13 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
                 status_code=status.HTTP_401_UNAUTHORIZED,
             )
         except AuthenticationError as ex:
-            if user.is_authenticated:
-                message = f"Authentication error for user {user.user_detail.username}: {str(ex)}"
-                logger.debug(message)
-            else:
-                message = f"Authentication error for unauthenticated user: {str(ex)}"
-                logger.error(message)
+            message = (
+                f"Authentication error for user {user.user_detail.username}: {str(ex)}"
+            )
+            logger.debug(message)
             return JSONResponse(
                 content=APIErrorResponse(error_message=f"{str(ex)}").model_dump(),
-                status_code=status.HTTP_403_FORBIDDEN,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 headers={"WWW-Authenticate": "Bearer"},
             )
         except Exception as ex:
