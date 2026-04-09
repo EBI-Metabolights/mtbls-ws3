@@ -7,9 +7,18 @@ from celery.signals import setup_logging, worker_process_init, worker_process_sh
 from dependency_injector.wiring import Provide, inject
 
 import mtbls
-from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
+from mtbls.application import get_worker_loop, set_worker_loop
 from mtbls.application.services.interfaces.async_task.utils import (
     get_async_task_registry,
+)
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+    StudyReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+    UserReadRepository,
 )
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
@@ -53,6 +62,16 @@ async def update_container(
     if not success:
         raise Exception("Configuration update task failed.")
     container.init_resources()
+    user_profile_service: UserProfileService = container.services.user_profile_service()
+    user_read_repository: UserReadRepository = (
+        container.repositories.user_read_repository()
+    )
+    user_read_repository.set_user_profile_service(user_profile_service)
+    study_read_repository: StudyReadRepository = (
+        container.repositories.study_read_repository()
+    )
+    study_read_repository.set_user_profile_service(user_profile_service)
+    module_config = container.module_config()
     queue_names = queue_names if queue_names else ["common"]
     module_config = container.module_config()
     modules = find_async_task_modules(app_name=app_name, queue_names=queue_names)

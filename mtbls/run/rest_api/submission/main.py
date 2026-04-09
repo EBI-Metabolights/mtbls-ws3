@@ -13,6 +13,15 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 
 import mtbls
 from mtbls.application.context.request_tracker import get_request_tracker
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+    StudyReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+    UserReadRepository,
+)
 from mtbls.presentation.rest_api.core import core_router
 from mtbls.presentation.rest_api.core.auth_backend import AuthBackend
 from mtbls.presentation.rest_api.core.authorization_middleware import (
@@ -64,7 +73,15 @@ async def update_container(
     if not success:
         raise Exception("Configuration update task failed.")
     container.init_resources()
-
+    user_profile_service: UserProfileService = container.services.user_profile_service()
+    user_read_repository: UserReadRepository = (
+        container.repositories.user_read_repository()
+    )
+    user_read_repository.set_user_profile_service(user_profile_service)
+    study_read_repository: StudyReadRepository = (
+        container.repositories.study_read_repository()
+    )
+    study_read_repository.set_user_profile_service(user_profile_service)
     module_config = container.module_config()
 
     modules = find_async_task_modules(app_name=app_name, queue_names=queue_names)
@@ -112,7 +129,7 @@ async def create_app(
         queue_names=queue_names,
         container=container,
     )
-    container.gateways.runtime_config.db_pool_size.override(db_connection_pool_size)
+
     server_config: ApiServerConfiguration = container.api_server_config()
     version: str = mtbls.__version__
 

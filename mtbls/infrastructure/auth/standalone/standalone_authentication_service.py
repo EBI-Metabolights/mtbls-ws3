@@ -46,7 +46,7 @@ class AuthenticationServiceImpl(AuthenticationService):
     @validate_inputs_outputs
     async def authenticate_with_token(
         self, token_type: TokenType, token: TokenStr, username: str = None
-    ) -> str:
+    ) -> tuple[str, None | str]:
         if token_type != TokenType.API_TOKEN:
             raise NotImplementedError()
         user = await self.user_read_repository.get_user_by_api_token(username, token)
@@ -59,46 +59,81 @@ class AuthenticationServiceImpl(AuthenticationService):
             )
         )
 
-    async def authenticate_with_password(self, username: str, password: str) -> str:
+    async def authenticate_with_password(
+        self, username: str, password: str
+    ) -> tuple[str, None | str]:
         user = await self.user_read_repository.get_user_by_username(username)
         if not user:
             raise AuthenticationError(f"Invalid username or password for '{username}'")
         if not await self._verify_password(password, user.password_hash):
             raise AuthenticationError(f"Invalid username or password for '{username}'")
-
         return await self.create_jwt_token(
             jwt_token_input=JwtTokenInput(
                 sub=user.username, scopes=["login"], role=user.role.name
             )
         )
 
+    async def refresh(self, refresh_token: str) -> tuple[str, None | str]:
+        content = await self.validate_jwt_token(refresh_token)
+        return self.create_jwt_token(
+            JwtTokenInput(sub=content.sub), scopes=["login"], role=content.role
+        )
+
     async def create_jwt_token(
         self,
         jwt_token_input: JwtTokenInput,
         expires_delta_in_minutes: Union[None, datetime.timedelta] = None,
-    ) -> str:
+        refresh_expires_delta_in_minutes: Union[None, datetime.timedelta] = None,
+    ) -> tuple[str, None | str]:
         jwt_token_content = JwtTokenContent.model_validate(
             jwt_token_input, from_attributes=True
         )
+        refresh_token_content = JwtTokenContent.model_validate(
+            jwt_token_input, from_attributes=True
+        )
         now: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
+
+        if refresh_expires_delta_in_minutes:
+            refresh_expire = now + refresh_expires_delta_in_minutes
+        else:
+            refresh_expire = now + datetime.timedelta(
+                minutes=self.config.access_token_expires_delta_in_minutes * 2
+            )
         if expires_delta_in_minutes:
             expire: datetime.datetime = now + expires_delta_in_minutes
+
         else:
             expire: datetime.datetime = now + datetime.timedelta(
                 minutes=self.config.access_token_expires_delta_in_minutes
             )
+
         jwt_token_content.iat = int(now.timestamp())
         jwt_token_content.exp = int(expire.timestamp())
-
         jwt_token_content.jti = str(uuid.uuid4())
         jti = jwt_token_content.jti
         key_bytes = bytes(f"{self.config.application_secret_key}-{jti}", "utf-8")
         key = hashlib.sha256(key_bytes).hexdigest()
-        return jwt.encode(
+
+        refresh_token_content.iat = jwt_token_content.iat
+        refresh_token_content.exp = int(refresh_expire.timestamp())
+        refresh_token_content.jti = str(uuid.uuid4())
+        refresh_jti = refresh_token_content.jti
+        refresh_key_bytes = bytes(
+            f"{self.config.application_secret_key}-{refresh_jti}", "utf-8"
+        )
+        refresh_key = hashlib.sha256(refresh_key_bytes).hexdigest()
+
+        access_token = jwt.encode(
             jwt_token_content.model_dump(exclude_defaults=True),
             key,
             algorithm=self.config.access_token_hash_algorithm,
         )
+        refresh_token = jwt.encode(
+            jwt_token_content.model_dump(exclude_defaults=True),
+            refresh_key,
+            algorithm=self.config.access_token_hash_algorithm,
+        )
+        return access_token, refresh_token
 
     async def revoke_jwt_token(self, refresh_jwt_token: str) -> bool:
         # TODO: implement it

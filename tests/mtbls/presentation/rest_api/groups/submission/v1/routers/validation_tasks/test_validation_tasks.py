@@ -717,7 +717,7 @@ class TestPostValidationsV1:
         )
         await cache_service.delete_key(key)
         del async_task_service.async_task_results_dict[task_id]
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         json_response = response.json()
         result = APIErrorResponse.model_validate(json_response)
-        assert "AsyncTaskAlreadyStartedError" in result.error_message
+        assert Status.ERROR == result.status

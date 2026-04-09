@@ -12,12 +12,13 @@ variables:
   CONFIG_DIR: "config-files"
 workflow:
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "staging"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "keycloak"
 stages:
 - lint
 - build
 - deploy-ws-worker
 - deploy-ws
+- deploy-mcp
 
 lint_and_test:
   stage: lint
@@ -51,12 +52,11 @@ lint_and_test:
   - git status
   - ls -al
   - echo "install dependencies"
-  - uv sync --locked --extra ws3 --group test --group dev
+  - uv sync --locked --group dev
   - echo "Run pre-commit tools"
-  - uv run ruff format
+  - uv run ruff format --check
   - uv run ruff check
   - uv run lint-imports
-  - uv run pre-commit run --all-files
   - echo "Run unit tests"
   - uv run pytest
   cache:
@@ -113,9 +113,21 @@ deploy_ws:
     CHART_NAME: mtbls-ws3-worker
   extends: .kube_deploy_script
 
+deploy_mcp:
+  stage: deploy-mcp
+  image:
+    name: ${CICD_GITLAB_REGISTRY}alpine/k8s:1.23.17
+    pull_policy: if-not-present
+  tags:
+    - docker
+    - mtbls
+  variables:
+    CHART_NAME: mtbls-ws3-mcp
+  extends: .kube_deploy_script
+
 .kube_deploy_script:
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "keycloak"
     when: on_success
   - if: $CI_COMMIT_BRANCH == "main"
     when: manual

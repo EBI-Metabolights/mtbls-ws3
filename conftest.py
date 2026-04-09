@@ -58,6 +58,7 @@ def local_env_container() -> Generator[Any, Any, Ws3ApplicationContainer]:
         config_file_path="tests/data/config/mtbls-base-config.yaml",
         secrets_file_path="tests/data/config/mtbls-base-config-secrets.yaml",
     )
+    container.services.user_profile_service.override(None)
     connection_json = container.config.gateways.database.sqlite.connection()
 
     db_connection = SQLiteDatabaseConnection.model_validate(connection_json)

@@ -45,7 +45,7 @@ cd mtbls-ws3
 uv python install 3.13
 
 # install python dependencies
-uv sync --extra ws3
+uv sync --group dev --group test
 
 # install pre-commit to check repository integrity and format checking
 uv run pre-commit

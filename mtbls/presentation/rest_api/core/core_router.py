@@ -36,6 +36,13 @@ async def custom_swagger_ui_html(
 ):
     config = api_server_config.server_info
     openapi_url = f"{config.root_path}/openapi.json"
+    if api_server_config.swagger_client_id:
+        init_oauth = {
+            "clientId": api_server_config.swagger_client_id,
+            "scopes": "openid profile email",
+        }
+    else:
+        init_oauth = None
     return docs.get_swagger_ui_html(
         openapi_url=openapi_url,
         title=config.title,
@@ -50,6 +57,7 @@ async def custom_swagger_ui_html(
             "syntaxHighlight.activate": True,
             "syntaxHighlight.theme": "agate",
         },
+        init_oauth=init_oauth,
     )
 
 
