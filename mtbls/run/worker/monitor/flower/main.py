@@ -9,6 +9,15 @@ from dependency_injector.wiring import Provide, inject
 from mtbls.application.services.interfaces.async_task.utils import (
     get_async_task_registry,
 )
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
+from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
+    StudyReadRepository,
+)
+from mtbls.application.services.interfaces.repositories.user.user_read_repository import (
+    UserReadRepository,
+)
 from mtbls.infrastructure.pub_sub.celery.celery_impl import CeleryAsyncTaskService
 from mtbls.infrastructure.pub_sub.connection.redis import RedisConnectionProvider
 from mtbls.run.config_utils import (
@@ -38,7 +47,15 @@ def initiate_container(
 
     set_application_configuration(container)
     container.init_resources()
-
+    user_profile_service: UserProfileService = container.services.user_profile_service()
+    user_read_repository: UserReadRepository = (
+        container.repositories.user_read_repository()
+    )
+    user_read_repository.set_user_profile_service(user_profile_service)
+    study_read_repository: StudyReadRepository = (
+        container.repositories.study_read_repository()
+    )
+    study_read_repository.set_user_profile_service(user_profile_service)
     logger = logging.getLogger(__name__)
     return container
 

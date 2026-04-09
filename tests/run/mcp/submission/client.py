@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 async def main():
-    async with Client("http://localhost:8000/mcp") as client:
+    async with Client("http://localhost:7077/mcp/") as client:
         tools = await client.list_tools()
         for idx, tool in enumerate(tools, start=1):
             logger.info("Tool %d\t: %s", idx, tool.name)

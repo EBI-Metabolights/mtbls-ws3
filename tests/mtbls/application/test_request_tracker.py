@@ -11,7 +11,7 @@ class TestRequestTracker:
 
         assert request_tracker.client_var.get() == "-"
         assert request_tracker.request_id_var.get() == "-"
-        assert request_tracker.user_id_var.get() == 0
+        assert request_tracker.user_id_var.get() == "-"
         assert request_tracker.task_id_var.get() == "-"
         assert request_tracker.route_path_var.get() == "-"
 
@@ -21,7 +21,7 @@ class TestRequestTracker:
         assert tracker1 == tracker2
 
     def test_get_request_tracker_model_01(self):
-        user_id = 123
+        user_id = "123"
         request_tracker = RequestTracker()
         request_tracker.client_var.set("client")
         request_tracker.request_id_var.set("request")
@@ -35,7 +35,7 @@ class TestRequestTracker:
         assert request_tracker.route_path_var.get() == "route"
 
     def test_get_request_tracker_model_02(self):
-        user_id = 123
+        user_id = "123"
         request_tracker = RequestTracker()
         request_tracker.client_var.set("client")
         request_tracker.request_id_var.set("request")
@@ -47,6 +47,6 @@ class TestRequestTracker:
         model = request_tracker.get_request_tracker_model()
         assert request_tracker.client_var.get() == "-"
         assert request_tracker.request_id_var.get() == "-"
-        assert request_tracker.user_id_var.get() == 0
+        assert request_tracker.user_id_var.get() == "-"
         assert request_tracker.task_id_var.get() == "-"
         assert request_tracker.route_path_var.get() == "-"

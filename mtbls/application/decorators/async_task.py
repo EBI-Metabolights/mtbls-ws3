@@ -1,12 +1,12 @@
 import asyncio
 import logging
 
+from mtbls.application import get_worker_loop, set_worker_loop
 from mtbls.application.context.async_task_registry import (
     ASYNC_TASK_APP_NAME,
     ASYNC_TASK_QUEUE,
     ASYNC_TASK_REGISTRY,
 )
-from mtbls.application.remote_tasks import get_worker_loop, set_worker_loop
 from mtbls.domain.shared.async_task.async_task_description import AsyncTaskDescription
 
 logger = logging.getLogger(__name__)

@@ -29,5 +29,5 @@ async def get_status(
         Provide["config"]
     ),
 ) -> APIResponse[dict[str, Any]]:
-    logger.info("%s user requested configuration", user.id_)
+    logger.info("%s user requested configuration", user.username)
     return APIResponse[dict[str, Any]](status="success", content=config)

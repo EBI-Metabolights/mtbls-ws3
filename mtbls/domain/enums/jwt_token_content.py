@@ -21,5 +21,6 @@ class JwtTokenContent(BaseModel):
 
 class JwtToken(BaseModel):
     access_token: str = ""
+    refresh_token: str = ""
     token_type: str = ""
     message: str = ""

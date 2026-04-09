@@ -4,6 +4,7 @@ import click
 
 from mtbls import __version__
 from mtbls.run.cli.index.index_group import index_group
+from mtbls.run.cli.mdp.create_mdp_lookup_tables import create_mdp_lookup_tables
 from mtbls.run.cli.validation.validation_group import validation_group
 
 
@@ -16,6 +17,7 @@ def mtbls_cli():
 
 mtbls_cli.add_command(index_group)
 mtbls_cli.add_command(validation_group)
+mtbls_cli.add_command(create_mdp_lookup_tables)
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:

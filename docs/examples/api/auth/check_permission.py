@@ -29,15 +29,15 @@ async def check_read_permission(
         if not context or not context.study or not context.permissions.read:
             logger.warning(
                 "User %s is not granted to view resource %s",
-                context.user.id_,
+                context.user.username,
                 resource_id,
             )
             raise AuthorizationError(
-                f"User {context.user.id_} is not granted to view resource {resource_id}"
+                f"User {context.user.username} is not granted to view resource {resource_id}"
             )
         logger.debug(
             "User %s is granted to view resource %s",
-            context.user.id_,
+            context.user.username,
             resource_id,
         )
         return context

@@ -1,6 +1,9 @@
 import abc
 from typing import Union
 
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
 from mtbls.application.services.interfaces.repositories.default.abstract_read_repository import (  # noqa: E501
     AbstractReadRepository,
 )  # noqa: E501
@@ -9,6 +12,15 @@ from mtbls.domain.shared.repository.entity_filter import EntityFilter
 
 
 class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
+    def __init__(self, user_profile_service: None | UserProfileService = None):
+        self.user_profile_service = user_profile_service
+
+    def get_user_profile_service(self):
+        return self.user_profile_service
+
+    def set_user_profile_service(self, user_profile_service: None | UserProfileService):
+        self.user_profile_service = user_profile_service
+
     @abc.abstractmethod
     async def get_study_by_id(
         self,
@@ -51,10 +63,4 @@ class StudyReadRepository(AbstractReadRepository[StudyOutput, int], abc.ABC):
     async def get_studies_by_username(self, username: str) -> list[StudyOutput]: ...
 
     @abc.abstractmethod
-    async def get_studies_by_email(self, email: str) -> list[StudyOutput]: ...
-
-    @abc.abstractmethod
     async def get_studies_by_orcid(self, orcid: str) -> list[StudyOutput]: ...
-
-    @abc.abstractmethod
-    async def get_studies_by_user_id(self, id_: str) -> list[StudyOutput]: ...

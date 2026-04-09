@@ -9,23 +9,26 @@ from mtbls.domain.enums.user_role import UserRole
 from mtbls.domain.enums.user_status import UserStatus
 
 
-class UserInput(BaseUser):
+class UserProfile(BaseUser):
     model_config = ConfigDict(
         from_attributes=True, strict=True, entity_type=Entity.User
     )
     username: Union[None, str] = None
     email: Union[None, str] = None
     role: Union[None, UserRole, int] = UserRole.ANONYMOUS
-    status: Union[None, UserStatus, int] = UserStatus.NEW
-    password_hash: Annotated[Union[None, str], Field(repr=False)] = None
-    api_token: Annotated[Union[None, str], Field(repr=False)] = None
+    status: Union[None, UserStatus, int] = UserStatus.FROZEN
     first_name: Union[None, str] = None
     last_name: Union[None, str] = None
     orcid: Union[None, str] = None
-    join_date: Union[None, datetime.datetime] = None
     address: Union[None, str] = None
     affiliation: Union[None, str] = None
     affiliation_url: Union[None, str] = None
+    globus_username: Union[None, str] = None
+    country: Union[None, str] = None
+    email_verified: Union[None, bool] = None
+    partner: Union[None, bool] = None
+    enabled: Union[None, bool] = None
+    join_date: Union[None, datetime.datetime] = None
 
     @field_validator("role")
     @classmethod
@@ -37,6 +40,27 @@ class UserInput(BaseUser):
         if isinstance(value, int):
             return UserRole(value)
         return None
+
+    @field_validator("status")
+    @classmethod
+    def status_validator(cls, value):
+        if value is None:
+            return None
+        if isinstance(value, UserStatus):
+            return value
+        if isinstance(value, int):
+            return UserStatus(value)
+        return None
+
+
+class UserInput(UserProfile):
+    model_config = ConfigDict(
+        from_attributes=True, strict=True, entity_type=Entity.User
+    )
+    password_hash: Annotated[Union[None, str], Field(repr=False)] = None
+    api_token: Annotated[Union[None, str], Field(repr=False)] = None
+    join_date: Union[None, datetime.datetime] = None
+    status: Union[None, UserStatus, int] = UserStatus.NEW
 
     @field_validator("status")
     @classmethod

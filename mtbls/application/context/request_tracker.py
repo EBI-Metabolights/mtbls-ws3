@@ -1,16 +1,29 @@
 from contextvars import ContextVar
 from functools import lru_cache
+from typing import Any, Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class RequestTrackerModel(BaseModel):
-    user_id: int = 0
+    user_id: str = ""
     route_path: str = ""
     resource_id: str = ""
     client: str = ""
     request_id: str = ""
     task_id: str = ""
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def validate_model(cls, v: Any, handler) -> Self:
+        v["user_id"] = str(v.get("user_id") or "-")
+        v["route_path"] = str(v.get("route_path") or "-")
+        v["resource_id"] = str(v.get("resource_id") or "-")
+        v["client"] = str(v.get("client") or "-")
+        v["request_id"] = str(v.get("request_id") or "-")
+        v["task_id"] = str(v.get("task_id") or "-")
+
+        return handler(v)
 
 
 class RequestTracker:
@@ -48,7 +61,7 @@ class RequestTracker:
         )
 
     def reset_request_tracker(self):
-        self.user_id_var.set(0)
+        self.user_id_var.set("-")
         self.resource_id_var.set("-")
         self.client_var.set("-")
         self.route_path_var.set("-")
@@ -56,7 +69,7 @@ class RequestTracker:
         self.task_id_var.set("-")
 
     def get_request_tracker_model(self) -> RequestTrackerModel:
-        user_id = 0
+        user_id = "-"
         try:
             user_id = self.user_id_var.get()
         except LookupError:
@@ -101,6 +114,6 @@ class RequestTracker:
 REQUEST_TRACKER = RequestTracker()
 
 
-@lru_cache
+@lru_cache(1)
 def get_request_tracker() -> RequestTracker:
     return REQUEST_TRACKER

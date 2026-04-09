@@ -22,6 +22,7 @@ from mtbls.application.services.interfaces.validation_override_service import (
 from mtbls.application.services.interfaces.validation_report_service import (
     ValidationReportService,
 )
+from mtbls.application.use_cases.validation.utils import evaulate_mtbls_model
 from mtbls.application.use_cases.validation.validation_reports import (
     get_validation_reports,
 )
@@ -146,6 +147,9 @@ async def get_metabolights_model(  # noqa: PLR0913
             f"MetaboLists study model is created for {resource_id}."
         )
         result.content = model
+        error_messages = evaulate_mtbls_model(model)
+        if error_messages:
+            raise Exception(" ; ".join(error_messages))
 
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -1,5 +1,8 @@
 import logging
 
+from mtbls.application.services.interfaces.auth.authentication_service import (
+    UserProfileService,
+)
 from mtbls.application.services.interfaces.http_client import HttpClient
 from mtbls.application.services.interfaces.ontology_search_service import (
     OntologySearchService,
@@ -56,6 +59,9 @@ class ValidationApp:
         )
         self.ontology_search_service: OntologySearchService = (
             self.container.services.ontology_search_service()
+        )
+        self.user_profile_service: UserProfileService = (
+            self.container.services.user_profile_service()
         )
         self.mhd_config = self.container.mhd_configuration()
         self.private_metadata_files_root_path = self.container.config.repositories.study_folders.mounted_paths.private_metadata_files_root_path()

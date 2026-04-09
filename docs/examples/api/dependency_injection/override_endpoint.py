@@ -53,7 +53,7 @@ async def patch_validation_overrides_endpoint(
     logger.info(
         "Override patch request for %s from user %s: %s",
         resource_id,
-        user.id_,
+        user.username,
         [x.model_dump_json() for x in overrides],
     )
     overrides_list = await patch_validation_overrides(
