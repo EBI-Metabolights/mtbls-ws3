@@ -107,32 +107,22 @@ class AuthorizationMiddleware(BaseHTTPMiddleware):
             logger.debug(access_request_message)
 
             response = await call_next(request)
-        except AuthorizationError as ex:
+        except Exception as ex:
             if user.is_authenticated:
                 message = f"Authorization error for user {user.user_detail.username}: {str(ex)}"
+                logger.debug(message)
+                return JSONResponse(
+                    content=APIErrorResponse(error_message=message).model_dump(),
+                    status_code=status.HTTP_403_FORBIDDEN,
+                )
             else:
-                message = f"Authorization error: {str(ex)}"
-            logger.debug(message)
-            return JSONResponse(
-                content=APIErrorResponse(error_message=message).model_dump(),
-                status_code=status.HTTP_401_UNAUTHORIZED,
-            )
-        except AuthenticationError as ex:
-            message = (
-                f"Authentication error for user {user.user_detail.username}: {str(ex)}"
-            )
-            logger.debug(message)
-            return JSONResponse(
-                content=APIErrorResponse(error_message=f"{str(ex)}").model_dump(),
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        except Exception as ex:
-            return JSONResponse(
-                content=APIErrorResponse(error_message=f"{str(ex)}").model_dump(),
-                status_code=status.HTTP_403_FORBIDDEN,
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+                message = f"Authentication error: {str(ex)}"
+                logger.debug(message)
+                return JSONResponse(
+                    content=APIErrorResponse(error_message=message).model_dump(),
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
         self.set_request_track(request.user, client_host, route_path, resource_id)
         process_time = time.time() - start_time
         response.headers["X-Process-Time"] = str(process_time)
