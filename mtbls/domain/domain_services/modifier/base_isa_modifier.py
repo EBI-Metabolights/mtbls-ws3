@@ -92,8 +92,10 @@ class BaseIsaModifier(abc.ABC, BaseModifier):
 
         if not version or not category or not study_created:
             logger.warning(
-                "Template version '%s', study category '%s' or study created '%s'"
+                "%s, %s: Template version '%s', study category '%s' or study created '%s' "
                 "values are not set properly",
+                file_type,
+                file_template_name,
                 version,
                 category,
                 study_created,
