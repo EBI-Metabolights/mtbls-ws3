@@ -50,11 +50,11 @@ ws3 = [
     "elasticsearch[async]>=8.0.0,<9",
     "authlib>=1.6.9",
     "beartype>=0.22.7",
-    "mtbls-mhd-integration>=0.0.32",
-    "mhd-model>=0.1.74",
+    "mtbls-mhd-integration>=0.0.33",
+    "mhd-model>=0.1.76",
     "metabolights-utils>=1.4.23",
     #security related
-    "cryptography>=46.0.6"
+    "cryptography>=46.0.7"
 ]
 
 [dependency-groups]
@@ -63,6 +63,8 @@ dev = [
     "ruff>=0.14.14",
     "commitizen>=4.9.1",
     "pre-commit>=4.0.1,<5",
+    #security related
+    "Pygments>=2.20.0"
 ]
 test = [
     "pytest>=8.4.2",

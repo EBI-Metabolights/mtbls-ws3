@@ -2,7 +2,7 @@ default_language_version:
   python: python3.13
 repos:
 - repo: https://github.com/abravalheri/validate-pyproject
-  rev: v0.24.1
+  rev: v0.25
   hooks:
   - id: validate-pyproject
     name: 🔍 Validate pyproject.toml
@@ -43,7 +43,7 @@ repos:
     name: 🟢  Check trailing whitespaces
     exclude: (tests/data/.+|resources/.+\.(js|css))$
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.9.13
+  rev: 0.11.6
   hooks:
   - id: uv-lock
     name: ✅ Check UV lock file
@@ -54,7 +54,7 @@ repos:
     name: 🔍 Detect missing __init__.py files
     args: [ "--create", "--track", "--python-folders", "mtbls" ]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.6
+  rev: v0.15.10
   hooks:
   - id: ruff-check
     name: 🔍 Check Format with Ruff
@@ -65,7 +65,7 @@ repos:
   - id: ruff-format
     name: 🐍 python · Format with Ruff
 - repo: https://github.com/seddonym/import-linter.git
-  rev: "v2.7"
+  rev: "v2.11"
   hooks:
   - id: import-linter
     name: 🪵 architecture and package structure check (lint-imports)
@@ -73,7 +73,7 @@ repos:
     additional_dependencies: [ dependency_injector ]
     args: [ "--no-cache" ]
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.10.0
+  rev: v4.13.10
   hooks:
   - id: commitizen
     name: "🗒️ git · Validate commit message"
