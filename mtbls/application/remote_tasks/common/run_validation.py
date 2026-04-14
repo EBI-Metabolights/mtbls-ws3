@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import json
 import logging
@@ -44,6 +43,7 @@ from mtbls.application.services.interfaces.study_metadata_service import (
 from mtbls.application.services.interfaces.study_metadata_service_factory import (
     StudyMetadataServiceFactory,
 )
+from mtbls.application.use_cases.validation.utils import evaulate_mtbls_model
 from mtbls.domain.entities.study_file import StudyDataFileOutput
 from mtbls.domain.entities.validation.validation_configuration import (
     BaseOntologyValidation,
@@ -191,7 +191,7 @@ def run_validation(  # noqa: PLR0913
     db_connection: dict = Provide["config.gateways.database.postgresql.connection"],
     **kwargs,
 ) -> AsyncTaskResult:
-    validation_run_configuration = asyncio.run(
+    validation_run_configuration = run_coroutine(
         create_validation_run_configuration(
             resource_id=resource_id,
             temp_folder=temp_folder,
@@ -309,6 +309,15 @@ async def run_validation_task(  # noqa: PLR0913
             phases,
             assignment_sheet_limit=validation_run_configuration.assignmet_sheet_limit,
         )
+        evaluation_errors = evaulate_mtbls_model(model)
+        if evaluation_errors:
+            logger.error(
+                "Validation input model evaluation failed for %s: %s",
+                resource_id,
+                " ; ".join(evaluation_errors),
+            )
+            raise Exception(" ; ".join(evaluation_errors))
+
         logger.debug("Validate using policy service.")
         policy_result = await validate_by_policy_service(
             resource_id,

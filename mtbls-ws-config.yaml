@@ -131,6 +131,8 @@ run:
       - curator
       - submitter
     api_server_config:
+      swagger_client_id: "{{ authentication.keycloak.swagger_client_id }}"
+      swagger_auth_host: "{{ authentication.keycloak.swagger_auth_host }}"
       port: "{{ run.submission.port }}"
       api_groups:
       - config_name: "public"
@@ -189,9 +191,9 @@ run:
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)s, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(user_id)s %(client)s %(route_path)s %(resource_id)s %(request_id)s %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"
@@ -237,9 +239,9 @@ run:
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s", "client": "%(client)s", "route_path": "%(route_path)s", "resource_id": "%(resource_id)s", "user_id": %(user_id)d, "request_id": "%(request_id)s", "task_id": "%(task_id)s", "thread_name": "%(threadName)s",  "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s", "client": "%(client)s", "route_path": "%(route_path)s", "resource_id": "%(resource_id)s", "user_id": %(user_id)s, "request_id": "%(request_id)s", "task_id": "%(task_id)s", "thread_name": "%(threadName)s",  "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
-          format: '%(levelname)-8s %(asctime)s %(user_id)d %(client)s %(route_path)s %(resource_id)s %(request_id)s %(task_id)s %(threadName)s, %(name)s "%(message)s"'
+          format: '%(levelname)-8s %(asctime)s %(user_id)s %(client)s %(route_path)s %(resource_id)s %(request_id)s %(task_id)s %(threadName)s, %(name)s "%(message)s"'
       handlers:
         console:
           class: "logging.StreamHandler"
@@ -278,7 +280,7 @@ run:
       disable_existing_loggers: true
       formatters:
         json_formatter:
-          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)d, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
+          format: '{ "level_name": "%(levelname)s", "time": "%(asctime)s",  "client": "%(client)s",  "path": "%(route_path)s", "resource_id": "%(resource_id)s", "user": %(user_id)s, "request_id": "%(request_id)s", "name": "%(name)s", "message": "%(message)s" }'
         text_formatter:
           format: '%(levelname)-8s %(asctime)s %(client)s %(name)s "%(message)s"'
       handlers:

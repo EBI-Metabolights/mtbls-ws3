@@ -3,18 +3,92 @@ import logging
 from pathlib import Path
 
 from dateutil.relativedelta import relativedelta
+from pydantic import BaseModel
 
 from mtbls.application.services.interfaces.repositories.study.study_read_repository import (
     StudyReadRepository,
 )
-from mtbls.application.use_cases.study_status.private_studies import (
+from mtbls.application.use_cases.study_status.utils import (
     get_private_study_ids,
 )
+from mtbls.domain.enums.curation_type import CurationType
+from mtbls.domain.enums.filter_operand import FilterOperand
+from mtbls.domain.enums.study_category import StudyCategory
+from mtbls.domain.enums.study_status import StudyStatus
+from mtbls.domain.shared.repository.entity_filter import EntityFilter
+from mtbls.domain.shared.repository.query_options import QueryFieldOptions
 
 logger = logging.getLogger(__name__)
 
 
-class PrivateStudyReleaseDateReporter:
+class StudySummary(BaseModel):
+    accession_number: str
+    mhd_accession: None | str
+    study_category: StudyCategory
+    status: StudyStatus
+    created_at: datetime.datetime
+    first_private_date: datetime.datetime | None
+    first_public_date: datetime.datetime | None
+    revision_number: int | None
+    revision_datetime: datetime.datetime | None
+    curation_type: None | CurationType
+    release_date: datetime.datetime | None
+
+
+async def get_all_studies(
+    study_read_repository: StudyReadRepository,
+) -> list[StudySummary]:
+    result = await study_read_repository.select_fields(
+        query_field_options=QueryFieldOptions(
+            filters=[
+                EntityFilter(
+                    key="status",
+                    operand=FilterOperand.IN,
+                    value=[
+                        StudyStatus.PUBLIC,
+                        StudyStatus.PRIVATE,
+                        StudyStatus.PROVISIONAL,
+                    ],
+                )
+            ],
+            selected_fields=[
+                "accession_number",
+                "mhd_accession",
+                "study_category",
+                "status",
+                "created_at",
+                "first_private_date",
+                "first_public_date",
+                "revision_number",
+                "revision_datetime",
+                "curation_type",
+                "release_date",
+            ],
+        )
+    )
+    return [
+        StudySummary(
+            accession_number=x[0],
+            mhd_accession=x[1],
+            study_category=x[2],
+            status=x[3],
+            created_at=x[4],
+            first_private_date=x[5],
+            first_public_date=x[6],
+            revision_number=x[7],
+            revision_datetime=x[8],
+            curation_type=x[9],
+            release_date=x[10],
+        )
+        for x in result.data
+    ]
+
+
+class StudyStatusReport:
+    pass
+
+
+class StudyStatusReporter:
     def __init__(self, study_read_repository: StudyReadRepository):
         self.study_read_repository = study_read_repository
 

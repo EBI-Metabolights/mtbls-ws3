@@ -57,6 +57,8 @@ class ApiServerConfiguration(APIBaseModel):
     api_groups: list[ApiGroup] = []
     cors: CorsConfiguration = CorsConfiguration()
     port: int = 7000
+    swagger_client_id: None | str = None
+    swagger_auth_host: None | str = None
 
 
 class Version(APIBaseModel):

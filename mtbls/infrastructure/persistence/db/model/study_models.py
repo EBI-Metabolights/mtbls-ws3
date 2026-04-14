@@ -135,22 +135,24 @@ class User(Base):
     }
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
+    apitoken: Mapped[str] = mapped_column(String(255), nullable=False)
+    username: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    # TODO: ONLY FOR STANDALONE USAGE
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    firstname: Mapped[str] = mapped_column(String(255), nullable=False)
+    lastname: Mapped[str] = mapped_column(String(255), nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=True)
     affiliation: Mapped[str] = mapped_column(String(255), nullable=True)
     affiliationurl: Mapped[str] = mapped_column(String(255), nullable=True)
-    apitoken: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    firstname: Mapped[str] = mapped_column(String(255), nullable=False)
+    orcid: Mapped[str] = mapped_column(String(255), nullable=True)
+    role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
+    metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
     joindate: Mapped[datetime.datetime] = mapped_column(
         server_default=func.now(), nullable=False
     )
-    lastname: Mapped[str] = mapped_column(String(255), nullable=False)
-    password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[UserRole] = mapped_column(IntEnum(UserRole), nullable=False)
     status: Mapped[UserStatus] = mapped_column(IntEnum(UserStatus), nullable=False)
-    username: Mapped[str] = mapped_column(String(255), nullable=False)
-    orcid: Mapped[str] = mapped_column(String(255), nullable=True)
-    metaspace_api_key: Mapped[str] = mapped_column(String(255), nullable=True)
 
     studies = relationship("Study", secondary="study_user", back_populates="submitters")
 

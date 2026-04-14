@@ -13,7 +13,8 @@
         "PYTHONPATH": "${workspaceFolder}",
         "PYDEVD_DISABLE_FILE_VALIDATION": "1"
       },
-      "justMyCode": false
+      "justMyCode": false,
+      "redirectOutput": true
     },
     {
       "name": "Run mtbls-ws3 Celery Worker",
@@ -27,7 +28,8 @@
         "PYTHONPATH": "${workspaceFolder}"
       },
       "jinja": true,
-      "justMyCode": false
+      "justMyCode": false,
+      "redirectOutput": true
     },
     {
       "name": "Run Celery Flower Monitor",
@@ -90,7 +92,7 @@
       "python": "${workspaceFolder}/.venv/bin/python",
       "program": "${workspaceFolder}/mtbls/run/cli/index/study_search_indices/maintain.py",
       "args": [
-        "test-public-study-search-index",
+        "public-study-search-index",
         "public"
       ],
       "console": "integratedTerminal",

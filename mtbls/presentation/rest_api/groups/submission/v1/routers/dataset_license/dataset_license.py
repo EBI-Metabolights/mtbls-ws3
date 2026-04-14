@@ -106,7 +106,7 @@ async def create_license_agreement(
         return response_message
     study.dataset_license = default_license_name
     study.dataset_license_version = default_license_version
-    study.dataset_license_agreeing_user = str(context.user.id_)
+    study.dataset_license_agreeing_user = str(context.user.username)
     default_license_url = LICENSE_URLS.get(
         (default_license_name.upper(), default_license_version.upper())
     )
@@ -114,7 +114,7 @@ async def create_license_agreement(
         name=default_license_name,
         agreed=True,
         version=default_license_version,
-        agreeing_user=str(context.user.id_),
+        agreeing_user=str(context.user.username),
         license_url=default_license_url,
     )
     await study_write_repository.update(entity=study)
