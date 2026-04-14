@@ -53,7 +53,7 @@ ws3 = [
     "elasticsearch[async]>=8.0.0,<9",
     "mtbls-mhd-integration>=0.0.33",
     "mhd-model>=0.1.76",
-    "metabolights-utils>=1.4.23",
+    "metabolights-utils>=1.4.25",
     "authlib>=1.6.9",
     "beartype>=0.22.7"
 ]
@@ -62,7 +62,7 @@ dev = [
     "ruff>=0.15.8",
     "commitizen>=4.9.1",
     "pre-commit>=4.0.1,<5",
-    "pytest>=8.4.2",
+    "pytest>=9.0.3",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
     "aiosqlite>=0.21.0",
