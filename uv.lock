@@ -1738,7 +1738,7 @@ wheels = [
 
 [[package]]
 name = "metabolights-utils"
-version = "1.4.23"
+version = "1.4.25"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1750,9 +1750,9 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "unidecode" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/8f/a3dba06ac61e6f998286029802f24dbcac6041bda930100969187c82f429/metabolights_utils-1.4.23.tar.gz", hash = "sha256:68a4f50a5131f39b429d84894caebc9d7ee04e534c60026508a2415f13446c25", size = 159365, upload-time = "2026-04-03T13:10:44.031Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/a9/f1aeb5d5f8d0ec8b8beba38620af56eac3ccd147d66f12ecd587babd23e3/metabolights_utils-1.4.25.tar.gz", hash = "sha256:1b60f473eefec9dbd1e819d18d0a49965c15255dc8f4635e2f1942010c5d1491", size = 159906, upload-time = "2026-04-14T09:46:12.745Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/a8/945c8fc1ca61e2963c454a0d199d2189cbed895a1d008c6fd28858301c1c/metabolights_utils-1.4.23-py3-none-any.whl", hash = "sha256:0f3f67b5700e81382678dd67c76f8578c8602427db776581820206453e85426e", size = 191139, upload-time = "2026-04-03T13:10:45.385Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/dd/2daa4f8e8e434912889fc75ea01c9dedd78b9ae9d745a35fe36f2054ec36/metabolights_utils-1.4.25-py3-none-any.whl", hash = "sha256:721ba431d11a0f8cd18ca12669f72fb2d2d665da3bd6409ae588bd35b1d62e38", size = 191560, upload-time = "2026-04-14T09:46:11.105Z" },
 ]
 
 [[package]]
@@ -1989,7 +1989,7 @@ dev = [
     { name = "commitizen", specifier = ">=4.9.1" },
     { name = "import-linter", specifier = ">=2.5.2" },
     { name = "pre-commit", specifier = ">=4.0.1,<5" },
-    { name = "pytest", specifier = ">=8.4.2" },
+    { name = "pytest", specifier = ">=9.0.3" },
     { name = "pytest-asyncio", specifier = ">=1.2.0" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "ruff", specifier = ">=0.15.8" },
@@ -2008,7 +2008,7 @@ ws3 = [
     { name = "greenlet", specifier = ">=3.2.4" },
     { name = "gunicorn", specifier = ">=25.3.0" },
     { name = "httpx", specifier = ">=0.27.0" },
-    { name = "metabolights-utils", specifier = ">=1.4.23" },
+    { name = "metabolights-utils", specifier = ">=1.4.25" },
     { name = "mhd-model", specifier = ">=0.1.74" },
     { name = "mtbls-mhd-integration", specifier = ">=0.0.32" },
     { name = "numpy", specifier = ">=2.1,<3" },
