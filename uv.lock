@@ -1738,7 +1738,7 @@ wheels = [
 
 [[package]]
 name = "metabolights-utils"
-version = "1.4.25"
+version = "1.4.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1750,9 +1750,9 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "unidecode" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/a9/f1aeb5d5f8d0ec8b8beba38620af56eac3ccd147d66f12ecd587babd23e3/metabolights_utils-1.4.25.tar.gz", hash = "sha256:1b60f473eefec9dbd1e819d18d0a49965c15255dc8f4635e2f1942010c5d1491", size = 159906, upload-time = "2026-04-14T09:46:12.745Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/9d/67d255c650bc13321b44553ade1a97f512d4df9f7c7048a9c9f70e8af73e/metabolights_utils-1.4.26.tar.gz", hash = "sha256:5d9f0ca108e4a9f758701182b38663401cffc26e67a85d036c46384aa6f63154", size = 159896, upload-time = "2026-04-15T11:15:37.485Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/dd/2daa4f8e8e434912889fc75ea01c9dedd78b9ae9d745a35fe36f2054ec36/metabolights_utils-1.4.25-py3-none-any.whl", hash = "sha256:721ba431d11a0f8cd18ca12669f72fb2d2d665da3bd6409ae588bd35b1d62e38", size = 191560, upload-time = "2026-04-14T09:46:11.105Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/6c/8557757f428f3b0c6ffce4a84d7dc2431fdb50a66f9180a6b1be31cb3bdd/metabolights_utils-1.4.26-py3-none-any.whl", hash = "sha256:a2a239c447937746be32f4eae889bb1cdb5e11a50b23d98353e9bdb3982c4b01", size = 191557, upload-time = "2026-04-15T11:15:36.029Z" },
 ]
 
 [[package]]
@@ -2008,7 +2008,7 @@ ws3 = [
     { name = "greenlet", specifier = ">=3.2.4" },
     { name = "gunicorn", specifier = ">=25.3.0" },
     { name = "httpx", specifier = ">=0.27.0" },
-    { name = "metabolights-utils", specifier = ">=1.4.25" },
+    { name = "metabolights-utils", specifier = ">=1.4.26" },
     { name = "mhd-model", specifier = ">=0.1.74" },
     { name = "mtbls-mhd-integration", specifier = ">=0.0.32" },
     { name = "numpy", specifier = ">=2.1,<3" },
