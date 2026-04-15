@@ -1738,7 +1738,7 @@ wheels = [
 
 [[package]]
 name = "metabolights-utils"
-version = "1.4.23"
+version = "1.4.27"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1750,9 +1750,9 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "unidecode" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/8f/a3dba06ac61e6f998286029802f24dbcac6041bda930100969187c82f429/metabolights_utils-1.4.23.tar.gz", hash = "sha256:68a4f50a5131f39b429d84894caebc9d7ee04e534c60026508a2415f13446c25", size = 159365, upload-time = "2026-04-03T13:10:44.031Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/7d/be69b6b3de05aa4ecd061088927ab25baf9826fb130db0d62719fe6b0e4c/metabolights_utils-1.4.27.tar.gz", hash = "sha256:34dc09afbf0032bacf2391893e9c359648dcb79984127299883a4af9b5753fbf", size = 159918, upload-time = "2026-04-15T11:38:59.658Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/a8/945c8fc1ca61e2963c454a0d199d2189cbed895a1d008c6fd28858301c1c/metabolights_utils-1.4.23-py3-none-any.whl", hash = "sha256:0f3f67b5700e81382678dd67c76f8578c8602427db776581820206453e85426e", size = 191139, upload-time = "2026-04-03T13:10:45.385Z" },
+    { url = "https://files.pythonhosted.org/packages/69/f1/878141b80091cff9ca5883792b029f5349ef1532c895ff18a615083d8bcd/metabolights_utils-1.4.27-py3-none-any.whl", hash = "sha256:3039488bf6cb840e7d3c7d38a14c38de5c72d07a922bcffa844b597c697b8895", size = 191591, upload-time = "2026-04-15T11:38:58.548Z" },
 ]
 
 [[package]]
@@ -1989,7 +1989,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "jsonpath-ng", specifier = ">=1.7.0,<2" },
     { name = "jsonschema", specifier = ">4.21.1" },
-    { name = "metabolights-utils", marker = "extra == 'ws3'", specifier = ">=1.4.23" },
+    { name = "metabolights-utils", marker = "extra == 'ws3'", specifier = ">=1.4.27" },
     { name = "mhd-model", marker = "extra == 'ws3'", specifier = ">=0.1.76" },
     { name = "mtbls-mhd-integration", marker = "extra == 'ws3'", specifier = ">=0.0.33" },
     { name = "numpy", marker = "extra == 'ws3'", specifier = ">=2.1,<3" },

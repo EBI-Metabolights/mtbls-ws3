@@ -52,7 +52,7 @@ ws3 = [
     "beartype>=0.22.7",
     "mtbls-mhd-integration>=0.0.33",
     "mhd-model>=0.1.76",
-    "metabolights-utils>=1.4.23",
+    "metabolights-utils>=1.4.27",
     #security related
     "cryptography>=46.0.7"
 ]
