@@ -55,7 +55,7 @@ ws3 = [
     "beartype>=0.22.7",
     "mtbls-mhd-integration>=0.0.32",
     "mhd-model>=0.1.74",
-    "metabolights-utils>=1.4.26",
+    "metabolights-utils>=1.4.27",
     "authlib>=1.6.9",
     "beartype>=0.22.7"
 ]
