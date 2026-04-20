@@ -51,8 +51,8 @@ ws3 = [
     "authlib>=1.6.9",
     "beartype>=0.22.7",
     "mtbls-mhd-integration>=0.0.34",
-    "mhd-model>=0.1.76",
-    "metabolights-utils>=1.4.27",
+    "mhd-model>=0.1.77",
+    "metabolights-utils>=1.4.28",
     #security related
     "cryptography>=46.0.7"
 ]
