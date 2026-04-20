@@ -1738,7 +1738,7 @@ wheels = [
 
 [[package]]
 name = "metabolights-utils"
-version = "1.4.27"
+version = "1.4.28"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1750,14 +1750,14 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "unidecode" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/7d/be69b6b3de05aa4ecd061088927ab25baf9826fb130db0d62719fe6b0e4c/metabolights_utils-1.4.27.tar.gz", hash = "sha256:34dc09afbf0032bacf2391893e9c359648dcb79984127299883a4af9b5753fbf", size = 159918, upload-time = "2026-04-15T11:38:59.658Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/a5/d1227f1d48978ee9014e5eb9f597b80249a1e8b8c3fcb3b7b2e8adfc4c57/metabolights_utils-1.4.28.tar.gz", hash = "sha256:032d4e32c14383cfba2b88a6a9f829c0e9b17c8ff95feb2110160fe6b52132c8", size = 159925, upload-time = "2026-04-18T11:30:25.001Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/f1/878141b80091cff9ca5883792b029f5349ef1532c895ff18a615083d8bcd/metabolights_utils-1.4.27-py3-none-any.whl", hash = "sha256:3039488bf6cb840e7d3c7d38a14c38de5c72d07a922bcffa844b597c697b8895", size = 191591, upload-time = "2026-04-15T11:38:58.548Z" },
+    { url = "https://files.pythonhosted.org/packages/02/55/38164652fad9a84c0d842df73d1432c65c98c07ea3f62571e9c2cfd9382f/metabolights_utils-1.4.28-py3-none-any.whl", hash = "sha256:a3c0fb0a381fe2c3a5cf062da514f1da6dfbb3eb59d9ffec0844306c1f9eae64", size = 191601, upload-time = "2026-04-18T11:30:23.752Z" },
 ]
 
 [[package]]
 name = "mhd-model"
-version = "0.1.76"
+version = "0.1.77"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bioregistry" },
@@ -1777,9 +1777,9 @@ dependencies = [
     { name = "reachable" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1b/1f/69b1e5c6bc616c489db6ce5319cab2a235ae132714bc897ca841fa87c158/mhd_model-0.1.76.tar.gz", hash = "sha256:8c173b32db27157b3ce26604510da1470ee2f45c77672740943830c1a1d08b34", size = 113432, upload-time = "2026-04-10T22:56:00.97Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/78/8f932dcf03716925ad2565b1eefd6d782806ab8dc86462c639ca8d0cc096/mhd_model-0.1.77.tar.gz", hash = "sha256:5e3f93dd719db9633a5a1096729b191ed24c0d025dfa3695ff7d5e3c0542d349", size = 113393, upload-time = "2026-04-20T18:00:53.058Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/15/12ffce6508961569708aa42239a1931594a04cf124683fdcae51302bafd1/mhd_model-0.1.76-py3-none-any.whl", hash = "sha256:99324eb9010476c3c9eb09f2a09f3eb1a7aa33c8700af1b9289a1d84c3bba9a5", size = 145290, upload-time = "2026-04-10T22:56:01.85Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/ab/699a43cb870357536be3f5770d58c40c69388040434c2b64d81808d1da1e/mhd_model-0.1.77-py3-none-any.whl", hash = "sha256:3e58c798c0891a62dc9b5440c2eb874b95f814f6f56557140cf0caa02cbb05b7", size = 145276, upload-time = "2026-04-20T18:00:52.026Z" },
 ]
 
 [[package]]
@@ -2008,8 +2008,8 @@ ws3 = [
     { name = "greenlet", specifier = ">=3.2.4" },
     { name = "gunicorn", specifier = ">=25.3.0" },
     { name = "httpx", specifier = ">=0.27.0" },
-    { name = "metabolights-utils", specifier = ">=1.4.27" },
-    { name = "mhd-model", specifier = ">=0.1.74" },
+    { name = "metabolights-utils", specifier = ">=1.4.28" },
+    { name = "mhd-model", specifier = ">=0.1.77" },
     { name = "mtbls-mhd-integration", specifier = ">=0.0.34" },
     { name = "numpy", specifier = ">=2.1,<3" },
     { name = "pandas", specifier = ">=2.3.3" },
