@@ -1874,7 +1874,7 @@ wheels = [
 
 [[package]]
 name = "mtbls-mhd-integration"
-version = "0.0.34"
+version = "0.0.35"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
@@ -1887,9 +1887,9 @@ dependencies = [
     { name = "requests" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/2e/96ee86a70587a198f296cd8ec4d710b64329560dbac02f237f5eff425c10/mtbls_mhd_integration-0.0.34.tar.gz", hash = "sha256:ad2aab8aa54263a928f3485469c07ad0e6f542498fa61d88558109b15d6c24ba", size = 46816, upload-time = "2026-04-15T14:39:14.553Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/1c/23bd36561c40e045dcbfe019e4657bc417b4fcf2ca50d156447179514f07/mtbls_mhd_integration-0.0.35.tar.gz", hash = "sha256:0475baec9694c1f61db3d54fe2ea09abddb50610a15d56c3d152585cec8b0d51", size = 46782, upload-time = "2026-04-23T14:14:14.487Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/0d/e77626d0298b4c6f711a03022052e58246e51f5f3610537c24dd0681e851/mtbls_mhd_integration-0.0.34-py3-none-any.whl", hash = "sha256:d3bcf7ddff63299c1aeafa31de051a638c31cda352f088371395be1569f55570", size = 51476, upload-time = "2026-04-15T14:39:13.567Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/f4/38abdbb257c677ed0e60f930b883b768b295ea8ea75e92c5c3691a73396e/mtbls_mhd_integration-0.0.35-py3-none-any.whl", hash = "sha256:6d9210e546ebe2fee34672817a959cece5699863d9646be642415420033df951", size = 51470, upload-time = "2026-04-23T14:14:15.633Z" },
 ]
 
 [[package]]
@@ -1991,7 +1991,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.21.1" },
     { name = "metabolights-utils", marker = "extra == 'ws3'", specifier = ">=1.4.28" },
     { name = "mhd-model", marker = "extra == 'ws3'", specifier = ">=0.1.77" },
-    { name = "mtbls-mhd-integration", marker = "extra == 'ws3'", specifier = ">=0.0.34" },
+    { name = "mtbls-mhd-integration", marker = "extra == 'ws3'", specifier = ">=0.0.35" },
     { name = "numpy", marker = "extra == 'ws3'", specifier = ">=2.1,<3" },
     { name = "pandas", marker = "extra == 'ws3'", specifier = ">=2.3.3" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.2" },
